@@ -49,7 +49,13 @@ fun ChatScreenPreview(vm: MainViewModel) {
 
 @Composable
 private fun PreviewHomeScreenDark(vm: MainViewModel) {
-	fun colorOf(color: String) = if (vm.mappedValues.getValue(color).first != color) vm.mappedValues.getValue(color).second else Color.Red
+	fun colorOf(color: String): Color {
+		return if (vm.mappedValues.containsKey(color)) {
+			vm.mappedValues.getValue(color).second
+		} else {
+			Color.Red
+		}
+	}
 
 	DarkTheme() {
 		OutlinedCard(
@@ -66,7 +72,13 @@ private fun PreviewHomeScreenDark(vm: MainViewModel) {
 
 @Composable
 private fun PreviewChatDark(vm: MainViewModel) {
-	fun colorOf(color: String) = if (vm.mappedValues.getValue(color).first != color) vm.mappedValues.getValue(color).second else Color.Red
+	fun colorOf(colorValueOf: String): Color {
+		return try {
+			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+		} catch (e: NoSuchElementException) {
+			Color.Red
+		}
+	}
 
 	Row(
 		Modifier.fillMaxWidth(),

@@ -40,8 +40,11 @@ fun SavedThemeItem(
 	vm: MainViewModel,
 	theme: Pair<Int, String>,
 ) {
-	fun colorOf(color: String) = Color(vm.getColorValueFrom(theme, color))
-
+	fun colorOf(colorValueOf: String): Color {
+		return vm.themeList.getOrNull(theme.first)?.get(theme.second)?.get(colorValueOf)?.let {
+			Color(it.second)
+		} ?: Color.Red
+	}
 	// EVERYTHING HERE IS TODO
 
 	OutlinedCard(modifier, shape = RoundedCornerShape(16.dp)) {
