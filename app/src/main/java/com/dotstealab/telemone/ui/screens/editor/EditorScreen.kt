@@ -98,6 +98,9 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 				Button(onClick = { launcher.launch(arrayOf("*/*")) }) {
 					Text(text = "Load File")
 				}
+				Button(onClick = { navController.navigate("ThemePreviewScreen") }) {
+					Text(text = "Preview")
+				}
 			}
 		}
 

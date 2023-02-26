@@ -8,6 +8,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import com.dotstealab.telemone.MainViewModel
 import com.dotstealab.telemone.ui.screens.editor.EditorScreen
+import com.dotstealab.telemone.ui.screens.editor.components.preview.ChatScreenPreview
+import com.dotstealab.telemone.ui.screens.editor.components.preview.PreviewScreens
+import com.dotstealab.telemone.ui.screens.editor.components.preview.ThemePreviewScreen
+import com.dotstealab.telemone.ui.screens.main.ChatScreenPreview
 import com.dotstealab.telemone.ui.screens.main.MainScreen
 import com.dotstealab.telemone.ui.screens.themeContents.ThemeContentsScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -55,6 +59,42 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 			}
 		) {
 			EditorScreen(navController, vm)
+		}
+
+		composable(
+			"ThemePreviewScreen",
+			enterTransition = {
+				when (initialState.destination.route) {
+					"EditorScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
+					else -> null
+				}
+			},
+			exitTransition = {
+				when (targetState.destination.route) {
+					"EditorScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
+					else -> null
+				}
+			}
+		) {
+			ThemePreviewScreen(navController, vm)
+		}
+
+		composable(
+			"ChatScreenPreview",
+			enterTransition = {
+				when (initialState.destination.route) {
+					"EditorScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
+					else -> null
+				}
+			},
+			exitTransition = {
+				when (targetState.destination.route) {
+					"EditorScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
+					else -> null
+				}
+			}
+		) {
+			ChatScreenPreview()
 		}
 
 		composable(
