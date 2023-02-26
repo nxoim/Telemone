@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.Color
@@ -14,14 +12,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import com.dotstealab.telemone.ui.theme.FullPaletteList
-import com.dotstealab.telemone.ui.theme.fullPalette
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.util.UUID
 
 
-// This takes quite long to load. An advice and explanations
+// This takes does not take long to load but An advice with explanations
 // will be greaty appreciated. *with examples* though cuz i think from top
 // to bottom cuz i mainly look for patterns cuz attention span
 // comparable to that one of a chimpanzee if not less
@@ -41,6 +38,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	// color in the list has to be int because Color() returns ulong anyway
 	// anyway and so loading a theme after restarting the app causes a
 	// crash
+	// don't ask me why i don't keep ulong and use ints instead
 	var themeList = mutableStateListOf<Map<String, Map<String, Pair<String, Int>>>>()
 	var mappedValues = mutableStateMapOf<String, Pair<String, Color>>()
 	var defaultCurrentTheme = mutableStateMapOf<String, Pair<String, Color>>()
@@ -77,7 +75,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
-	fun removeMap(uuid: String) {
+	fun deleteTheme(uuid: String) {
 		val mapToRemove = themeList.find { it.containsKey(uuid) }
 		themeList.remove(mapToRemove)
 
@@ -101,10 +99,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-
 	// idk if im dum but i dont think this is able to properly load telegrams
 	// stock themes, like "Day".
-	fun loadThemeFromFile(context: Context, uri: Uri, palette: FullPaletteList, isDarkTheme: Boolean) {
+	fun loadThemeFromFile(
+		context: Context,
+		uri: Uri,
+		palette: FullPaletteList
+	) {
 		try {
 			val loadedMap = mutableStateMapOf<String, Pair<String, Color>>()
 
@@ -204,27 +205,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 					}
 				}
 
-				if (isDarkTheme) loadDarkTheme(palette) else loadLightTheme(palette)
-
-				// how do i make it not crash upon calling colors in prevews
-				// and also clear the map
-//				mappedValues.clear()
-				mappedValues.putAll(loadedMap)
-				loadedFromFileTheme.putAll(loadedMap)
-
+				// TODO Implement prompt "Clear the current theme before
+				//  importing this one?"
 				loadedFromFileTheme.clear()
+				mappedValues.putAll(loadedMap)
 				loadedFromFileTheme.putAll(loadedMap)
 			}
 		} catch (e: IndexOutOfBoundsException) {
 			Toast.makeText(
 				context,
 				"Chosen file isn't a Telegram (not Telegram X) theme.",
-				5
+				Toast.LENGTH_LONG
 			).show()
 		}
 	}
 
 	fun resetCurrentTheme() {
+		mappedValues.clear()
 		mappedValues.putAll(defaultCurrentTheme)
 	}
 
@@ -232,11 +229,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		mappedValues[key] = Pair(colorToken, colorValue)
 	}
 
-	fun getColorValueFrom(theme: Pair<Int, String>, colorValueOf: String): Int {
-		val index = theme.first
-		val uuid = theme.second
+	fun startupConfigProcess(palette: FullPaletteList, isDarkMode: Boolean) {
+		val theme = if (isDarkMode) defaultDarkTheme(palette) else defaultLightTheme(palette)
 
-		return themeList[index][uuid]!!.getValue(colorValueOf).second
+		theme.map {
+			val colorToken = assignColorToken(palette, Color(it.value))
+			mappedValues[it.key] = Pair(colorToken, Color(it.value))
+			defaultCurrentTheme.put(it.key, Pair(colorToken, Color(it.value)))
+		}
 	}
 
 	fun loadDarkTheme(palette: FullPaletteList) {
@@ -245,7 +245,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		defaultDarkTheme(palette).map {
 			val colorToken = assignColorToken(palette, Color(it.value))
 
-			mappedValues.put(it.key, Pair(colorToken, Color(it.value)))
+			mappedValues[it.key] = Pair(colorToken, Color(it.value))
 			defaultCurrentTheme[it.key] = Pair(colorToken, Color(it.value))
 		}
 	}
@@ -258,19 +258,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 			mappedValues[it.key] = Pair(colorToken, Color(it.value))
 			defaultCurrentTheme[it.key] = Pair(colorToken, Color(it.value))
-		}
-	}
-
-	@Composable
-	fun startupConfigProcess() {
-		val isDarkMode = isSystemInDarkTheme()
-		val palette = fullPalette()
-		val theme = if (isDarkMode) defaultDarkTheme(palette) else defaultLightTheme(palette)
-
-		theme.map {
-			val colorToken = assignColorToken(palette, Color(it.value))
-			mappedValues[it.key] = Pair(colorToken, Color(it.value))
-			defaultCurrentTheme.put(it.key, Pair(colorToken, Color(it.value)))
 		}
 	}
 

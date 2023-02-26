@@ -7,7 +7,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,8 +21,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -35,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import com.dotstealab.telemone.MainViewModel
@@ -48,18 +53,21 @@ import com.dotstealab.telemone.ui.theme.fullPalette
 fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 	val context = LocalContext.current
 	val palette = fullPalette()
-	val isDarkTheme = isSystemInDarkTheme()
 
 	val themeList by remember { derivedStateOf { vm.themeList }  }
 	val mappedValues by remember { derivedStateOf { vm.mappedValues }  }
+	val mappedValuesAsList = mappedValues.toList().sortedBy { it.first }
 	val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
-	val launcher =
-		rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { result ->
-			pickedFileUriState.value = result
-			result?.let { uri ->
-				vm.loadThemeFromFile(context, uri, palette, isDarkTheme)
-			}
+
+	val launcher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.OpenDocument()
+	) { result ->
+		pickedFileUriState.value = result
+
+		result?.let { uri ->
+			vm.loadThemeFromFile(context, uri, palette)
 		}
+	}
 
 	Column(Modifier.statusBarsPadding()) {
 		Column() {
@@ -74,6 +82,7 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 					Text(text = "Reset current theme")
 				}
 			}
+
 			Row() {
 				Button(onClick = { vm.loadLightTheme(palette) }) {
 					Text(text = "Load Light Theme")
@@ -108,6 +117,9 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 					horizontalArrangement = Arrangement.spacedBy(16.dp)
 				) {
 					itemsIndexed(themeList.flatMap { it.keys }, key = { _, item -> item }) { index, uuid ->
+						var showMenu by remember { mutableStateOf(false) }
+						var showDialog by remember { mutableStateOf(false) }
+
 						SavedThemeItem(
 							Modifier
 								.width(150.dp)
@@ -116,20 +128,109 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 								.animateItemPlacement()
 								.combinedClickable(
 									onClick = { vm.setCurrentMapTo(uuid) },
-									onLongClick = { vm.removeMap(uuid) }
+									onLongClick = { showMenu = true }
 								),
 							vm,
 							Pair(index, uuid)
 						)
+
+						DropdownMenu(
+							expanded = showMenu,
+							onDismissRequest = { showMenu = false }
+						) {
+							DropdownMenuItem(
+								text = { Text("Override defaults (not implemented)")},
+								onClick = { /*TODO*/ }
+							)
+							DropdownMenuItem(
+								text = { Text("Delete theme") },
+								onClick = {
+									showDialog = true
+									showMenu = false
+								}
+							)
+						}
+
+						if (showDialog) Dialog(onDismissRequest = { showDialog = false }) {
+							AlertDialog(
+								onDismissRequest = { showDialog = false },
+								title = { Text("Delete this theme?") },
+								icon = {
+									SavedThemeItem(
+										Modifier
+											.width(150.dp)
+											.height(180.dp)
+											.clip(RoundedCornerShape(16.dp)),
+										vm,
+										Pair(index, uuid)
+									)
+								},
+								text = { Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",) },
+								confirmButton = {
+									FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
+										Text("Delete")
+									}
+								},
+								dismissButton = {
+									TextButton(onClick = { showDialog = false },) {
+										Text("Cancel")
+									}
+								}
+							)
+						}
 					}
 				}
 			}
 
-			items(mappedValues.toList().sortedBy { it.first }, key = { it.first }) { map ->
-				var showPopUp by remember { mutableStateOf(false) }
-				val backgroundColor = mappedValues.getValue(map.first).second
+			mappedValuesAsList.forEach { map ->
+				when(map.second.first) {
+					"INCOMPATIBLE VALUE" -> item {
+						var showPopUp by remember { mutableStateOf(false) }
+						val backgroundColor = when (mappedValues.containsKey(map.first)) {
+							true -> mappedValues[map.first]!!.second
+							else -> Color.Red
+						}
 
-				if (map.second.first == "INCOMPATIBLE VALUE") Row(
+						if (map.second.first == "INCOMPATIBLE VALUE") Row(
+							Modifier
+								.height(64.dp)
+								.fillMaxWidth()
+								.background(backgroundColor)
+								.clickable { showPopUp = !showPopUp }
+								.animateItemPlacement()
+						) {
+							Column() {
+								// name
+								Text(
+									text = map.first,
+									color = Color.White,
+									modifier = Modifier.background(Color(0x4D000000))
+								)
+								// material you palette color token
+								Text(
+									text = map.second.first,
+									color = Color.White,
+									modifier = Modifier.background(Color(0x4D000000))
+								)
+							}
+
+							if (showPopUp) {
+								Popup(onDismissRequest = { showPopUp = false }) {
+									PalettePopup(map.first, vm, palette)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			items(mappedValuesAsList, key = { it.first }) { map ->
+				var showPopUp by remember { mutableStateOf(false) }
+				val backgroundColor = when (mappedValues.containsKey(map.first)) {
+					true -> mappedValues[map.first]!!.second
+					else -> Color.Red
+				}
+				Row(
 					Modifier
 						.height(64.dp)
 						.fillMaxWidth()
@@ -141,40 +242,14 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 						// name
 						Text(
 							text = map.first,
-							modifier = Modifier.background(Color(0xB3FFFFFF))
-						)
+							color = Color.White,
+							modifier = Modifier.background(Color(0x4D000000)))
 						// material you palette color token
 						Text(
 							text = map.second.first,
-							modifier = Modifier.background(Color(0xB3FFFFFF))
+							color = Color.White,
+							modifier = Modifier.background(Color(0x4D000000))
 						)
-					}
-
-					if (showPopUp) {
-						Popup(onDismissRequest = { showPopUp = false })  {
-							PalettePopup(map.first, vm, palette)
-						}
-					}
-				}
-			}
-
-			items(mappedValues.toList().sortedBy { it.first }) { map ->
-				var showPopUp by remember { mutableStateOf(false) }
-				val backgroundColor = mappedValues.getValue(map.first).second
-
-				if (map.second.first != "INCOMPATIBLE VALUE") Row(
-					Modifier
-						.height(64.dp)
-						.fillMaxWidth()
-						.background(backgroundColor)
-						.clickable { showPopUp = !showPopUp }
-						.animateItemPlacement()
-				) {
-					Column() {
-						// name
-						Text(text = map.first, modifier = Modifier.background(Color(0x4D000000)))
-						// material you palette color token
-						Text(text = map.second.first, modifier = Modifier.background(Color(0x4D000000)))
 					}
 
 					if (showPopUp) {
