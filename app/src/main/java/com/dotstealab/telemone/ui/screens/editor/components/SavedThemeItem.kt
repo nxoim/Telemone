@@ -1,4 +1,4 @@
-package com.dotstealab.telemone.ui.screens.main.components
+package com.dotstealab.telemone.ui.screens.editor.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
