@@ -3,6 +3,9 @@ package com.dotstealab.telemone.ui.screens.editor
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,9 +46,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import com.dotstealab.telemone.MainViewModel
-import com.dotstealab.telemone.ui.screens.main.ChatScreenPreview
-import com.dotstealab.telemone.ui.screens.main.components.PalettePopup
-import com.dotstealab.telemone.ui.screens.main.components.SavedThemeItem
+import com.dotstealab.telemone.ui.screens.editor.components.ChatScreenPreview
+import com.dotstealab.telemone.ui.screens.editor.components.PalettePopup
+import com.dotstealab.telemone.ui.screens.editor.components.SavedThemeItem
 import com.dotstealab.telemone.ui.theme.fullPalette
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -118,7 +121,8 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 				) {
 					itemsIndexed(themeList.flatMap { it.keys }, key = { _, item -> item }) { index, uuid ->
 						var showMenu by remember { mutableStateOf(false) }
-						var showDialog by remember { mutableStateOf(false) }
+						var showDeleteDialog by remember { mutableStateOf(false) }
+						var showApplyDialog by remember { mutableStateOf(false) }
 
 						SavedThemeItem(
 							Modifier
@@ -127,7 +131,7 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 								.clip(RoundedCornerShape(16.dp))
 								.animateItemPlacement()
 								.combinedClickable(
-									onClick = { vm.setCurrentMapTo(uuid) },
+									onClick = { showApplyDialog = true },
 									onLongClick = { showMenu = true }
 								),
 							vm,
@@ -145,39 +149,118 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 							DropdownMenuItem(
 								text = { Text("Delete theme") },
 								onClick = {
-									showDialog = true
+									showDeleteDialog = true
 									showMenu = false
 								}
 							)
 						}
 
-						if (showDialog) Dialog(onDismissRequest = { showDialog = false }) {
+
+						AnimatedVisibility(
+							visible = showApplyDialog,
+							enter = expandVertically(),
+							exit = shrinkVertically()
+						) {
 							AlertDialog(
-								onDismissRequest = { showDialog = false },
-								title = { Text("Delete this theme?") },
-								icon = {
-									SavedThemeItem(
-										Modifier
-											.width(150.dp)
-											.height(180.dp)
-											.clip(RoundedCornerShape(16.dp)),
-										vm,
-										Pair(index, uuid)
-									)
-								},
-								text = { Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",) },
+								onDismissRequest = { showApplyDialog = false },
 								confirmButton = {
-									FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
-										Text("Delete")
+									TextButton(
+										onClick = {
+											showApplyDialog = false
+
+											vm.setCurrentMapTo(
+												uuid,
+												loadTokens = false,
+												palette,
+												clearCurrentTheme = true
+											)
+										}
+									) {
+										Text("Load color values and clear current theme")
+									}
+
+									TextButton(
+										onClick = {
+											showApplyDialog = false
+
+											vm.setCurrentMapTo(
+												uuid,
+												loadTokens = false,
+												palette,
+												clearCurrentTheme = false
+											)
+										}
+									) {
+										Text("Load color values and  don't clear current theme")
 									}
 								},
 								dismissButton = {
-									TextButton(onClick = { showDialog = false },) {
-										Text("Cancel")
+									TextButton(
+										onClick = {
+											showApplyDialog = false
+
+											vm.setCurrentMapTo(
+												uuid,
+												loadTokens = true,
+												palette,
+												clearCurrentTheme = true
+											)
+										}
+									) {
+										Text("Load colors from material color scheme tokens and clear current theme")
+									}
+									TextButton(
+										onClick = {
+											showApplyDialog = false
+
+											vm.setCurrentMapTo(
+												uuid,
+												loadTokens = true,
+												palette,
+												clearCurrentTheme = false
+											)
+										}
+									) {
+										Text("Load colors from material color scheme tokens and don't clear current theme")
 									}
 								}
 							)
 						}
+
+						AnimatedVisibility(
+							visible = showDeleteDialog,
+							enter = expandVertically(),
+							exit = shrinkVertically()
+						) {
+							Dialog(onDismissRequest = { showDeleteDialog = false }) {
+								AlertDialog(
+									onDismissRequest = { showDeleteDialog = false },
+									title = { Text("Delete this theme?") },
+									icon = {
+										SavedThemeItem(
+											Modifier
+												.width(150.dp)
+												.height(180.dp)
+												.clip(RoundedCornerShape(16.dp)),
+											vm,
+											Pair(index, uuid)
+										)
+									},
+									text = { Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",) },
+									confirmButton = {
+										FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
+											Text("Delete")
+										}
+									},
+									dismissButton = {
+										TextButton(onClick = { showDeleteDialog = false },) {
+											Text("Cancel")
+										}
+									}
+								)
+							}
+						}
+
 					}
 				}
 			}

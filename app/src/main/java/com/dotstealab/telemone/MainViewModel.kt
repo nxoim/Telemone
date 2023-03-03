@@ -83,17 +83,104 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		preferences.edit().clear().putString(themeListKey, contents).apply()
 	}
 
-	fun setCurrentMapTo(uuid: String) {
+	fun setCurrentMapTo(
+		uuid: String,
+		loadTokens: Boolean,
+		palette: FullPaletteList,
+		clearCurrentTheme: Boolean
+	) {
 		val loadedMap = themeList.firstOrNull { it.containsKey(uuid) }?.get(uuid)
 
 		if (loadedMap != null) {
-			mappedValues.clear()
-			loadedMap.let {
-				it.forEach { colorPair ->
-					mappedValues.putIfAbsent(
-						colorPair.key,
-						Pair(colorPair.value.first, Color(colorPair.value.second))
-					)
+			if (loadTokens) {
+				if (clearCurrentTheme) { mappedValues.clear() }
+				loadedMap.let {
+					it.forEach { colorPair ->
+						val colorToken = colorPair.value.first
+						val colorValue = when (colorPair.value.first) {
+							"a1_0" -> palette.a1_0
+							"a1_10" -> palette.a1_10
+							"a1_50" -> palette.a1_50
+							"a1_100" -> palette.a1_100
+							"a1_200" -> palette.a1_200
+							"a1_300" -> palette.a1_300
+							"a1_400" -> palette.a1_400
+							"a1_500" -> palette.a1_500
+							"a1_600" -> palette.a1_600
+							"a1_700" -> palette.a1_700
+							"a1_800" -> palette.a1_800
+							"a1_900" -> palette.a1_900
+							"a1_1000" -> palette.a1_1000
+							"a2_0" -> palette.a2_0
+							"a2_10" -> palette.a2_10
+							"a2_50" -> palette.a2_50
+							"a2_100" -> palette.a2_100
+							"a2_200" -> palette.a2_200
+							"a2_300" -> palette.a2_300
+							"a2_400" -> palette.a2_400
+							"a2_500" -> palette.a2_500
+							"a2_600" -> palette.a2_600
+							"a2_700" -> palette.a2_700
+							"a2_800" -> palette.a2_800
+							"a2_900" -> palette.a2_900
+							"a2_1000" -> palette.a2_1000
+							"a3_0" -> palette.a3_0
+							"a3_10" -> palette.a3_10
+							"a3_50" -> palette.a3_50
+							"a3_100" -> palette.a3_100
+							"a3_200" -> palette.a3_200
+							"a3_300" -> palette.a3_300
+							"a3_400" -> palette.a3_400
+							"a3_500" -> palette.a3_500
+							"a3_600" -> palette.a3_600
+							"a3_700" -> palette.a3_700
+							"a3_800" -> palette.a3_800
+							"a3_900" -> palette.a3_900
+							"a3_1000" -> palette.a3_1000
+							"n1_0" -> palette.n1_0
+							"n1_10" -> palette.n1_10
+							"n1_50" -> palette.n1_50
+							"n1_100" -> palette.n1_100
+							"n1_200" -> palette.n1_200
+							"n1_300" -> palette.n1_300
+							"n1_400" -> palette.n1_400
+							"n1_500" -> palette.n1_500
+							"n1_600" -> palette.n1_600
+							"n1_700" -> palette.n1_700
+							"n1_800" -> palette.n1_800
+							"n1_900" -> palette.n1_900
+							"n1_1000" -> palette.n1_1000
+							"n2_0" -> palette.n2_0
+							"n2_10" -> palette.n2_10
+							"n2_50" -> palette.n2_50
+							"n2_100" -> palette.n2_100
+							"n2_200" -> palette.n2_200
+							"n2_300" -> palette.n2_300
+							"n2_400" -> palette.n2_400
+							"n2_500" -> palette.n2_500
+							"n2_600" -> palette.n2_600
+							"n2_700" -> palette.n2_700
+							"n2_800" -> palette.n2_800
+							"n2_900" -> palette.n2_900
+							"n2_1000" -> palette.n2_1000
+							else -> Color.Red
+						}
+
+						mappedValues.putIfAbsent(
+							colorPair.key,
+							Pair(colorToken, colorValue)
+						)
+					}
+				}
+			} else {
+				if (clearCurrentTheme) { mappedValues.clear() }
+				loadedMap.let {
+					it.forEach { colorPair ->
+						mappedValues.putIfAbsent(
+							colorPair.key,
+							Pair(colorPair.value.first, Color(colorPair.value.second))
+						)
+					}
 				}
 			}
 		}
