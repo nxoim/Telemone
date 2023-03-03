@@ -62,7 +62,17 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 	val mappedValuesAsList = mappedValues.toList().sortedBy { it.first }
 	val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
 
-	val launcher = rememberLauncherForActivityResult(
+	var showClearBeforeLoadDialog by remember { mutableStateOf(false) }
+	val launcherThatClears = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.OpenDocument()
+	) { result ->
+		pickedFileUriState.value = result
+
+		result?.let { uri ->
+			vm.loadThemeFromFile(context, uri, palette, clearCurrentTheme = true)
+		}
+	}
+	val launcherThatDoesnt = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.OpenDocument()
 	) { result ->
 		pickedFileUriState.value = result
@@ -71,6 +81,48 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 			vm.loadThemeFromFile(context, uri, palette)
 		}
 	}
+
+	AnimatedVisibility(
+		visible = showClearBeforeLoadDialog,
+		enter = expandVertically(),
+		exit = shrinkVertically()
+	) {
+		AlertDialog(
+			onDismissRequest = { showClearBeforeLoadDialog = false },
+			title = { Text("Clear current theme before loading?") },
+			text = {
+				   Text("""Loading a theme will save your current theme to "Saved Themes".""")
+			},
+			confirmButton = {
+				TextButton(
+					onClick = {
+						showClearBeforeLoadDialog = false
+						vm.saveCurrentTheme()
+						launcherThatClears.launch(arrayOf("*/*"))
+					}
+				) {
+					Text("Clear")
+				}
+
+				TextButton(
+					onClick = {
+						showClearBeforeLoadDialog = false
+						vm.saveCurrentTheme()
+						launcherThatDoesnt.launch(arrayOf("*/*"))
+					}
+				) {
+					Text("Leave as is")
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { showClearBeforeLoadDialog = false }) {
+					Text("Cancel")
+				}
+			}
+		)
+	}
+
+
 
 	Column(Modifier.statusBarsPadding()) {
 		Column() {
@@ -98,7 +150,7 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 				}
 			}
 			Row(Modifier.padding(24.dp)) {
-				Button(onClick = { launcher.launch(arrayOf("*/*")) }) {
+				Button(onClick = { showClearBeforeLoadDialog = true }) {
 					Text(text = "Load File")
 				}
 			}

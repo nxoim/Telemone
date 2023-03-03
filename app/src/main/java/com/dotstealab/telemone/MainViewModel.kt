@@ -191,7 +191,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun loadThemeFromFile(
 		context: Context,
 		uri: Uri,
-		palette: FullPaletteList
+		palette: FullPaletteList,
+		clearCurrentTheme: Boolean = false
 	) {
 		try {
 			val loadedMap = mutableStateMapOf<String, Pair<String, Color>>()
