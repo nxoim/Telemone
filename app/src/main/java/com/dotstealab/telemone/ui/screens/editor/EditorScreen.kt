@@ -24,13 +24,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -42,11 +39,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import com.dotstealab.telemone.MainViewModel
 import com.dotstealab.telemone.ui.screens.editor.components.ChatScreenPreview
+import com.dotstealab.telemone.ui.screens.editor.components.ClearBeforeLoadDialog
+import com.dotstealab.telemone.ui.screens.editor.components.DeleteThemeDialog
+import com.dotstealab.telemone.ui.screens.editor.components.LoadFromSavedDialog
 import com.dotstealab.telemone.ui.screens.editor.components.PalettePopup
 import com.dotstealab.telemone.ui.screens.editor.components.SavedThemeItem
 import com.dotstealab.telemone.ui.theme.fullPalette
@@ -87,42 +86,20 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 		enter = expandVertically(),
 		exit = shrinkVertically()
 	) {
-		AlertDialog(
-			onDismissRequest = { showClearBeforeLoadDialog = false },
-			title = { Text("Clear current theme before loading?") },
-			text = {
-				   Text("""Loading a theme will save your current theme to "Saved Themes".""")
+		ClearBeforeLoadDialog(
+			{ showClearBeforeLoadDialog = false },
+			{
+				showClearBeforeLoadDialog = false
+				vm.saveCurrentTheme()
+				launcherThatClears.launch(arrayOf("*/*"))
 			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showClearBeforeLoadDialog = false
-						vm.saveCurrentTheme()
-						launcherThatClears.launch(arrayOf("*/*"))
-					}
-				) {
-					Text("Clear")
-				}
-
-				TextButton(
-					onClick = {
-						showClearBeforeLoadDialog = false
-						vm.saveCurrentTheme()
-						launcherThatDoesnt.launch(arrayOf("*/*"))
-					}
-				) {
-					Text("Leave as is")
-				}
-			},
-			dismissButton = {
-				TextButton(onClick = { showClearBeforeLoadDialog = false }) {
-					Text("Cancel")
-				}
+			{
+				showClearBeforeLoadDialog = false
+				vm.saveCurrentTheme()
+				launcherThatDoesnt.launch(arrayOf("*/*"))
 			}
 		)
 	}
-
-
 
 	Column(Modifier.statusBarsPadding()) {
 		Column() {
@@ -213,72 +190,11 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 							enter = expandVertically(),
 							exit = shrinkVertically()
 						) {
-							AlertDialog(
-								onDismissRequest = { showApplyDialog = false },
-								confirmButton = {
-									TextButton(
-										onClick = {
-											showApplyDialog = false
-
-											vm.setCurrentMapTo(
-												uuid,
-												loadTokens = false,
-												palette,
-												clearCurrentTheme = true
-											)
-										}
-									) {
-										Text("Load color values and clear current theme")
-									}
-
-									TextButton(
-										onClick = {
-											showApplyDialog = false
-
-											vm.setCurrentMapTo(
-												uuid,
-												loadTokens = false,
-												palette,
-												clearCurrentTheme = false
-											)
-										}
-									) {
-										Text("Load color values and  don't clear current theme")
-									}
-									TextButton(onClick = { showApplyDialog = false }) {
-										Text("Cancel")
-									}
-								},
-								dismissButton = {
-									TextButton(
-										onClick = {
-											showApplyDialog = false
-
-											vm.setCurrentMapTo(
-												uuid,
-												loadTokens = true,
-												palette,
-												clearCurrentTheme = true
-											)
-										}
-									) {
-										Text("Load colors from material color scheme tokens and clear current theme")
-									}
-									TextButton(
-										onClick = {
-											showApplyDialog = false
-
-											vm.setCurrentMapTo(
-												uuid,
-												loadTokens = true,
-												palette,
-												clearCurrentTheme = false
-											)
-										}
-									) {
-										Text("Load colors from material color scheme tokens and don't clear current theme")
-									}
-								}
+							LoadFromSavedDialog(
+								{ showApplyDialog = false },
+								vm,
+								palette,
+								uuid
 							)
 						}
 
@@ -287,35 +203,13 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 							enter = expandVertically(),
 							exit = shrinkVertically()
 						) {
-							Dialog(onDismissRequest = { showDeleteDialog = false }) {
-								AlertDialog(
-									onDismissRequest = { showDeleteDialog = false },
-									title = { Text("Delete this theme?") },
-									icon = {
-										SavedThemeItem(
-											Modifier
-												.width(150.dp)
-												.height(180.dp)
-												.clip(RoundedCornerShape(16.dp)),
-											vm,
-											Pair(index, uuid)
-										)
-									},
-									text = { Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",) },
-									confirmButton = {
-										FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
-											Text("Delete")
-										}
-									},
-									dismissButton = {
-										TextButton(onClick = { showDeleteDialog = false },) {
-											Text("Cancel")
-										}
-									}
-								)
-							}
+							DeleteThemeDialog(
+								close = { showDeleteDialog = false },
+								vm,
+								index,
+								uuid
+							)
 						}
-
 					}
 				}
 			}
