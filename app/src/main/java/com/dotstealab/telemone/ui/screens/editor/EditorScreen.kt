@@ -245,6 +245,9 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 									) {
 										Text("Load color values and  don't clear current theme")
 									}
+									TextButton(onClick = { showApplyDialog = false }) {
+										Text("Cancel")
+									}
 								},
 								dismissButton = {
 									TextButton(
