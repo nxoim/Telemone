@@ -41,9 +41,10 @@ fun SavedThemeItem(
 	theme: Pair<Int, String>,
 ) {
 	fun colorOf(colorValueOf: String): Color {
-		return vm.themeList.getOrNull(theme.first)?.get(theme.second)?.get(colorValueOf)?.let {
-			Color(it.second)
-		} ?: Color.Red
+		return vm.themeList.find { it.containsKey(theme.second) }
+			?.get(theme.second)
+			?.get(colorValueOf)
+			?.let { Color(it.second) } ?: Color.Red
 	}
 	// EVERYTHING HERE IS TODO
 
