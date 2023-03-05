@@ -185,17 +185,22 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel) {
 									onLongClick = { showMenu = true }
 								),
 							vm,
-							Pair(index, uuid),
-							showMenu,
-							{ showMenu = false},
-							{
+							theme = Pair(index, uuid),
+							closeMenu = { showMenu = false},
+							overwriteTheme = {
 								showMenu = false
 								showOverwriteChoiceDialog = true
-							}
-						) {
-							showDeleteDialog = true
-							showMenu = false
-						}
+							},
+							deleteTheme = {
+								showMenu = false
+								showDeleteDialog = true
+							},
+							exportTheme = {
+								showMenu = false
+								vm.exportTheme(uuid, context)
+							},
+							showMenu = showMenu
+						)
 
 						AnimatedVisibility(
 							visible = showApplyDialog,

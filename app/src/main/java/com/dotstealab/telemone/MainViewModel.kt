@@ -255,6 +255,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun startupConfigProcess(palette: FullPaletteList, isDarkMode: Boolean, context: Context) {
 		val darkTheme = defaultDarkTheme(palette, context)
 		val lightTheme = defaultLightTheme(palette, context)
+		val defaultThemeKey = if (isDarkMode)
+			"defaultDarkThemeUUID"
+		else
+			"defaultLightThemeUUID"
 
 		// check if default themes are put in the list
 		if (!themeList.any { it.containsKey("defaultDarkThemeUUID") }) {
@@ -266,41 +270,48 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 
 		// this will also fill in the missing values
-		if (isDarkMode) {
-			themeList.find { it.containsKey("defaultDarkThemeUUID") }
-				?.getValue("defaultDarkThemeUUID")?.map {
-					val uiItemName = it.key
-					val colorToken = it.value.first
-					val colorValueAsItWasSaved = Color(it.value.second)
-					val colorValueFromToken = getColorValueFromColorToken(colorToken, palette)
+		themeList.find { it.containsKey(defaultThemeKey) }
+			?.getValue(defaultThemeKey)?.map {
+				val uiItemName = it.key
+				val colorToken = it.value.first
+				val colorValueAsItWasSaved = Color(it.value.second)
+				val colorValueFromToken = getColorValueFromColorToken(colorToken, palette)
 
-					// if color token is something that is in the palette
-					// list - load it. if not - load what was saved
-					if (allColorTokensAsList.contains(colorToken)) {
-						mappedValues[uiItemName] = Pair(colorToken, colorValueFromToken)
-						defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueFromToken)
-					} else {
-						mappedValues[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
-						defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
-					}
+				// if color token is something that is in the palette
+				// list - load it. if not - load what was saved
+				if (allColorTokensAsList.contains(colorToken)) {
+					mappedValues[uiItemName] = Pair(colorToken, colorValueFromToken)
+					defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueFromToken)
+				} else {
+					mappedValues[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
+					defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
 				}
-		} else {
-			themeList.find { it.containsKey("defaultLightThemeUUID") }
-				?.getValue("defaultLightThemeUUID")?.map {
-					val uiItemName = it.key
-					val colorToken = it.value.first
-					val colorValueAsItWasSaved = Color(it.value.second)
-					val colorValueFromToken = getColorValueFromColorToken(colorToken, palette)
+			}
+	}
 
-					if (allColorTokensAsList.contains(colorToken)) {
-						mappedValues[uiItemName] = Pair(colorToken, colorValueFromToken)
-						defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueFromToken)
-					} else {
-						mappedValues[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
-						defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
-					}
-				}
-		}
+	fun exportTheme(uuid: String, context: Context) {
+		val map = themeList.find { it.containsKey(uuid) }?.getValue(uuid)
+			?.mapValues { it.value.second }
+			?.entries?.joinToString("\n")
+		val result = "${
+			map?.replace(")", "")
+				?.replace("(", "")
+				?.replace(", ", "=")
+		}\n"
+
+		File(context.cacheDir, "TeleMone Export.attheme").writeText(result)
+
+		val uri = FileProvider.getUriForFile(
+			context,
+			"${context.packageName}.provider",
+			File(context.cacheDir, "TeleMone Custom.attheme")
+		)
+
+		val intent = Intent(Intent.ACTION_SEND)
+		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+		intent.type = "*/attheme"
+		intent.putExtra(Intent.EXTRA_STREAM, uri)
+		context.startActivity(Intent.createChooser(intent, "TeleMone Custom"))
 	}
 
 	fun loadDefaultDarkTheme(palette: FullPaletteList) {

@@ -41,10 +41,11 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	theme: Pair<Int, String>,
-	showMenu: Boolean = false,
 	closeMenu: () -> Unit = {},
 	overwriteTheme: () -> Unit = {},
 	deleteTheme: () -> Unit = {},
+	exportTheme: () -> Unit = {},
+	showMenu: Boolean = false,
 ) {
 	fun colorOf(colorValueOf: String): Color {
 		return vm.themeList.find { it.containsKey(theme.second) }
@@ -75,6 +76,10 @@ fun SavedThemeItem(
 		expanded = showMenu,
 		onDismissRequest = { closeMenu() }
 	) {
+		DropdownMenuItem(
+			text = { Text("Export this theme")},
+			onClick = { exportTheme() }
+		)
 		DropdownMenuItem(
 			text = { Text("Overwrite a default theme")},
 			onClick = { overwriteTheme() }
