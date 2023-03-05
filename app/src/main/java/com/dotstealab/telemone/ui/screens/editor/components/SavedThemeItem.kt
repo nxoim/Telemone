@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -39,6 +41,10 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	theme: Pair<Int, String>,
+	showMenu: Boolean = false,
+	closeMenu: () -> Unit = {},
+	overwriteTheme: () -> Unit = {},
+	deleteTheme: () -> Unit = {},
 ) {
 	fun colorOf(colorValueOf: String): Color {
 		return vm.themeList.find { it.containsKey(theme.second) }
@@ -62,6 +68,20 @@ fun SavedThemeItem(
 			colorOf("chat_messagePanelBackground"),
 			colorOf("chat_messagePanelIcons"),
 			colorOf("chat_messagePanelHint")
+		)
+	}
+
+	DropdownMenu(
+		expanded = showMenu,
+		onDismissRequest = { closeMenu() }
+	) {
+		DropdownMenuItem(
+			text = { Text("Overwrite a default theme")},
+			onClick = { overwriteTheme() }
+		)
+		DropdownMenuItem(
+			text = { Text("Delete theme") },
+			onClick = { deleteTheme()	}
 		)
 	}
 }

@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
 				LaunchedEffect(Unit) {
 					scope.launch {
-						vm.startupConfigProcess(palette, isDarkMode)
+						vm.startupConfigProcess(palette, isDarkMode, applicationContext)
 					}
 				}
 
