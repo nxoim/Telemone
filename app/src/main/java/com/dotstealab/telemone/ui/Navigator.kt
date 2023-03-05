@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import com.dotstealab.telemone.MainViewModel
 import com.dotstealab.telemone.ui.screens.editor.EditorScreen
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ChatScreenPreview
+import com.dotstealab.telemone.ui.screens.editor.components.preview.ListOfChatsScreenPreview
 import com.dotstealab.telemone.ui.screens.editor.components.preview.PreviewScreens
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ThemePreviewScreen
 import com.dotstealab.telemone.ui.screens.main.ChatScreenPreview
@@ -95,6 +96,24 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 			}
 		) {
 			ChatScreenPreview()
+		}
+
+		composable(
+			"ListOfChatsScreenPreview",
+			enterTransition = {
+				when (initialState.destination.route) {
+					"EditorScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
+					else -> null
+				}
+			},
+			exitTransition = {
+				when (targetState.destination.route) {
+					"EditorScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
+					else -> null
+				}
+			}
+		) {
+			ListOfChatsScreenPreview()
 		}
 
 		composable(
