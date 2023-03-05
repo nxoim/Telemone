@@ -7,6 +7,8 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
@@ -17,6 +19,17 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.util.UUID
+
+typealias ThemeUUID = String
+typealias UiElementName = String
+typealias ColorToken = String
+typealias ColorValue = Int
+typealias DataAboutColors = Pair<ColorToken, ColorValue>
+typealias Theme = Map<UiElementName, DataAboutColors>
+typealias Themes = Map<ThemeUUID, Theme>
+typealias ThemeList = SnapshotStateList<Themes>
+typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
+
 
 
 // This does not take long to load but an advice with explanations
@@ -30,6 +43,7 @@ import java.util.UUID
 
 // funny of you to actually expect some sort of documentation in the
 // comments
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 	private val themeListKey = "AppPreferences.ThemeList"
 	private val preferences = application.getSharedPreferences(
@@ -38,23 +52,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	)
 
 	// god bless your eyes and brain that has to process this
-	// translation:
-	// <Themes<UUID, Theme<Name, DataAboutColors<ColorToken, ColorValue>>>
 	// color in the list has to be int because Color() returns ulong anyway
 	// anyway and so loading a theme after restarting the app causes a
-	// crash
+	// crash.
 	// don't ask me why i don't keep ulong and use ints instead
-	var themeList = mutableStateListOf<Map<String, Map<String, Pair<String, Int>>>>()
-	var mappedValues = mutableStateMapOf<String, Pair<String, Color>>()
-	var defaultCurrentTheme = mutableStateMapOf<String, Pair<String, Color>>()
-	var loadedFromFileTheme = mutableStateMapOf<String, Pair<String, Color>>()
+	// i recomment you checking out
+	var themeList: ThemeList = mutableStateListOf()
+	var mappedValues: LoadedTheme = mutableStateMapOf()
+	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
+	var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 	// will need this to update source theme files or something
 	val differencesBetweenFileAndCurrent = loadedFromFileTheme - mappedValues
 
 	init {
 		val savedThemeList = preferences.getString(themeListKey, "[]")
-		val type = object : TypeToken<List<Map<String, Map<String, Pair<String, Int>>>>>() {}.type
-		val list = Gson().fromJson<List<Map<String, Map<String, Pair<String, Int>>>>>(savedThemeList, type)
+		val type = object : TypeToken<ThemeList>() {}.type
+		val list = Gson().fromJson<ThemeList>(savedThemeList, type)
 		themeList.addAll(
 			list.map { map ->
 				map.mapValues { entry ->
@@ -134,7 +147,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		clearCurrentTheme: Boolean
 	) {
 		try {
-			val loadedMap = mutableStateMapOf<String, Pair<String, Color>>()
+			val loadedMap: LoadedTheme = mutableStateMapOf()
 
 			context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
 				reader.forEachLine { line ->
