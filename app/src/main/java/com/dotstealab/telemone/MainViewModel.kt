@@ -12,6 +12,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.AndroidViewModel
 import com.dotstealab.telemone.ui.theme.FullPaletteList
 import com.dotstealab.telemone.ui.theme.allColorTokensAsList
@@ -33,7 +34,7 @@ typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
 
 // This does not take long to load but an advice with explanations
-// will be greaty appreciated. *with examples* though cuz i think from top
+// will be greatly appreciated. *with examples* though cuz i think from top
 // to bottom cuz i mainly look for patterns cuz attention span
 // comparable to that one of a chimpanzee if not less
 
@@ -56,7 +57,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	// anyway and so loading a theme after restarting the app causes a
 	// crash.
 	// don't ask me why i don't keep ulong and use ints instead
-	// i recomment you checking out
+	// i recommend you checking out
 	var themeList: ThemeList = mutableStateListOf()
 	var mappedValues: LoadedTheme = mutableStateMapOf()
 	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
@@ -138,7 +139,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	// idk if im dum but i dont think this is able to properly load telegrams
+	// idk if im dum but i don't think this is able to properly load telegrams
 	// stock themes, like "Day".
 	fun loadThemeFromFile(
 		context: Context,
@@ -146,50 +147,85 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		palette: FullPaletteList,
 		clearCurrentTheme: Boolean
 	) {
-		try {
-			val loadedMap: LoadedTheme = mutableStateMapOf()
+		val loadedMap: LoadedTheme = mutableStateMapOf()
+		var containsIncompatibleValues = false
+		var isCorrectFormat = false
 
-			context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
+		context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
+			if (
+				uri.path.toString().contains(".txt")
+				||
+				uri.path.toString().contains(".attheme")
+			)  {
 				reader.forEachLine { line ->
-					if (line.isNotEmpty()) {
-						val splitLine = line.split("=")
-						val key = splitLine[0]
-						val value = splitLine[1]
+					if (
+						line.contains("=")
+						&&
+						line.replace(" ", "") != ""
+					) {
+						line.replace(" ", "").split("=").let { splitLine ->
+							// check if tere is the ui components name is present
+							if (splitLine[0].isNotEmpty()) {
+								isCorrectFormat = true
 
-						try {
-							loadedMap[key] = Pair("", Color(value.toLong().toInt()))
-						} catch (e: NumberFormatException) {
-							val colorValue = getColorValueFromColorToken(value, palette)
-							val isUnsupported = colorValue == Color.Red
-							val pair = Pair(
-								if (isUnsupported) "INCOMPATIBLE VALUE" else value,
-								colorValue
-							)
+								val uiElementName = splitLine[0]
+								val colorValueAsString = splitLine[1]
 
-							loadedMap.put(key, pair).apply {
-								// my brain not brainin. sory
-								Toast.makeText(
-									context,
-									"Some colors are incompatible and were marked as such.",
-									Toast.LENGTH_LONG
-								).show()
+								val isValueANumber = colorValueAsString.replace("-", "").isDigitsOnly()
+								val isValueActuallyAColorToken = allColorTokensAsList.contains(splitLine[1])
+
+								if (isValueANumber) {
+									val colorValue = Color(colorValueAsString.toLong())
+									val colorToken = getColorTokenFromColorValue(palette, colorValue)
+
+									loadedMap[uiElementName] = Pair(colorToken, colorValue)
+								} else if (isValueActuallyAColorToken) {
+									// checks if the contents are like "uiElelemnt=n1_800"
+									val colorToken = colorValueAsString
+									val colorValue = getColorValueFromColorToken(colorToken, palette)
+
+									loadedMap[uiElementName] = Pair(colorToken, colorValue)
+								} else {
+									loadedMap[uiElementName] = Pair("INCOMPATIBLE VALUE", Color.Red)
+									containsIncompatibleValues = true
+								}
 							}
 						}
 					}
 				}
 
-				if (clearCurrentTheme) mappedValues.clear()
+				if (containsIncompatibleValues) {
+					Toast.makeText(
+						context,
+						"Some colors are incompatible and were marked as such.",
+						Toast.LENGTH_LONG
+					).show()
+				}
 
-				loadedFromFileTheme.clear()
-				mappedValues.putAll(loadedMap)
-				loadedFromFileTheme.putAll(loadedMap)
+				if (isCorrectFormat) {
+					if (clearCurrentTheme) mappedValues.clear()
+
+					loadedFromFileTheme.clear()
+					mappedValues.putAll(loadedMap)
+					loadedFromFileTheme.putAll(loadedMap)
+				} else {
+					Toast.makeText(
+						context,
+						"Chosen file isn't a Telegram (not Telegram X) theme.",
+						Toast.LENGTH_LONG
+					).show()
+				}
+			} else {
+				Toast.makeText(
+					context,
+					"Chosen file isn't a Telegram (not Telegram X) theme.",
+					Toast.LENGTH_LONG
+				).show()
 			}
-		} catch (e: IndexOutOfBoundsException) {
-			Toast.makeText(
-				context,
-				"Chosen file isn't a Telegram (not Telegram X) theme.",
-				Toast.LENGTH_LONG
-			).show()
+
+			// reset
+			containsIncompatibleValues = false
+			isCorrectFormat = false
 		}
 	}
 
@@ -580,8 +616,168 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 	}
 }
 
+val fallbackKeys = mapOf(
+	"chat_inAdminText" to "chat_inTimeText",
+	"chat_inAdminSelectedText" to "chat_inTimeSelectedText",
+	"player_progressCachedBackground" to "player_progressBackground",
+	"chat_inAudioCacheSeekbar" to "chat_inAudioSeekbar",
+	"chat_outAudioCacheSeekbar" to "chat_outAudioSeekbar",
+	"chat_emojiSearchBackground" to "chat_emojiPanelStickerPackSelector",
+	"location_sendLiveLocationIcon" to "location_sendLocationIcon",
+	"changephoneinfo_image2" to "featuredStickers_addButton",
+	"graySectionText" to "windowBackgroundWhiteGrayText2",
+	"chat_inMediaIcon" to "chat_inBubble",
+	"chat_outMediaIcon" to "chat_outBubble",
+	"chat_inMediaIconSelected" to "chat_inBubbleSelected",
+	"chat_outMediaIconSelected" to "chat_outBubbleSelected",
+	"chats_actionUnreadIcon" to "profile_actionIcon",
+	"chats_actionUnreadBackground" to "profile_actionBackground",
+	"chats_actionUnreadPressedBackground" to "profile_actionPressedBackground",
+	"dialog_inlineProgressBackground" to "windowBackgroundGray",
+	"dialog_inlineProgress" to "chats_menuItemIcon",
+	"groupcreate_spanDelete" to "chats_actionIcon",
+	"sharedMedia_photoPlaceholder" to "windowBackgroundGray",
+	"chat_attachPollBackground" to "chat_attachAudioBackground",
+	"chat_attachPollIcon" to "chat_attachAudioIcon",
+	"chats_onlineCircle" to "windowBackgroundWhiteBlueText",
+	"windowBackgroundWhiteBlueButton" to "windowBackgroundWhiteValueText",
+	"windowBackgroundWhiteBlueIcon" to "windowBackgroundWhiteValueText",
+	"undo_background" to "chat_gifSaveHintBackground",
+	"undo_cancelColor" to "chat_gifSaveHintText",
+	"undo_infoColor" to "chat_gifSaveHintText",
+	"windowBackgroundUnchecked" to "windowBackgroundWhite",
+	"windowBackgroundChecked" to "windowBackgroundWhite",
+	"switchTrackBlue" to "switchTrack",
+	"switchTrackBlueChecked" to "switchTrackChecked",
+	"switchTrackBlueThumb" to "windowBackgroundWhite",
+	"switchTrackBlueThumbChecked" to "windowBackgroundWhite",
+	"windowBackgroundCheckText" to "windowBackgroundWhite",
+	"contextProgressInner4" to "contextProgressInner1",
+	"contextProgressOuter4" to "contextProgressOuter1",
+	"switchTrackBlueSelector" to "listSelector",
+	"switchTrackBlueSelectorChecked" to "listSelector",
+	"chat_emojiBottomPanelIcon" to "chat_emojiPanelIcon",
+	"chat_emojiSearchIcon" to "chat_emojiPanelIcon",
+	"chat_emojiPanelStickerSetNameHighlight" to "windowBackgroundWhiteBlueText4",
+	"chat_emojiPanelStickerPackSelectorLine" to "chat_emojiPanelIconSelected",
+	"sharedMedia_actionMode" to "actionBarDefault",
+	"sheet_scrollUp" to "chat_emojiPanelStickerPackSelector",
+	"sheet_other" to "player_actionBarItems",
+	"dialogSearchBackground" to "chat_emojiPanelStickerPackSelector",
+	"dialogSearchHint" to "chat_emojiPanelIcon",
+	"dialogSearchIcon" to "chat_emojiPanelIcon",
+	"dialogSearchText" to "windowBackgroundWhiteBlackText",
+	"dialogFloatingButtonPressed" to "dialogRoundCheckBox",
+	"dialogFloatingIcon" to "dialogRoundCheckBoxCheck",
+	"dialogShadowLine" to "chat_emojiPanelShadowLine",
+	"chat_emojiPanelIconSelector" to "listSelector",
+	"actionBarDefaultArchived" to "actionBarDefault",
+	"actionBarDefaultArchivedSelector" to "actionBarDefaultSelector",
+	"actionBarDefaultArchivedIcon" to "actionBarDefaultIcon",
+	"actionBarDefaultArchivedTitle" to "actionBarDefaultTitle",
+	"actionBarDefaultArchivedSearch" to "actionBarDefaultSearch",
+	"actionBarDefaultArchivedSearchPlaceholder" to "actionBarDefaultSearchPlaceholder",
+	"chats_message_threeLines" to "chats_message",
+	"chats_nameMessage_threeLines" to "chats_nameMessage",
+	"chats_nameArchived" to "chats_name",
+	"chats_nameMessageArchived" to "chats_nameMessage",
+	"chats_nameMessageArchived_threeLines" to "chats_nameMessage",
+	"chats_messageArchived" to "chats_message",
+	"avatar_backgroundArchived" to "chats_unreadCounterMuted",
+	"chats_archiveBackground" to "chats_actionBackground",
+	"chats_archivePinBackground" to "chats_unreadCounterMuted",
+	"chats_archiveIcon" to "chats_actionIcon",
+	"chats_archiveText" to "chats_actionIcon",
+	"actionBarDefaultSubmenuItemIcon" to "dialogIcon",
+	"checkboxDisabled" to "chats_unreadCounterMuted",
+	"chat_status" to "actionBarDefaultSubtitle",
+	"chat_inGreenCall" to "calls_callReceivedGreenIcon",
+	"chat_inRedCall" to "calls_callReceivedRedIcon",
+	"chat_outGreenCall" to "calls_callReceivedGreenIcon",
+	"actionBarTabActiveText" to "actionBarDefaultTitle",
+	"actionBarTabUnactiveText" to "actionBarDefaultSubtitle",
+	"actionBarTabLine" to "actionBarDefaultTitle",
+	"actionBarTabSelector" to "actionBarDefaultSelector",
+	"profile_status" to "avatar_subtitleInProfileBlue",
+	"chats_menuTopBackgroundCats" to "avatar_backgroundActionBarBlue",
+	"chat_outLinkSelectBackground" to "chat_linkSelectBackground",
+	"actionBarDefaultSubmenuSeparator" to "windowBackgroundGray",
+	"chat_attachPermissionImage" to "dialogTextBlack",
+	"chat_attachPermissionMark" to "chat_sentError",
+	"chat_attachPermissionText" to "dialogTextBlack",
+	"chat_attachEmptyImage" to "emptyListPlaceholder",
+	"chat_attachEmptyImage" to "emptyListPlaceholder",
+	"actionBarBrowser" to "actionBarDefault",
+	"chats_sentReadCheck" to "chats_sentCheck",
+	"chat_outSentCheckRead" to "chat_outSentCheck",
+	"chat_outSentCheckReadSelected" to "chat_outSentCheckSelected",
+	"chats_archivePullDownBackground" to "chats_unreadCounterMuted",
+	"chats_archivePullDownBackgroundActive" to "chats_actionBackground",
+	"avatar_backgroundArchivedHidden" to "avatar_backgroundSaved",
+	"featuredStickers_removeButtonText" to "featuredStickers_addButtonPressed",
+	"dialogEmptyImage" to "player_time",
+	"dialogEmptyText" to "player_time",
+	"location_actionIcon" to "dialogTextBlack",
+	"location_actionActiveIcon" to "windowBackgroundWhiteBlueText7",
+	"location_actionBackground" to "dialogBackground",
+	"location_actionPressedBackground" to "dialogBackgroundGray",
+	"location_sendLocationText" to "windowBackgroundWhiteBlueText7",
+	"location_sendLiveLocationText" to "windowBackgroundWhiteGreenText",
+	"chat_outTextSelectionHighlight" to "chat_textSelectBackground",
+	"chat_inTextSelectionHighlight" to "chat_textSelectBackground",
+	"chat_TextSelectionCursor" to "chat_messagePanelCursor",
+	"chat_outTextSelectionCursor" to "chat_TextSelectionCursor",
+	"chat_inPollCorrectAnswer" to "chat_attachLocationBackground",
+	"chat_outPollCorrectAnswer" to "chat_attachLocationBackground",
+	"chat_inPollWrongAnswer" to "chat_attachAudioBackground",
+	"chat_outPollWrongAnswer" to "chat_attachAudioBackground",
+	"windowBackgroundWhiteYellowText" to "avatar_nameInMessageOrange",
+	"profile_tabText" to "windowBackgroundWhiteGrayText",
+	"profile_tabSelectedText" to "windowBackgroundWhiteBlueHeader",
+	"profile_tabSelectedLine" to "windowBackgroundWhiteBlueHeader",
+	"profile_tabSelector" to "listSelector",
+	"statisticChartPopupBackground" to "dialogBackground",
+	"chat_attachGalleryText" to "chat_attachGalleryBackground",
+	"chat_attachAudioText" to "chat_attachAudioBackground",
+	"chat_attachFileText" to "chat_attachFileBackground",
+	"chat_attachContactText" to "chat_attachContactBackground",
+	"chat_attachLocationText" to "chat_attachLocationBackground",
+	"chat_attachPollText" to "chat_attachPollBackground",
+	"chat_inPsaNameText" to "avatar_nameInMessageGreen",
+	"chat_outPsaNameText" to "avatar_nameInMessageGreen",
+	"chat_outAdminText" to "chat_outTimeText",
+	"chat_outAdminSelectedText" to "chat_outTimeSelectedText",
+	"returnToCallMutedBackground" to "windowBackgroundWhite",
+	"dialogSwipeRemove" to "avatar_backgroundRed",
+	"chat_inReactionButtonBackground" to "chat_inLoader",
+	"chat_outReactionButtonBackground" to "chat_outLoader",
+	"chat_inReactionButtonText" to "chat_inPreviewInstantText",
+	"chat_outReactionButtonText" to "chat_outPreviewInstantText",
+	"chat_inReactionButtonTextSelected" to "windowBackgroundWhite",
+	"chat_outReactionButtonTextSelected" to "windowBackgroundWhite",
+	"dialogReactionMentionBackground" to "voipgroup_mutedByAdminGradient2",
+	"topics_unreadCounter" to "chats_unreadCounter",
+	"topics_unreadCounterMuted" to "chats_message",
+	"avatar_background2Saved" to "avatar_backgroundSaved",
+	"avatar_background2Red" to "avatar_backgroundRed",
+	"avatar_background2Orange" to "avatar_backgroundOrange",
+	"avatar_background2Violet" to "avatar_backgroundViolet",
+	"avatar_background2Green" to "avatar_backgroundGreen",
+	"avatar_background2Cyan" to "avatar_backgroundCyan",
+	"avatar_background2Blue" to "avatar_backgroundBlue",
+	"avatar_background2Pink" to "avatar_backgroundPink",
+	"statisticChartLine_orange" to "color_orange",
+	"statisticChartLine_blue" to "color_blue",
+	"statisticChartLine_red" to "color_red",
+	"statisticChartLine_lightblue" to "color_lightblue",
+	"statisticChartLine_golden" to "color_yellow",
+	"statisticChartLine_purple" to "color_purple",
+	"statisticChartLine_indigo" to "color_purple",
+	"statisticChartLine_cyan" to "color_cyan"
+)
+
 // maybe we'll still need this in the future
-fun assignColorToken(palette: FullPaletteList, color: Color): String {
+fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String {
 	return when(color) {
 		palette.a1_0 -> "a1_0"
 		palette.a1_10 -> "a1_10"
@@ -648,6 +844,6 @@ fun assignColorToken(palette: FullPaletteList, color: Color): String {
 		palette.n2_800 -> "n2_800"
 		palette.n2_900 -> "n2_900"
 		palette.n2_1000 -> "n2_1000"
-		else -> "unspecified"
+		else -> ""
 	}
 }
