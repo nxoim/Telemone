@@ -1,4 +1,4 @@
-package com.dotstealab.telemone.ui.screens.main.components
+package com.dotstealab.telemone.ui.screens.editor.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -39,11 +41,17 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	theme: Pair<Int, String>,
+	closeMenu: () -> Unit = {},
+	overwriteTheme: () -> Unit = {},
+	deleteTheme: () -> Unit = {},
+	exportTheme: () -> Unit = {},
+	showMenu: Boolean = false,
 ) {
 	fun colorOf(colorValueOf: String): Color {
-		return vm.themeList.getOrNull(theme.first)?.get(theme.second)?.get(colorValueOf)?.let {
-			Color(it.second)
-		} ?: Color.Red
+		return vm.themeList.find { it.containsKey(theme.second) }
+			?.get(theme.second)
+			?.get(colorValueOf)
+			?.let { Color(it.second) } ?: Color.Red
 	}
 	// EVERYTHING HERE IS TODO
 
@@ -61,6 +69,24 @@ fun SavedThemeItem(
 			colorOf("chat_messagePanelBackground"),
 			colorOf("chat_messagePanelIcons"),
 			colorOf("chat_messagePanelHint")
+		)
+	}
+
+	DropdownMenu(
+		expanded = showMenu,
+		onDismissRequest = { closeMenu() }
+	) {
+		DropdownMenuItem(
+			text = { Text("Export this theme")},
+			onClick = { exportTheme() }
+		)
+		DropdownMenuItem(
+			text = { Text("Overwrite a default theme")},
+			onClick = { overwriteTheme() }
+		)
+		DropdownMenuItem(
+			text = { Text("Delete theme") },
+			onClick = { deleteTheme()	}
 		)
 	}
 }
