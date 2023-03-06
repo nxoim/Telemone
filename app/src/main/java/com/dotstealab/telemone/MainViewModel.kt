@@ -58,18 +58,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	// crash.
 	// don't ask me why i don't keep ulong and use ints instead
 	// i recommend you checking out
-	var themeList: ThemeList = mutableStateListOf()
-	var mappedValues: LoadedTheme = mutableStateMapOf()
-	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
-	var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
+	private var _themeList: ThemeList = mutableStateListOf()
+	val themeList: ThemeList get() = _themeList
+	private var _mappedValues: LoadedTheme = mutableStateMapOf()
+	val mappedValues: LoadedTheme get() = _mappedValues
+	private var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
+	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 	// will need this to update source theme files or something
-	val differencesBetweenFileAndCurrent = loadedFromFileTheme - mappedValues
+	val differencesBetweenFileAndCurrent = loadedFromFileTheme - _mappedValues
 
 	init {
 		val savedThemeList = preferences.getString(themeListKey, "[]")
 		val type = object : TypeToken<ThemeList>() {}.type
 		val list = Gson().fromJson<ThemeList>(savedThemeList, type)
-		themeList.addAll(
+		_themeList.addAll(
 			list.map { map ->
 				map.mapValues { entry ->
 					entry.value.mapValues { (_, value) -> Pair(value.first, value.second) }
@@ -83,23 +85,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		val uuid = UUID.randomUUID().toString()
 		val map = mutableMapOf<String, Pair<String, Int>>()
 
-		mappedValues.forEach { (themeTokenName, colorPair) ->
+		_mappedValues.forEach { (themeTokenName, colorPair) ->
 			val colorMap = Pair(colorPair.first, colorPair.second.toArgb())
 
 			map[themeTokenName] = colorMap
 			mapWithUuid.putIfAbsent(uuid, map)
 		}
-		themeList.add(mapWithUuid)
+		_themeList.add(mapWithUuid)
 
-		val contents = Gson().toJson(themeList)
+		val contents = Gson().toJson(_themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
 	fun deleteTheme(uuid: String) {
-		val mapToRemove = themeList.find { it.containsKey(uuid) }
-		themeList.remove(mapToRemove)
+		val mapToRemove = _themeList.find { it.containsKey(uuid) }
+		_themeList.remove(mapToRemove)
 
-		val contents = Gson().toJson(themeList)
+		val contents = Gson().toJson(_themeList)
 		preferences.edit().clear().putString(themeListKey, contents).apply()
 	}
 
@@ -109,27 +111,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		palette: FullPaletteList,
 		clearCurrentTheme: Boolean
 	) {
-		val loadedMap = themeList.firstOrNull { it.containsKey(uuid) }?.get(uuid)
+		val loadedMap = _themeList.firstOrNull { it.containsKey(uuid) }?.get(uuid)
 
 		if (loadedMap != null) {
 			if (loadTokens) {
-				if (clearCurrentTheme) { mappedValues.clear() }
+				if (clearCurrentTheme) { _mappedValues.clear() }
 				loadedMap.let {
 					it.forEach { colorPair ->
 						val colorToken = colorPair.value.first
 						val colorValue = getColorValueFromColorToken(colorToken, palette)
 
-						mappedValues.putIfAbsent(
+						_mappedValues.putIfAbsent(
 							colorPair.key,
 							Pair(colorToken, colorValue)
 						)
 					}
 				}
 			} else {
-				if (clearCurrentTheme) { mappedValues.clear() }
+				if (clearCurrentTheme) { _mappedValues.clear() }
 				loadedMap.let {
 					it.forEach { colorPair ->
-						mappedValues.putIfAbsent(
+						_mappedValues.putIfAbsent(
 							colorPair.key,
 							Pair(colorPair.value.first, Color(colorPair.value.second))
 						)
@@ -203,10 +205,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				}
 
 				if (isCorrectFormat) {
-					if (clearCurrentTheme) mappedValues.clear()
+					if (clearCurrentTheme) _mappedValues.clear()
 
 					loadedFromFileTheme.clear()
-					mappedValues.putAll(loadedMap)
+					_mappedValues.putAll(loadedMap)
 					loadedFromFileTheme.putAll(loadedMap)
 				} else {
 					Toast.makeText(
@@ -230,17 +232,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun resetCurrentTheme() {
-		mappedValues.clear()
-		mappedValues.putAll(defaultCurrentTheme)
+		_mappedValues.clear()
+		_mappedValues.putAll(defaultCurrentTheme)
 	}
 
 	fun overwriteCurrentLightTheme(uuid: String, palette: FullPaletteList) {
-		val newDefaultTheme = themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
+		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
-		val index = themeList.indexOfFirst { it.containsKey("defaultLightThemeUUID") }
+		val index = _themeList.indexOfFirst { it.containsKey("defaultLightThemeUUID") }
 
 		val defaultTheme = if (index != -1) {
-			themeList[index].getValue("defaultLightThemeUUID").toMutableMap()
+			_themeList[index].getValue("defaultLightThemeUUID").toMutableMap()
 		} else {
 			mutableMapOf()
 		}
@@ -262,19 +264,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			}
 		}
 
-		themeList[index] = mapOf("defaultLightThemeUUID" to defaultTheme)
+		_themeList[index] = mapOf("defaultLightThemeUUID" to defaultTheme)
 
-		val contents = Gson().toJson(themeList)
+		val contents = Gson().toJson(_themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
 	fun overwriteCurrentDarkTheme(uuid: String, palette: FullPaletteList) {
-		val newDefaultTheme = themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
+		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
-		val index = themeList.indexOfFirst { it.containsKey("defaultDarkThemeUUID") }
+		val index = _themeList.indexOfFirst { it.containsKey("defaultDarkThemeUUID") }
 
 		val defaultTheme = if (index != -1) {
-			themeList[index].getValue("defaultDarkThemeUUID").toMutableMap()
+			_themeList[index].getValue("defaultDarkThemeUUID").toMutableMap()
 		} else {
 			mutableMapOf()
 		}
@@ -291,14 +293,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			}
 		}
 
-		themeList[index] = mapOf("defaultDarkThemeUUID" to defaultTheme)
+		_themeList[index] = mapOf("defaultDarkThemeUUID" to defaultTheme)
 
-		val contents = Gson().toJson(themeList)
+		val contents = Gson().toJson(_themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
 	fun changeValue(key: String, colorValue: Color, colorToken: String) {
-		mappedValues[key] = Pair(colorToken, colorValue)
+		_mappedValues[key] = Pair(colorToken, colorValue)
 	}
 
 	fun startupConfigProcess(palette: FullPaletteList, isDarkMode: Boolean, context: Context) {
@@ -310,16 +312,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			"defaultLightThemeUUID"
 
 		// check if default themes are put in the list
-		if (!themeList.any { it.containsKey("defaultDarkThemeUUID") }) {
-			themeList.add(mapOf("defaultDarkThemeUUID" to darkTheme))
+		if (!_themeList.any { it.containsKey("defaultDarkThemeUUID") }) {
+			_themeList.add(mapOf("defaultDarkThemeUUID" to darkTheme))
 		}
 		// dont do if else or when here because it will only check the first one
-		if (!themeList.any { it.containsKey("defaultLightThemeUUID") }) {
-			themeList.add(mapOf("defaultLightThemeUUID" to lightTheme))
+		if (!_themeList.any { it.containsKey("defaultLightThemeUUID") }) {
+			_themeList.add(mapOf("defaultLightThemeUUID" to lightTheme))
 		}
 
 		// this will also fill in the missing values
-		themeList.find { it.containsKey(defaultThemeKey) }
+		_themeList.find { it.containsKey(defaultThemeKey) }
 			?.getValue(defaultThemeKey)?.map {
 				val uiItemName = it.key
 				val colorToken = it.value.first
@@ -329,17 +331,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				// if color token is something that is in the palette
 				// list - load it. if not - load what was saved
 				if (allColorTokensAsList.contains(colorToken)) {
-					mappedValues[uiItemName] = Pair(colorToken, colorValueFromToken)
+					_mappedValues[uiItemName] = Pair(colorToken, colorValueFromToken)
 					defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueFromToken)
 				} else {
-					mappedValues[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
+					_mappedValues[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
 					defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
 				}
 			}
 	}
 
 	fun exportTheme(uuid: String, context: Context) {
-		val map = themeList.find { it.containsKey(uuid) }?.getValue(uuid)
+		val map = _themeList.find { it.containsKey(uuid) }?.getValue(uuid)
 			?.mapValues { it.value.second }
 			?.entries?.joinToString("\n")
 		val result = "${
@@ -364,57 +366,57 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun loadDefaultDarkTheme(palette: FullPaletteList) {
-		themeList.find { it.containsKey("defaultDarkThemeUUID") }
+		_themeList.find { it.containsKey("defaultDarkThemeUUID") }
 			?.getValue("defaultDarkThemeUUID")?.map {
 				val uiItemName = it.key
 				val colorToken = it.value.first
 				val colorValue = getColorValueFromColorToken(colorToken, palette)
 
-				mappedValues[uiItemName] = Pair(it.value.first, colorValue)
+				_mappedValues[uiItemName] = Pair(it.value.first, colorValue)
 				defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
 			}
 	}
 
 	fun loadDefaultLightTheme(palette: FullPaletteList) {
-		themeList.find { it.containsKey("defaultLightThemeUUID") }
+		_themeList.find { it.containsKey("defaultLightThemeUUID") }
 			?.getValue("defaultLightThemeUUID")?.map {
 				val uiItemName = it.key
 				val colorToken = it.value.first
 				val colorValue = getColorValueFromColorToken(colorToken, palette)
 
-				mappedValues[uiItemName] = Pair(colorToken, colorValue)
+				_mappedValues[uiItemName] = Pair(colorToken, colorValue)
 				defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
 			}
 	}
 
 	fun loadStockDarkTheme(palette: FullPaletteList, context: Context) {
-		mappedValues.clear()
+		_mappedValues.clear()
 
 		defaultDarkTheme(palette, context).map {
 			val uiItemName = it.key
 			val colorToken = it.value.first
 			val colorValue = Color(it.value.second)
 
-			mappedValues[uiItemName] = Pair(colorToken, colorValue)
+			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
 			defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
 		}
 	}
 
 	fun loadStockLightTheme(palette: FullPaletteList, context: Context) {
-		mappedValues.clear()
+		_mappedValues.clear()
 
 		defaultLightTheme(palette, context).map {
 			val uiItemName = it.key
 			val colorToken = it.value.first
 			val colorValue = Color(it.value.second)
 
-			mappedValues[uiItemName] = Pair(colorToken, colorValue)
+			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
 			defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
 		}
 	}
 
 	fun shareCustomTheme(context: Context) {
-		val map = mappedValues.mapValues {
+		val map = _mappedValues.mapValues {
 			it.value.second.toArgb()
 		}.entries.joinToString("\n")
 		val result = "${
@@ -439,7 +441,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun saveLightModeTheme(context: Context, palette: FullPaletteList) {
-		val source = themeList.find { it.containsKey("defaultLightThemeUUID") }
+		val source = _themeList.find { it.containsKey("defaultLightThemeUUID") }
 			?.getValue("defaultLightThemeUUID")
 		// prints ui element name = the color we gave it
 		val result = source!!.run {
@@ -465,7 +467,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun saveDarkModeTheme(context: Context, palette: FullPaletteList) {
-		val source = themeList.find { it.containsKey("defaultDarkThemeUUID") }
+		val source = _themeList.find { it.containsKey("defaultDarkThemeUUID") }
 			?.getValue("defaultDarkThemeUUID")
 
 		val result = source!!.run {
