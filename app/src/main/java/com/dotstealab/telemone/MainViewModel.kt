@@ -353,14 +353,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		val uri = FileProvider.getUriForFile(
 			context,
 			"${context.packageName}.provider",
-			File(context.cacheDir, "TeleMone Custom.attheme")
+			File(context.cacheDir, "TeleMone Export.attheme")
 		)
 
 		val intent = Intent(Intent.ACTION_SEND)
 		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 		intent.type = "*/attheme"
 		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "TeleMone Custom"))
+		context.startActivity(Intent.createChooser(intent, "TeleMone Export"))
 	}
 
 	fun loadDefaultDarkTheme(palette: FullPaletteList) {
