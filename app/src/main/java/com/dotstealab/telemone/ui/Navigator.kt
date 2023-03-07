@@ -12,7 +12,6 @@ import com.dotstealab.telemone.ui.screens.editor.components.preview.ChatScreenPr
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ListOfChatsScreenPreview
 import com.dotstealab.telemone.ui.screens.editor.components.preview.PreviewScreens
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ThemePreviewScreen
-import com.dotstealab.telemone.ui.screens.main.ChatScreenPreview
 import com.dotstealab.telemone.ui.screens.main.MainScreen
 import com.dotstealab.telemone.ui.screens.themeContents.ThemeContentsScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
