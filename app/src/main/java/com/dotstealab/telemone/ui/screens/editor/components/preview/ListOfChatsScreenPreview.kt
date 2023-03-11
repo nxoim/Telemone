@@ -1,6 +1,7 @@
 package com.dotstealab.telemone.ui.screens.editor.components.preview
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import android.app.Application
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,33 +28,61 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dotstealab.telemone.MainViewModel
+import kotlin.math.min
 
 @Composable
-fun ListOfChatsScreenPreview() {
+fun ListOfChatsScreenPreview(vm: MainViewModel, animatedValue: Float = 1f) {
+    val scale = min(0.5f + animatedValue, 1f)
+    fun colorOf(colorValueOf: String): Color {
+        return try {
+            vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+        } catch (e: NoSuchElementException) {
+            Color.Red
+        }
+    }
+
     Column(
         modifier = Modifier
-            .systemBarsPadding()
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
+            .fillMaxSize()
+            .background(colorOf("windowBackgroundWhite"))
     ) {
-        TgHeader()
-        ChatItem(pinned = true)
-        ChatItem(unread = true)
-        ChatItem(secret = true, sent = true)
-        ChatItem(muted = true, unread = true)
-        ChatItem(verified = true)
-        ChatItem(secret = true)
+        Header(
+            scale,
+            backgroundColor = colorOf("actionBarDefault"),
+            iconsColor = colorOf("actionBarDefaultIcon"),
+            titleColor = colorOf("actionBarDefaultTitle"),
+            folderUnderlineColor = colorOf("actionBarTabLine"),
+            selectedFolderItemColor = colorOf("actionBarActiveText"),
+            unselectedFolderItemColor = colorOf("actionBarUnactiveText")
+        )
+        ChatItem(scale, pinned = true, vm = vm)
+        ChatItem(scale, unread = true, vm = vm)
+        ChatItem(scale, secret = true, sent = true, vm = vm)
+        ChatItem(scale, muted = true, unread = true, vm = vm)
+        ChatItem(scale, verified = true, vm = vm)
+        ChatItem(scale, secret = true, vm = vm)
     }
 }
 
 @Composable
-fun TgHeader() {
+fun Header(
+    animatedValue: Float,
+    backgroundColor: Color,
+    iconsColor: Color,
+    titleColor: Color,
+    folderUnderlineColor: Color,
+    selectedFolderItemColor: Color,
+    unselectedFolderItemColor: Color
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -65,54 +93,88 @@ fun TgHeader() {
             imageVector = Icons.Default.Menu,
             contentDescription = "Menu",
             modifier = Modifier
-                .padding(16.dp)
-                .size(24.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                .padding((16 * animatedValue).dp)
+                .size((24 * animatedValue).dp),
+            tint = iconsColor,
         )
-        Text(
+        Text(maxLines = 1,
             text = "TeleMone",
             modifier = Modifier
-                .padding(16.dp),
-            fontSize = 20.sp,
+                .padding((16 * animatedValue).dp),
+            fontSize = (20 * animatedValue).sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = titleColor,
         )
         Spacer(modifier = Modifier.weight(1f))
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "Search",
             modifier = Modifier
-                .padding(16.dp)
-                .size(24.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                .padding((16 * animatedValue).dp)
+                .size((24 * animatedValue).dp),
+            tint = iconsColor,
         )
     }
 }
 
 @Composable
 fun ChatItem(
+    animatedValue: Float,
     pinned: Boolean = false,
     unread: Boolean = false,
     sent: Boolean = false,
     secret: Boolean = false,
     muted: Boolean = false,
     verified: Boolean = false,
+    vm: MainViewModel
 ) {
+    fun colorOf(colorValueOf: String): Color {
+        return try {
+            vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+        } catch (e: NoSuchElementException) {
+            Color.Red
+        }
+    }
+    val backgroundColor = colorOf("windowBackgroundWhite")
+    val unreadCounterColor = colorOf("chats_unreadCounter")
+    val unreadMutedCounterColor = colorOf("chats_unreadCounterMuted")
+    val unreadCounterNumberColor = colorOf("chats_unreadCounterText")
+    val dividerColor = colorOf("divider")
+    val messageTextColor = colorOf("chats_message")
+    val messageAttachementColor = colorOf("chats_actionMessage")
+    val pinIconColor = colorOf("chats_pinnedIcon")
+    val dateColor = colorOf("chats_date")
+    val readCheckColor = colorOf("chats_sentReadCheck")
+    val avatarService1Color = colorOf("avatar_backgroundSaved")
+    val avatarService2Color = colorOf("avatar_background2Saved")
+    val chatSecretIconColor = colorOf("chats_secretIcon")
+    val chatSecretNameColor = colorOf("chats_secretName")
+    val chatNameColor = colorOf("chats_name")
+//    val mutedIconColor literally doesnt show in app
+    val verifiedIconBackgroundColor = colorOf("chats_verifiedBackground")
+    val verifiedIconColor = colorOf("chats_verifiedCheck")
+
+    // TODO: put all of the colors
+    val avatarCyan1BackgroundColor = colorOf("avatar_backgroundCyan")
+    val avatarCyan2BackgroundColor = colorOf("avatar_backgroundCyan")
+    val avatarTextColor = colorOf("avatar_text")
+
     Row(
         modifier = Modifier
             .padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = 8.dp,
-                bottom = 8.dp,
+                start = (16 * animatedValue).dp,
+                end = (16 * animatedValue).dp,
+                top = (8 * animatedValue).dp,
+                bottom = (8 * animatedValue).dp,
             )
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .background(backgroundColor),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Card(
             modifier = Modifier
-                .size(50.dp),
+                .size((50 * animatedValue).dp),
             shape = RoundedCornerShape(100),
         ) {
             Column(
@@ -121,13 +183,14 @@ fun ChatItem(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
+                Text(maxLines = 1,
                     text = "A",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = avatarTextColor,
+                    fontSize = (18  * animatedValue).sp
                 )
             }
         }
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width((12 * animatedValue).dp))
         Column(
             verticalArrangement = Arrangement.Center,
         ) {
@@ -139,48 +202,48 @@ fun ChatItem(
                         imageVector = Icons.Default.Lock,
                         contentDescription = "Secret Chat",
                         modifier = Modifier
-                            .size(14.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            .size((14 * animatedValue).dp),
+                        tint = chatSecretIconColor,
                     )
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.width((2 * animatedValue).dp))
                 }
-                Text(
+                Text(maxLines = 1,
                     text = "Chat Name",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
+                    fontSize = (15 * animatedValue).sp,
                     color =
-                        if(secret) MaterialTheme.colorScheme.onPrimaryContainer
-                        else if(isSystemInDarkTheme()) Color.White
-                        else Color.Black,
+                        if (secret) chatSecretNameColor
+                        else chatNameColor,
                 )
                 if(muted) {
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.width((2 * animatedValue).dp))
                     Icon(
                         imageVector = Icons.Default.VolumeOff,
                         contentDescription = "Muted",
                         modifier = Modifier
-                            .size(14.dp),
+                            .size((14 * animatedValue).dp),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
                 else if(verified) {
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.width((2 * animatedValue).dp))
                     Icon(
                         imageVector = Icons.Filled.Verified,
                         contentDescription = "Verified",
-                        modifier = Modifier
-                            .size(14.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size((14 * animatedValue).dp),
+                        tint = verifiedIconColor,
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height((2 * animatedValue).dp))
             val message = "Lorem ipsum dolor sit amet"
-            Text(
+            Text(maxLines = 1,
                 text =
                     if(sent) "You: $message"
                     else "$message",
-                fontSize = 15.sp,
+                fontSize = (15 * animatedValue).sp,
+                color = messageTextColor,
+                modifier = Modifier.weight(1f, false)
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -196,33 +259,36 @@ fun ChatItem(
                         imageVector = Icons.Default.DoneAll,
                         contentDescription = "Sent",
                         modifier = Modifier
-                            .size(20.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            .size((20 * animatedValue).dp)
+                            .weight(1f, false),
+                        tint = readCheckColor,
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width((8 * animatedValue).dp))
                 }
-                Text(
+                Text(maxLines = 1,
                     text = "12:00",
-                    fontSize = 11.sp,
+                    fontSize = (11 * animatedValue).sp,
+                    color = dateColor
                 )
             }
             if(pinned) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height((8 * animatedValue).dp))
                 Icon(
                     imageVector = Icons.Default.PushPin,
                     contentDescription = "Pinned",
                     modifier = Modifier
-                        .size(18.dp)
+                        .size((18 * animatedValue).dp)
                         .rotate(45f),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = pinIconColor
                 )
             }
             else if(unread) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Card(
+                Spacer(modifier = Modifier.height((8 * animatedValue).dp))
+                Column(
                     modifier = Modifier
-                        .size(18.dp),
-                    shape = RoundedCornerShape(100),
+                        .size((18 * animatedValue).dp)
+                        .clip(RoundedCornerShape(100))
+                        .background(unreadCounterColor),
                 ) {
                     Column(
                         modifier = Modifier
@@ -230,10 +296,11 @@ fun ChatItem(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Text(
+                        Text(maxLines = 1,
                             text = "1",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontSize = 8.sp,
+                            color = unreadCounterNumberColor,
+                            fontSize = (14 * animatedValue).sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -242,8 +309,11 @@ fun ChatItem(
     }
 }
 
-@Preview (showSystemUi = true, device = "spec:width=1080px,height=2400px,dpi=440")
+@Preview(showSystemUi = true, device = "spec:width=1080px,height=2400px,dpi=440",
+    showBackground = true,
+    wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE
+)
 @Composable
 fun ListOfChatsScreenPreviewPreview() {
-    ListOfChatsScreenPreview()
+    ListOfChatsScreenPreview(MainViewModel(Application()))
 }

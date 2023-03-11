@@ -7,10 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import com.dotstealab.telemone.MainViewModel
+import com.dotstealab.telemone.ui.screens.editor.AlternativeEditorScreen
 import com.dotstealab.telemone.ui.screens.editor.EditorScreen
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ChatScreenPreview
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ListOfChatsScreenPreview
-import com.dotstealab.telemone.ui.screens.editor.components.preview.PreviewScreens
 import com.dotstealab.telemone.ui.screens.editor.components.preview.ThemePreviewScreen
 import com.dotstealab.telemone.ui.screens.main.MainScreen
 import com.dotstealab.telemone.ui.screens.themeContents.ThemeContentsScreen
@@ -46,6 +46,26 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 			enterTransition = {
 				when (initialState.destination.route) {
 					"MainScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
+					"AlternativeEditorScreen" -> slideInHorizontally(initialOffsetX = { -screenWidth })
+					else -> null
+				}
+			},
+			exitTransition = {
+				when (targetState.destination.route) {
+					"AlternativeEditorScreen" -> slideOutHorizontally(targetOffsetX = { -screenWidth })
+					"MainScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
+					else -> null
+				}
+			}
+		) {
+			EditorScreen(navController, vm)
+		}
+
+		composable(
+			"AlternativeEditorScreen",
+			enterTransition = {
+				when (initialState.destination.route) {
+					"EditorScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
 					"ThemeContentsScreen" -> slideInHorizontally(initialOffsetX = { -screenWidth })
 					else -> null
 				}
@@ -53,12 +73,12 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 			exitTransition = {
 				when (targetState.destination.route) {
 					"ThemeContentsScreen" -> slideOutHorizontally(targetOffsetX = { -screenWidth })
-					"MainScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
+					"EditorScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
 					else -> null
 				}
 			}
 		) {
-			EditorScreen(navController, vm)
+			AlternativeEditorScreen(navController, vm)
 		}
 
 		composable(
@@ -94,7 +114,7 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 				}
 			}
 		) {
-			ChatScreenPreview()
+			ChatScreenPreview(vm)
 		}
 
 		composable(
@@ -112,20 +132,20 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 				}
 			}
 		) {
-			ListOfChatsScreenPreview()
+			ListOfChatsScreenPreview(vm)
 		}
 
 		composable(
 			"ThemeContentsScreen",
 			enterTransition = {
 				when (initialState.destination.route) {
-					"EditorScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
+					"AlternativeEditorScreen" -> slideInHorizontally(initialOffsetX = { screenWidth })
 					else -> null
 				}
 			},
 			exitTransition = {
 				when (targetState.destination.route) {
-					"EditorScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
+					"AlternativeEditorScreen" -> slideOutHorizontally(targetOffsetX = { screenWidth })
 					else -> null
 				}
 			}

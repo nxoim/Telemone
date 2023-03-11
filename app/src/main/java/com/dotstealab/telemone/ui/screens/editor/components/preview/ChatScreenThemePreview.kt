@@ -1,5 +1,6 @@
 package com.dotstealab.telemone.ui.screens.editor.components.preview
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,29 +8,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.CropSquare
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material.icons.filled.Terminal
@@ -41,47 +37,84 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dotstealab.telemone.MainViewModel
 
 
 @Composable
-fun ChatScreenPreview() {
+fun ChatScreenPreview(vm: MainViewModel) {
+    fun colorOf(colorValueOf: String): Color {
+        return try {
+            vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+        } catch (e: NoSuchElementException) {
+            Color.Red
+        }
+    }
+
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding(),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
     ) {
-        GroupInfoTopBar()
-        PinnedMessages()
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.Bottom,
-        ) {
-            MessageWithImageReceivedBubble()
-            MessageSentBubble()
-            VoiceMessageSentBubble()
-            MessageReceivedBubble()
-            SongReceivedBubble()
-            MessageSentBubble()
-            BottomBar()
+        Box() {
+            Column(
+                modifier = Modifier
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                MessageWithImageReceivedBubble()
+                MessageSentBubble(colorOf("chat_outBubble"))
+                VoiceMessageSentBubble()
+                MessageReceivedBubble()
+                SongReceivedBubble()
+                MessageSentBubble(colorOf("chat_outBubble"))
+            }
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column() {
+                    GroupInfoTopBar(colorOf("actionBarDefault"),
+                        colorOf("actionBarDefaultIcon"),
+                        colorOf("avatar_backgroundOrange"),
+                        colorOf("avatar_text"),
+                        colorOf("actionBarDefaultTitle"),
+                        colorOf("actionBarDefaultSubtitle"))
+                    PinnedMessages(colorOf("actionBarDefault"))
+                }
+
+                BottomBar(
+                    colorOf("chat_messagePanelBackground"),
+//				colorOf("chats_attachMessage"),
+                    colorOf("chat_messagePanelIcons"),
+                    colorOf("chat_messagePanelHint")
+                )
+            }
+
         }
     }
 }
 
 @Composable
-fun GroupInfoTopBar() {
+fun GroupInfoTopBar(
+    backgroundColor: Color,
+    iconColor: Color,
+    emptyAvatarPreviewBackgroundColor: Color,
+    emptyAvatarPreviewLetterColor: Color,
+    titleTextColor: Color,
+    membersTextColor: Color
+) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .background(backgroundColor),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
@@ -90,13 +123,14 @@ fun GroupInfoTopBar() {
             contentDescription = "Back",
             modifier = Modifier
                 .padding(16.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Card(
+        Box(
             modifier = Modifier
-                .size(40.dp),
-            shape = RoundedCornerShape(100),
+                .size(40.dp)
+                .clip(RoundedCornerShape(100))
+                .background(emptyAvatarPreviewBackgroundColor)
         ) {
             Column(
                 modifier = Modifier
@@ -106,7 +140,7 @@ fun GroupInfoTopBar() {
             ) {
                 Text(
                     text = "A",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = emptyAvatarPreviewLetterColor,
                 )
             }
         }
@@ -119,10 +153,12 @@ fun GroupInfoTopBar() {
                 text = "Cool Group",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
+                color = titleTextColor
             )
             Text(
                 text = "30 members, 2 online",
                 style = MaterialTheme.typography.bodySmall,
+                color = membersTextColor
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -131,7 +167,7 @@ fun GroupInfoTopBar() {
             contentDescription = "Search",
             modifier = Modifier
                 .padding(8.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Icon(
@@ -139,16 +175,17 @@ fun GroupInfoTopBar() {
             contentDescription = "More",
             modifier = Modifier
                 .padding(8.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
     }
 }
 
 @Composable
-fun PinnedMessages() {
+fun PinnedMessages(backgroundColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(backgroundColor)
             .padding(8.dp)
             .height(40.dp),
         horizontalArrangement = Arrangement.Start,
@@ -275,7 +312,7 @@ fun MessageWithImageReceivedBubble() {
 }
 
 @Composable
-fun MessageSentBubble() {
+fun MessageSentBubble(backgroundColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -286,6 +323,9 @@ fun MessageSentBubble() {
                 .fillMaxWidth()
                 .padding(8.dp),
             shape = RoundedCornerShape(20),
+            colors = CardDefaults.cardColors(
+                containerColor = backgroundColor
+            )
         ) {
             Box {
                 Text(
@@ -546,10 +586,16 @@ fun SongReceivedBubble() {
 }
 
 @Composable
-fun BottomBar() {
+fun BottomBar(
+    backgroundColor: Color,
+    iconColor: Color,
+    textHintColor: Color
+) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .height(48.dp)
+            .background(backgroundColor),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
@@ -558,13 +604,13 @@ fun BottomBar() {
             contentDescription = "EmojisStickersGifs",
             modifier = Modifier
                 .size(32.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = "Message",
             fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = textHintColor,
         )
         Spacer(modifier = Modifier.weight(1f))
         Icon(
@@ -572,7 +618,7 @@ fun BottomBar() {
             contentDescription = "Photo",
             modifier = Modifier
                 .size(32.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Icon(
@@ -581,7 +627,7 @@ fun BottomBar() {
             modifier = Modifier
                 .rotate(225f)
                 .size(32.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Icon(
@@ -589,13 +635,17 @@ fun BottomBar() {
             contentDescription = "Voice",
             modifier = Modifier
                 .size(32.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = iconColor,
         )
     }
 }
 
-@Preview (showSystemUi = true, device = "spec:width=1080px,height=2400px,dpi=440")
+@Preview(
+    device = "id:pixel_6_pro",
+    wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
+    showBackground = true, apiLevel = 33
+)
 @Composable
 fun ChatScreenPreviewPreview() {
-    ChatScreenPreview()
+    ChatScreenPreview(MainViewModel(Application()))
 }
