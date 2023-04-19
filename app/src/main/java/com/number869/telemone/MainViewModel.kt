@@ -81,6 +81,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		)
 	}
 
+	fun colorOfCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color {
+		return try {
+			mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+		} catch (e: NoSuchElementException) {
+			Color.Red
+		}
+	}
+
 	fun saveCurrentTheme() {
 		val mapWithUuid = mutableMapOf<String, Map<String, Pair<String, Int>>>()
 		val uuid = UUID.randomUUID().toString()
