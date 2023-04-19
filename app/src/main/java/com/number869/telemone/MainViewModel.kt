@@ -21,6 +21,7 @@ import com.number869.telemone.ui.theme.allColorTokensAsList
 import java.io.File
 import java.util.UUID
 
+// no im not making a data class
 typealias ThemeUUID = String
 typealias UiElementName = String
 typealias ColorToken = String
