@@ -39,14 +39,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.screens.editor.components.ChatScreenPreview
-import com.number869.telemone.ui.screens.editor.components.ClearBeforeLoadDialog
-import com.number869.telemone.ui.screens.editor.components.DeleteThemeDialog
-import com.number869.telemone.ui.screens.editor.components.LoadFromSavedDialog
-import com.number869.telemone.ui.screens.editor.components.OverwriteChoiceDialog
-import com.number869.telemone.ui.screens.editor.components.OverwriteDefaultsDialog
-import com.number869.telemone.ui.screens.editor.components.PalettePopup
-import com.number869.telemone.ui.screens.editor.components.SavedThemeItem
+import com.number869.telemone.ui.screens.editor.components.old.ChatScreenPreview
+import com.number869.telemone.ui.screens.editor.components.old.ClearBeforeLoadDialog
+import com.number869.telemone.ui.screens.editor.components.old.DeleteThemeDialog
+import com.number869.telemone.ui.screens.editor.components.old.LoadFromSavedDialog
+import com.number869.telemone.ui.screens.editor.components.old.OverwriteChoiceDialog
+import com.number869.telemone.ui.screens.editor.components.old.OverwriteDefaultsDialog
+import com.number869.telemone.ui.screens.editor.components.old.PalettePopup
+import com.number869.telemone.ui.screens.editor.components.old.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
 
 

@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.editor.components.preview
+package com.number869.telemone.ui.screens.editor.components.old.preview
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

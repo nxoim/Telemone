@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.editor.components.preview
+package com.number869.telemone.ui.screens.editor.components.old.preview
 
 import android.app.Application
 import androidx.compose.foundation.background

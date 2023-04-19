@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.editor.components
+package com.number869.telemone.ui.screens.editor.components.old
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
