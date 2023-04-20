@@ -40,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
@@ -111,139 +113,152 @@ fun GroupInfoTopBar(
     titleTextColor: Color,
     membersTextColor: Color
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(backgroundColor),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
+            .background(backgroundColor)
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back",
-            modifier = Modifier
-                .padding(16.dp),
-            tint = iconColor,
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(100))
-                .background(emptyAvatarPreviewBackgroundColor)
+        Row(
+            Modifier.padding(horizontal = 8.dp).padding(top = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
         ) {
-            Column(
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .padding(16.dp),
+                tint = iconColor,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(100))
+                    .background(emptyAvatarPreviewBackgroundColor)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "A",
+                        color = emptyAvatarPreviewLetterColor,
+                        style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = "A",
-                    color = emptyAvatarPreviewLetterColor,
+                    text = "Cool Group",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 18.sp,
+                    color = titleTextColor,
+                    style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+                )
+                Text(
+                    text = "30 members, 2 online",
+                    color = membersTextColor,
+                    style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.bodySmall)
                 )
             }
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Text(
-                text = "Cool Group",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = titleTextColor
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                modifier = Modifier
+                    .padding(8.dp),
+                tint = iconColor,
             )
-            Text(
-                text = "30 members, 2 online",
-                style = MaterialTheme.typography.bodySmall,
-                color = membersTextColor
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(24.dp),
+                tint = iconColor,
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
-        Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = "Search",
-            modifier = Modifier
-                .padding(8.dp),
-            tint = iconColor,
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = "More",
-            modifier = Modifier
-                .padding(8.dp),
-            tint = iconColor,
-        )
     }
 }
 
 @Composable
 fun PinnedMessages(backgroundColor: Color) {
-    Row(
-        modifier = Modifier
+    // TODO COLORS
+    Box(
+        Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(8.dp)
-            .height(40.dp),
-        horizontalArrangement = Arrangement.Start,
     ) {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Card(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(12.dp)
-                    .background(MaterialTheme.colorScheme.onPrimary),
-                shape = RoundedCornerShape(20),
-            ) { }
-            Spacer(modifier = Modifier.height(2.dp))
-            Card(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(12.dp)
-                    .background(MaterialTheme.colorScheme.onPrimary),
-                shape = RoundedCornerShape(20),
-            ) { }
-            Spacer(modifier = Modifier.height(2.dp))
-            Card(
-                modifier = Modifier
-                    .width(3.dp)
-                    .height(12.dp)
-                    .background(MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(20),
-            ) { }
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Text(
-                text = "Pinned Messages",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            Text(
-                text = "Lorem ipsum dolor sit amet",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Icon(
-            imageVector = Icons.Default.PushPin,
-            contentDescription = "More",
+        Row(
             modifier = Modifier
-                .padding(8.dp)
-                .size(32.dp)
-                .rotate(45f),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-        )
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 28.dp)
+                .height(40.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Card(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(12.dp)
+                        .background(MaterialTheme.colorScheme.onPrimary),
+                    shape = RoundedCornerShape(20),
+                ) { }
+                Spacer(modifier = Modifier.height(2.dp))
+                Card(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(12.dp)
+                        .background(MaterialTheme.colorScheme.onPrimary),
+                    shape = RoundedCornerShape(20),
+                ) { }
+                Spacer(modifier = Modifier.height(2.dp))
+                Card(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(12.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(20),
+                ) { }
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Text(
+                    text = "Pinned Messages",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Text(
+                    text = "Lorem ipsum dolor sit amet",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.PushPin,
+                contentDescription = "More",
+                modifier = Modifier
+                    .size(18.dp)
+                    .rotate(45f),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
     }
 }
 

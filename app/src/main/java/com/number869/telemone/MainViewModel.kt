@@ -5,8 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
@@ -67,6 +70,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 	// will need this to update source theme files or something
 	val differencesBetweenFileAndCurrent = loadedFromFileTheme - _mappedValues
+	val savedShadowValues: LoadedTheme = mutableStateMapOf()
+
+	var disableShadows by mutableStateOf(true)
 
 	init {
 		val savedThemeList = preferences.getString(themeListKey, "[]")
@@ -86,6 +92,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
 		} catch (e: NoSuchElementException) {
 			Color.Red
+		}
+	}
+
+	fun switchShadowsOnOff() {
+		disableShadows = !disableShadows
+
+		if (disableShadows) {
+			defaultShadowTokens.forEach { (key, value) ->
+				_mappedValues[key] = value
+			}
+		} else {
+			savedShadowValues.forEach { (key, value) ->
+				_mappedValues[key] = value
+			}
 		}
 	}
 
@@ -215,6 +235,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 				if (isCorrectFormat) {
 					if (clearCurrentTheme) _mappedValues.clear()
+
+					// check if has shadows specified
+					for ((key, value) in defaultShadowTokens) {
+						if (!_mappedValues.contains(key)) {
+							_mappedValues[key] = value
+							savedShadowValues[key] = value
+						}
+					}
+
+					for ((key, value) in fallbackKeys) {
+						if (!_mappedValues.contains(key)) {
+							//	Find the key in _mappedValues that matches the value in
+							// fallbackKeys
+							val matchedKey = _mappedValues.keys.find { it == value }
+							//	If there is a match, clone the key-value pair from
+							// _mappedValues and add it with the new key
+							if (matchedKey != null) {
+								_mappedValues[key] = _mappedValues[matchedKey]!!
+							}
+						}
+					}
+
+					if (disableShadows) {
+						defaultShadowTokens.forEach { (key, value) ->
+							_mappedValues[key] = value
+						}
+					} else {
+						savedShadowValues.forEach { (key, value) ->
+							_mappedValues[key] = value
+						}
+					}
 
 					loadedFromFileTheme.clear()
 					_mappedValues.putAll(loadedMap)
@@ -347,6 +398,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 					defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueAsItWasSaved)
 				}
 			}
+
+		// check if has shadows specified
+		for ((key, value) in defaultShadowTokens) {
+			if (!_mappedValues.contains(key)) {
+				_mappedValues[key] = value
+				defaultCurrentTheme[key] = value
+				savedShadowValues[key] = value
+			}
+		}
+
+		for ((key, value) in fallbackKeys) {
+			if (!_mappedValues.contains(key)) {
+				//Find the key in _mappedValues that matches the value in
+				// fallbackKeys
+				val matchedKey = _mappedValues.keys.find { it == value }
+				//If there is a match, clone the key-value pair from
+				// _mappedValues and add it with the new key
+				if (matchedKey != null) {
+					_mappedValues[key] = _mappedValues[matchedKey]!!
+					defaultCurrentTheme[key] = _mappedValues[matchedKey]!!
+				}
+			}
+		}
+
+		if (disableShadows) {
+			defaultShadowTokens.forEach { (key, value) ->
+				_mappedValues[key] = value
+			}
+		} else {
+			savedShadowValues.forEach { (key, value) ->
+				_mappedValues[key] = value
+			}
+		}
 	}
 
 	fun exportTheme(uuid: String, context: Context) {
@@ -855,6 +939,18 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.n2_800 -> "n2_800"
 		palette.n2_900 -> "n2_900"
 		palette.n2_1000 -> "n2_1000"
+		Color.Transparent -> "TRANSPARENT"
 		else -> ""
 	}
 }
+
+val defaultShadowTokens = mapOf(
+	"windowBackgroundGrayShadow" to Pair("TRANSPARENT", Color.Transparent),
+	"chat_inBubbleShadow" to Pair("TRANSPARENT", Color.Transparent),
+	"chat_outBubbleShadow" to Pair("TRANSPARENT", Color.Transparent),
+	"chats_menuTopShadow" to Pair("TRANSPARENT", Color.Transparent),
+	"chats_menuTopShadowCats" to Pair("TRANSPARENT", Color.Transparent),
+	"dialogShadowLine" to Pair("TRANSPARENT", Color.Transparent),
+	"key_chat_messagePanelVoiceLockShadow" to Pair("TRANSPARENT", Color.Transparent),
+	"chat_emojiPanelShadowLine" to Pair("TRANSPARENT", Color.Transparent)
+)
