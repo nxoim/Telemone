@@ -22,10 +22,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,12 +66,13 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 				map.keys.filterNot {
 					it == "defaultLightThemeUUID" || it == "defaultDarkThemeUUID"
 				}
-			}
+			}.reversed()
 		}
 	}
 	val mappedValues by remember { derivedStateOf { vm.mappedValues }  }
 	val mappedValuesAsList = mappedValues.toList().sortedBy { it.first }
 	val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
+	val savedThemesRowState = rememberLazyListState()
 
 	var showClearBeforeLoadDialog by remember { mutableStateOf(false) }
 
@@ -112,6 +115,10 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 				launcherThatDoesnt.launch(arrayOf("*/*"))
 			}
 		)
+	}
+
+	LaunchedEffect(themeList) {
+		savedThemesRowState.animateScrollToItem(0)
 	}
 
 	Column(Modifier.statusBarsPadding()) {
@@ -180,6 +187,7 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 				Text(text = "Saved Themes")
 
 				LazyRow(
+					state = savedThemesRowState,
 					contentPadding = PaddingValues(horizontal = 16.dp),
 					horizontalArrangement = Arrangement.spacedBy(16.dp)
 				) {
