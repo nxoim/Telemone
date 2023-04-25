@@ -118,7 +118,7 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel, state: Ove
 					}
 
 					AnimatedVisibility(visible = itemState.isExpanded) {
-						AlternativeEditorScreen(navController, vm)
+						AlternativeEditorScreen(state, vm)
 					}
 				}
 			}

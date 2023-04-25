@@ -37,7 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.navigation.NavHostController
+import com.number869.seksinavigation.OverlayItemWrapper
+import com.number869.seksinavigation.OverlayLayoutState
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.screens.editor.components.old.ChatScreenPreview
 import com.number869.telemone.ui.screens.editor.components.old.ClearBeforeLoadDialog
@@ -47,12 +48,13 @@ import com.number869.telemone.ui.screens.editor.components.old.OverwriteChoiceDi
 import com.number869.telemone.ui.screens.editor.components.old.OverwriteDefaultsDialog
 import com.number869.telemone.ui.screens.editor.components.old.PalettePopup
 import com.number869.telemone.ui.screens.editor.components.old.SavedThemeItem
+import com.number869.telemone.ui.screens.themeContents.ThemeContentsScreen
 import com.number869.telemone.ui.theme.fullPalette
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AlternativeEditorScreen(navController: NavHostController, vm: MainViewModel) {
+fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel) {
 	val context = LocalContext.current
 	val palette = fullPalette()
 
@@ -133,8 +135,22 @@ fun AlternativeEditorScreen(navController: NavHostController, vm: MainViewModel)
 				Button(onClick = { vm.loadStockDarkTheme(palette, context) }) {
 					Text(text = "Load Stock Dark")
 				}
-				Button(onClick = { navController.navigate("ThemeContentsScreen") }) {
-					Text(text = "Show Values")
+
+				val isContentsScreenExpanded = overlayState.itemsState["themeContentsScreen"]?.isExpanded ?: false
+				OverlayItemWrapper(
+					key = "themeContentsScreen",
+					isOriginalItemStatic = true,
+					state = overlayState
+				) {
+					AnimatedVisibility(visible = !isContentsScreenExpanded) {
+						Button(onClick = { overlayState.addToOverlayStack("themeContentsScreen")  }) {
+							Text(text = "Show Values")
+						}
+					}
+
+					AnimatedVisibility(visible = isContentsScreenExpanded) {
+						ThemeContentsScreen(vm)
+					}
 				}
 			}
 
@@ -148,9 +164,6 @@ fun AlternativeEditorScreen(navController: NavHostController, vm: MainViewModel)
 				}
 				Button(onClick = { showClearBeforeLoadDialog = true }) {
 					Text(text = "Load File")
-				}
-				Button(onClick = { navController.navigate("ThemePreviewScreen") }) {
-					Text(text = "Preview")
 				}
 			}
 		}

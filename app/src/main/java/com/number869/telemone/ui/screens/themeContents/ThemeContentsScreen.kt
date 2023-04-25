@@ -1,5 +1,6 @@
 package com.number869.telemone.ui.screens.themeContents
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -39,7 +40,8 @@ fun ThemeContentsScreen(vm: MainViewModel) {
 
 	LazyColumn(
 		Modifier
-			.fillMaxSize(),
+			.fillMaxSize()
+			.background(MaterialTheme.colorScheme.background),
 		contentPadding = PaddingValues(
 			top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding(),
 			bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
