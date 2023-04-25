@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.service.controls.ControlsProviderService.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -361,6 +363,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 	fun changeValue(key: String, colorValue: Color, colorToken: String) {
 		_mappedValues[key] = Pair(colorToken, colorValue)
+
+		Log.d(TAG, "color value replaced at $key with $colorValue")
 	}
 
 	fun startupConfigProcess(palette: FullPaletteList, isDarkMode: Boolean, context: Context) {
@@ -707,6 +711,101 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"n2_800" -> palette.n2_800
 		"n2_900" -> palette.n2_900
 		"n2_1000" -> palette.n2_1000
+		"background" -> palette.background
+		"surface" -> palette.surface
+		"surface_elevation_level_3" -> palette.surfaceElevationLevel3
+		"TRANSPARENT" -> Color.Transparent
+		"blue_0" -> palette.blueTonalPalette.getValue(0)
+		"blue_100" -> palette.blueTonalPalette.getValue(10)
+		"blue_200" -> palette.blueTonalPalette.getValue(20)
+		"blue_300" -> palette.blueTonalPalette.getValue(30)
+		"blue_400" -> palette.blueTonalPalette.getValue(40)
+		"blue_500" -> palette.blueTonalPalette.getValue(50)
+		"blue_600" -> palette.blueTonalPalette.getValue(60)
+		"blue_700" -> palette.blueTonalPalette.getValue(70)
+		"blue_800" -> palette.blueTonalPalette.getValue(80)
+		"blue_900" -> palette.blueTonalPalette.getValue(90)
+		"blue_950" -> palette.blueTonalPalette.getValue(95)
+		"blue_990" -> palette.blueTonalPalette.getValue(99)
+		"blue_1000" -> palette.blueTonalPalette.getValue(100)
+		"red_0" -> palette.redTonalPalette.getValue(0)
+		"red_100" -> palette.redTonalPalette.getValue(10)
+		"red_200" -> palette.redTonalPalette.getValue(20)
+		"red_300" -> palette.redTonalPalette.getValue(30)
+		"red_400" -> palette.redTonalPalette.getValue(40)
+		"red_500" -> palette.redTonalPalette.getValue(50)
+		"red_600" -> palette.redTonalPalette.getValue(60)
+		"red_700" -> palette.redTonalPalette.getValue(70)
+		"red_800" -> palette.redTonalPalette.getValue(80)
+		"red_900" -> palette.redTonalPalette.getValue(90)
+		"red_950" -> palette.redTonalPalette.getValue(95)
+		"red_990" -> palette.redTonalPalette.getValue(99)
+		"red_1000" -> palette.redTonalPalette.getValue(100)
+		"green_0" -> palette.greenTonalPalette.getValue(0)
+		"green_100" -> palette.greenTonalPalette.getValue(10)
+		"green_200" -> palette.greenTonalPalette.getValue(20)
+		"green_300" -> palette.greenTonalPalette.getValue(30)
+		"green_400" -> palette.greenTonalPalette.getValue(40)
+		"green_500" -> palette.greenTonalPalette.getValue(50)
+		"green_600" -> palette.greenTonalPalette.getValue(60)
+		"green_700" -> palette.greenTonalPalette.getValue(70)
+		"green_800" -> palette.greenTonalPalette.getValue(80)
+		"green_900" -> palette.greenTonalPalette.getValue(90)
+		"green_950" -> palette.greenTonalPalette.getValue(95)
+		"green_990" -> palette.greenTonalPalette.getValue(99)
+		"green_1000" -> palette.greenTonalPalette.getValue(100)
+		"orange_0" -> palette.orangeTonalPalette.getValue(0)
+		"orange_100" -> palette.orangeTonalPalette.getValue(10)
+		"orange_200" -> palette.orangeTonalPalette.getValue(20)
+		"orange_300" -> palette.orangeTonalPalette.getValue(30)
+		"orange_400" -> palette.orangeTonalPalette.getValue(40)
+		"orange_500" -> palette.orangeTonalPalette.getValue(50)
+		"orange_600" -> palette.orangeTonalPalette.getValue(60)
+		"orange_700" -> palette.orangeTonalPalette.getValue(70)
+		"orange_800" -> palette.orangeTonalPalette.getValue(80)
+		"orange_900" -> palette.orangeTonalPalette.getValue(90)
+		"orange_950" -> palette.orangeTonalPalette.getValue(95)
+		"orange_990" -> palette.orangeTonalPalette.getValue(99)
+		"orange_1000" -> palette.orangeTonalPalette.getValue(100)
+		"violet_0" -> palette.violetTonalPalette.getValue(0)
+		"violet_100" -> palette.violetTonalPalette.getValue(10)
+		"violet_200" -> palette.violetTonalPalette.getValue(20)
+		"violet_300" -> palette.violetTonalPalette.getValue(30)
+		"violet_400" -> palette.violetTonalPalette.getValue(40)
+		"violet_500" -> palette.violetTonalPalette.getValue(50)
+		"violet_600" -> palette.violetTonalPalette.getValue(60)
+		"violet_700" -> palette.violetTonalPalette.getValue(70)
+		"violet_800" -> palette.violetTonalPalette.getValue(80)
+		"violet_900" -> palette.violetTonalPalette.getValue(90)
+		"violet_950" -> palette.violetTonalPalette.getValue(95)
+		"violet_990" -> palette.violetTonalPalette.getValue(99)
+		"violet_1000" -> palette.violetTonalPalette.getValue(100)
+		"cyan_0" -> palette.cyanTonalPalette.getValue(0)
+		"cyan_100" -> palette.cyanTonalPalette.getValue(10)
+		"cyan_200" -> palette.cyanTonalPalette.getValue(20)
+		"cyan_300" -> palette.cyanTonalPalette.getValue(30)
+		"cyan_400" -> palette.cyanTonalPalette.getValue(40)
+		"cyan_500" -> palette.cyanTonalPalette.getValue(50)
+		"cyan_600" -> palette.cyanTonalPalette.getValue(60)
+		"cyan_700" -> palette.cyanTonalPalette.getValue(70)
+		"cyan_800" -> palette.cyanTonalPalette.getValue(80)
+		"cyan_900" -> palette.cyanTonalPalette.getValue(90)
+		"cyan_950" -> palette.cyanTonalPalette.getValue(95)
+		"cyan_990" -> palette.cyanTonalPalette.getValue(99)
+		"cyan_1000" -> palette.cyanTonalPalette.getValue(100)
+		"pink_0" -> palette.pinkTonalPalette.getValue(0)
+		"pink_100" -> palette.pinkTonalPalette.getValue(10)
+		"pink_200" -> palette.pinkTonalPalette.getValue(20)
+		"pink_300" -> palette.pinkTonalPalette.getValue(30)
+		"pink_400" -> palette.pinkTonalPalette.getValue(40)
+		"pink_500" -> palette.pinkTonalPalette.getValue(50)
+		"pink_600" -> palette.pinkTonalPalette.getValue(60)
+		"pink_700" -> palette.pinkTonalPalette.getValue(70)
+		"pink_800" -> palette.pinkTonalPalette.getValue(80)
+		"pink_900" -> palette.pinkTonalPalette.getValue(90)
+		"pink_950" -> palette.pinkTonalPalette.getValue(95)
+		"pink_990" -> palette.pinkTonalPalette.getValue(99)
+		"pink_1000" -> palette.pinkTonalPalette.getValue(100)
 		else -> Color.Red
 	}
 }
@@ -939,7 +1038,101 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.n2_800 -> "n2_800"
 		palette.n2_900 -> "n2_900"
 		palette.n2_1000 -> "n2_1000"
+		palette.background -> "background"
+		palette.surface -> "surface"
+		palette.surfaceElevationLevel3 -> "surface_elevation_level_3"
 		Color.Transparent -> "TRANSPARENT"
+		palette.blueTonalPalette.getValue(0) -> "blue_0"
+		palette.blueTonalPalette.getValue(10) -> "blue_100"
+		palette.blueTonalPalette.getValue(20) -> "blue_200"
+		palette.blueTonalPalette.getValue(30) -> "blue_300"
+		palette.blueTonalPalette.getValue(40) -> "blue_400"
+		palette.blueTonalPalette.getValue(50) -> "blue_500"
+		palette.blueTonalPalette.getValue(60) -> "blue_600"
+		palette.blueTonalPalette.getValue(70) -> "blue_700"
+		palette.blueTonalPalette.getValue(80) -> "blue_800"
+		palette.blueTonalPalette.getValue(90) -> "blue_900"
+		palette.blueTonalPalette.getValue(95) -> "blue_950"
+		palette.blueTonalPalette.getValue(99) -> "blue_990"
+		palette.blueTonalPalette.getValue(100) -> "blue_1000"
+		palette.redTonalPalette.getValue(0) -> "red_0"
+		palette.redTonalPalette.getValue(10) -> "red_100"
+		palette.redTonalPalette.getValue(20) -> "red_200"
+		palette.redTonalPalette.getValue(30) -> "red_300"
+		palette.redTonalPalette.getValue(40) -> "red_400"
+		palette.redTonalPalette.getValue(50) -> "red_500"
+		palette.redTonalPalette.getValue(60) -> "red_600"
+		palette.redTonalPalette.getValue(70) -> "red_700"
+		palette.redTonalPalette.getValue(80) -> "red_800"
+		palette.redTonalPalette.getValue(90) -> "red_900"
+		palette.redTonalPalette.getValue(95) -> "red_950"
+		palette.redTonalPalette.getValue(99) -> "red_990"
+		palette.redTonalPalette.getValue(100) -> "red_1000"
+		palette.greenTonalPalette.getValue(0) -> "green_0"
+		palette.greenTonalPalette.getValue(10) -> "green_100"
+		palette.greenTonalPalette.getValue(20) -> "green_200"
+		palette.greenTonalPalette.getValue(30) -> "green_300"
+		palette.greenTonalPalette.getValue(40) -> "green_400"
+		palette.greenTonalPalette.getValue(50) -> "green_500"
+		palette.greenTonalPalette.getValue(60) -> "green_600"
+		palette.greenTonalPalette.getValue(70) -> "green_700"
+		palette.greenTonalPalette.getValue(80) -> "green_800"
+		palette.greenTonalPalette.getValue(90) -> "green_900"
+		palette.greenTonalPalette.getValue(95) -> "green_950"
+		palette.greenTonalPalette.getValue(99) -> "green_990"
+		palette.greenTonalPalette.getValue(100) -> "green_1000"
+		palette.orangeTonalPalette.getValue(0) -> "orange_0"
+		palette.orangeTonalPalette.getValue(10) -> "orange_100"
+		palette.orangeTonalPalette.getValue(20) -> "orange_200"
+		palette.orangeTonalPalette.getValue(30) -> "orange_300"
+		palette.orangeTonalPalette.getValue(40) -> "orange_400"
+		palette.orangeTonalPalette.getValue(50) -> "orange_500"
+		palette.orangeTonalPalette.getValue(60) -> "orange_600"
+		palette.orangeTonalPalette.getValue(70) -> "orange_700"
+		palette.orangeTonalPalette.getValue(80) -> "orange_800"
+		palette.orangeTonalPalette.getValue(90) -> "orange_900"
+		palette.orangeTonalPalette.getValue(95) -> "orange_950"
+		palette.orangeTonalPalette.getValue(99) -> "orange_990"
+		palette.orangeTonalPalette.getValue(100) -> "orange_1000"
+		palette.violetTonalPalette.getValue(0) -> "violet_0"
+		palette.violetTonalPalette.getValue(10) -> "violet_100"
+		palette.violetTonalPalette.getValue(20) -> "violet_200"
+		palette.violetTonalPalette.getValue(30) -> "violet_300"
+		palette.violetTonalPalette.getValue(40) -> "violet_400"
+		palette.violetTonalPalette.getValue(50) -> "violet_500"
+		palette.violetTonalPalette.getValue(60) -> "violet_600"
+		palette.violetTonalPalette.getValue(70) -> "violet_700"
+		palette.violetTonalPalette.getValue(80) -> "violet_800"
+		palette.violetTonalPalette.getValue(90) -> "violet_900"
+		palette.violetTonalPalette.getValue(95) -> "violet_950"
+		palette.violetTonalPalette.getValue(99) -> "violet_990"
+		palette.violetTonalPalette.getValue(100) -> "violet_1000"
+		palette.cyanTonalPalette.getValue(0) -> "cyan_0"
+		palette.cyanTonalPalette.getValue(10) -> "cyan_100"
+		palette.cyanTonalPalette.getValue(20) -> "cyan_200"
+		palette.cyanTonalPalette.getValue(30) -> "cyan_300"
+		palette.cyanTonalPalette.getValue(40) -> "cyan_400"
+		palette.cyanTonalPalette.getValue(50) -> "cyan_500"
+		palette.cyanTonalPalette.getValue(60) -> "cyan_600"
+		palette.cyanTonalPalette.getValue(70) -> "cyan_700"
+		palette.cyanTonalPalette.getValue(80) -> "cyan_800"
+		palette.cyanTonalPalette.getValue(90) -> "cyan_900"
+		palette.cyanTonalPalette.getValue(95) -> "cyan_950"
+		palette.cyanTonalPalette.getValue(99) -> "cyan_990"
+		palette.cyanTonalPalette.getValue(100) -> "cyan_1000"
+		palette.pinkTonalPalette.getValue(0) -> "pink_0"
+		palette.pinkTonalPalette.getValue(10) -> "pink_100"
+		palette.pinkTonalPalette.getValue(20) -> "pink_200"
+		palette.pinkTonalPalette.getValue(30) -> "pink_300"
+		palette.pinkTonalPalette.getValue(40) -> "pink_400"
+		palette.pinkTonalPalette.getValue(50) -> "pink_500"
+		palette.pinkTonalPalette.getValue(60) -> "pink_600"
+		palette.pinkTonalPalette.getValue(70) -> "pink_700"
+		palette.pinkTonalPalette.getValue(80) -> "pink_800"
+		palette.pinkTonalPalette.getValue(90) -> "pink_900"
+		palette.pinkTonalPalette.getValue(95) -> "pink_950"
+		palette.pinkTonalPalette.getValue(99) -> "pink_990"
+		palette.pinkTonalPalette.getValue(100) -> "pink_1000"
 		else -> ""
 	}
 }
@@ -952,5 +1145,8 @@ val defaultShadowTokens = mapOf(
 	"chats_menuTopShadowCats" to Pair("TRANSPARENT", Color.Transparent),
 	"dialogShadowLine" to Pair("TRANSPARENT", Color.Transparent),
 	"key_chat_messagePanelVoiceLockShadow" to Pair("TRANSPARENT", Color.Transparent),
-	"chat_emojiPanelShadowLine" to Pair("TRANSPARENT", Color.Transparent)
+	"chat_emojiPanelShadowLine" to Pair("TRANSPARENT", Color.Transparent),
+	"chat_messagePanelShadow" to Pair("TRANSPARENT", Color.Transparent),
+	// TODO choose which shadows you want to be gone
+//	"chat_goDownButtonShadow" to Pair("TRANSPARENT", Color.Transparent)
 )
