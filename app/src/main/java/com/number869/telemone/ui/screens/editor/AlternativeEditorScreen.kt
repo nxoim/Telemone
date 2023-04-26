@@ -280,7 +280,8 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 								{
 									showOverwriteChoiceDialog = false
 									showOverwriteDarkThemeDialog = true
-								}
+								},
+								vm
 							)
 						}
 
@@ -295,7 +296,9 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 									showOverwriteDarkThemeDialog = false
 									vm.overwriteDefaultDarkTheme(uuid, palette)
 								},
-								thingToOverwrite = "default dark theme"
+								vm = vm,
+								overwriteDark = true,
+								uuid
 							)
 						}
 
@@ -310,7 +313,9 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 									showOverwriteLightThemeDialog = false
 									vm.overwriteDefaultLightTheme(uuid, palette)
 								},
-								thingToOverwrite = "default light theme"
+								vm = vm,
+								overwriteDark = false,
+								uuid
 							)
 						}
 					}
