@@ -224,7 +224,7 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 									onLongClick = { showMenu = true }
 								),
 							vm,
-							theme = Pair(index, uuid),
+							uuid = uuid,
 							closeMenu = { showMenu = false},
 							overwriteTheme = {
 								showMenu = false
@@ -262,7 +262,6 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 							DeleteThemeDialog(
 								close = { showDeleteDialog = false },
 								vm,
-								index,
 								uuid
 							)
 						}

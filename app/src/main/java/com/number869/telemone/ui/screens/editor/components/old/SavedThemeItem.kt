@@ -40,7 +40,7 @@ import com.number869.telemone.MainViewModel
 fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
-	theme: Pair<Int, String>,
+	uuid: String,
 	closeMenu: () -> Unit = {},
 	overwriteTheme: () -> Unit = {},
 	deleteTheme: () -> Unit = {},
@@ -48,8 +48,8 @@ fun SavedThemeItem(
 	showMenu: Boolean = false,
 ) {
 	fun colorOf(colorValueOf: String): Color {
-		return vm.themeList.find { it.containsKey(theme.second) }
-			?.get(theme.second)
+		return vm.themeList.find { it.containsKey(uuid) }
+			?.get(uuid)
 			?.get(colorValueOf)
 			?.let { Color(it.second) } ?: Color.Red
 	}

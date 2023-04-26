@@ -17,7 +17,6 @@ import com.number869.telemone.MainViewModel
 fun DeleteThemeDialog(
 	close: () -> Unit,
 	vm: MainViewModel,
-	index: Int,
 	uuid: String
 ) {
 	AlertDialog(
@@ -30,7 +29,7 @@ fun DeleteThemeDialog(
 					.height(180.dp)
 					.clip(RoundedCornerShape(16.dp)),
 				vm,
-				Pair(index, uuid)
+				uuid
 			)
 		},
 		text = { Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",) },
