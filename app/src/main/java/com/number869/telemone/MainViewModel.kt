@@ -90,7 +90,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		)
 	}
 
-	fun colorOfCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color {
+	fun colorFromCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color {
 		return try {
 			mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
 		} catch (e: NoSuchElementException) {
@@ -137,16 +137,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		preferences.edit().clear().putString(themeListKey, contents).apply()
 	}
 
-	fun setCurrentMapTo(
+	fun loadTheme(
 		uuid: String,
-		loadTokens: Boolean,
+		withTokens: Boolean,
 		palette: FullPaletteList,
 		clearCurrentTheme: Boolean
 	) {
 		val loadedMap = _themeList.firstOrNull { it.containsKey(uuid) }?.get(uuid)
 
 		if (loadedMap != null) {
-			if (loadTokens) {
+			if (withTokens) {
 				if (clearCurrentTheme) { _mappedValues.clear() }
 				loadedMap.let {
 					it.forEach { colorPair ->
@@ -299,7 +299,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		_mappedValues.putAll(defaultCurrentTheme)
 	}
 
-	fun overwriteCurrentLightTheme(uuid: String, palette: FullPaletteList) {
+	fun overwriteDefaultLightTheme(uuid: String, palette: FullPaletteList) {
 		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
 		val index = _themeList.indexOfFirst { it.containsKey("defaultLightThemeUUID") }
@@ -333,7 +333,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
-	fun overwriteCurrentDarkTheme(uuid: String, palette: FullPaletteList) {
+	fun overwriteDefaultDarkTheme(uuid: String, palette: FullPaletteList) {
 		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
 		val index = _themeList.indexOfFirst { it.containsKey("defaultDarkThemeUUID") }
@@ -369,8 +369,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun startupConfigProcess(palette: FullPaletteList, isDarkMode: Boolean, context: Context) {
-		val darkTheme = defaultDarkTheme(palette, context)
-		val lightTheme = defaultLightTheme(palette, context)
+		val darkTheme = com.number869.telemone.stockDarkTheme(palette, context)
+		val lightTheme = stockLightTheme(palette, context)
 		val defaultThemeKey = if (isDarkMode)
 			"defaultDarkThemeUUID"
 		else
@@ -490,7 +490,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun loadStockDarkTheme(palette: FullPaletteList, context: Context) {
 		_mappedValues.clear()
 
-		defaultDarkTheme(palette, context).map {
+		stockDarkTheme(palette, context).map {
 			val uiItemName = it.key
 			val colorToken = it.value.first
 			val colorValue = Color(it.value.second)
@@ -503,7 +503,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun loadStockLightTheme(palette: FullPaletteList, context: Context) {
 		_mappedValues.clear()
 
-		defaultLightTheme(palette, context).map {
+		stockLightTheme(palette, context).map {
 			val uiItemName = it.key
 			val colorToken = it.value.first
 			val colorValue = Color(it.value.second)
@@ -513,7 +513,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	fun shareCustomTheme(context: Context) {
+	fun exportCustomTheme(context: Context) {
 		val map = _mappedValues.mapValues {
 			it.value.second.toArgb()
 		}.entries.joinToString("\n")
@@ -538,7 +538,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "TeleMone Custom"))
 	}
 
-	fun saveLightModeTheme(context: Context, palette: FullPaletteList) {
+	fun saveLightTheme(context: Context, palette: FullPaletteList) {
 		val source = _themeList.find { it.containsKey("defaultLightThemeUUID") }
 			?.getValue("defaultLightThemeUUID")
 		// prints ui element name = the color we gave it
@@ -564,7 +564,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "TeleMone Light"))
 	}
 
-	fun saveDarkModeTheme(context: Context, palette: FullPaletteList) {
+	fun saveDarkTheme(context: Context, palette: FullPaletteList) {
 		val source = _themeList.find { it.containsKey("defaultDarkThemeUUID") }
 			?.getValue("defaultDarkThemeUUID")
 
@@ -596,7 +596,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 // at the moment(!!)
 
 // themes in assets folder MUST have values existent in fullPalette()
-private fun defaultLightTheme(
+private fun stockLightTheme(
 	palette: FullPaletteList,
 	context: Context
 ): Map<String, Pair<String, Int>> {
@@ -621,7 +621,7 @@ private fun defaultLightTheme(
 }
 
 // also at least pretend to like these funny little silly haha comments
-private fun defaultDarkTheme(
+private fun stockDarkTheme(
 	palette: FullPaletteList,
 	context: Context
 ): Map<String, Pair<String, Int>> {

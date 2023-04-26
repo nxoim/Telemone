@@ -21,9 +21,9 @@ fun LoadFromSavedDialog(
 				onClick = {
 					close()
 
-					vm.setCurrentMapTo(
+					vm.loadTheme(
 						uuid,
-						loadTokens = false,
+						withTokens = false,
 						palette,
 						clearCurrentTheme = true
 					)
@@ -36,9 +36,9 @@ fun LoadFromSavedDialog(
 				onClick = {
 					close()
 
-					vm.setCurrentMapTo(
+					vm.loadTheme(
 						uuid,
-						loadTokens = false,
+						withTokens = false,
 						palette,
 						clearCurrentTheme = false
 					)
@@ -55,9 +55,9 @@ fun LoadFromSavedDialog(
 				onClick = {
 					close()
 
-					vm.setCurrentMapTo(
+					vm.loadTheme(
 						uuid,
-						loadTokens = true,
+						withTokens = true,
 						palette,
 						clearCurrentTheme = true
 					)
@@ -69,9 +69,9 @@ fun LoadFromSavedDialog(
 				onClick = {
 					close()
 
-					vm.setCurrentMapTo(
+					vm.loadTheme(
 						uuid,
-						loadTokens = true,
+						withTokens = true,
 						palette,
 						clearCurrentTheme = false
 					)

@@ -134,14 +134,14 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 	Column(Modifier.statusBarsPadding()) {
 		Column() {
 			Row() {
-				Button(onClick = { vm.shareCustomTheme(context) }) {
-					Text(text = "Share Current")
+				Button(onClick = { vm.exportCustomTheme(context) }) {
+					Text(text = "Export Current")
 				}
 				Button(onClick = { vm.saveCurrentTheme() }) {
-					Text(text = "Save")
+					Text(text = "Save Current")
 				}
 				Button(onClick = { vm.resetCurrentTheme() }) {
-					Text(text = "Reset current theme")
+					Text(text = "Reset current")
 				}
 			}
 
@@ -294,7 +294,7 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 								close = { showOverwriteDarkThemeDialog = false },
 								overwrite = {
 									showOverwriteDarkThemeDialog = false
-									vm.overwriteCurrentDarkTheme(uuid, palette)
+									vm.overwriteDefaultDarkTheme(uuid, palette)
 								},
 								thingToOverwrite = "default dark theme"
 							)
@@ -309,7 +309,7 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 								close = { showOverwriteLightThemeDialog = false },
 								overwrite = {
 									showOverwriteLightThemeDialog = false
-									vm.overwriteCurrentLightTheme(uuid, palette)
+									vm.overwriteDefaultLightTheme(uuid, palette)
 								},
 								thingToOverwrite = "default light theme"
 							)

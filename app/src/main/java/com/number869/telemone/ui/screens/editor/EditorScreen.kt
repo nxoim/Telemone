@@ -98,8 +98,8 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel, state: Ove
 		}
 
 		Column {
-			Button(onClick = { vm.shareCustomTheme(context) }) {
-				Text(text = "Share Current")
+			Button(onClick = { vm.exportCustomTheme(context) }) {
+				Text(text = "Export Current")
 			}
 
 			OverlayItemWrapper(
@@ -146,13 +146,13 @@ fun AppBarColoursItem(vm: MainViewModel, palette: FullPaletteList) {
 					.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(32.dp))
 			) {
 				GroupInfoTopBar(
-					vm.colorOfCurrentTheme("actionBarDefault"),
-					vm.colorOfCurrentTheme("actionBarDefaultIcon"),
-					vm.colorOfCurrentTheme("avatar_backgroundOrange"),
-					vm.colorOfCurrentTheme("avatar_text"),
-					vm.colorOfCurrentTheme("actionBarDefaultTitle"),
-					vm.colorOfCurrentTheme("actionBarDefaultSubtitle"))
-				PinnedMessages(vm.colorOfCurrentTheme("actionBarDefault"))
+					vm.colorFromCurrentTheme("actionBarDefault"),
+					vm.colorFromCurrentTheme("actionBarDefaultIcon"),
+					vm.colorFromCurrentTheme("avatar_backgroundOrange"),
+					vm.colorFromCurrentTheme("avatar_text"),
+					vm.colorFromCurrentTheme("actionBarDefaultTitle"),
+					vm.colorFromCurrentTheme("actionBarDefaultSubtitle"))
+				PinnedMessages(vm.colorFromCurrentTheme("actionBarDefault"))
 			}
 		}
 
@@ -171,7 +171,7 @@ fun AppBarColoursItem(vm: MainViewModel, palette: FullPaletteList) {
 @Composable
 fun ColorSelectionItem(itemName: String, vm: MainViewModel, palette: FullPaletteList) {
 	var showPopUp by remember { mutableStateOf(false) }
-	val color by remember { derivedStateOf { vm.colorOfCurrentTheme(itemName) } }
+	val color by remember { derivedStateOf { vm.colorFromCurrentTheme(itemName) } }
 
 	Box(
 		Modifier
