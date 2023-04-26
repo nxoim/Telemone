@@ -71,7 +71,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	private var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 	// will need this to update source theme files or something
-	val differencesBetweenFileAndCurrent = loadedFromFileTheme - _mappedValues
+	// TODO DEBUG THIS
+	val differencesBetweenFileAndCurrent = loadedFromFileTheme.filterKeys { it !in _mappedValues.keys }
 	val savedShadowValues: LoadedTheme = mutableStateMapOf()
 
 	var disableShadows by mutableStateOf(true)
@@ -605,7 +606,7 @@ private fun defaultLightTheme(
 		.bufferedReader().use { reader ->
 			reader.forEachLine { line ->
 				if (line.isNotEmpty()) {
-					val splitLine = line.split("=")
+					val splitLine = line.replace(" ", "").split("=")
 					val key = splitLine[0]
 					val value = splitLine[1]
 
@@ -630,7 +631,7 @@ private fun defaultDarkTheme(
 		.bufferedReader().use { reader ->
 			reader.forEachLine { line ->
 				if (line.isNotEmpty()) {
-					val splitLine = line.split("=")
+					val splitLine = line.replace(" ", "").split("=")
 					val key = splitLine[0]
 					val value = splitLine[1]
 
@@ -711,9 +712,12 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"n2_800" -> palette.n2_800
 		"n2_900" -> palette.n2_900
 		"n2_1000" -> palette.n2_1000
-		"background" -> palette.background
-		"surface" -> palette.surface
-		"surface_elevation_level_3" -> palette.surfaceElevationLevel3
+		"background_light" -> palette.backgroundLight
+		"surface_light" -> palette.surfaceLight
+		"surface_elevation_level_3_light" -> palette.surfaceElevationLevel3Light
+		"background_dark" -> palette.backgroundDark
+		"surface_dark" -> palette.surfaceDark
+		"surface_elevation_level_3_dark" -> palette.surfaceElevationLevel3Dark
 		"TRANSPARENT" -> Color.Transparent
 		"blue_0" -> palette.blueTonalPalette.getValue(0)
 		"blue_100" -> palette.blueTonalPalette.getValue(10)
@@ -1038,9 +1042,12 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.n2_800 -> "n2_800"
 		palette.n2_900 -> "n2_900"
 		palette.n2_1000 -> "n2_1000"
-		palette.background -> "background"
-		palette.surface -> "surface"
-		palette.surfaceElevationLevel3 -> "surface_elevation_level_3"
+		palette.backgroundLight -> "background_light"
+		palette.surfaceLight -> "surface_light"
+		palette.surfaceElevationLevel3Light -> "surface_elevation_level_3_light"
+		palette.backgroundDark -> "background_dark"
+		palette.surfaceDark -> "surface_dark"
+		palette.surfaceElevationLevel3Dark -> "surface_elevation_level_3_dark"
 		Color.Transparent -> "TRANSPARENT"
 		palette.blueTonalPalette.getValue(0) -> "blue_0"
 		palette.blueTonalPalette.getValue(10) -> "blue_100"

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,8 +40,12 @@ import com.number869.telemone.ui.theme.fullPalette
 @Composable
 fun ChatScreenPreview(vm: MainViewModel) {
 	Column {
-		Text(text = "Current theme")
-		Row(Modifier.padding(32.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+		Text(
+			text = "Current theme",
+			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.headlineMedium),
+			modifier = Modifier.padding(start = 24.dp)
+		)
+		Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
 			PreviewHomeScreenDark(vm)
 			PreviewChatDark(vm)
 		}

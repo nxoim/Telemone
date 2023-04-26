@@ -220,9 +220,12 @@ data class FullPaletteList(
 	val n2_800: Color,
 	val n2_900: Color,
 	val n2_1000: Color,
-	val background: Color,
-	val surface: Color,
-	val surfaceElevationLevel3: Color,
+	val backgroundLight: Color,
+	val surfaceLight: Color,
+	val surfaceElevationLevel3Light: Color,
+	val backgroundDark: Color,
+	val surfaceDark: Color,
+	val surfaceElevationLevel3Dark: Color,
 	val blueTonalPalette: Map<Int, Color>,
 	val redTonalPalette: Map<Int, Color>,
 	val greenTonalPalette: Map<Int, Color>,
@@ -234,6 +237,25 @@ data class FullPaletteList(
 
 @Composable
 fun fullPalette(): FullPaletteList {
+	var backgroundLight = Color.Red
+	var surfaceLight = Color.Red
+	var surfaceElevationLevel3Light = Color.Red
+	var backgroundDark = Color.Red
+	var surfaceDark = Color.Red
+	var surfaceElevationLevel3Dark = Color.Red
+
+	LightTheme {
+		backgroundLight = MaterialTheme.colorScheme.background
+		surfaceLight = MaterialTheme.colorScheme.surface
+		surfaceElevationLevel3Light = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+	}
+
+	DarkTheme {
+		backgroundDark = MaterialTheme.colorScheme.background
+		surfaceDark = MaterialTheme.colorScheme.surface
+		surfaceElevationLevel3Dark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+	}
+
 	return FullPaletteList(
 		a1_0 = colorResource(system_accent1_0),
 		a1_10 = colorResource(system_accent1_10),
@@ -300,10 +322,13 @@ fun fullPalette(): FullPaletteList {
 		n2_800 = colorResource(system_neutral2_800),
 		n2_900 = colorResource(system_neutral2_900),
 		n2_1000 = colorResource(system_neutral2_1000),
-		background = MaterialTheme.colorScheme.background,
+		backgroundLight = backgroundLight,
 		// you cant get neutral 98 color... ask google about their decisions
-		surface = MaterialTheme.colorScheme.surface,
-		surfaceElevationLevel3 = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+		surfaceLight = surfaceLight,
+		surfaceElevationLevel3Light = surfaceElevationLevel3Light,
+		backgroundDark = backgroundDark,
+		surfaceDark = surfaceDark,
+		surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
 		blueTonalPalette = getColorTonesMap(
 			Color(
 				MaterialColors.harmonize(Color.Blue.toArgb(), MaterialTheme.colorScheme.primary.toArgb())

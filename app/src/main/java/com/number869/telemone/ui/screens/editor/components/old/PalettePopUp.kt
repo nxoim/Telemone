@@ -17,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.theme.DarkTheme
 import com.number869.telemone.ui.theme.FullPaletteList
+import com.number869.telemone.ui.theme.LightTheme
 
 @Composable
 fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
@@ -436,47 +438,93 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 
 			// transparent, surface, etc
 			Row {
-				val background = MaterialTheme.colorScheme.background
-				Box(
-					Modifier
-						.size(26.dp)
-						.background(background)
-						.clickable {
-							vm.changeValue(
-								key,
-								background,
-								"background"
-							)
-						}
-				)
+				LightTheme {
+					val backgroundLight = MaterialTheme.colorScheme.background
+					Box(
+						Modifier
+							.size(26.dp)
+							.background(backgroundLight)
+							.clickable {
+								vm.changeValue(
+									key,
+									backgroundLight,
+									"background_light"
+								)
+							}
+					)
 
-				val surface = MaterialTheme.colorScheme.surface
-				Box(
-					Modifier
-						.size(26.dp)
-						.background(surface)
-						.clickable {
-							vm.changeValue(
-								key,
-								surface,
-								"surface"
-							)
-						}
-				)
+					val surfaceLight = MaterialTheme.colorScheme.surface
+					Box(
+						Modifier
+							.size(26.dp)
+							.background(surfaceLight)
+							.clickable {
+								vm.changeValue(
+									key,
+									surfaceLight,
+									"surface_light"
+								)
+							}
+					)
 
-				val surfaceElevationLevel3 = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-				Box(
-					Modifier
-						.size(26.dp)
-						.background(surfaceElevationLevel3)
-						.clickable {
-							vm.changeValue(
-								key,
-								surfaceElevationLevel3,
-								"surface_elevation_level_3"
-							)
-						}
-				)
+					val surfaceElevationLevel3Light = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+					Box(
+						Modifier
+							.size(26.dp)
+							.background(surfaceElevationLevel3Light)
+							.clickable {
+								vm.changeValue(
+									key,
+									surfaceElevationLevel3Light,
+									"surface_elevation_level_3_light"
+								)
+							}
+					)
+				}
+
+				DarkTheme {
+					val backgroundDark = MaterialTheme.colorScheme.background
+					Box(
+						Modifier
+							.size(26.dp)
+							.background(backgroundDark)
+							.clickable {
+								vm.changeValue(
+									key,
+									backgroundDark,
+									"background_dark"
+								)
+							}
+					)
+
+					val surfaceDark = MaterialTheme.colorScheme.surface
+					Box(
+						Modifier
+							.size(26.dp)
+							.background(surfaceDark)
+							.clickable {
+								vm.changeValue(
+									key,
+									surfaceDark,
+									"surface_dark"
+								)
+							}
+					)
+
+					val surfaceElevationLevel3Dark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+					Box(
+						Modifier
+							.size(26.dp)
+							.background(surfaceElevationLevel3Dark)
+							.clickable {
+								vm.changeValue(
+									key,
+									surfaceElevationLevel3Dark,
+									"surface_elevation_level_3_dark"
+								)
+							}
+					)
+				}
 
 				Text(
 					text = "Transparent",
