@@ -105,7 +105,7 @@ fun OverwriteDefaultsDialog(
 		text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. You can revert this change any time inside the theme editor.""") },
 		icon = {
 			Column(Modifier.fillMaxWidth()) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
+				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
 					// current default
 					SavedThemeItem(
 						Modifier
