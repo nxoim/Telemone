@@ -443,12 +443,12 @@ fun fullPalette(): FullPaletteList {
 		),
 		orange = getColorTonesMap(
 			Color(
-				MaterialColors.harmonize(Color(0xFFFFA500).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+				MaterialColors.harmonize(Color(0xFFFF8400).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
 			)
 		),
 		violet = getColorTonesMap(
 			Color(
-				MaterialColors.harmonize(Color(0xFF9B26B6).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+				MaterialColors.harmonize(Color(0xFF9E00FF).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
 			)
 		),
 		cyan = getColorTonesMap(
@@ -458,7 +458,7 @@ fun fullPalette(): FullPaletteList {
 		),
 		pink = getColorTonesMap(
 			Color(
-				MaterialColors.harmonize(Color(0xFFFF6499).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+				MaterialColors.harmonize(Color(0xFFFF00D5).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
 			)
 		),
 	)
