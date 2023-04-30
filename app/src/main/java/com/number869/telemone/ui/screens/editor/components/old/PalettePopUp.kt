@@ -31,80 +31,80 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_0)
-						.clickable { vm.changeValue(key, palette.a1_0, "a1_0") }
+						.background(palette.primary_0)
+						.clickable { vm.changeValue(key, palette.primary_0, "primary_0") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_10)
-						.clickable { vm.changeValue(key, palette.a1_10, "a1_10") }
+						.background(palette.primary_10)
+						.clickable { vm.changeValue(key, palette.primary_10, "primary_10") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_50)
-						.clickable { vm.changeValue(key, palette.a1_50, "a1_50") }
+						.background(palette.primary_20)
+						.clickable { vm.changeValue(key, palette.primary_20, "primary_20") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_100)
-						.clickable { vm.changeValue(key, palette.a1_100, "a1_100") }
+						.background(palette.primary_30)
+						.clickable { vm.changeValue(key, palette.primary_30, "primary_30") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_200)
-						.clickable { vm.changeValue(key, palette.a1_200, "a1_200") }
+						.background(palette.primary_40)
+						.clickable { vm.changeValue(key, palette.primary_40, "primary_40") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_300)
-						.clickable { vm.changeValue(key, palette.a1_300, "a1_300") }
+						.background(palette.primary_50)
+						.clickable { vm.changeValue(key, palette.primary_50, "primary_50") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_400)
-						.clickable { vm.changeValue(key, palette.a1_400, "a1_400") }
+						.background(palette.primary_60)
+						.clickable { vm.changeValue(key, palette.primary_60, "primary_60") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_500)
-						.clickable { vm.changeValue(key, palette.a1_500, "a1_500") }
+						.background(palette.primary_70)
+						.clickable { vm.changeValue(key, palette.primary_70, "primary_70") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_600)
-						.clickable { vm.changeValue(key, palette.a1_600, "a1_600") }
+						.background(palette.primary_80)
+						.clickable { vm.changeValue(key, palette.primary_80, "primary_80") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_700)
-						.clickable { vm.changeValue(key, palette.a1_700, "a1_700") }
+						.background(palette.primary_90)
+						.clickable { vm.changeValue(key, palette.primary_90, "primary_90") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_800)
-						.clickable { vm.changeValue(key, palette.a1_800, "a1_800") }
+						.background(palette.primary_95)
+						.clickable { vm.changeValue(key, palette.primary_95, "primary_95") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_900)
-						.clickable { vm.changeValue(key, palette.a1_900, "a1_900") }
+						.background(palette.primary_99)
+						.clickable { vm.changeValue(key, palette.primary_99, "primary_99") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a1_1000)
-						.clickable { vm.changeValue(key, palette.a1_1000, "a1_1000") }
+						.background(palette.primary_100)
+						.clickable { vm.changeValue(key, palette.primary_100, "primary_100") }
 				)
 			}
 
@@ -113,80 +113,80 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_0)
-						.clickable { vm.changeValue(key, palette.a2_0, "a2_0") }
+						.background(palette.secondary_0)
+						.clickable { vm.changeValue(key, palette.secondary_0, "secondary_0") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_10)
-						.clickable { vm.changeValue(key, palette.a2_10, "a2_10") }
+						.background(palette.secondary_10)
+						.clickable { vm.changeValue(key, palette.secondary_10, "secondary_10") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_50)
-						.clickable { vm.changeValue(key, palette.a2_50, "a2_50") }
+						.background(palette.secondary_20)
+						.clickable { vm.changeValue(key, palette.secondary_20, "secondary_20") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_100)
-						.clickable { vm.changeValue(key, palette.a2_100, "a2_100") }
+						.background(palette.secondary_30)
+						.clickable { vm.changeValue(key, palette.secondary_30, "secondary_30") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_200)
-						.clickable { vm.changeValue(key, palette.a2_200, "a2_200") }
+						.background(palette.secondary_40)
+						.clickable { vm.changeValue(key, palette.secondary_40, "secondary_40") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_300)
-						.clickable { vm.changeValue(key, palette.a2_300, "a2_300") }
+						.background(palette.secondary_50)
+						.clickable { vm.changeValue(key, palette.secondary_50, "secondary_50") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_400)
-						.clickable { vm.changeValue(key, palette.a2_400, "a2_400") }
+						.background(palette.secondary_60)
+						.clickable { vm.changeValue(key, palette.secondary_60, "secondary_60") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_500)
-						.clickable { vm.changeValue(key, palette.a2_500, "a2_500") }
+						.background(palette.secondary_70)
+						.clickable { vm.changeValue(key, palette.secondary_70, "secondary_70") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_600)
-						.clickable { vm.changeValue(key, palette.a2_600, "a2_600") }
+						.background(palette.secondary_80)
+						.clickable { vm.changeValue(key, palette.secondary_80, "secondary_80") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_700)
-						.clickable { vm.changeValue(key, palette.a2_700, "a2_700") }
+						.background(palette.secondary_90)
+						.clickable { vm.changeValue(key, palette.secondary_90, "secondary_90") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_800)
-						.clickable { vm.changeValue(key, palette.a2_800, "a2_800") }
+						.background(palette.secondary_95)
+						.clickable { vm.changeValue(key, palette.secondary_95, "secondary_95") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_900)
-						.clickable { vm.changeValue(key, palette.a2_900, "a2_900") }
+						.background(palette.secondary_99)
+						.clickable { vm.changeValue(key, palette.secondary_99, "secondary_99") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a2_1000)
-						.clickable { vm.changeValue(key, palette.a2_1000, "a2_1000") }
+						.background(palette.secondary_100)
+						.clickable { vm.changeValue(key, palette.secondary_100, "secondary_100") }
 				)
 			}
 
@@ -195,80 +195,80 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_0)
-						.clickable { vm.changeValue(key, palette.a3_0, "a3_0") }
+						.background(palette.tertiary_0)
+						.clickable { vm.changeValue(key, palette.tertiary_0, "tertiary_0") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_10)
-						.clickable { vm.changeValue(key, palette.a3_10, "a3_10") }
+						.background(palette.tertiary_10)
+						.clickable { vm.changeValue(key, palette.tertiary_10, "tertiary_10") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_50)
-						.clickable { vm.changeValue(key, palette.a3_50, "a3_50") }
+						.background(palette.tertiary_20)
+						.clickable { vm.changeValue(key, palette.tertiary_20, "tertiary_20") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_100)
-						.clickable { vm.changeValue(key, palette.a3_100, "a3_100") }
+						.background(palette.tertiary_30)
+						.clickable { vm.changeValue(key, palette.tertiary_30, "tertiary_30") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_200)
-						.clickable { vm.changeValue(key, palette.a3_200, "a3_200") }
+						.background(palette.tertiary_40)
+						.clickable { vm.changeValue(key, palette.tertiary_40, "tertiary_40") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_300)
-						.clickable { vm.changeValue(key, palette.a3_300, "a3_300") }
+						.background(palette.tertiary_50)
+						.clickable { vm.changeValue(key, palette.tertiary_50, "tertiary_50") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_400)
-						.clickable { vm.changeValue(key, palette.a3_400, "a3_400") }
+						.background(palette.tertiary_60)
+						.clickable { vm.changeValue(key, palette.tertiary_60, "tertiary_60") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_500)
-						.clickable { vm.changeValue(key, palette.a3_500, "a3_500") }
+						.background(palette.tertiary_70)
+						.clickable { vm.changeValue(key, palette.tertiary_70, "tertiary_70") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_600)
-						.clickable { vm.changeValue(key, palette.a3_600, "a3_600") }
+						.background(palette.tertiary_80)
+						.clickable { vm.changeValue(key, palette.tertiary_80, "tertiary_80") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_700)
-						.clickable { vm.changeValue(key, palette.a3_700, "a3_700") }
+						.background(palette.tertiary_90)
+						.clickable { vm.changeValue(key, palette.tertiary_90, "tertiary_90") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_800)
-						.clickable { vm.changeValue(key, palette.a3_800, "a3_800") }
+						.background(palette.tertiary_95)
+						.clickable { vm.changeValue(key, palette.tertiary_95, "tertiary_95") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_900)
-						.clickable { vm.changeValue(key, palette.a3_900, "a3_900") }
+						.background(palette.tertiary_99)
+						.clickable { vm.changeValue(key, palette.tertiary_99, "tertiary_99") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.a3_1000)
-						.clickable { vm.changeValue(key, palette.a3_1000, "a3_1000") }
+						.background(palette.tertiary_100)
+						.clickable { vm.changeValue(key, palette.tertiary_100, "tertiary_100") }
 				)
 			}
 
@@ -277,80 +277,80 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_0)
-						.clickable { vm.changeValue(key, palette.n1_0, "n1_0") }
+						.background(palette.neutral_0)
+						.clickable { vm.changeValue(key, palette.neutral_0, "neutral_0") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_10)
-						.clickable { vm.changeValue(key, palette.n1_10, "n1_10") }
+						.background(palette.neutral_10)
+						.clickable { vm.changeValue(key, palette.neutral_10, "neutral_10") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_50)
-						.clickable { vm.changeValue(key, palette.n1_50, "n1_50") }
+						.background(palette.neutral_20)
+						.clickable { vm.changeValue(key, palette.neutral_20, "neutral_20") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_100)
-						.clickable { vm.changeValue(key, palette.n1_100, "n1_100") }
+						.background(palette.neutral_30)
+						.clickable { vm.changeValue(key, palette.neutral_30, "neutral_30") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_200)
-						.clickable { vm.changeValue(key, palette.n1_200, "n1_200") }
+						.background(palette.neutral_40)
+						.clickable { vm.changeValue(key, palette.neutral_40, "neutral_40") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_300)
-						.clickable { vm.changeValue(key, palette.n1_300, "n1_300") }
+						.background(palette.neutral_50)
+						.clickable { vm.changeValue(key, palette.neutral_50, "neutral_50") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_400)
-						.clickable { vm.changeValue(key, palette.n1_400, "n1_400") }
+						.background(palette.neutral_60)
+						.clickable { vm.changeValue(key, palette.neutral_60, "neutral_60") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_500)
-						.clickable { vm.changeValue(key, palette.n1_500, "n1_500") }
+						.background(palette.neutral_70)
+						.clickable { vm.changeValue(key, palette.neutral_70, "neutral_70") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_600)
-						.clickable { vm.changeValue(key, palette.n1_600, "n1_600") }
+						.background(palette.neutral_80)
+						.clickable { vm.changeValue(key, palette.neutral_80, "neutral_80") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_700)
-						.clickable { vm.changeValue(key, palette.n1_700, "n1_700") }
+						.background(palette.neutral_90)
+						.clickable { vm.changeValue(key, palette.neutral_90, "neutral_90") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_800)
-						.clickable { vm.changeValue(key, palette.n1_800, "n1_800") }
+						.background(palette.neutral_95)
+						.clickable { vm.changeValue(key, palette.neutral_95, "neutral_95") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_900)
-						.clickable { vm.changeValue(key, palette.n1_900, "n1_900") }
+						.background(palette.neutral_99)
+						.clickable { vm.changeValue(key, palette.neutral_99, "neutral_99") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n1_1000)
-						.clickable { vm.changeValue(key, palette.n1_1000, "n1_1000") }
+						.background(palette.neutral_100)
+						.clickable { vm.changeValue(key, palette.neutral_100, "neutral_100") }
 				)
 			}
 
@@ -359,80 +359,80 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_0)
-						.clickable { vm.changeValue(key, palette.n2_0, "n2_0") }
+						.background(palette.neutralVariant_0)
+						.clickable { vm.changeValue(key, palette.neutralVariant_0, "neutral_variant_0") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_10)
-						.clickable { vm.changeValue(key, palette.n2_10, "n2_10") }
+						.background(palette.neutralVariant_10)
+						.clickable { vm.changeValue(key, palette.neutralVariant_10, "neutral_variant_10") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_50)
-						.clickable { vm.changeValue(key, palette.n2_50, "n2_50") }
+						.background(palette.neutralVariant_20)
+						.clickable { vm.changeValue(key, palette.neutralVariant_20, "neutral_variant_20") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_100)
-						.clickable { vm.changeValue(key, palette.n2_100, "n2_100") }
+						.background(palette.neutralVariant_30)
+						.clickable { vm.changeValue(key, palette.neutralVariant_30, "neutral_variant_30") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_200)
-						.clickable { vm.changeValue(key, palette.n2_200, "n2_200") }
+						.background(palette.neutralVariant_40)
+						.clickable { vm.changeValue(key, palette.neutralVariant_40, "neutral_variant_40") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_300)
-						.clickable { vm.changeValue(key, palette.n2_300, "n2_300") }
+						.background(palette.neutralVariant_50)
+						.clickable { vm.changeValue(key, palette.neutralVariant_50, "neutral_variant_50") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_400)
-						.clickable { vm.changeValue(key, palette.n2_400, "n2_400") }
+						.background(palette.neutralVariant_60)
+						.clickable { vm.changeValue(key, palette.neutralVariant_60, "neutral_variant_60") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_500)
-						.clickable { vm.changeValue(key, palette.n2_500, "n2_500") }
+						.background(palette.neutralVariant_70)
+						.clickable { vm.changeValue(key, palette.neutralVariant_70, "neutral_variant_70") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_600)
-						.clickable { vm.changeValue(key, palette.n2_600, "n2_600") }
+						.background(palette.neutralVariant_80)
+						.clickable { vm.changeValue(key, palette.neutralVariant_80, "neutral_variant_80") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_700)
-						.clickable { vm.changeValue(key, palette.n2_700, "n2_700") }
+						.background(palette.neutralVariant_90)
+						.clickable { vm.changeValue(key, palette.neutralVariant_90, "neutral_variant_90") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_800)
-						.clickable { vm.changeValue(key, palette.n2_800, "n2_800") }
+						.background(palette.neutralVariant_95)
+						.clickable { vm.changeValue(key, palette.neutralVariant_95, "neutral_variant_95") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_900)
-						.clickable { vm.changeValue(key, palette.n2_900, "n2_900") }
+						.background(palette.neutralVariant_99)
+						.clickable { vm.changeValue(key, palette.neutralVariant_99, "neutral_variant_99") }
 				)
 				Box(
 					Modifier
 						.size(26.dp)
-						.background(palette.n2_1000)
-						.clickable { vm.changeValue(key, palette.n2_1000, "n2_1000") }
+						.background(palette.neutralVariant_100)
+						.clickable { vm.changeValue(key, palette.neutralVariant_100, "neutral_variant_100") }
 				)
 			}
 
@@ -536,7 +536,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.blueTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.blue.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
@@ -555,7 +555,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.greenTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.green.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
@@ -574,7 +574,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.orangeTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.orange.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
@@ -593,7 +593,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.redTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.red.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
@@ -612,7 +612,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.violetTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.violet.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
@@ -631,7 +631,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.pinkTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.pink.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
@@ -650,7 +650,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 			}
 
 			LazyRow() {
-				palette.cyanTonalPalette.toList().reversed().forEach { (tone, value) ->
+				palette.cyan.toList().forEach { (tone, value) ->
 					item {
 						Box(
 							Modifier
