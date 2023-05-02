@@ -50,14 +50,14 @@ fun MainScreen(
 				state = overlayLayoutState
 			) {
 				Column(Modifier.background(MaterialTheme.colorScheme.background)) {
-					val itemState = overlayLayoutState.itemsState["mainEditor"] ?: overlayLayoutState.emptyOverlayItemValues
-					AnimatedVisibility(visible = !itemState.isExpanded) {
+					val isExpanded = overlayLayoutState.getIsExpanded("mainEditor")
+					AnimatedVisibility(visible = !isExpanded) {
 						OutlinedButton(onClick = { overlayLayoutState.addToOverlayStack("mainEditor") }) {
 							Text(text = "Go to theme editor")
 						}
 					}
 
-					AnimatedVisibility(visible = itemState.isExpanded) {
+					AnimatedVisibility(visible = isExpanded) {
 						EditorScreen(navController, vm, overlayLayoutState)
 					}
 				}

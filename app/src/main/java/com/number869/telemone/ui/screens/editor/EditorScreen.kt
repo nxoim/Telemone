@@ -109,15 +109,15 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel, state: Ove
 				state = state
 			) {
 				Column(Modifier.background(MaterialTheme.colorScheme.background)) {
-					val itemState = state.itemsState["alternativeEditorScreen"] ?: state.emptyOverlayItemValues
+					val isExpanded = state.getIsExpanded("alternativeEditorScreen")
 
-					AnimatedVisibility(visible = !itemState.isExpanded) {
+					AnimatedVisibility(visible = !isExpanded) {
 						OutlinedButton(onClick = { state.addToOverlayStack("alternativeEditorScreen") }) {
 							Text(text = "Go to alternative editor")
 						}
 					}
 
-					AnimatedVisibility(visible = itemState.isExpanded) {
+					AnimatedVisibility(visible = isExpanded) {
 						AlternativeEditorScreen(state, vm)
 					}
 				}

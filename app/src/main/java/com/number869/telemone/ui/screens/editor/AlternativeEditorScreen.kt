@@ -153,7 +153,11 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 					Text(text = "Load Stock Dark")
 				}
 
-				val isContentsScreenExpanded = overlayState.itemsState["themeContentsScreen"]?.isExpanded ?: false
+				val isContentsScreenExpanded by remember {
+					derivedStateOf {
+						overlayState.getIsExpanded("themeContentsScreen")
+					}
+				}
 				OverlayItemWrapper(
 					key = "themeContentsScreen",
 					isOriginalItemStatic = true,
