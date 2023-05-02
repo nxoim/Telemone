@@ -65,6 +65,7 @@ import android.R.color.system_neutral2_600
 import android.R.color.system_neutral2_700
 import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
+import androidx.annotation.FloatRange
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -72,7 +73,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.google.android.material.color.MaterialColors
+import com.google.android.material.color.MaterialColors.harmonize
+import com.smarttoolfactory.extendedcolors.util.ColorUtil
 import com.smarttoolfactory.extendedcolors.util.getColorTonesMap
 
 
@@ -341,6 +343,36 @@ fun fullPalette(): FullPaletteList {
 	var surfaceDark = Color.Red
 	var surfaceElevationLevel3Dark = Color.Red
 
+	val saturationOfPrimary = ColorUtil.colorToHSL(colorResource(system_accent1_400))[1]
+
+	val harmonizedBlue = Color(
+		harmonize(Color.Blue.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
+	val harmonizedRed = Color(
+		harmonize(Color.Red.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
+	val harmonizedGreen = Color(
+		harmonize(Color.Green.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
+	val harmonizedOrange = Color(
+		harmonize(Color(0xFFFF8400).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
+	val harmonizedViolet = Color(
+		harmonize(Color(0xFF9E00FF).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
+	val harmonizedCyan = Color(
+		harmonize(Color.Cyan.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
+	val harmonizedPink = Color(
+		harmonize(Color(0xFFFF00D5).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+	).blendWith(Color.White, 1f - saturationOfPrimary)
+
 	LightTheme {
 		backgroundLight = MaterialTheme.colorScheme.background
 		surfaceLight = MaterialTheme.colorScheme.surface
@@ -426,40 +458,21 @@ fun fullPalette(): FullPaletteList {
 		backgroundDark = backgroundDark,
 		surfaceDark = surfaceDark,
 		surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
-		blue = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color.Blue.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
-		red = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color.Red.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
-		green = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color.Green.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
-		orange = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color(0xFFFF8400).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
-		violet = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color(0xFF9E00FF).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
-		cyan = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color.Cyan.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
-		pink = getColorTonesMap(
-			Color(
-				MaterialColors.harmonize(Color(0xFFFF00D5).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-			)
-		),
+		blue = getColorTonesMap(harmonizedBlue),
+		red = getColorTonesMap(harmonizedRed),
+		green = getColorTonesMap(harmonizedGreen),
+		orange = getColorTonesMap(harmonizedOrange),
+		violet = getColorTonesMap(harmonizedViolet),
+		cyan = getColorTonesMap(harmonizedCyan),
+		pink = getColorTonesMap(harmonizedPink),
+	)
+}
+
+fun Color.blendWith(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float): Color {
+	val inv = 1f - ratio
+	return copy(
+		red = red * inv + color.red * ratio,
+		blue = blue * inv + color.blue * ratio,
+		green = green * inv + color.green * ratio,
 	)
 }
