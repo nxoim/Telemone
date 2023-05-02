@@ -546,7 +546,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"blue_$tone${if (tone != 0) "0" else ""}"
+										"blue_$tone"
 									)
 								}
 						)
@@ -565,7 +565,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"green_$tone${if (tone != 0) "0" else ""}"
+										"green_$tone"
 									)
 								}
 						)
@@ -584,7 +584,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"orange_$tone${if (tone != 0) "0" else ""}"
+										"orange_$tone"
 									)
 								}
 						)
@@ -603,7 +603,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"red_$tone${if (tone != 0) "0" else ""}"
+										"red_$tone"
 									)
 								}
 						)
@@ -622,7 +622,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"violet_$tone${if (tone != 0) "0" else ""}"
+										"violet_$tone"
 									)
 								}
 						)
@@ -641,7 +641,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"pink_$tone${if (tone != 0) "0" else ""}"
+										"pink_$tone"
 									)
 								}
 						)
@@ -660,7 +660,7 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 									vm.changeValue(
 										key,
 										value,
-										"cyan_$tone${if (tone != 0) "0" else ""}"
+										"cyan_$tone"
 									)
 								}
 						)
