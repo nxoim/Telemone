@@ -343,7 +343,7 @@ fun fullPalette(): FullPaletteList {
 	var surfaceDark = Color.Red
 	var surfaceElevationLevel3Dark = Color.Red
 
-	val saturationOfPrimary = ColorUtil.colorToHSL(colorResource(system_accent1_400))[1]
+	val saturationOfPrimary = ColorUtil.colorToHSL(colorResource(system_accent1_600))[1]
 
 	val harmonizedBlue = Color(
 		harmonize(Color.Blue.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
@@ -358,11 +358,11 @@ fun fullPalette(): FullPaletteList {
 	).blendWith(Color.White, 1f - saturationOfPrimary)
 
 	val harmonizedOrange = Color(
-		harmonize(Color(0xFFFF8400).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+		harmonize(Color(0xFFFFAA00).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
 	).blendWith(Color.White, 1f - saturationOfPrimary)
 
 	val harmonizedViolet = Color(
-		harmonize(Color(0xFF9E00FF).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+		harmonize(Color(0xFFEB00FF).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
 	).blendWith(Color.White, 1f - saturationOfPrimary)
 
 	val harmonizedCyan = Color(
@@ -370,7 +370,7 @@ fun fullPalette(): FullPaletteList {
 	).blendWith(Color.White, 1f - saturationOfPrimary)
 
 	val harmonizedPink = Color(
-		harmonize(Color(0xFFFF00D5).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
+		harmonize(Color(0xFFFF32AC).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
 	).blendWith(Color.White, 1f - saturationOfPrimary)
 
 	LightTheme {
