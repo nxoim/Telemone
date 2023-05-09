@@ -5,6 +5,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -163,13 +165,13 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 					isOriginalItemStatic = true,
 					state = overlayState
 				) {
-					AnimatedVisibility(visible = !isContentsScreenExpanded) {
+					AnimatedVisibility(visible = !isContentsScreenExpanded, enter = fadeIn(), exit = fadeOut()) {
 						Button(onClick = { overlayState.addToOverlayStack("themeContentsScreen")  }) {
 							Text(text = "Show Values")
 						}
 					}
 
-					AnimatedVisibility(visible = isContentsScreenExpanded) {
+					AnimatedVisibility(visible = isContentsScreenExpanded, enter = fadeIn(), exit = fadeOut()) {
 						ThemeContentsScreen(vm)
 					}
 				}

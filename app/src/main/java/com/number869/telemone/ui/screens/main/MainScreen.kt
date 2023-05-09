@@ -1,6 +1,8 @@
 package com.number869.telemone.ui.screens.main
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,13 +53,13 @@ fun MainScreen(
 			) {
 				Column(Modifier.background(MaterialTheme.colorScheme.background)) {
 					val isExpanded = overlayLayoutState.getIsExpanded("mainEditor")
-					AnimatedVisibility(visible = !isExpanded) {
+					AnimatedVisibility(visible = !isExpanded, enter = fadeIn(), exit = fadeOut()) {
 						OutlinedButton(onClick = { overlayLayoutState.addToOverlayStack("mainEditor") }) {
 							Text(text = "Go to theme editor")
 						}
 					}
 
-					AnimatedVisibility(visible = isExpanded) {
+					AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
 						EditorScreen(navController, vm, overlayLayoutState)
 					}
 				}

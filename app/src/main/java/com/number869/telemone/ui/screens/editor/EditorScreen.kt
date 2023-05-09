@@ -1,6 +1,8 @@
 package com.number869.telemone.ui.screens.editor
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -111,13 +113,13 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel, state: Ove
 				Column(Modifier.background(MaterialTheme.colorScheme.background)) {
 					val isExpanded = state.getIsExpanded("alternativeEditorScreen")
 
-					AnimatedVisibility(visible = !isExpanded) {
+					AnimatedVisibility(visible = !isExpanded, enter = fadeIn(), exit = fadeOut()) {
 						OutlinedButton(onClick = { state.addToOverlayStack("alternativeEditorScreen") }) {
 							Text(text = "Go to alternative editor")
 						}
 					}
 
-					AnimatedVisibility(visible = isExpanded) {
+					AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
 						AlternativeEditorScreen(state, vm)
 					}
 				}
