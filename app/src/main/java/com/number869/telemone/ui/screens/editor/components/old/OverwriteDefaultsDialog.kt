@@ -1,5 +1,8 @@
 package com.number869.telemone.ui.screens.editor.components.old
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,113 +31,129 @@ import com.number869.telemone.MainViewModel
 @Composable
 fun OverwriteChoiceDialog(
 	close: () -> Unit,
+	isShowingOverwriteChoiceDialog: Boolean,
 	chooseLight: () -> Unit,
 	chooseDark: () -> Unit,
 	vm: MainViewModel
 ) {
-	AlertDialog(
-		onDismissRequest = { close() },
-		title = { Text(text = "Which Theme to Overwrite?") },
-		confirmButton = {
-			Column {
-				Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-					Column(horizontalAlignment = Alignment.CenterHorizontally) {
-						SavedThemeItem(
-							Modifier
-								.width(120.dp)
-								.height(150.dp)
-								.clickable { chooseLight() }
-								.clip(RoundedCornerShape(16.dp))
-								.weight(1f, false),
-							vm,
-							"defaultLightThemeUUID"
-						)
+	AnimatedVisibility(
+		visible = isShowingOverwriteChoiceDialog,
+		enter = expandVertically(),
+		exit = shrinkVertically()
+	) {
+		AlertDialog(
+			onDismissRequest = { close() },
+			title = { Text(text = "Which Theme to Overwrite?") },
+			confirmButton = {
+				Column {
+					Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+						Column(horizontalAlignment = Alignment.CenterHorizontally) {
+							SavedThemeItem(
+								Modifier
+									.width(120.dp)
+									.height(150.dp)
+									.clickable { chooseLight() }
+									.clip(RoundedCornerShape(16.dp))
+									.weight(1f, false),
+								vm,
+								"defaultLightThemeUUID"
+							)
 
-						TextButton(onClick = { chooseLight() }) {
-							Text("Overwrite Light")
+							TextButton(onClick = { chooseLight() }) {
+								Text("Overwrite Light")
+							}
+						}
+
+						Column(horizontalAlignment = Alignment.CenterHorizontally) {
+							SavedThemeItem(
+								Modifier
+									.width(120.dp)
+									.height(150.dp)
+									.clickable { chooseDark() }
+									.clip(RoundedCornerShape(16.dp))
+									.weight(1f, false),
+								vm,
+								"defaultDarkThemeUUID"
+							)
+
+							TextButton(onClick = { chooseDark() }) {
+								Text("Overwrite Dark")
+							}
 						}
 					}
 
-					Column(horizontalAlignment = Alignment.CenterHorizontally) {
-						SavedThemeItem(
-							Modifier
-								.width(120.dp)
-								.height(150.dp)
-								.clickable { chooseDark() }
-								.clip(RoundedCornerShape(16.dp))
-								.weight(1f, false),
-							vm,
-							"defaultDarkThemeUUID"
-						)
-
-						TextButton(onClick = { chooseDark() }) {
-							Text("Overwrite Dark")
-						}
+					FilledTonalButton(onClick = { close() }, modifier = Modifier.align(End)) {
+						Text("Cancel")
 					}
-				}
-
-				FilledTonalButton(onClick = { close() }, modifier = Modifier.align(End)) {
-					Text("Cancel")
 				}
 			}
-		}
-	)
+		)
+	}
+
 }
 @Composable
 fun OverwriteDefaultsDialog(
 	close: () -> Unit,
+	isShowing: Boolean,
 	overwrite: () -> Unit,
 	vm: MainViewModel,
 	overwriteDark: Boolean,
 	overwriteWith: String
 ) {
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
-	AlertDialog(
-		onDismissRequest = { close() },
-		confirmButton = {
-			FilledTonalButton(onClick = { overwrite() }) {
-				Text("Overwrite")
-			}
-		},
-		dismissButton = {
-			TextButton(onClick = { close() }) {
-				Text("Cancel")
-			}
-		},
-		title = { Text("Do you really want to overwrite the $thingThatsBeingOverwritten?")},
-		text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. You can revert this change any time inside the theme editor.""") },
-		icon = {
-			Column(Modifier.fillMaxWidth()) {
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
-					// current default
-					SavedThemeItem(
-						Modifier
-							.width(110.dp)
-							.height(140.dp)
-							.clip(RoundedCornerShape(16.dp)),
-						vm,
-						uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID"
-					)
 
-					Spacer(Modifier.width(8.dp))
-					Icon(
-						Icons.Default.ArrowForward,
-						contentDescription = "Arrow pointing at the prompted new default theme.",
-						modifier = Modifier.size(32.dp)
-					)
-					Spacer(Modifier.width(8.dp))
+	AnimatedVisibility(
+		visible = isShowing,
+		enter = expandVertically(),
+		exit = shrinkVertically()
+	) {
+		AlertDialog(
+			onDismissRequest = { close() },
+			confirmButton = {
+				FilledTonalButton(onClick = { overwrite() }) {
+					Text("Overwrite")
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { close() }) {
+					Text("Cancel")
+				}
+			},
+			title = { Text("Do you really want to overwrite the $thingThatsBeingOverwritten?")},
+			text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. You can revert this change any time inside the theme editor.""") },
+			icon = {
+				Column(Modifier.fillMaxWidth()) {
+					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
+						// current default
+						SavedThemeItem(
+							Modifier
+								.width(110.dp)
+								.height(140.dp)
+								.clip(RoundedCornerShape(16.dp)),
+							vm,
+							uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID"
+						)
 
-					// new default
-					SavedThemeItem(
-						Modifier
-							.width(110.dp)
-							.height(140.dp)
-							.clip(RoundedCornerShape(16.dp)),
-						vm,
-						uuid = overwriteWith
-					)
+						Spacer(Modifier.width(8.dp))
+						Icon(
+							Icons.Default.ArrowForward,
+							contentDescription = "Arrow pointing at the prompted new default theme.",
+							modifier = Modifier.size(32.dp)
+						)
+						Spacer(Modifier.width(8.dp))
+
+						// new default
+						SavedThemeItem(
+							Modifier
+								.width(110.dp)
+								.height(140.dp)
+								.clip(RoundedCornerShape(16.dp)),
+							vm,
+							uuid = overwriteWith
+						)
+					}
 				}
 			}
-		}
-	)
+		)
+	}
 }

@@ -247,83 +247,52 @@ fun AlternativeEditorScreen(overlayState: OverlayLayoutState, vm: MainViewModel)
 							showMenu = showMenu
 						)
 
-						AnimatedVisibility(
-							visible = showApplyDialog,
-							enter = expandVertically(),
-							exit = shrinkVertically()
-						) {
-							LoadFromSavedDialog(
-								{ showApplyDialog = false },
-								vm,
-								palette,
-								uuid
-							)
-						}
+						LoadFromSavedDialog(
+							{ showApplyDialog = false },
+							showApplyDialog,
+							vm,
+							palette,
+							uuid
+						)
 
-						AnimatedVisibility(
-							visible = showDeleteDialog,
-							enter = expandVertically(),
-							exit = shrinkVertically()
-						) {
-							DeleteThemeDialog(
-								close = { showDeleteDialog = false },
-								vm,
-								uuid
-							)
-						}
+						DeleteThemeDialog(
+							close = { showDeleteDialog = false },
+							showDeleteDialog,
+							vm,
+							uuid
+						)
 
-						AnimatedVisibility(
-							visible = showOverwriteChoiceDialog,
-							enter = expandVertically(),
-							exit = shrinkVertically()
-						) {
-							OverwriteChoiceDialog(
-								{ showOverwriteChoiceDialog = false },
-								{
-									showOverwriteChoiceDialog = false
-									showOverwriteLightThemeDialog = true
-								},
-								{
-									showOverwriteChoiceDialog = false
-									showOverwriteDarkThemeDialog = true
-								},
-								vm
-							)
-						}
+						OverwriteChoiceDialog(
+							{ showOverwriteChoiceDialog = false },
+							showOverwriteChoiceDialog,
+							{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
+							{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
+							vm
+						)
 
-						AnimatedVisibility(
-							visible = showOverwriteDarkThemeDialog,
-							enter = expandVertically(),
-							exit = shrinkVertically()
-						) {
-							OverwriteDefaultsDialog(
-								close = { showOverwriteDarkThemeDialog = false },
-								overwrite = {
-									showOverwriteDarkThemeDialog = false
-									vm.overwriteDefaultDarkTheme(uuid, palette)
-								},
-								vm = vm,
-								overwriteDark = true,
-								uuid
-							)
-						}
+						OverwriteDefaultsDialog(
+							close = { showOverwriteDarkThemeDialog = false },
+							showOverwriteDarkThemeDialog,
+							overwrite = {
+								showOverwriteDarkThemeDialog = false
+								vm.overwriteDefaultDarkTheme(uuid, palette)
+							},
+							vm = vm,
+							overwriteDark = true,
+							uuid
+						)
 
-						AnimatedVisibility(
-							visible = showOverwriteLightThemeDialog,
-							enter = expandVertically(),
-							exit = shrinkVertically()
-						) {
-							OverwriteDefaultsDialog(
-								close = { showOverwriteLightThemeDialog = false },
-								overwrite = {
-									showOverwriteLightThemeDialog = false
-									vm.overwriteDefaultLightTheme(uuid, palette)
-								},
-								vm = vm,
-								overwriteDark = false,
-								uuid
-							)
-						}
+						OverwriteDefaultsDialog(
+							close = { showOverwriteLightThemeDialog = false },
+							showOverwriteLightThemeDialog,
+							overwrite = {
+								showOverwriteLightThemeDialog = false
+								vm.overwriteDefaultLightTheme(uuid, palette)
+							},
+							vm = vm,
+							overwriteDark = false,
+							uuid
+						)
 					}
 				}
 			}

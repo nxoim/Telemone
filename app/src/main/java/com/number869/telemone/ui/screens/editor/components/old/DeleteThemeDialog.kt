@@ -1,5 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.old
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,32 +17,39 @@ import com.number869.telemone.MainViewModel
 @Composable
 fun DeleteThemeDialog(
 	close: () -> Unit,
+	isShowingDeleteDialog: Boolean,
 	vm: MainViewModel,
 	uuid: String
 ) {
-	AlertDialog(
-		onDismissRequest = { close() },
-		title = { Text("Delete this theme?") },
-		icon = {
-			SavedThemeItem(
-				Modifier
-					.width(150.dp)
-					.height(180.dp)
-					.clip(RoundedCornerShape(16.dp)),
-				vm,
-				uuid
-			)
-		},
-		text = { Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",) },
-		confirmButton = {
-			FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
-				Text("Delete")
+	AnimatedVisibility(
+		visible = isShowingDeleteDialog
+	) {
+		AlertDialog(
+			onDismissRequest = { close() },
+			title = { Text("Delete this theme?") },
+			icon = {
+				SavedThemeItem(
+					Modifier
+						.width(150.dp)
+						.height(180.dp)
+						.clip(RoundedCornerShape(16.dp)),
+					vm,
+					uuid
+				)
+			},
+			text = {
+				Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",)
+			},
+			confirmButton = {
+				FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
+					Text("Delete")
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { close() },) {
+					Text("Cancel")
+				}
 			}
-		},
-		dismissButton = {
-			TextButton(onClick = { close() },) {
-				Text("Cancel")
-			}
-		}
-	)
+		)
+	}
 }
