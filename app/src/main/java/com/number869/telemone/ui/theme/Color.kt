@@ -89,6 +89,66 @@ val Pink40 = Color(0xFF7D5260)
 // this is used for checking if the a token is present in a theme
 // TODO ! UPDATE WHEN ADDING NEW COLOR TOKENS !
 val allColorTokensAsList = listOf(
+	"primary_light",
+	"on_primary_light",
+	"primary_container_light",
+	"on_primary_container_light",
+	"inverse_primary_light",
+	"secondary_light",
+	"on_secondary_light",
+	"secondary_container_light",
+	"on_secondary_container_light",
+	"tertiary_light",
+	"on_tertiary_light",
+	"tertiary_container_light",
+	"on_tertiary_container_light",
+	"background_light",
+	"on_background_light",
+	"surface_light",
+	"on_surface_light",
+	"surface_variant_light",
+	"on_surface_variant_light",
+	"surface_tint_light",
+	"inverse_surface_light",
+	"inverse_on_surface_light",
+	"error_light",
+	"on_error_light",
+	"error_container_light",
+	"on_error_container_light",
+	"outline_light",
+	"outline_variant_light",
+	"scrim_light",
+	"surface_elevation_level_3_light",
+	"primary_dark",
+	"on_primary_dark",
+	"primary_container_dark",
+	"on_primary_container_dark",
+	"inverse_primary_dark",
+	"secondary_dark",
+	"on_secondary_dark",
+	"secondary_container_dark",
+	"on_secondary_container_dark",
+	"tertiary_dark",
+	"on_tertiary_dark",
+	"tertiary_container_dark",
+	"on_tertiary_container_dark",
+	"background_dark",
+	"on_background_dark",
+	"surface_dark",
+	"on_surface_dark",
+	"surface_variant_dark",
+	"on_surface_variant_dark",
+	"surface_tint_dark",
+	"inverse_surface_dark",
+	"inverse_on_surface_dark",
+	"error_dark",
+	"on_error_dark",
+	"error_container_dark",
+	"on_error_container_dark",
+	"outline_dark",
+	"outline_variant_dark",
+	"scrim_dark",
+	"surface_elevation_level_3_dark",
 	"primary_0",
 	"primary_10",
 	"primary_20",
@@ -154,12 +214,6 @@ val allColorTokensAsList = listOf(
 	"neutral_variant_95",
 	"neutral_variant_99",
 	"neutral_variant_100",
-	"background_light",
-	"surface_light",
-	"surface_elevation_level_3_light",
-	"background_dark",
-	"surface_dark",
-	"surface_elevation_level_3_dark",
 	"blue_0",
 	"blue_10",
 	"blue_20",
@@ -253,7 +307,71 @@ val allColorTokensAsList = listOf(
 	"pink_100"
 )
 
+data class ColorRoles(
+	val primaryLight: Color,
+	val onPrimaryLight: Color,
+	val primaryContainerLight: Color,
+	val onPrimaryContainerLight: Color,
+	val inversePrimaryLight: Color,
+	val secondaryLight: Color,
+	val onSecondaryLight: Color,
+	val secondaryContainerLight: Color,
+	val onSecondaryContainerLight: Color,
+	val tertiaryLight: Color,
+	val onTertiaryLight: Color,
+	val tertiaryContainerLight: Color,
+	val onTertiaryContainerLight: Color,
+	val backgroundLight: Color,
+	val onBackgroundLight: Color,
+	val surfaceLight: Color,
+	val onSurfaceLight: Color,
+	val surfaceVariantLight: Color,
+	val onSurfaceVariantLight: Color,
+	val surfaceTintLight: Color,
+	val inverseSurfaceLight: Color,
+	val inverseOnSurfaceLight: Color,
+	val errorLight: Color,
+	val onErrorLight: Color,
+	val errorContainerLight: Color,
+	val onErrorContainerLight: Color,
+	val outlineLight: Color,
+	val outlineVariantLight: Color,
+	val scrimLight: Color,
+	val surfaceElevationLevel3Light: Color,
+	val primaryDark: Color,
+	val onPrimaryDark: Color,
+	val primaryContainerDark: Color,
+	val onPrimaryContainerDark: Color,
+	val inversePrimaryDark: Color,
+	val secondaryDark: Color,
+	val onSecondaryDark: Color,
+	val secondaryContainerDark: Color,
+	val onSecondaryContainerDark: Color,
+	val tertiaryDark: Color,
+	val onTertiaryDark: Color,
+	val tertiaryContainerDark: Color,
+	val onTertiaryContainerDark: Color,
+	val backgroundDark: Color,
+	val onBackgroundDark: Color,
+	val surfaceDark: Color,
+	val onSurfaceDark: Color,
+	val surfaceVariantDark: Color,
+	val onSurfaceVariantDark: Color,
+	val surfaceTintDark: Color,
+	val inverseSurfaceDark: Color,
+	val inverseOnSurfaceDark: Color,
+	val errorDark: Color,
+	val onErrorDark: Color,
+	val errorContainerDark: Color,
+	val onErrorContainerDark: Color,
+	val outlineDark: Color,
+	val outlineVariantDark: Color,
+	val scrimDark: Color,
+	val surfaceElevationLevel3Dark: Color,
+)
+
 data class FullPaletteList(
+	val colorRoles: ColorRoles,
 	val primary_0: Color,
 	val primary_10: Color,
 	val primary_20: Color,
@@ -319,12 +437,6 @@ data class FullPaletteList(
 	val neutralVariant_95: Color,
 	val neutralVariant_99: Color,
 	val neutralVariant_100: Color,
-	val backgroundLight: Color,
-	val surfaceLight: Color,
-	val surfaceElevationLevel3Light: Color,
-	val backgroundDark: Color,
-	val surfaceDark: Color,
-	val surfaceElevationLevel3Dark: Color,
 	val blue: Map<Int, Color>,
 	val red: Map<Int, Color>,
 	val green: Map<Int, Color>,
@@ -336,11 +448,65 @@ data class FullPaletteList(
 
 @Composable
 fun fullPalette(): FullPaletteList {
+	var primaryLight = Color.Red
+	var onPrimaryLight = Color.Red
+	var primaryContainerLight = Color.Red
+	var onPrimaryContainerLight = Color.Red
+	var inversePrimaryLight = Color.Red
+	var secondaryLight = Color.Red
+	var onSecondaryLight = Color.Red
+	var secondaryContainerLight = Color.Red
+	var onSecondaryContainerLight = Color.Red
+	var tertiaryLight = Color.Red
+	var onTertiaryLight = Color.Red
+	var tertiaryContainerLight = Color.Red
+	var onTertiaryContainerLight = Color.Red
 	var backgroundLight = Color.Red
+	var onBackgroundLight = Color.Red
 	var surfaceLight = Color.Red
+	var onSurfaceLight = Color.Red
+	var surfaceVariantLight = Color.Red
+	var onSurfaceVariantLight = Color.Red
+	var surfaceTintLight = Color.Red
+	var inverseSurfaceLight = Color.Red
+	var inverseOnSurfaceLight = Color.Red
+	var errorLight = Color.Red
+	var onErrorLight = Color.Red
+	var errorContainerLight = Color.Red
+	var onErrorContainerLight = Color.Red
+	var outlineLight = Color.Red
+	var outlineVariantLight = Color.Red
+	var scrimLight = Color.Red
 	var surfaceElevationLevel3Light = Color.Red
+	var primaryDark = Color.Red
+	var onPrimaryDark = Color.Red
+	var primaryContainerDark = Color.Red
+	var onPrimaryContainerDark = Color.Red
+	var inversePrimaryDark = Color.Red
+	var secondaryDark = Color.Red
+	var onSecondaryDark = Color.Red
+	var secondaryContainerDark = Color.Red
+	var onSecondaryContainerDark = Color.Red
+	var tertiaryDark = Color.Red
+	var onTertiaryDark = Color.Red
+	var tertiaryContainerDark = Color.Red
+	var onTertiaryContainerDark = Color.Red
 	var backgroundDark = Color.Red
+	var onBackgroundDark = Color.Red
 	var surfaceDark = Color.Red
+	var onSurfaceDark = Color.Red
+	var surfaceVariantDark = Color.Red
+	var onSurfaceVariantDark = Color.Red
+	var surfaceTintDark = Color.Red
+	var inverseSurfaceDark = Color.Red
+	var inverseOnSurfaceDark = Color.Red
+	var errorDark = Color.Red
+	var onErrorDark = Color.Red
+	var errorContainerDark = Color.Red
+	var onErrorContainerDark = Color.Red
+	var outlineDark = Color.Red
+	var outlineVariantDark = Color.Red
+	var scrimDark = Color.Red
 	var surfaceElevationLevel3Dark = Color.Red
 
 	val saturationOfPrimary = ColorUtil.colorToHSL(colorResource(system_accent1_600))[1]
@@ -374,18 +540,136 @@ fun fullPalette(): FullPaletteList {
 	).blendWith(Color.White, 1f - saturationOfPrimary)
 
 	LightTheme {
+		primaryLight = MaterialTheme.colorScheme.primary
+		onPrimaryLight = MaterialTheme.colorScheme.onPrimary
+		primaryContainerLight = MaterialTheme.colorScheme.primaryContainer
+		onPrimaryContainerLight = MaterialTheme.colorScheme.onPrimaryContainer
+		inversePrimaryLight = MaterialTheme.colorScheme.inversePrimary
+		secondaryLight = MaterialTheme.colorScheme.secondary
+		onSecondaryLight = MaterialTheme.colorScheme.onSecondary
+		secondaryContainerLight = MaterialTheme.colorScheme.secondaryContainer
+		onSecondaryContainerLight = MaterialTheme.colorScheme.onSecondaryContainer
+		tertiaryLight = MaterialTheme.colorScheme.tertiary
+		onTertiaryLight = MaterialTheme.colorScheme.onTertiary
+		tertiaryContainerLight = MaterialTheme.colorScheme.tertiaryContainer
+		onTertiaryContainerLight = MaterialTheme.colorScheme.onTertiaryContainer
+		backgroundLight = MaterialTheme.colorScheme.background
+		onBackgroundLight = MaterialTheme.colorScheme.onBackground
+		surfaceLight = MaterialTheme.colorScheme.surface
+		onSurfaceLight = MaterialTheme.colorScheme.onSurface
+		surfaceVariantLight = MaterialTheme.colorScheme.surfaceVariant
+		onSurfaceVariantLight = MaterialTheme.colorScheme.onSurfaceVariant
+		surfaceTintLight = MaterialTheme.colorScheme.surfaceTint
+		inverseSurfaceLight = MaterialTheme.colorScheme.inverseSurface
+		inverseOnSurfaceLight = MaterialTheme.colorScheme.inverseOnSurface
+		errorLight = MaterialTheme.colorScheme.error
+		onErrorLight = MaterialTheme.colorScheme.onError
+		errorContainerLight = MaterialTheme.colorScheme.errorContainer
+		onErrorContainerLight = MaterialTheme.colorScheme.onErrorContainer
+		outlineLight = MaterialTheme.colorScheme.outline
+		outlineVariantLight = MaterialTheme.colorScheme.outlineVariant
+		scrimLight = MaterialTheme.colorScheme.scrim
 		backgroundLight = MaterialTheme.colorScheme.background
 		surfaceLight = MaterialTheme.colorScheme.surface
 		surfaceElevationLevel3Light = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 	}
 
 	DarkTheme {
+		primaryDark = MaterialTheme.colorScheme.primary
+		onPrimaryDark = MaterialTheme.colorScheme.onPrimary
+		primaryContainerDark = MaterialTheme.colorScheme.primaryContainer
+		onPrimaryContainerDark = MaterialTheme.colorScheme.onPrimaryContainer
+		inversePrimaryDark = MaterialTheme.colorScheme.inversePrimary
+		secondaryDark = MaterialTheme.colorScheme.secondary
+		onSecondaryDark = MaterialTheme.colorScheme.onSecondary
+		secondaryContainerDark = MaterialTheme.colorScheme.secondaryContainer
+		onSecondaryContainerDark = MaterialTheme.colorScheme.onSecondaryContainer
+		tertiaryDark = MaterialTheme.colorScheme.tertiary
+		onTertiaryDark = MaterialTheme.colorScheme.onTertiary
+		tertiaryContainerDark = MaterialTheme.colorScheme.tertiaryContainer
+		onTertiaryContainerDark = MaterialTheme.colorScheme.onTertiaryContainer
 		backgroundDark = MaterialTheme.colorScheme.background
+		onBackgroundDark = MaterialTheme.colorScheme.onBackground
 		surfaceDark = MaterialTheme.colorScheme.surface
+		onSurfaceDark = MaterialTheme.colorScheme.onSurface
+		surfaceVariantDark = MaterialTheme.colorScheme.surfaceVariant
+		onSurfaceVariantDark = MaterialTheme.colorScheme.onSurfaceVariant
+		surfaceTintDark = MaterialTheme.colorScheme.surfaceTint
+		inverseSurfaceDark = MaterialTheme.colorScheme.inverseSurface
+		inverseOnSurfaceDark = MaterialTheme.colorScheme.inverseOnSurface
+		errorDark = MaterialTheme.colorScheme.error
+		onErrorDark = MaterialTheme.colorScheme.onError
+		errorContainerDark = MaterialTheme.colorScheme.errorContainer
+		onErrorContainerDark = MaterialTheme.colorScheme.onErrorContainer
+		outlineDark = MaterialTheme.colorScheme.outline
+		outlineVariantDark = MaterialTheme.colorScheme.outlineVariant
+		scrimDark = MaterialTheme.colorScheme.scrim
 		surfaceElevationLevel3Dark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 	}
 
 	return FullPaletteList(
+		colorRoles = ColorRoles(
+			primaryLight = primaryLight,
+			onPrimaryLight = onPrimaryLight,
+			primaryContainerLight = primaryContainerLight,
+			onPrimaryContainerLight = onPrimaryContainerLight,
+			inversePrimaryLight = inversePrimaryLight,
+			secondaryLight = secondaryLight,
+			onSecondaryLight = onSecondaryLight,
+			secondaryContainerLight = secondaryContainerLight,
+			onSecondaryContainerLight = onSecondaryContainerLight,
+			tertiaryLight = tertiaryLight,
+			onTertiaryLight = onTertiaryLight,
+			tertiaryContainerLight = tertiaryContainerLight,
+			onTertiaryContainerLight = onTertiaryContainerLight,
+			backgroundLight = backgroundLight,
+			onBackgroundLight = onBackgroundLight,
+			surfaceLight = surfaceLight,
+			onSurfaceLight = onSurfaceLight,
+			surfaceVariantLight = surfaceVariantLight,
+			onSurfaceVariantLight = onSurfaceVariantLight,
+			surfaceTintLight = surfaceTintLight,
+			inverseSurfaceLight = inverseSurfaceLight,
+			inverseOnSurfaceLight = inverseOnSurfaceLight,
+			errorLight = errorLight,
+			onErrorLight = onErrorLight,
+			errorContainerLight = errorContainerLight,
+			onErrorContainerLight = onErrorContainerLight,
+			outlineLight = outlineLight,
+			outlineVariantLight = outlineVariantLight,
+			scrimLight = scrimLight,
+			surfaceElevationLevel3Light = surfaceElevationLevel3Light,
+			primaryDark = primaryDark,
+			onPrimaryDark = onPrimaryDark,
+			primaryContainerDark = primaryContainerDark,
+			onPrimaryContainerDark = onPrimaryContainerDark,
+			inversePrimaryDark = inversePrimaryDark,
+			secondaryDark = secondaryDark,
+			onSecondaryDark = onSecondaryDark,
+			secondaryContainerDark = secondaryContainerDark,
+			onSecondaryContainerDark = onSecondaryContainerDark,
+			tertiaryDark = tertiaryDark,
+			onTertiaryDark = onTertiaryDark,
+			tertiaryContainerDark = tertiaryContainerDark,
+			onTertiaryContainerDark = onTertiaryContainerDark,
+			backgroundDark = backgroundDark,
+			onBackgroundDark = onBackgroundDark,
+			surfaceDark = surfaceDark,
+			onSurfaceDark = onSurfaceDark,
+			surfaceVariantDark = surfaceVariantDark,
+			onSurfaceVariantDark = onSurfaceVariantDark,
+			surfaceTintDark = surfaceTintDark,
+			inverseSurfaceDark = inverseSurfaceDark,
+			inverseOnSurfaceDark = inverseOnSurfaceDark,
+			errorDark = errorDark,
+			onErrorDark = onErrorDark,
+			errorContainerDark = errorContainerDark,
+			onErrorContainerDark = onErrorContainerDark,
+			outlineDark = outlineDark,
+			outlineVariantDark = outlineVariantDark,
+			scrimDark = scrimDark,
+			surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
+		),
 		primary_0 = colorResource(system_accent1_1000),
 		primary_10 = colorResource(system_accent1_900),
 		primary_20 = colorResource(system_accent1_800),
@@ -451,20 +735,13 @@ fun fullPalette(): FullPaletteList {
 		neutralVariant_95 = colorResource(system_neutral2_50),
 		neutralVariant_99 = colorResource(system_neutral2_10),
 		neutralVariant_100 = colorResource(system_neutral2_0),
-		backgroundLight = backgroundLight,
-		// you cant get neutral 98 color... ask google about their decisions
-		surfaceLight = surfaceLight,
-		surfaceElevationLevel3Light = surfaceElevationLevel3Light,
-		backgroundDark = backgroundDark,
-		surfaceDark = surfaceDark,
-		surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
 		blue = getColorTonesMap(harmonizedBlue),
 		red = getColorTonesMap(harmonizedRed),
 		green = getColorTonesMap(harmonizedGreen),
 		orange = getColorTonesMap(harmonizedOrange),
 		violet = getColorTonesMap(harmonizedViolet),
 		cyan = getColorTonesMap(harmonizedCyan),
-		pink = getColorTonesMap(harmonizedPink),
+		pink = getColorTonesMap(harmonizedPink)
 	)
 }
 

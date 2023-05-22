@@ -26,6 +26,381 @@ fun PalettePopup(key: String, vm: MainViewModel, palette: FullPaletteList) {
 	Surface(modifier = Modifier) {
 		Column {
 			Text(text = key)
+
+			Row {
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.primaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.primaryLight, "primary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onPrimaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onPrimaryLight, "on_primary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.primaryContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.primaryContainerLight, "primary_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onPrimaryContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onPrimaryContainerLight, "on_primary_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.inversePrimaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.inversePrimaryLight, "inverse_primary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.secondaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.secondaryLight, "secondary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSecondaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onSecondaryLight, "on_secondary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.secondaryContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.secondaryContainerLight, "secondary_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSecondaryContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onPrimaryContainerLight, "on_secondary_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.tertiaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.tertiaryLight, "tertiary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onTertiaryLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onTertiaryLight, "on_tertiary_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.tertiaryContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.tertiaryContainerLight, "tertiary_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onTertiaryContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onTertiaryContainerLight, "on_tertiary_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.backgroundLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.backgroundLight, "background_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onBackgroundLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onBackgroundLight, "on_background_light") }
+				)
+			}
+			Row {
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceLight, "surface_light") }
+				)
+
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSurfaceLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onSurfaceLight, "on_surface_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceVariantLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceVariantLight, "surface_variant_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSurfaceVariantLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onSurfaceVariantLight, "on_surface_variant_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceTintLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceTintLight, "surface_tint_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.inverseSurfaceLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.inverseSurfaceLight, "inverse_surface_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.inverseOnSurfaceLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.inverseOnSurfaceLight, "inverse_on_surface_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.errorLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.errorLight, "error_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onErrorLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onErrorLight, "on_error_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.errorContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.errorContainerLight, "error_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onErrorContainerLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.onErrorContainerLight, "on_error_container_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.outlineLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.outlineLight, "outline_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.outlineVariantLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.outlineVariantLight, "outline_variant_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.scrimLight)
+						.clickable { vm.changeValue(key, palette.colorRoles.scrimLight, "scrim_light") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceElevationLevel3Light)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceElevationLevel3Light, "surface_elevation_level_3_light") }
+				)
+			}
+
+
+			Row {
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.primaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.primaryDark, "primary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onPrimaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onPrimaryDark, "on_primary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.primaryContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.primaryContainerDark, "primary_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onPrimaryContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onPrimaryContainerDark, "on_primary_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.inversePrimaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.inversePrimaryDark, "inverse_primary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.secondaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.secondaryDark, "secondary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSecondaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onSecondaryDark, "on_secondary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.secondaryContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.secondaryContainerDark, "secondary_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSecondaryContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onPrimaryContainerDark, "on_secondary_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.tertiaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.tertiaryDark, "tertiary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onTertiaryDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onTertiaryDark, "on_tertiary_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.tertiaryContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.tertiaryContainerDark, "tertiary_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onTertiaryContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onTertiaryContainerDark, "on_tertiary_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.backgroundDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.backgroundDark, "background_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onBackgroundDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onBackgroundDark, "on_background_dark") }
+				)
+			}
+			Row {
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceDark, "surface_dark") }
+				)
+
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSurfaceDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onSurfaceDark, "on_surface_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceVariantDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceVariantDark, "surface_variant_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onSurfaceVariantDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onSurfaceVariantDark, "on_surface_variant_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceTintDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceTintDark, "surface_tint_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.inverseSurfaceDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.inverseSurfaceDark, "inverse_surface_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.inverseOnSurfaceDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.inverseOnSurfaceDark, "inverse_on_surface_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.errorDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.errorDark, "error_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onErrorDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onErrorDark, "on_error_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.errorContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.errorContainerDark, "error_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.onErrorContainerDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.onErrorContainerDark, "on_error_container_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.outlineDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.outlineDark, "outline_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.outlineVariantDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.outlineVariantDark, "outline_variant_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.scrimDark)
+						.clickable { vm.changeValue(key, palette.colorRoles.scrimDark, "scrim_dark") }
+				)
+				Box(
+					Modifier
+						.size(26.dp)
+						.background(palette.colorRoles.surfaceElevationLevel3Dark)
+						.clickable { vm.changeValue(key, palette.colorRoles.surfaceElevationLevel3Dark, "surface_elevation_level_3_dark") }
+				)
+			}
+			
+
 			// primary
 			Row {
 				Box(
