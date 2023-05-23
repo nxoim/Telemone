@@ -68,7 +68,7 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling:1.5.0-alpha04'
     debugImplementation 'androidx.compose.ui:ui-test-manifest:1.5.0-alpha04'
 
-    implementation 'com.google.accompanist:accompanist-navigation-animation:0.30.0'
+    implementation 'com.google.accompanist:accompanist-navigation-animation:0.31.2-alpha'
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.0'
 
     implementation 'com.google.code.gson:gson:2.10.1'

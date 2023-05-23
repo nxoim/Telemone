@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.number869.seksinavigation.OverlayLayout
 import com.number869.seksinavigation.rememberOverlayLayoutState
-import com.number869.telemone.ui.screens.main.MainScreen
+import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TeleMoneTheme
 import com.number869.telemone.ui.theme.fullPalette
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
 					color = MaterialTheme.colorScheme.background
 				) {
 					OverlayLayout(overlayLayoutState, this) {
-						MainScreen(navController, vm, overlayLayoutState)
+						Navigator(navController, vm, overlayLayoutState)
 					}
 				}
 			}

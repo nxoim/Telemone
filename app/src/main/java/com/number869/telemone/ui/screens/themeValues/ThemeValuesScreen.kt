@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.themeContents
+package com.number869.telemone.ui.screens.themeValues
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import com.number869.telemone.MainViewModel
 
 @Composable
-fun ThemeContentsScreen(vm: MainViewModel) {
+fun ThemeValuesScreen(vm: MainViewModel) {
 	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
 	val text = mutableListOf<String>()
 	var showValues by remember { mutableStateOf(false) }
