@@ -55,39 +55,41 @@ fun SavedThemeItem(
 	}
 	// EVERYTHING HERE IS TODO
 
-	OutlinedCard(modifier, shape = RoundedCornerShape(16.dp)) {
-		ChatTopAppBar(
-			colorOf("actionBarDefault"),
-			colorOf("actionBarDefaultIcon"),
-			colorOf("avatar_backgroundOrange"),
-			colorOf("avatar_text"),
-			colorOf("actionBarDefaultTitle"),
-			colorOf("actionBarDefaultSubtitle")
-		)
-		Messages(colorOf("windowBackgroundWhite"))
-		ChatBottomAppBar(
-			colorOf("chat_messagePanelBackground"),
-			colorOf("chat_messagePanelIcons"),
-			colorOf("chat_messagePanelHint")
-		)
-	}
+	Box {
+		OutlinedCard(modifier, shape = RoundedCornerShape(16.dp)) {
+			ChatTopAppBar(
+				colorOf("actionBarDefault"),
+				colorOf("actionBarDefaultIcon"),
+				colorOf("avatar_backgroundOrange"),
+				colorOf("avatar_text"),
+				colorOf("actionBarDefaultTitle"),
+				colorOf("actionBarDefaultSubtitle")
+			)
+			Messages(colorOf("windowBackgroundWhite"))
+			ChatBottomAppBar(
+				colorOf("chat_messagePanelBackground"),
+				colorOf("chat_messagePanelIcons"),
+				colorOf("chat_messagePanelHint")
+			)
+		}
 
-	DropdownMenu(
-		expanded = showMenu,
-		onDismissRequest = { closeMenu() }
-	) {
-		DropdownMenuItem(
-			text = { Text("Export this theme")},
-			onClick = { exportTheme() }
-		)
-		DropdownMenuItem(
-			text = { Text("Overwrite a default theme")},
-			onClick = { overwriteTheme() }
-		)
-		DropdownMenuItem(
-			text = { Text("Delete theme") },
-			onClick = { deleteTheme()	}
-		)
+		DropdownMenu(
+			expanded = showMenu,
+			onDismissRequest = { closeMenu() }
+		) {
+			DropdownMenuItem(
+				text = { Text("Export this theme")},
+				onClick = { exportTheme() }
+			)
+			DropdownMenuItem(
+				text = { Text("Overwrite a default theme")},
+				onClick = { overwriteTheme() }
+			)
+			DropdownMenuItem(
+				text = { Text("Delete theme") },
+				onClick = { deleteTheme()	}
+			)
+		}
 	}
 }
 
