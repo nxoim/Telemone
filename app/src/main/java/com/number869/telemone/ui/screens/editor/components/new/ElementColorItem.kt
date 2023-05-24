@@ -3,6 +3,7 @@ package com.number869.telemone.ui.screens.editor.components.new
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,44 +53,46 @@ fun ElementColorItem(
 	else
 		RoundedCornerShape(4.dp)
 
-	Column(
-		modifier
-			.clip(roundedCornerShape)
-			.background(backgroundColor)
-			.height(64.dp)
-			.fillMaxWidth()
-			.clickable { showPopUp = !showPopUp },
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center,
-	) {
-		// name
-		Text(
-			text = uiElementData.first,
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
-			color = Color.White,
-			modifier = Modifier
-				.clip(CircleShape)
-				.background(Color(0x4D000000))
-				.padding(horizontal = 8.dp, vertical = 2.dp)
-		)
+	Box {
+		Column(
+			modifier
+				.clip(roundedCornerShape)
+				.background(backgroundColor)
+				.height(64.dp)
+				.fillMaxWidth()
+				.clickable { showPopUp = !showPopUp },
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center,
+		) {
+			// name
+			Text(
+				text = uiElementData.first,
+				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+				color = Color.White,
+				modifier = Modifier
+					.clip(CircleShape)
+					.background(Color(0x4D000000))
+					.padding(horizontal = 8.dp, vertical = 2.dp)
+			)
 
-		Spacer(modifier = Modifier.height(8.dp))
+			Spacer(modifier = Modifier.height(8.dp))
 
-		// material you palette color token
-		Text(
-			text = uiElementData.second.first,
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
-			color = Color.White,
-			modifier = Modifier
-				.clip(CircleShape)
-				.background(Color(0x4D000000))
-				.padding(horizontal = 8.dp, vertical = 2.dp)
-		)
-	}
+			// material you palette color token
+			Text(
+				text = uiElementData.second.first,
+				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+				color = Color.White,
+				modifier = Modifier
+					.clip(CircleShape)
+					.background(Color(0x4D000000))
+					.padding(horizontal = 8.dp, vertical = 2.dp)
+			)
+		}
 
-	if (showPopUp) {
-		Popup(onDismissRequest = { showPopUp = false }) {
-			PalettePopup(uiElementData.first, vm, palette)
+		if (showPopUp) {
+			Popup(onDismissRequest = { showPopUp = false }) {
+				PalettePopup(uiElementData.first, vm, palette)
+			}
 		}
 	}
 }
