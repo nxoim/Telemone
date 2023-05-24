@@ -21,7 +21,7 @@ import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Navigator(navController: NavHostController, vm: MainViewModel, overlayLayoutState: OverlayLayoutState) {
-	val screenWidth = LocalConfiguration.current.screenWidthDp / 2
+	val screenWidth = LocalConfiguration.current.screenWidthDp
 	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
 
 	AnimatedNavHost(navController, Screens.MainScreen.route) {
@@ -29,13 +29,13 @@ fun Navigator(navController: NavHostController, vm: MainViewModel, overlayLayout
 			Screens.MainScreen.route,
 			enterTransition = {
 				when (initialState.destination.route) {
-					Screens.EditorScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { -screenWidth }) + fadeIn(tween(500, 100))
+					Screens.EditorScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { -screenWidth }) + fadeIn(tween(300, 100))
 					else -> null
 				}
 			},
 			exitTransition = {
 				when (targetState.destination.route) {
-					Screens.EditorScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { -screenWidth }) + fadeOut(tween(500, 100))
+					Screens.EditorScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { -screenWidth }) + fadeOut(tween(300, 100))
 					else -> null
 				}
 			}
@@ -47,15 +47,15 @@ fun Navigator(navController: NavHostController, vm: MainViewModel, overlayLayout
 			Screens.EditorScreen.route,
 			enterTransition = {
 				when (initialState.destination.route) {
-					Screens.MainScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { screenWidth }) + fadeIn(tween(500, 100))
-					Screens.ThemeValuesScreen.route -> slideInHorizontally(initialOffsetX = { -screenWidth }) + fadeIn(tween(500, 100, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs))
+					Screens.MainScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { screenWidth }) + fadeIn(tween(300, 100))
+					Screens.ThemeValuesScreen.route -> slideInHorizontally(initialOffsetX = { -screenWidth }) + fadeIn(tween(300, 100, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs))
 					else -> null
 				}
 			},
 			exitTransition = {
 				when (targetState.destination.route) {
-					Screens.ThemeValuesScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { -screenWidth }) + fadeOut(tween(500, 100))
-					Screens.MainScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { screenWidth }) + fadeOut(tween(500, 100))
+					Screens.ThemeValuesScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { -screenWidth }) + fadeOut(tween(300, 100))
+					Screens.MainScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { screenWidth }) + fadeOut(tween(300, 100))
 					else -> null
 				}
 			}
@@ -67,13 +67,13 @@ fun Navigator(navController: NavHostController, vm: MainViewModel, overlayLayout
 			Screens.ThemeValuesScreen.route,
 			enterTransition = {
 				when (initialState.destination.route) {
-					Screens.EditorScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { screenWidth }) + fadeIn(tween(500, 100))
+					Screens.EditorScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { screenWidth }) + fadeIn(tween(300, 100))
 					else -> null
 				}
 			},
 			exitTransition = {
 				when (targetState.destination.route) {
-					Screens.EditorScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { screenWidth }) + fadeOut(tween(500, 100))
+					Screens.EditorScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { screenWidth }) + fadeOut(tween(300, 100))
 					else -> null
 				}
 			}
