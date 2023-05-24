@@ -1,5 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.old
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.theme.FullPaletteList
 
 @Composable
 fun OverwriteChoiceDialog(
@@ -34,7 +36,9 @@ fun OverwriteChoiceDialog(
 	isShowingOverwriteChoiceDialog: Boolean,
 	chooseLight: () -> Unit,
 	chooseDark: () -> Unit,
-	vm: MainViewModel
+	vm: MainViewModel,
+	palette: FullPaletteList,
+	context: Context
 ) {
 	AnimatedVisibility(
 		visible = isShowingOverwriteChoiceDialog,
@@ -56,7 +60,9 @@ fun OverwriteChoiceDialog(
 									.clip(RoundedCornerShape(16.dp))
 									.weight(1f, false),
 								vm,
-								"defaultLightThemeUUID"
+								"defaultLightThemeUUID",
+								palette,
+								context
 							)
 
 							TextButton(onClick = { chooseLight() }) {
@@ -73,7 +79,9 @@ fun OverwriteChoiceDialog(
 									.clip(RoundedCornerShape(16.dp))
 									.weight(1f, false),
 								vm,
-								"defaultDarkThemeUUID"
+								"defaultDarkThemeUUID",
+								palette,
+								context
 							)
 
 							TextButton(onClick = { chooseDark() }) {
@@ -98,7 +106,9 @@ fun OverwriteDefaultsDialog(
 	overwrite: () -> Unit,
 	vm: MainViewModel,
 	overwriteDark: Boolean,
-	overwriteWith: String
+	overwriteWith: String,
+	palette: FullPaletteList,
+	context: Context
 ) {
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
 
@@ -131,7 +141,9 @@ fun OverwriteDefaultsDialog(
 								.height(140.dp)
 								.clip(RoundedCornerShape(16.dp)),
 							vm,
-							uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID"
+							uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
+							palette,
+							context
 						)
 
 						Spacer(Modifier.width(8.dp))
@@ -149,7 +161,9 @@ fun OverwriteDefaultsDialog(
 								.height(140.dp)
 								.clip(RoundedCornerShape(16.dp)),
 							vm,
-							uuid = overwriteWith
+							uuid = overwriteWith,
+							palette,
+							context
 						)
 					}
 				}

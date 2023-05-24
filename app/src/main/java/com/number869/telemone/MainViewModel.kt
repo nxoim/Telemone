@@ -32,25 +32,16 @@ typealias UiElementName = String
 typealias ColorToken = String
 typealias ColorValue = Int
 typealias DataAboutColors = Pair<ColorToken, ColorValue>
-typealias Theme = Map<UiElementName, DataAboutColors>
-typealias Themes = Map<ThemeUUID, Theme>
+typealias UiElementData = Map<UiElementName, DataAboutColors>
+typealias Themes = Map<ThemeUUID, UiElementData>
 typealias ThemeList = SnapshotStateList<Themes>
 typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
 
-
-// This does not take long to load but an advice with explanations
-// will be greatly appreciated. *with examples* though cuz i think from top
-// to bottom cuz i mainly look for patterns cuz attention span
-// comparable to that one of a chimpanzee if not less
-
-// i will refactor all of this. someday. if i only focused on cleanness
-// i would've never made this a real thing. saying this cuz i know y'all are
-// gonna be coming after me for the things i wrote 💀
+// i will refactor all of this. someday. maybe. probably not.
 
 // funny of you to actually expect some sort of documentation in the
 // comments
-
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 	private val themeListKey = "AppPreferences.ThemeList"
 	private val preferences = application.getSharedPreferences(

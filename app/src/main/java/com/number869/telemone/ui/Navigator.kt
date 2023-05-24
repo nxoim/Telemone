@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import com.number869.seksinavigation.OverlayLayoutState
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.screens.editor.EditorScreen
 import com.number869.telemone.ui.screens.main.MainScreen
@@ -20,7 +19,7 @@ import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Navigator(navController: NavHostController, vm: MainViewModel, overlayLayoutState: OverlayLayoutState) {
+fun Navigator(navController: NavHostController, vm: MainViewModel) {
 	val screenWidth = LocalConfiguration.current.screenWidthDp
 	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
 
@@ -60,7 +59,7 @@ fun Navigator(navController: NavHostController, vm: MainViewModel, overlayLayout
 				}
 			}
 		) {
-			EditorScreen(overlayLayoutState, navController, vm)
+			EditorScreen(navController, vm)
 		}
 
 		composable(

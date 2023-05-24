@@ -1,5 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.old
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -13,13 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.theme.FullPaletteList
 
 @Composable
 fun DeleteThemeDialog(
 	close: () -> Unit,
 	isShowingDeleteDialog: Boolean,
 	vm: MainViewModel,
-	uuid: String
+	uuid: String,
+	palette: FullPaletteList,
+	context: Context
 ) {
 	AnimatedVisibility(
 		visible = isShowingDeleteDialog
@@ -34,7 +38,9 @@ fun DeleteThemeDialog(
 						.height(180.dp)
 						.clip(RoundedCornerShape(16.dp)),
 					vm,
-					uuid
+					uuid,
+					palette,
+					context
 				)
 			},
 			text = {

@@ -1,7 +1,10 @@
 package com.number869.telemone.ui.screens.editor.components.old
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +28,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.theme.FullPaletteList
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -41,23 +50,56 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	uuid: String,
-	closeMenu: () -> Unit = {},
-	loadWithOptions: () -> Unit = {},
-	overwriteTheme: () -> Unit = {},
-	deleteTheme: () -> Unit = {},
-	exportTheme: () -> Unit = {},
-	showMenu: Boolean = false,
+	palette: FullPaletteList,
+	context: Context,
+	isInSavedThemesRow: Boolean = false
 ) {
+	var showMenu by remember { mutableStateOf(false) }
+	var showDeleteDialog by remember { mutableStateOf(false) }
+	var showLoadWithOptionsDialog by remember { mutableStateOf(false) }
+	var showOverwriteChoiceDialog by remember { mutableStateOf(false) }
+	var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
+	var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
+
 	fun colorOf(colorValueOf: String): Color {
 		return vm.themeList.find { it.containsKey(uuid) }
 			?.get(uuid)
 			?.get(colorValueOf)
 			?.let { Color(it.second) } ?: Color.Red
 	}
-	// EVERYTHING HERE IS TODO
 
 	Box {
-		OutlinedCard(modifier, shape = RoundedCornerShape(16.dp)) {
+		OutlinedCard(
+			modifier
+				.width(150.dp)
+				.height(180.dp)
+				.clip(RoundedCornerShape(16.dp))
+				.let {
+					return@let if (isInSavedThemesRow)
+						it.combinedClickable (
+							onClick = {
+								vm.loadTheme(
+									uuid,
+									withTokens = false,
+									palette,
+									clearCurrentTheme = true
+								)
+
+								Toast
+									.makeText(
+										context,
+										"Theme loaded",
+										Toast.LENGTH_SHORT
+									)
+									.show()
+							},
+							onLongClick = { showMenu = true }
+						)
+					else
+						it
+				},
+			shape = RoundedCornerShape(16.dp)
+		) {
 			ChatTopAppBar(
 				colorOf("actionBarDefault"),
 				colorOf("actionBarDefaultIcon"),
@@ -76,26 +118,92 @@ fun SavedThemeItem(
 
 		DropdownMenu(
 			expanded = showMenu,
-			onDismissRequest = { closeMenu() }
+			onDismissRequest = { showMenu = false }
 		) {
 			DropdownMenuItem(
 				text = { Text("Load theme with options") },
-				onClick = { loadWithOptions() }
+				onClick = { showLoadWithOptionsDialog = true }
 			)
 			DropdownMenuItem(
 				text = { Text("Export this theme")},
-				onClick = { exportTheme() }
+				onClick = {
+					showMenu = false
+					vm.exportTheme(uuid, context)
+				}
 			)
 			DropdownMenuItem(
 				text = { Text("Overwrite a default theme")},
-				onClick = { overwriteTheme() }
+				onClick = {
+					showMenu = false
+					showOverwriteChoiceDialog = true
+				}
 			)
 			DropdownMenuItem(
 				text = { Text("Delete theme") },
-				onClick = { deleteTheme()	}
+				onClick = {
+					showMenu = false
+					showDeleteDialog = true
+				}
 			)
 		}
 	}
+
+	// i dont know what to do with all these dialogs
+
+	LoadWithOptionsDialog(
+		{ showLoadWithOptionsDialog = false },
+		showLoadWithOptionsDialog,
+		vm,
+		palette,
+		uuid
+	)
+
+	DeleteThemeDialog(
+		close = { showDeleteDialog = false },
+		showDeleteDialog,
+		vm,
+		uuid,
+		palette,
+		context
+	)
+
+	OverwriteChoiceDialog(
+		{ showOverwriteChoiceDialog = false },
+		showOverwriteChoiceDialog,
+		{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
+		{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
+		vm,
+		palette,
+		context
+	)
+
+	OverwriteDefaultsDialog(
+		close = { showOverwriteDarkThemeDialog = false },
+		showOverwriteDarkThemeDialog,
+		overwrite = {
+			showOverwriteDarkThemeDialog = false
+			vm.overwriteDefaultDarkTheme(uuid, palette)
+		},
+		vm = vm,
+		overwriteDark = true,
+		uuid,
+		palette,
+		context
+	)
+
+	OverwriteDefaultsDialog(
+		close = { showOverwriteLightThemeDialog = false },
+		showOverwriteLightThemeDialog,
+		overwrite = {
+			showOverwriteLightThemeDialog = false
+			vm.overwriteDefaultLightTheme(uuid, palette)
+		},
+		vm = vm,
+		overwriteDark = false,
+		uuid,
+		palette,
+		context
+	)
 }
 
 @Composable

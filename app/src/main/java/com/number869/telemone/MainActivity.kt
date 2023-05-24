@@ -13,8 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.number869.seksinavigation.OverlayLayout
-import com.number869.seksinavigation.rememberOverlayLayoutState
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TeleMoneTheme
 import com.number869.telemone.ui.theme.fullPalette
@@ -31,7 +29,6 @@ class MainActivity : ComponentActivity() {
 				val palette = fullPalette()
 				val vm: MainViewModel = viewModel()
 				val scope = rememberCoroutineScope()
-				val overlayLayoutState = rememberOverlayLayoutState()
 
 				LaunchedEffect(Unit) {
 					scope.launch {
@@ -43,9 +40,7 @@ class MainActivity : ComponentActivity() {
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colorScheme.background
 				) {
-					OverlayLayout(overlayLayoutState, this) {
-						Navigator(navController, vm, overlayLayoutState)
-					}
+					Navigator(navController, vm)
 				}
 			}
 		}

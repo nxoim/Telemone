@@ -1,8 +1,5 @@
 package com.number869.telemone.ui.screens.editor
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -46,10 +42,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
-import com.number869.seksinavigation.OverlayItemWrapper
-import com.number869.seksinavigation.OverlayLayoutState
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.Screens
 import com.number869.telemone.ui.screens.editor.components.old.PalettePopup
 import com.number869.telemone.ui.screens.editor.components.old.preview.GroupInfoTopBar
 import com.number869.telemone.ui.screens.editor.components.old.preview.PinnedMessages
@@ -59,7 +52,7 @@ import com.number869.telemone.ui.theme.fullPalette
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EditorScreen(navController: NavHostController, vm: MainViewModel, state: OverlayLayoutState) {
+fun DeprecatedEditorScreen(navController: NavHostController, vm: MainViewModel) {
 	val topPaddingAsDp = WindowInsets.systemBars.getTop(LocalDensity.current).dp
 	val bottomPaddingAsDp = WindowInsets.systemBars.getBottom(LocalDensity.current).dp
 
@@ -105,24 +98,24 @@ fun EditorScreen(navController: NavHostController, vm: MainViewModel, state: Ove
 				Text(text = "Export Current")
 			}
 
-			OverlayItemWrapper(
-				isOriginalItemStatic = true,
-				originalCornerRadius = 16.dp,
-				key = "alternativeEditorScreen",
-				state = state
-			) {
-				val isExpanded = state.getIsExpanded("alternativeEditorScreen")
-
-				AnimatedVisibility(visible = !isExpanded, enter = fadeIn(), exit = fadeOut()) {
-					OutlinedButton(onClick = { navController.navigate(Screens.EditorScreen.route) }) {
-						Text(text = "Go to alternative editor")
-					}
-				}
-
-				AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-					EditorScreen(state, navController, vm)
-				}
-			}
+//			OverlayItemWrapper(
+//				isOriginalItemStatic = true,
+//				originalCornerRadius = 16.dp,
+//				key = "alternativeEditorScreen",
+//				state = state
+//			) {
+//				val isExpanded = state.getIsExpanded("alternativeEditorScreen")
+//
+//				AnimatedVisibility(visible = !isExpanded, enter = fadeIn(), exit = fadeOut()) {
+//					OutlinedButton(onClick = { navController.navigate(Screens.EditorScreen.route) }) {
+//						Text(text = "Go to alternative editor")
+//					}
+//				}
+//
+//				AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+//					EditorScreen(navController, vm)
+//				}
+//			}
 		}
 	}
 }
