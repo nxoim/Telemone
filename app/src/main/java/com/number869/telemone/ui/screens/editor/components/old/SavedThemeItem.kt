@@ -42,6 +42,7 @@ fun SavedThemeItem(
 	vm: MainViewModel,
 	uuid: String,
 	closeMenu: () -> Unit = {},
+	loadWithOptions: () -> Unit = {},
 	overwriteTheme: () -> Unit = {},
 	deleteTheme: () -> Unit = {},
 	exportTheme: () -> Unit = {},
@@ -77,6 +78,10 @@ fun SavedThemeItem(
 			expanded = showMenu,
 			onDismissRequest = { closeMenu() }
 		) {
+			DropdownMenuItem(
+				text = { Text("Load theme with options") },
+				onClick = { loadWithOptions() }
+			)
 			DropdownMenuItem(
 				text = { Text("Export this theme")},
 				onClick = { exportTheme() }

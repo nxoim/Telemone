@@ -9,7 +9,7 @@ import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.theme.FullPaletteList
 
 @Composable
-fun LoadFromSavedDialog(
+fun LoadWithOptionsDialog(
 	close: () -> Unit,
 	isShowingApplyDialog: Boolean,
 	vm: MainViewModel,

@@ -3,6 +3,7 @@
 package com.number869.telemone.ui.screens.editor
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -79,7 +80,7 @@ import com.number869.telemone.ui.Screens
 import com.number869.telemone.ui.screens.editor.components.old.ChatScreenPreview
 import com.number869.telemone.ui.screens.editor.components.old.ClearBeforeLoadDialog
 import com.number869.telemone.ui.screens.editor.components.old.DeleteThemeDialog
-import com.number869.telemone.ui.screens.editor.components.old.LoadFromSavedDialog
+import com.number869.telemone.ui.screens.editor.components.old.LoadWithOptionsDialog
 import com.number869.telemone.ui.screens.editor.components.old.OverwriteChoiceDialog
 import com.number869.telemone.ui.screens.editor.components.old.OverwriteDefaultsDialog
 import com.number869.telemone.ui.screens.editor.components.old.PalettePopup
@@ -300,7 +301,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 							itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
 								var showMenu by remember { mutableStateOf(false) }
 								var showDeleteDialog by remember { mutableStateOf(false) }
-								var showApplyDialog by remember { mutableStateOf(false) }
+								var showLoadWithOptionsDialog by remember { mutableStateOf(false) }
 								var showOverwriteChoiceDialog by remember { mutableStateOf(false) }
 								var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
 								var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
@@ -312,12 +313,22 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 										.clip(RoundedCornerShape(16.dp))
 										.animateItemPlacement()
 										.combinedClickable(
-											onClick = { showApplyDialog = true },
+											onClick = {
+												vm.loadTheme(
+													uuid,
+													withTokens = false,
+													palette,
+													clearCurrentTheme = true
+												)
+
+												Toast.makeText(context, "Theme loaded", Toast.LENGTH_SHORT).show()
+											},
 											onLongClick = { showMenu = true }
 										),
 									vm,
 									uuid = uuid,
 									closeMenu = { showMenu = false},
+									loadWithOptions = { showLoadWithOptionsDialog = true },
 									overwriteTheme = {
 										showMenu = false
 										showOverwriteChoiceDialog = true
@@ -333,9 +344,9 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 									showMenu = showMenu
 								)
 
-								LoadFromSavedDialog(
-									{ showApplyDialog = false },
-									showApplyDialog,
+								LoadWithOptionsDialog(
+									{ showLoadWithOptionsDialog = false },
+									showLoadWithOptionsDialog,
 									vm,
 									palette,
 									uuid
