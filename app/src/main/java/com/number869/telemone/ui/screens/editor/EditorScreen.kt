@@ -48,8 +48,8 @@ import androidx.navigation.NavController
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.screens.editor.components.new.AlternativeEditorTopAppBar
+import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
-import com.number869.telemone.ui.screens.editor.components.old.ChatScreenPreview
 import com.number869.telemone.ui.screens.editor.components.old.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
 
@@ -89,7 +89,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 				contentPadding = PaddingValues(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp)
 			) {
 				item {
-					ChatScreenPreview(vm)
+					CurrentThemePreview(vm)
 
 					Text(
 						text = "Saved Themes",

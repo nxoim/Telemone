@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.editor.components.old
+package com.number869.telemone.ui.screens.editor.components.new
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,27 +34,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.DarkTheme
 import com.number869.telemone.ui.theme.fullPalette
 
 @Composable
-fun ChatScreenPreview(vm: MainViewModel) {
-	Column(Modifier.fillMaxWidth()) {
+fun CurrentThemePreview(vm: MainViewModel) {
+	Column {
 		Text(
 			text = "Current theme",
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.labelLarge),
+			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
+				MaterialTheme.typography.labelLarge),
 			modifier = Modifier.padding(start = 24.dp),
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
-		Row(Modifier.padding(16.dp).align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-			PreviewHomeScreenDark(vm)
-			PreviewChatDark(vm)
+		Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+			PreviewHomeScreen(vm)
+			PreviewChat(vm)
 		}
 	}
 }
 
 @Composable
-private fun PreviewHomeScreenDark(vm: MainViewModel) {
+private fun PreviewHomeScreen(vm: MainViewModel) {
 	fun colorOf(color: String): Color {
 		return if (vm.mappedValues.containsKey(color)) {
 			vm.mappedValues.getValue(color).second
@@ -63,21 +63,19 @@ private fun PreviewHomeScreenDark(vm: MainViewModel) {
 		}
 	}
 
-	DarkTheme() {
-		OutlinedCard(
-			Modifier
-				.width(150.dp)
-				.height(180.dp),
-			shape = RoundedCornerShape(16.dp),
-			colors = CardDefaults.outlinedCardColors(colorOf("windowBackgroundWhite")),
-		) {
+	OutlinedCard(
+		Modifier
+			.width(150.dp)
+			.height(180.dp),
+		shape = RoundedCornerShape(16.dp),
+		colors = CardDefaults.outlinedCardColors(colorOf("windowBackgroundWhite")),
+	) {
 
-		}
 	}
 }
 
 @Composable
-private fun PreviewChatDark(vm: MainViewModel) {
+private fun PreviewChat(vm: MainViewModel) {
 	fun colorOf(colorValueOf: String): Color {
 		return try {
 			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
@@ -86,32 +84,27 @@ private fun PreviewChatDark(vm: MainViewModel) {
 		}
 	}
 
-	Row(
-		Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.spacedBy(16.dp)
+	OutlinedCard(
+		Modifier
+			.width(150.dp)
+			.height(180.dp),
+		shape = RoundedCornerShape(16.dp)
 	) {
-		OutlinedCard(
-			Modifier
-				.width(150.dp)
-				.height(180.dp),
-			shape = RoundedCornerShape(16.dp)
-		) {
-			ChatTopAppBar(
-				colorOf("actionBarDefault"),
-				colorOf("actionBarDefaultIcon"),
-				colorOf("avatar_backgroundOrange"),
-				colorOf("avatar_text"),
-				colorOf("actionBarDefaultTitle"),
-				colorOf("actionBarDefaultSubtitle")
-			)
-			Messages(colorOf("windowBackgroundWhite"))
-			ChatBottomAppBar(
-				colorOf("chat_messagePanelBackground"),
+		ChatTopAppBar(
+			colorOf("actionBarDefault"),
+			colorOf("actionBarDefaultIcon"),
+			colorOf("avatar_backgroundOrange"),
+			colorOf("avatar_text"),
+			colorOf("actionBarDefaultTitle"),
+			colorOf("actionBarDefaultSubtitle")
+		)
+		Messages(colorOf("windowBackgroundWhite"))
+		ChatBottomAppBar(
+			colorOf("chat_messagePanelBackground"),
 //				colorOf("chats_attachMessage"),
-				colorOf("chat_messagePanelIcons"),
-				colorOf("chat_messagePanelHint")
-			)
-		}
+			colorOf("chat_messagePanelIcons"),
+			colorOf("chat_messagePanelHint")
+		)
 	}
 }
 
