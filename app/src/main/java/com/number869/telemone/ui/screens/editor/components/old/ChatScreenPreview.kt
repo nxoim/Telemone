@@ -39,13 +39,14 @@ import com.number869.telemone.ui.theme.fullPalette
 
 @Composable
 fun ChatScreenPreview(vm: MainViewModel) {
-	Column {
+	Column(Modifier.fillMaxWidth()) {
 		Text(
 			text = "Current theme",
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.headlineMedium),
-			modifier = Modifier.padding(start = 24.dp)
+			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.labelLarge),
+			modifier = Modifier.padding(start = 24.dp),
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
-		Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+		Row(Modifier.padding(16.dp).align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
 			PreviewHomeScreenDark(vm)
 			PreviewChatDark(vm)
 		}

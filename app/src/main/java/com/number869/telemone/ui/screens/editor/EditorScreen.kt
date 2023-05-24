@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -67,6 +69,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
@@ -251,110 +254,147 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 
 				Text(
 					text = "Saved Themes",
-					style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-						MaterialTheme.typography.headlineMedium),
-					modifier = Modifier.padding(start = 24.dp)
+					style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.labelLarge),
+					modifier = Modifier.padding(start = 24.dp),
+					color = MaterialTheme.colorScheme.onPrimaryContainer
 				)
 
-				LazyRow(
-					state = savedThemesRowState,
-					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
-					horizontalArrangement = Arrangement.spacedBy(16.dp)
-				) {
-					itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
-						var showMenu by remember { mutableStateOf(false) }
-						var showDeleteDialog by remember { mutableStateOf(false) }
-						var showApplyDialog by remember { mutableStateOf(false) }
-						var showOverwriteChoiceDialog by remember { mutableStateOf(false) }
-						var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
-						var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
-
-						SavedThemeItem(
+				AnimatedVisibility(visible = themeList.isEmpty()) {
+					Box(
+						Modifier
+							.fillMaxWidth(1f)
+							.height(120.dp)
+							.clip(RoundedCornerShape(16.dp))
+							.animateItemPlacement()
+							.animateContentSize()
+					) {
+						Column(
 							Modifier
-								.width(150.dp)
-								.height(180.dp)
-								.clip(RoundedCornerShape(16.dp))
-								.animateItemPlacement()
-								.combinedClickable(
-									onClick = { showApplyDialog = true },
-									onLongClick = { showMenu = true }
-								),
-							vm,
-							uuid = uuid,
-							closeMenu = { showMenu = false},
-							overwriteTheme = {
-								showMenu = false
-								showOverwriteChoiceDialog = true
-							},
-							deleteTheme = {
-								showMenu = false
-								showDeleteDialog = true
-							},
-							exportTheme = {
-								showMenu = false
-								vm.exportTheme(uuid, context)
-							},
-							showMenu = showMenu
-						)
+								.fillMaxSize()
+								.padding(horizontal = 32.dp, vertical = 16.dp)
+								.clip(CircleShape)
+								.background(MaterialTheme.colorScheme.surfaceVariant),
+							horizontalAlignment = Alignment.CenterHorizontally,
+							verticalArrangement = Arrangement.Center
+						) {
+							Text(
+								"No saved themes",
+								style = TextStyle(platformStyle = PlatformTextStyle(
+									includeFontPadding = false
+								)).plus(MaterialTheme.typography.headlineSmall),
+								textAlign = TextAlign.Center
+							)
+						}
+					}
+				}
 
-						LoadFromSavedDialog(
-							{ showApplyDialog = false },
-							showApplyDialog,
-							vm,
-							palette,
-							uuid
-						)
 
-						DeleteThemeDialog(
-							close = { showDeleteDialog = false },
-							showDeleteDialog,
-							vm,
-							uuid
-						)
+				AnimatedVisibility(visible = themeList.isNotEmpty()) {
+					Column {
+						LazyRow(
+							state = savedThemesRowState,
+							contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
+							horizontalArrangement = Arrangement.spacedBy(16.dp),
+							modifier = Modifier.animateContentSize()
+						) {
+							itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
+								var showMenu by remember { mutableStateOf(false) }
+								var showDeleteDialog by remember { mutableStateOf(false) }
+								var showApplyDialog by remember { mutableStateOf(false) }
+								var showOverwriteChoiceDialog by remember { mutableStateOf(false) }
+								var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
+								var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
 
-						OverwriteChoiceDialog(
-							{ showOverwriteChoiceDialog = false },
-							showOverwriteChoiceDialog,
-							{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
-							{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
-							vm
-						)
+								SavedThemeItem(
+									Modifier
+										.width(150.dp)
+										.height(180.dp)
+										.clip(RoundedCornerShape(16.dp))
+										.animateItemPlacement()
+										.combinedClickable(
+											onClick = { showApplyDialog = true },
+											onLongClick = { showMenu = true }
+										),
+									vm,
+									uuid = uuid,
+									closeMenu = { showMenu = false},
+									overwriteTheme = {
+										showMenu = false
+										showOverwriteChoiceDialog = true
+									},
+									deleteTheme = {
+										showMenu = false
+										showDeleteDialog = true
+									},
+									exportTheme = {
+										showMenu = false
+										vm.exportTheme(uuid, context)
+									},
+									showMenu = showMenu
+								)
 
-						OverwriteDefaultsDialog(
-							close = { showOverwriteDarkThemeDialog = false },
-							showOverwriteDarkThemeDialog,
-							overwrite = {
-								showOverwriteDarkThemeDialog = false
-								vm.overwriteDefaultDarkTheme(uuid, palette)
-							},
-							vm = vm,
-							overwriteDark = true,
-							uuid
-						)
+								LoadFromSavedDialog(
+									{ showApplyDialog = false },
+									showApplyDialog,
+									vm,
+									palette,
+									uuid
+								)
 
-						OverwriteDefaultsDialog(
-							close = { showOverwriteLightThemeDialog = false },
-							showOverwriteLightThemeDialog,
-							overwrite = {
-								showOverwriteLightThemeDialog = false
-								vm.overwriteDefaultLightTheme(uuid, palette)
-							},
-							vm = vm,
-							overwriteDark = false,
-							uuid
-						)
+								DeleteThemeDialog(
+									close = { showDeleteDialog = false },
+									showDeleteDialog,
+									vm,
+									uuid
+								)
+
+								OverwriteChoiceDialog(
+									{ showOverwriteChoiceDialog = false },
+									showOverwriteChoiceDialog,
+									{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
+									{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
+									vm
+								)
+
+								OverwriteDefaultsDialog(
+									close = { showOverwriteDarkThemeDialog = false },
+									showOverwriteDarkThemeDialog,
+									overwrite = {
+										showOverwriteDarkThemeDialog = false
+										vm.overwriteDefaultDarkTheme(uuid, palette)
+									},
+									vm = vm,
+									overwriteDark = true,
+									uuid
+								)
+
+								OverwriteDefaultsDialog(
+									close = { showOverwriteLightThemeDialog = false },
+									showOverwriteLightThemeDialog,
+									overwrite = {
+										showOverwriteLightThemeDialog = false
+										vm.overwriteDefaultLightTheme(uuid, palette)
+									},
+									vm = vm,
+									overwriteDark = false,
+									uuid
+								)
+							}
+						}
+
+						Spacer(modifier = Modifier.height(16.dp))
 					}
 				}
 			}
 
 			if (mappedValues.values.contains(Pair("INCOMPATIBLE VALUE", Color.Red))) {
 				item {
-					Spacer(modifier = Modifier.height(16.dp))
 					Text(
 						text = "Incompatible Values",
 						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-							MaterialTheme.typography.headlineMedium),
-						modifier = Modifier.padding(start = 24.dp)
+							MaterialTheme.typography.labelLarge),
+						modifier = Modifier.padding(start = 24.dp),
+						color = MaterialTheme.colorScheme.onPrimaryContainer
 					)
 					Spacer(modifier = Modifier.height(12.dp))
 				}
@@ -397,7 +437,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 									modifier = Modifier
 										.clip(CircleShape)
 										.background(Color(0x4D000000))
-										.padding(horizontal = 8.dp, vertical = 4.dp)
+										.padding(horizontal = 8.dp, vertical = 2.dp)
 								)
 
 								Spacer(modifier = Modifier.height(8.dp))
@@ -410,7 +450,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 									modifier = Modifier
 										.clip(CircleShape)
 										.background(Color(0x4D000000))
-										.padding(horizontal = 8.dp, vertical = 4.dp)
+										.padding(horizontal = 8.dp, vertical = 2.dp)
 								)
 							}
 
@@ -430,8 +470,9 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 					Text(
 						text = "Incompatible Values",
 						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-							MaterialTheme.typography.headlineMedium),
-						modifier = Modifier.padding(start = 24.dp)
+							MaterialTheme.typography.labelLarge),
+						modifier = Modifier.padding(start = 24.dp),
+						color = MaterialTheme.colorScheme.onPrimaryContainer
 					)
 					Spacer(modifier = Modifier.height(12.dp))
 				}
@@ -471,7 +512,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 								modifier = Modifier
 									.clip(CircleShape)
 									.background(Color(0x4D000000))
-									.padding(horizontal = 8.dp, vertical = 4.dp)
+									.padding(horizontal = 8.dp, vertical = 2.dp)
 							)
 
 							Spacer(modifier = Modifier.height(8.dp))
@@ -484,7 +525,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 								modifier = Modifier
 									.clip(CircleShape)
 									.background(Color(0x4D000000))
-									.padding(horizontal = 8.dp, vertical = 4.dp)
+									.padding(horizontal = 8.dp, vertical = 2.dp)
 							)
 						}
 
@@ -495,15 +536,16 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 						}
 					}
 				}
+				item { Spacer(modifier = Modifier.height(16.dp)) }
 			}
 
 			item {
-				Spacer(modifier = Modifier.height(16.dp))
 				Text(
 					text = "All Colors",
 					style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-						MaterialTheme.typography.headlineMedium),
-					modifier = Modifier.padding(start = 24.dp)
+						MaterialTheme.typography.labelLarge),
+					modifier = Modifier.padding(start = 24.dp),
+					color = MaterialTheme.colorScheme.onPrimaryContainer
 				)
 				Spacer(modifier = Modifier.height(12.dp))
 			}
@@ -543,7 +585,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 							modifier = Modifier
 								.clip(CircleShape)
 								.background(Color(0x4D000000))
-								.padding(horizontal = 8.dp, vertical = 4.dp)
+								.padding(horizontal = 8.dp, vertical = 2.dp)
 						)
 
 						Spacer(modifier = Modifier.height(8.dp))
@@ -556,7 +598,7 @@ fun ShitPissAss(overlayState: OverlayLayoutState, vm: MainViewModel) {
 							modifier = Modifier
 								.clip(CircleShape)
 								.background(Color(0x4D000000))
-								.padding(horizontal = 8.dp, vertical = 4.dp)
+								.padding(horizontal = 8.dp, vertical = 2.dp)
 						)
 					}
 
