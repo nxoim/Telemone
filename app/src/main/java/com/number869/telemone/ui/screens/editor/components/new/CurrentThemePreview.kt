@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -387,11 +386,12 @@ fun ChatItem(
 //    val mutedIconColor literally doesnt show in app
 	val verifiedIconBackgroundColor = colorOf("chats_verifiedBackground")
 	val verifiedIconColor = colorOf("chats_verifiedCheck")
+	val avatarTextColor = colorOf("avatar_text")
 
 	// TODO: put all of the colors
+	// TODO randomize these maybe
 	val avatarCyan1BackgroundColor = colorOf("avatar_backgroundCyan")
 	val avatarCyan2BackgroundColor = colorOf("avatar_backgroundCyan")
-	val avatarTextColor = colorOf("avatar_text")
 
 	Column {
 		Row(
@@ -402,9 +402,11 @@ fun ChatItem(
 			horizontalArrangement = Arrangement.Start,
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			Card(
-				modifier = Modifier.size(18.dp),
-				shape = CircleShape
+			Box(
+				Modifier
+					.size(18.dp)
+					.clip(CircleShape)
+					.background(avatarCyan1BackgroundColor)
 			) {
 				Column(
 					modifier = Modifier.fillMaxSize(),
