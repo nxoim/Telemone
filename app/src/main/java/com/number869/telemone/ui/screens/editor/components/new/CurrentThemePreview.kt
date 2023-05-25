@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,8 +43,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
@@ -75,10 +72,10 @@ fun CurrentThemePreview(vm: MainViewModel) {
 
 @Composable
 private fun PreviewHomeScreen(vm: MainViewModel) {
-	fun colorOf(color: String): Color {
-		return if (vm.mappedValues.containsKey(color)) {
-			vm.mappedValues.getValue(color).second
-		} else {
+	fun colorOf(colorValueOf: String): Color {
+		return try {
+			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+		} catch (e: NoSuchElementException) {
 			Color.Red
 		}
 	}
@@ -90,7 +87,28 @@ private fun PreviewHomeScreen(vm: MainViewModel) {
 		shape = RoundedCornerShape(16.dp),
 		colors = CardDefaults.outlinedCardColors(colorOf("windowBackgroundWhite")),
 	) {
-		ListOfChatsScreenPreview(vm = vm)
+		Column(
+			modifier = Modifier
+				.fillMaxSize()
+				.background(colorOf("windowBackgroundWhite"))
+		) {
+			ListPreviewHeader(
+				backgroundColor = colorOf("actionBarDefault"),
+				iconsColor = colorOf("actionBarDefaultIcon"),
+				titleColor = colorOf("actionBarDefaultTitle"),
+				folderUnderlineColor = colorOf("actionBarTabLine"),
+				selectedFolderItemColor = colorOf("actionBarActiveText"),
+				unselectedFolderItemColor = colorOf("actionBarUnactiveText")
+			)
+
+			Spacer(modifier = Modifier.height(2.dp))
+
+			ChatItem(pinned = true, vm = vm)
+			ChatItem(unread = true, vm = vm)
+			ChatItem(secret = true, sent = true, vm = vm)
+			ChatItem(muted = true, unread = true, vm = vm)
+			ChatItem(verified = true, vm = vm)
+		}
 	}
 }
 
@@ -278,42 +296,6 @@ private fun ChatBottomAppBar(
 			)
 		}
 	}
-}
-
-
-@Composable
-fun ListOfChatsScreenPreview(vm: MainViewModel, animatedValue: Float = 1f) {
-    val scale = 0.4f
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
-    Column(
-        modifier = Modifier
-			.fillMaxSize()
-			.background(colorOf("windowBackgroundWhite"))
-    ) {
-        ListPreviewHeader(
-            backgroundColor = colorOf("actionBarDefault"),
-            iconsColor = colorOf("actionBarDefaultIcon"),
-            titleColor = colorOf("actionBarDefaultTitle"),
-            folderUnderlineColor = colorOf("actionBarTabLine"),
-            selectedFolderItemColor = colorOf("actionBarActiveText"),
-            unselectedFolderItemColor = colorOf("actionBarUnactiveText")
-        )
-
-		Spacer(modifier = Modifier.height(2.dp))
-
-        ChatItem(pinned = true, vm = vm)
-        ChatItem(unread = true, vm = vm)
-        ChatItem(secret = true, sent = true, vm = vm)
-        ChatItem(muted = true, unread = true, vm = vm)
-        ChatItem(verified = true, vm = vm)
-    }
 }
 
 @Composable
@@ -540,14 +522,4 @@ fun ChatItem(
 
 		Divider(Modifier.padding(horizontal = 8.dp), color = dividerColor)
 	}
-
-}
-
-@Preview(showSystemUi = true, device = "spec:width=1080px,height=2400px,dpi=440",
-	showBackground = true,
-	wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE
-)
-@Composable
-fun ListOfChatsScreenPreviewPreview() {
-	ListOfChatsScreenPreview(MainViewModel(Application()))
 }
