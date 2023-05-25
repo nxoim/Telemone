@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def version = "1.0.0"
+
 android {
     namespace 'com.number869.telemone'
     compileSdkPreview 'UpsideDownCake'
@@ -19,7 +21,7 @@ android {
         }
         signingConfig signingConfigs.debug
         versionName version
-        versionNameSuffix version
+        versionCode version.split("\\.").join("").toInteger()
     }
 
     buildTypes {
