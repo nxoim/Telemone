@@ -211,7 +211,7 @@ fun AboutScreen(navController: NavHostController) {
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Icon(
-                                    imageVector = if (number869Expanded) {
+                                    imageVector = if (Lambada10Expanded) {
                                         Icons.Filled.ExpandLess
                                     } else {
                                         Icons.Filled.ExpandMore
