@@ -75,8 +75,13 @@ fun AboutScreen(navController: NavHostController) {
                 AboutCard(
                     label = "Version",
                     content = {
+                        val context = LocalContext.current
+                        val versionName = context.packageManager.getPackageInfo(
+                            context.packageName,
+                            0
+                        ).versionName
                         Text(
-                            text = "1.0.0",
+                            text = versionName,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
