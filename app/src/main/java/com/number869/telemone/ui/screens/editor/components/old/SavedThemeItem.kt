@@ -236,6 +236,8 @@ private fun ChatTopAppBar(
 				tint = iconColor
 			)
 
+			Spacer(modifier = Modifier.width(2.dp))
+
 			Box(
 				Modifier
 					.size(16.dp)
@@ -252,8 +254,6 @@ private fun ChatTopAppBar(
 					color = emptyAvatarPreviewLetterColor
 				)
 			}
-
-			Spacer(modifier = Modifier.width(2.dp))
 
 			Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
 				Text(
