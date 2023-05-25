@@ -126,8 +126,15 @@ fun AboutScreen(navController: NavHostController) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .clickable(onClick = {
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://github.com/$number869Github")
+                                            )
+                                            context.startActivity(intent)
+                                        })
                                         .padding(start = 16.dp),
-                                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
                                         painter = painterResource(
@@ -143,14 +150,6 @@ fun AboutScreen(navController: NavHostController) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = number869Github,
-                                        modifier = Modifier
-                                            .clickable(onClick = {
-                                                val intent = Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    Uri.parse("https://github.com/$number869Github")
-                                                )
-                                                context.startActivity(intent)
-                                            }),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
@@ -158,8 +157,15 @@ fun AboutScreen(navController: NavHostController) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .clickable(onClick = {
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://t.me/$number869Telegram")
+                                            )
+                                            context.startActivity(intent)
+                                        })
                                         .padding(start = 16.dp),
-                                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
                                         painter = painterResource(
@@ -175,14 +181,6 @@ fun AboutScreen(navController: NavHostController) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = number869Telegram,
-                                        modifier = Modifier
-                                            .clickable(onClick = {
-                                                val intent = Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    Uri.parse("https://t.me/$number869Telegram")
-                                                )
-                                                context.startActivity(intent)
-                                            }),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
@@ -224,6 +222,13 @@ fun AboutScreen(navController: NavHostController) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .clickable(onClick = {
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://github.com/$Lambada10Github")
+                                            )
+                                            context.startActivity(intent)
+                                        })
                                         .padding(start = 16.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -241,14 +246,6 @@ fun AboutScreen(navController: NavHostController) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = Lambada10Github,
-                                        modifier = Modifier
-                                            .clickable(onClick = {
-                                                val intent = Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    Uri.parse("https://github.com/$Lambada10Github")
-                                                )
-                                                context.startActivity(intent)
-                                            }),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
@@ -256,8 +253,15 @@ fun AboutScreen(navController: NavHostController) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .clickable(onClick = {
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://t.me/$Lambada10Telegram")
+                                            )
+                                            context.startActivity(intent)
+                                        })
                                         .padding(start = 16.dp),
-                                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
                                         painter = painterResource(
@@ -273,14 +277,6 @@ fun AboutScreen(navController: NavHostController) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = Lambada10Telegram,
-                                        modifier = Modifier
-                                            .clickable(onClick = {
-                                                val intent = Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    Uri.parse("https://t.me/$Lambada10Telegram")
-                                                )
-                                                context.startActivity(intent)
-                                            }),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
