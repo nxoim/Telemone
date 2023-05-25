@@ -94,7 +94,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 					Text(
 						text = "Saved Themes",
 						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.labelLarge),
-						modifier = Modifier.padding(start = 24.dp),
+						modifier = Modifier.padding(start = 16.dp),
 						color = MaterialTheme.colorScheme.onPrimaryContainer
 					)
 
@@ -160,7 +160,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							text = "Incompatible Values",
 							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
 								MaterialTheme.typography.labelLarge),
-							modifier = Modifier.padding(start = 24.dp),
+							modifier = Modifier.padding(start = 16.dp),
 							color = MaterialTheme.colorScheme.onPrimaryContainer
 						)
 						Spacer(modifier = Modifier.height(12.dp))
@@ -192,7 +192,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							text = "Incompatible Values",
 							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
 								MaterialTheme.typography.labelLarge),
-							modifier = Modifier.padding(start = 24.dp),
+							modifier = Modifier.padding(start = 16.dp),
 							color = MaterialTheme.colorScheme.onPrimaryContainer
 						)
 						Spacer(modifier = Modifier.height(12.dp))
@@ -219,7 +219,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 						text = "All Colors",
 						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
 							MaterialTheme.typography.labelLarge),
-						modifier = Modifier.padding(start = 24.dp),
+						modifier = Modifier.padding(start = 16.dp),
 						color = MaterialTheme.colorScheme.onPrimaryContainer
 					)
 					Spacer(modifier = Modifier.height(12.dp))

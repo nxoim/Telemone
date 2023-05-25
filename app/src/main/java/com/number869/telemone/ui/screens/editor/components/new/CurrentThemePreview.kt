@@ -58,7 +58,7 @@ fun CurrentThemePreview(vm: MainViewModel) {
 			text = "Current theme",
 			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
 				MaterialTheme.typography.labelLarge),
-			modifier = Modifier.padding(start = 24.dp),
+			modifier = Modifier.padding(start = 16.dp),
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Row(
