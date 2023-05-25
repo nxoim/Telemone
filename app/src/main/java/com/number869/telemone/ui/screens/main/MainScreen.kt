@@ -1,11 +1,10 @@
 package com.number869.telemone.ui.screens.main
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
@@ -17,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.Screens
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
 
 
@@ -27,7 +27,14 @@ fun MainScreen(
 	vm: MainViewModel = viewModel()
 ) {
 	Column(Modifier.fillMaxSize()) {
-		CenterAlignedTopAppBar(title = { Text(text = "TeleMone") }, windowInsets = WindowInsets.statusBars)
+		CenterAlignedTopAppBar(
+			title = {
+				Text(
+					text = "TeleMone",
+					Modifier.clickable { navController.navigate(Screens.AboutScreen.route) }
+				)
+			}
+		)
 		Column(
 			Modifier
 				.padding(24.dp)

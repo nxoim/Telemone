@@ -6,13 +6,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.screens.about.AboutScreen
 import com.number869.telemone.ui.screens.editor.EditorScreen
 import com.number869.telemone.ui.screens.main.MainScreen
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
@@ -40,6 +43,24 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 			}
 		) {
 			MainScreen(navController, vm)
+		}
+
+		composable(
+			Screens.AboutScreen.route,
+			enterTransition = {
+				when (initialState.destination.route) {
+					Screens.MainScreen.route -> slideInVertically(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetY = { -screenWidth }) + fadeIn(tween(300, 100))
+					else -> null
+				}
+			},
+			exitTransition = {
+				when (targetState.destination.route) {
+					Screens.EditorScreen.route -> slideOutVertically(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetY = { -screenWidth }) + fadeOut(tween(300, 100))
+					else -> null
+				}
+			}
+		) {
+			AboutScreen(navController)
 		}
 
 		composable(
@@ -85,5 +106,6 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 enum class Screens(val route: String) {
 	MainScreen("MainScreen"),
 	EditorScreen("EditorScreen"),
-	ThemeValuesScreen("ThemeValuesScreen")
+	ThemeValuesScreen("ThemeValuesScreen"),
+	AboutScreen("AboutScreen")
 }
