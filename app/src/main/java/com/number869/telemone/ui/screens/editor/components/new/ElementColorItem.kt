@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.screens.editor.components.old.PalettePopup
 import com.number869.telemone.ui.theme.FullPaletteList
 
 @Composable
@@ -40,7 +39,6 @@ fun ElementColorItem(
 	lastIndexInList: Int,
 	palette: FullPaletteList
 ) {
-	var showPopUp by remember { mutableStateOf(false) }
 	val backgroundColor = when (themeMap.containsKey(uiElementData.first)) {
 		true -> themeMap[uiElementData.first]!!.second
 		else -> Color.Red
@@ -53,7 +51,9 @@ fun ElementColorItem(
 	else
 		RoundedCornerShape(4.dp)
 
-	Box {
+	Box(contentAlignment = Alignment.Center) {
+		var showPopUp by remember { mutableStateOf(false) }
+
 		Column(
 			modifier
 				.clip(roundedCornerShape)
@@ -89,10 +89,11 @@ fun ElementColorItem(
 			)
 		}
 
-		if (showPopUp) {
-			Popup(onDismissRequest = { showPopUp = false }) {
-				PalettePopup(uiElementData.first, vm, palette)
-			}
+		Popup(
+			alignment = Alignment.TopCenter,
+			onDismissRequest = { showPopUp = false }
+		) {
+			PalettePopup(uiElementData.first, vm, palette, backgroundColor, showPopUp)
 		}
 	}
 }

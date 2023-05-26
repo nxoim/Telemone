@@ -106,7 +106,11 @@ val allColorTokensAsList = listOf(
 	"on_background_light",
 	"surface_light",
 	"on_surface_light",
-	"surface_variant_light",
+	"surface_container_lowest_light",
+	"surface_container_low_light",
+	"surface_container_light",
+	"surface_container_high_light",
+	"surface_container_highest_light",
 	"on_surface_variant_light",
 	"surface_tint_light",
 	"inverse_surface_light",
@@ -118,7 +122,6 @@ val allColorTokensAsList = listOf(
 	"outline_light",
 	"outline_variant_light",
 	"scrim_light",
-	"surface_elevation_level_3_light",
 	"primary_dark",
 	"on_primary_dark",
 	"primary_container_dark",
@@ -136,7 +139,11 @@ val allColorTokensAsList = listOf(
 	"on_background_dark",
 	"surface_dark",
 	"on_surface_dark",
-	"surface_variant_dark",
+	"surface_container_lowest_dark",
+	"surface_container_low_dark",
+	"surface_container_dark",
+	"surface_container_high_dark",
+	"surface_container_highest_dark",
 	"on_surface_variant_dark",
 	"surface_tint_dark",
 	"inverse_surface_dark",
@@ -148,7 +155,6 @@ val allColorTokensAsList = listOf(
 	"outline_dark",
 	"outline_variant_dark",
 	"scrim_dark",
-	"surface_elevation_level_3_dark",
 	"primary_0",
 	"primary_10",
 	"primary_20",
@@ -312,7 +318,6 @@ data class ColorRoles(
 	val onPrimaryLight: Color,
 	val primaryContainerLight: Color,
 	val onPrimaryContainerLight: Color,
-	val inversePrimaryLight: Color,
 	val secondaryLight: Color,
 	val onSecondaryLight: Color,
 	val secondaryContainerLight: Color,
@@ -321,15 +326,17 @@ data class ColorRoles(
 	val onTertiaryLight: Color,
 	val tertiaryContainerLight: Color,
 	val onTertiaryContainerLight: Color,
-	val backgroundLight: Color,
-	val onBackgroundLight: Color,
+	// TODO WHERE GOOOGLE???? WHERE
+	// val surfaceDimLight: Color,
+	// val surfaceBrightLight: Color,
 	val surfaceLight: Color,
 	val onSurfaceLight: Color,
-	val surfaceVariantLight: Color,
+	val surfaceContainerLowestLight: Color,
+	val surfaceContainerLowLight: Color,
+	val surfaceContainerLight: Color,
+	val surfaceContainerHighLight: Color,
+	val surfaceContainerHighestLight: Color,
 	val onSurfaceVariantLight: Color,
-	val surfaceTintLight: Color,
-	val inverseSurfaceLight: Color,
-	val inverseOnSurfaceLight: Color,
 	val errorLight: Color,
 	val onErrorLight: Color,
 	val errorContainerLight: Color,
@@ -337,12 +344,10 @@ data class ColorRoles(
 	val outlineLight: Color,
 	val outlineVariantLight: Color,
 	val scrimLight: Color,
-	val surfaceElevationLevel3Light: Color,
 	val primaryDark: Color,
 	val onPrimaryDark: Color,
 	val primaryContainerDark: Color,
 	val onPrimaryContainerDark: Color,
-	val inversePrimaryDark: Color,
 	val secondaryDark: Color,
 	val onSecondaryDark: Color,
 	val secondaryContainerDark: Color,
@@ -351,23 +356,24 @@ data class ColorRoles(
 	val onTertiaryDark: Color,
 	val tertiaryContainerDark: Color,
 	val onTertiaryContainerDark: Color,
-	val backgroundDark: Color,
-	val onBackgroundDark: Color,
+	// val surfaceDimDark: Color,
+	// val surfaceBrightDark: Color,
 	val surfaceDark: Color,
 	val onSurfaceDark: Color,
-	val surfaceVariantDark: Color,
+	val surfaceContainerLowestDark: Color,
+	val surfaceContainerLowDark: Color,
+	val surfaceContainerDark: Color,
+	val surfaceContainerHighDark: Color,
+	val surfaceContainerHighestDark: Color,
 	val onSurfaceVariantDark: Color,
 	val surfaceTintDark: Color,
-	val inverseSurfaceDark: Color,
-	val inverseOnSurfaceDark: Color,
 	val errorDark: Color,
 	val onErrorDark: Color,
 	val errorContainerDark: Color,
 	val onErrorContainerDark: Color,
 	val outlineDark: Color,
 	val outlineVariantDark: Color,
-	val scrimDark: Color,
-	val surfaceElevationLevel3Dark: Color,
+	val scrimDark: Color
 )
 
 data class FullPaletteList(
@@ -446,6 +452,281 @@ data class FullPaletteList(
 	val pink: Map<Int, Color>
 )
 
+enum class Primary {
+	Primary0,
+	Primary10,
+	Primary20,
+	Primary30,
+	Primary40,
+	Primary50,
+	Primary60,
+	Primary70,
+	Primary80,
+	Primary90,
+	Primary95,
+	Primary99,
+	Primary100;
+
+	// assign colors to each thing
+	@Composable
+	operator fun component1(): Color {
+		return when (this) {
+			Primary0 -> colorResource(system_accent1_1000)
+			Primary10 -> colorResource(system_accent1_900)
+			Primary20 -> colorResource(system_accent1_800)
+			Primary30 -> colorResource(system_accent1_700)
+			Primary40 -> colorResource(system_accent1_600)
+			Primary50 -> colorResource(system_accent1_500)
+			Primary60 -> colorResource(system_accent1_400)
+			Primary70 -> colorResource(system_accent1_300)
+			Primary80 -> colorResource(system_accent1_200)
+			Primary90 -> colorResource(system_accent1_100)
+			Primary95 -> colorResource(system_accent1_50)
+			Primary99 -> colorResource(system_accent1_10)
+			Primary100 -> colorResource(system_accent1_0)
+		}
+	}
+
+	// assign names to each thing
+	operator fun component2(): String {
+		return when (this) {
+			Primary0 -> "primary_0"
+			Primary10 -> "primary_10"
+			Primary20 -> "primary_20"
+			Primary30 -> "primary_30"
+			Primary40 -> "primary_40"
+			Primary50 -> "primary_50"
+			Primary60 -> "primary_60"
+			Primary70 -> "primary_70"
+			Primary80 -> "primary_80"
+			Primary90 -> "primary_90"
+			Primary95 -> "primary_95"
+			Primary99 -> "primary_99"
+			Primary100 -> "primary_100"
+		}
+	}
+}
+
+enum class Secondary {
+	Secondary0,
+	Secondary10,
+	Secondary20,
+	Secondary30,
+	Secondary40,
+	Secondary50,
+	Secondary60,
+	Secondary70,
+	Secondary80,
+	Secondary90,
+	Secondary95,
+	Secondary99,
+	Secondary100;
+
+	// assign colors to each thing
+	@Composable
+	operator fun component1(): Color {
+		return when (this) {
+			Secondary0 -> colorResource(system_accent2_1000)
+			Secondary10 -> colorResource(system_accent2_900)
+			Secondary20 -> colorResource(system_accent2_800)
+			Secondary30 -> colorResource(system_accent2_700)
+			Secondary40 -> colorResource(system_accent2_600)
+			Secondary50 -> colorResource(system_accent2_500)
+			Secondary60 -> colorResource(system_accent2_400)
+			Secondary70 -> colorResource(system_accent2_300)
+			Secondary80 -> colorResource(system_accent2_200)
+			Secondary90 -> colorResource(system_accent2_100)
+			Secondary95 -> colorResource(system_accent2_50)
+			Secondary99 -> colorResource(system_accent2_10)
+			Secondary100 -> colorResource(system_accent2_0)
+		}
+	}
+
+	// assign names to each thing
+	operator fun component2(): String {
+		return when (this) {
+			Secondary0 -> "secondary_0"
+			Secondary10 -> "secondary_10"
+			Secondary20 -> "secondary_20"
+			Secondary30 -> "secondary_30"
+			Secondary40 -> "secondary_40"
+			Secondary50 -> "secondary_50"
+			Secondary60 -> "secondary_60"
+			Secondary70 -> "secondary_70"
+			Secondary80 -> "secondary_80"
+			Secondary90 -> "secondary_90"
+			Secondary95 -> "secondary_95"
+			Secondary99 -> "secondary_99"
+			Secondary100 -> "secondary_100"
+		}
+	}
+}
+
+enum class Tertiary {
+	Tertiary0,
+	Tertiary10,
+	Tertiary20,
+	Tertiary30,
+	Tertiary40,
+	Tertiary50,
+	Tertiary60,
+	Tertiary70,
+	Tertiary80,
+	Tertiary90,
+	Tertiary95,
+	Tertiary99,
+	Tertiary100;
+
+	// assign colors to each thing
+	@Composable
+	operator fun component1(): Color {
+		return when (this) {
+			Tertiary0 -> colorResource(system_accent3_1000)
+			Tertiary10 -> colorResource(system_accent3_900)
+			Tertiary20 -> colorResource(system_accent3_800)
+			Tertiary30 -> colorResource(system_accent3_700)
+			Tertiary40 -> colorResource(system_accent3_600)
+			Tertiary50 -> colorResource(system_accent3_500)
+			Tertiary60 -> colorResource(system_accent3_400)
+			Tertiary70 -> colorResource(system_accent3_300)
+			Tertiary80 -> colorResource(system_accent3_200)
+			Tertiary90 -> colorResource(system_accent3_100)
+			Tertiary95 -> colorResource(system_accent3_50)
+			Tertiary99 -> colorResource(system_accent3_10)
+			Tertiary100 -> colorResource(system_accent3_0)
+		}
+	}
+
+	// assign names to each thing
+	operator fun component2(): String {
+		return when (this) {
+			Tertiary0 -> "tertiary_0"
+			Tertiary10 -> "tertiary_10"
+			Tertiary20 -> "tertiary_20"
+			Tertiary30 -> "tertiary_30"
+			Tertiary40 -> "tertiary_40"
+			Tertiary50 -> "tertiary_50"
+			Tertiary60 -> "tertiary_60"
+			Tertiary70 -> "tertiary_70"
+			Tertiary80 -> "tertiary_80"
+			Tertiary90 -> "tertiary_90"
+			Tertiary95 -> "tertiary_95"
+			Tertiary99 -> "tertiary_99"
+			Tertiary100 -> "tertiary_100"
+		}
+	}
+}
+
+enum class Neutral {
+	Neutral0,
+	Neutral10,
+	Neutral20,
+	Neutral30,
+	Neutral40,
+	Neutral50,
+	Neutral60,
+	Neutral70,
+	Neutral80,
+	Neutral90,
+	Neutral95,
+	Neutral99,
+	Neutral100;
+
+	// assign colors to each thing
+	@Composable
+	operator fun component1(): Color {
+		return when (this) {
+			Neutral0 -> colorResource(system_neutral1_1000)
+			Neutral10 -> colorResource(system_neutral1_900)
+			Neutral20 -> colorResource(system_neutral1_800)
+			Neutral30 -> colorResource(system_neutral1_700)
+			Neutral40 -> colorResource(system_neutral1_600)
+			Neutral50 -> colorResource(system_neutral1_500)
+			Neutral60 -> colorResource(system_neutral1_400)
+			Neutral70 -> colorResource(system_neutral1_300)
+			Neutral80 -> colorResource(system_neutral1_200)
+			Neutral90 -> colorResource(system_neutral1_100)
+			Neutral95 -> colorResource(system_neutral1_50)
+			Neutral99 -> colorResource(system_neutral1_10)
+			Neutral100 -> colorResource(system_neutral1_0)
+		}
+	}
+
+	// assign names to each thing
+	operator fun component2(): String {
+		return when (this) {
+			Neutral0 -> "neutral_0"
+			Neutral10 -> "neutral_10"
+			Neutral20 -> "neutral_20"
+			Neutral30 -> "neutral_30"
+			Neutral40 -> "neutral_40"
+			Neutral50 -> "neutral_50"
+			Neutral60 -> "neutral_60"
+			Neutral70 -> "neutral_70"
+			Neutral80 -> "neutral_80"
+			Neutral90 -> "neutral_90"
+			Neutral95 -> "neutral_95"
+			Neutral99 -> "neutral_99"
+			Neutral100 -> "neutral_100"
+		}
+	}
+}
+
+enum class NeutralVariant {
+	NeutralVariant0,
+	NeutralVariant10,
+	NeutralVariant20,
+	NeutralVariant30,
+	NeutralVariant40,
+	NeutralVariant50,
+	NeutralVariant60,
+	NeutralVariant70,
+	NeutralVariant80,
+	NeutralVariant90,
+	NeutralVariant95,
+	NeutralVariant99,
+	NeutralVariant100;
+
+	// assign colors to each thing
+	@Composable
+	operator fun component1(): Color {
+		return when (this) {
+			NeutralVariant0 -> colorResource(system_neutral2_1000)
+			NeutralVariant10 -> colorResource(system_neutral2_900)
+			NeutralVariant20 -> colorResource(system_neutral2_800)
+			NeutralVariant30 -> colorResource(system_neutral2_700)
+			NeutralVariant40 -> colorResource(system_neutral2_600)
+			NeutralVariant50 -> colorResource(system_neutral2_500)
+			NeutralVariant60 -> colorResource(system_neutral2_400)
+			NeutralVariant70 -> colorResource(system_neutral2_300)
+			NeutralVariant80 -> colorResource(system_neutral2_200)
+			NeutralVariant90 -> colorResource(system_neutral2_100)
+			NeutralVariant95 -> colorResource(system_neutral2_50)
+			NeutralVariant99 -> colorResource(system_neutral2_10)
+			NeutralVariant100 -> colorResource(system_neutral2_0)
+		}
+	}
+
+	// assign name to each thing
+	operator fun component2(): String {
+		return when (this) {
+			NeutralVariant0 -> "neutral_variant_0"
+			NeutralVariant10 -> "neutral_variant_10"
+			NeutralVariant20 -> "neutral_variant_20"
+			NeutralVariant30 -> "neutral_variant_30"
+			NeutralVariant40 -> "neutral_variant_40"
+			NeutralVariant50 -> "neutral_variant_50"
+			NeutralVariant60 -> "neutral_variant_60"
+			NeutralVariant70 -> "neutral_variant_70"
+			NeutralVariant80 -> "neutral_variant_80"
+			NeutralVariant90 -> "neutral_variant_90"
+			NeutralVariant95 -> "neutral_variant_95"
+			NeutralVariant99 -> "neutral_variant_99"
+			NeutralVariant100 -> "neutral_variant_100"
+		}
+	}
+}
+
 @Composable
 fun fullPalette(): FullPaletteList {
 	var primaryLight = Color.Red
@@ -464,8 +745,14 @@ fun fullPalette(): FullPaletteList {
 	var backgroundLight = Color.Red
 	var onBackgroundLight = Color.Red
 	var surfaceLight = Color.Red
+//	var surfaceDimLight = Color.Red
+//	var surfaceBrightLight = Color.Red
 	var onSurfaceLight = Color.Red
-	var surfaceVariantLight = Color.Red
+	var surfaceContainerLowestLight = Color.Red
+	var surfaceContainerLowLight = Color.Red
+	var surfaceContainerLight = Color.Red
+	var surfaceContainerHighLight = Color.Red
+	var surfaceContainerHighestLight = Color.Red
 	var onSurfaceVariantLight = Color.Red
 	var surfaceTintLight = Color.Red
 	var inverseSurfaceLight = Color.Red
@@ -477,7 +764,6 @@ fun fullPalette(): FullPaletteList {
 	var outlineLight = Color.Red
 	var outlineVariantLight = Color.Red
 	var scrimLight = Color.Red
-	var surfaceElevationLevel3Light = Color.Red
 	var primaryDark = Color.Red
 	var onPrimaryDark = Color.Red
 	var primaryContainerDark = Color.Red
@@ -494,8 +780,14 @@ fun fullPalette(): FullPaletteList {
 	var backgroundDark = Color.Red
 	var onBackgroundDark = Color.Red
 	var surfaceDark = Color.Red
+//	var surfaceDimDark = Color.Red
+//	var surfaceBrightDark = Color.Red
 	var onSurfaceDark = Color.Red
-	var surfaceVariantDark = Color.Red
+	var surfaceContainerLowestDark = Color.Red
+	var surfaceContainerLowDark = Color.Red
+	var surfaceContainerDark = Color.Red
+	var surfaceContainerHighDark = Color.Red
+	var surfaceContainerHighestDark = Color.Red
 	var onSurfaceVariantDark = Color.Red
 	var surfaceTintDark = Color.Red
 	var inverseSurfaceDark = Color.Red
@@ -507,7 +799,6 @@ fun fullPalette(): FullPaletteList {
 	var outlineDark = Color.Red
 	var outlineVariantDark = Color.Red
 	var scrimDark = Color.Red
-	var surfaceElevationLevel3Dark = Color.Red
 
 	val saturationOfPrimary = ColorUtil.colorToHSL(colorResource(system_accent1_600))[1]
 
@@ -556,8 +847,16 @@ fun fullPalette(): FullPaletteList {
 		backgroundLight = MaterialTheme.colorScheme.background
 		onBackgroundLight = MaterialTheme.colorScheme.onBackground
 		surfaceLight = MaterialTheme.colorScheme.surface
+//		surfaceDimLight = MaterialTheme.colorScheme.surfaceDim
+//		surfaceBrightLight = MaterialTheme.colorScheme.surfaceBright
 		onSurfaceLight = MaterialTheme.colorScheme.onSurface
-		surfaceVariantLight = MaterialTheme.colorScheme.surfaceVariant
+		// TODO i think the specs will change in the future
+		// TODO SURFACE CONTAINER LOWEST IS WRONG BRUHHHHHHHHHHHHH
+		surfaceContainerLowestLight = MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp)
+		surfaceContainerLowLight = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+		surfaceContainerLight = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+		surfaceContainerHighLight = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+		surfaceContainerHighestLight = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 		onSurfaceVariantLight = MaterialTheme.colorScheme.onSurfaceVariant
 		surfaceTintLight = MaterialTheme.colorScheme.surfaceTint
 		inverseSurfaceLight = MaterialTheme.colorScheme.inverseSurface
@@ -571,7 +870,6 @@ fun fullPalette(): FullPaletteList {
 		scrimLight = MaterialTheme.colorScheme.scrim
 		backgroundLight = MaterialTheme.colorScheme.background
 		surfaceLight = MaterialTheme.colorScheme.surface
-		surfaceElevationLevel3Light = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 	}
 
 	DarkTheme {
@@ -591,8 +889,14 @@ fun fullPalette(): FullPaletteList {
 		backgroundDark = MaterialTheme.colorScheme.background
 		onBackgroundDark = MaterialTheme.colorScheme.onBackground
 		surfaceDark = MaterialTheme.colorScheme.surface
+//		surfaceDimDark = MaterialTheme.colorScheme.surfaceDim
+//		surfaceBrightDark = MaterialTheme.colorScheme.surfaceBright
 		onSurfaceDark = MaterialTheme.colorScheme.onSurface
-		surfaceVariantDark = MaterialTheme.colorScheme.surfaceVariant
+		surfaceContainerLowestDark = MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp)
+		surfaceContainerLowDark = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+		surfaceContainerDark = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+		surfaceContainerHighDark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+		surfaceContainerHighestDark = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 		onSurfaceVariantDark = MaterialTheme.colorScheme.onSurfaceVariant
 		surfaceTintDark = MaterialTheme.colorScheme.surfaceTint
 		inverseSurfaceDark = MaterialTheme.colorScheme.inverseSurface
@@ -604,7 +908,6 @@ fun fullPalette(): FullPaletteList {
 		outlineDark = MaterialTheme.colorScheme.outline
 		outlineVariantDark = MaterialTheme.colorScheme.outlineVariant
 		scrimDark = MaterialTheme.colorScheme.scrim
-		surfaceElevationLevel3Dark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 	}
 
 	return FullPaletteList(
@@ -613,7 +916,6 @@ fun fullPalette(): FullPaletteList {
 			onPrimaryLight = onPrimaryLight,
 			primaryContainerLight = primaryContainerLight,
 			onPrimaryContainerLight = onPrimaryContainerLight,
-			inversePrimaryLight = inversePrimaryLight,
 			secondaryLight = secondaryLight,
 			onSecondaryLight = onSecondaryLight,
 			secondaryContainerLight = secondaryContainerLight,
@@ -622,15 +924,14 @@ fun fullPalette(): FullPaletteList {
 			onTertiaryLight = onTertiaryLight,
 			tertiaryContainerLight = tertiaryContainerLight,
 			onTertiaryContainerLight = onTertiaryContainerLight,
-			backgroundLight = backgroundLight,
-			onBackgroundLight = onBackgroundLight,
 			surfaceLight = surfaceLight,
 			onSurfaceLight = onSurfaceLight,
-			surfaceVariantLight = surfaceVariantLight,
+			surfaceContainerLowestLight = surfaceContainerLowestLight,
+			surfaceContainerLowLight = surfaceContainerLowLight,
+			surfaceContainerLight = surfaceContainerLight,
+			surfaceContainerHighLight = surfaceContainerHighLight,
+			surfaceContainerHighestLight = surfaceContainerHighestLight,
 			onSurfaceVariantLight = onSurfaceVariantLight,
-			surfaceTintLight = surfaceTintLight,
-			inverseSurfaceLight = inverseSurfaceLight,
-			inverseOnSurfaceLight = inverseOnSurfaceLight,
 			errorLight = errorLight,
 			onErrorLight = onErrorLight,
 			errorContainerLight = errorContainerLight,
@@ -638,12 +939,10 @@ fun fullPalette(): FullPaletteList {
 			outlineLight = outlineLight,
 			outlineVariantLight = outlineVariantLight,
 			scrimLight = scrimLight,
-			surfaceElevationLevel3Light = surfaceElevationLevel3Light,
 			primaryDark = primaryDark,
 			onPrimaryDark = onPrimaryDark,
 			primaryContainerDark = primaryContainerDark,
 			onPrimaryContainerDark = onPrimaryContainerDark,
-			inversePrimaryDark = inversePrimaryDark,
 			secondaryDark = secondaryDark,
 			onSecondaryDark = onSecondaryDark,
 			secondaryContainerDark = secondaryContainerDark,
@@ -652,15 +951,15 @@ fun fullPalette(): FullPaletteList {
 			onTertiaryDark = onTertiaryDark,
 			tertiaryContainerDark = tertiaryContainerDark,
 			onTertiaryContainerDark = onTertiaryContainerDark,
-			backgroundDark = backgroundDark,
-			onBackgroundDark = onBackgroundDark,
 			surfaceDark = surfaceDark,
 			onSurfaceDark = onSurfaceDark,
-			surfaceVariantDark = surfaceVariantDark,
+			surfaceContainerLowestDark = surfaceContainerLowestDark,
+			surfaceContainerLowDark = surfaceContainerLowDark,
+			surfaceContainerDark = surfaceContainerDark,
+			surfaceContainerHighDark = surfaceContainerHighDark,
+			surfaceContainerHighestDark = surfaceContainerHighestDark,
 			onSurfaceVariantDark = onSurfaceVariantDark,
 			surfaceTintDark = surfaceTintDark,
-			inverseSurfaceDark = inverseSurfaceDark,
-			inverseOnSurfaceDark = inverseOnSurfaceDark,
 			errorDark = errorDark,
 			onErrorDark = onErrorDark,
 			errorContainerDark = errorContainerDark,
@@ -668,7 +967,6 @@ fun fullPalette(): FullPaletteList {
 			outlineDark = outlineDark,
 			outlineVariantDark = outlineVariantDark,
 			scrimDark = scrimDark,
-			surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
 		),
 		primary_0 = colorResource(system_accent1_1000),
 		primary_10 = colorResource(system_accent1_900),

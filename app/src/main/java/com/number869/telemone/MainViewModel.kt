@@ -643,7 +643,6 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"on_primary_light" -> palette.colorRoles.onPrimaryLight
 		"primary_container_light" -> palette.colorRoles.primaryContainerLight
 		"on_primary_container_light" -> palette.colorRoles.onPrimaryContainerLight
-		"inverse_primary_light" -> palette.colorRoles.inversePrimaryLight
 		"secondary_light" -> palette.colorRoles.secondaryLight
 		"on_secondary_light" -> palette.colorRoles.onSecondaryLight
 		"secondary_container_light" -> palette.colorRoles.secondaryContainerLight
@@ -652,15 +651,16 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"on_tertiary_light" -> palette.colorRoles.onTertiaryLight
 		"tertiary_container_light" -> palette.colorRoles.tertiaryContainerLight
 		"on_tertiary_container_light" -> palette.colorRoles.onTertiaryContainerLight
-		"background_light" -> palette.colorRoles.backgroundLight
-		"on_background_light" -> palette.colorRoles.onBackgroundLight
 		"surface_light" -> palette.colorRoles.surfaceLight
+		// "surface_dim_light" -> palette.colorRoles.surfaceDimLight
+		// "surface_bright_light" -> palette.colorRoles.surfaceBrightLight
 		"on_surface_light" -> palette.colorRoles.onSurfaceLight
-		"surface_variant_light" -> palette.colorRoles.surfaceVariantLight
+		"surface_container_lowest_light" -> palette.colorRoles.surfaceContainerLowestLight
+		"surface_container_low_light" -> palette.colorRoles.surfaceContainerLowLight
+		"surface_container_light" -> palette.colorRoles.surfaceContainerLight
+		"surface_container_high_light" -> palette.colorRoles.surfaceContainerHighLight
+		"surface_container_highest_light" -> palette.colorRoles.surfaceContainerHighestLight
 		"on_surface_variant_light" -> palette.colorRoles.onSurfaceVariantLight
-		"surface_tint_light" -> palette.colorRoles.surfaceTintLight
-		"inverse_surface_light" -> palette.colorRoles.inverseSurfaceLight
-		"inverse_on_surface_light" -> palette.colorRoles.inverseOnSurfaceLight
 		"error_light" -> palette.colorRoles.errorLight
 		"on_error_light" -> palette.colorRoles.onErrorLight
 		"error_container_light" -> palette.colorRoles.errorContainerLight
@@ -668,12 +668,10 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"outline_light" -> palette.colorRoles.outlineLight
 		"outline_variant_light" -> palette.colorRoles.outlineVariantLight
 		"scrim_light" -> palette.colorRoles.scrimLight
-		"surface_elevation_level_3_light" -> palette.colorRoles.surfaceElevationLevel3Light
 		"primary_dark" -> palette.colorRoles.primaryDark
 		"on_primary_dark" -> palette.colorRoles.onPrimaryDark
 		"primary_container_dark" -> palette.colorRoles.primaryContainerDark
 		"on_primary_container_dark" -> palette.colorRoles.onPrimaryContainerDark
-		"inverse_primary_dark" -> palette.colorRoles.inversePrimaryDark
 		"secondary_dark" -> palette.colorRoles.secondaryDark
 		"on_secondary_dark" -> palette.colorRoles.onSecondaryDark
 		"secondary_container_dark" -> palette.colorRoles.secondaryContainerDark
@@ -682,15 +680,17 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"on_tertiary_dark" -> palette.colorRoles.onTertiaryDark
 		"tertiary_container_dark" -> palette.colorRoles.tertiaryContainerDark
 		"on_tertiary_container_dark" -> palette.colorRoles.onTertiaryContainerDark
-		"background_dark" -> palette.colorRoles.backgroundDark
-		"on_background_dark" -> palette.colorRoles.onBackgroundDark
 		"surface_dark" -> palette.colorRoles.surfaceDark
+		// "surface_dim_dark" -> palette.colorRoles.surfaceDimDark
+		// "surface_bright_dark" -> palette.colorRoles.surfaceBrightDark
 		"on_surface_dark" -> palette.colorRoles.onSurfaceDark
-		"surface_variant_dark" -> palette.colorRoles.surfaceVariantDark
+		"surface_container_lowest_dark" -> palette.colorRoles.surfaceContainerLowestDark
+		"surface_container_low_dark" -> palette.colorRoles.surfaceContainerLowDark
+		"surface_container_dark" -> palette.colorRoles.surfaceContainerDark
+		"surface_container_high_dark" -> palette.colorRoles.surfaceContainerHighDark
+		"surface_container_highest_dark" -> palette.colorRoles.surfaceContainerHighestDark
 		"on_surface_variant_dark" -> palette.colorRoles.onSurfaceVariantDark
 		"surface_tint_dark" -> palette.colorRoles.surfaceTintDark
-		"inverse_surface_dark" -> palette.colorRoles.inverseSurfaceDark
-		"inverse_on_surface_dark" -> palette.colorRoles.inverseOnSurfaceDark
 		"error_dark" -> palette.colorRoles.errorDark
 		"on_error_dark" -> palette.colorRoles.onErrorDark
 		"error_container_dark" -> palette.colorRoles.errorContainerDark
@@ -698,7 +698,6 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"outline_dark" -> palette.colorRoles.outlineDark
 		"outline_variant_dark" -> palette.colorRoles.outlineVariantDark
 		"scrim_dark" -> palette.colorRoles.scrimDark
-		"surface_elevation_level_3_dark" -> palette.colorRoles.surfaceElevationLevel3Dark
 		"primary_0" -> palette.primary_0
 		"primary_10" -> palette.primary_10
 		"primary_20" -> palette.primary_20
@@ -1027,7 +1026,6 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.onPrimaryLight -> "on_primary_light"
 		palette.colorRoles.primaryContainerLight -> "primary_container_light"
 		palette.colorRoles.onPrimaryContainerLight -> "on_primary_container_light"
-		palette.colorRoles.inversePrimaryLight -> "inverse_primary_light"
 		palette.colorRoles.secondaryLight -> "secondary_light"
 		palette.colorRoles.onSecondaryLight -> "on_secondary_light"
 		palette.colorRoles.secondaryContainerLight -> "secondary_container_light"
@@ -1036,15 +1034,16 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.onTertiaryLight -> "on_tertiary_light"
 		palette.colorRoles.tertiaryContainerLight -> "tertiary_container_light"
 		palette.colorRoles.onTertiaryContainerLight -> "on_tertiary_container_light"
-		palette.colorRoles.backgroundLight -> "background_light"
-		palette.colorRoles.onBackgroundLight -> "on_background_light"
 		palette.colorRoles.surfaceLight -> "surface_light"
+		// palette.colorRoles.surfaceDimLight -> "surface_dim_light"
+		// palette.colorRoles.surfaceBrightLight -> "surface_bright_light"
 		palette.colorRoles.onSurfaceLight -> "on_surface_light"
-		palette.colorRoles.surfaceVariantLight -> "surface_variant_light"
+		palette.colorRoles.surfaceContainerLowestLight -> "surface_container_lowest_light"
+		palette.colorRoles.surfaceContainerLowLight -> "surface_container_low_light"
+		palette.colorRoles.surfaceContainerLight -> "surface_container_light"
+		palette.colorRoles.surfaceContainerHighLight -> "surface_container_high_light"
+		palette.colorRoles.surfaceContainerHighestLight -> "surface_container_highest_light"
 		palette.colorRoles.onSurfaceVariantLight -> "on_surface_variant_light"
-		palette.colorRoles.surfaceTintLight -> "surface_tint_light"
-		palette.colorRoles.inverseSurfaceLight -> "inverse_surface_light"
-		palette.colorRoles.inverseOnSurfaceLight -> "inverse_on_surface_light"
 		palette.colorRoles.errorLight -> "error_light"
 		palette.colorRoles.onErrorLight -> "on_error_light"
 		palette.colorRoles.errorContainerLight -> "error_container_light"
@@ -1052,12 +1051,10 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.outlineLight -> "outline_light"
 		palette.colorRoles.outlineVariantLight -> "outline_variant_light"
 		palette.colorRoles.scrimLight -> "scrim_light"
-		palette.colorRoles.surfaceElevationLevel3Light -> "surface_elevation_level_3_light"
 		palette.colorRoles.primaryDark -> "primary_dark"
 		palette.colorRoles.onPrimaryDark -> "on_primary_dark"
 		palette.colorRoles.primaryContainerDark -> "primary_container_dark"
 		palette.colorRoles.onPrimaryContainerDark -> "on_primary_container_dark"
-		palette.colorRoles.inversePrimaryDark -> "inverse_primary_dark"
 		palette.colorRoles.secondaryDark -> "secondary_dark"
 		palette.colorRoles.onSecondaryDark -> "on_secondary_dark"
 		palette.colorRoles.secondaryContainerDark -> "secondary_container_dark"
@@ -1066,15 +1063,17 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.onTertiaryDark -> "on_tertiary_dark"
 		palette.colorRoles.tertiaryContainerDark -> "tertiary_container_dark"
 		palette.colorRoles.onTertiaryContainerDark -> "on_tertiary_container_dark"
-		palette.colorRoles.backgroundDark -> "background_dark"
-		palette.colorRoles.onBackgroundDark -> "on_background_dark"
 		palette.colorRoles.surfaceDark -> "surface_dark"
+		// palette.colorRoles.surfaceDimDark -> "surface_dim_dark"
+		// palette.colorRoles.surfaceBrightDark -> "surface_bright_dark"
 		palette.colorRoles.onSurfaceDark -> "on_surface_dark"
-		palette.colorRoles.surfaceVariantDark -> "surface_variant_dark"
+		palette.colorRoles.surfaceContainerLowestDark -> "surface_container_lowest_dark"
+		palette.colorRoles.surfaceContainerLowDark -> "surface_container_low_dark"
+		palette.colorRoles.surfaceContainerDark -> "surface_container_dark"
+		palette.colorRoles.surfaceContainerHighDark -> "surface_container_high_dark"
+		palette.colorRoles.surfaceContainerHighestDark -> "surface_container_highest_dark"
 		palette.colorRoles.onSurfaceVariantDark -> "on_surface_variant_dark"
 		palette.colorRoles.surfaceTintDark -> "surface_tint_dark"
-		palette.colorRoles.inverseSurfaceDark -> "inverse_surface_dark"
-		palette.colorRoles.inverseOnSurfaceDark -> "inverse_on_surface_dark"
 		palette.colorRoles.errorDark -> "error_dark"
 		palette.colorRoles.onErrorDark -> "on_error_dark"
 		palette.colorRoles.errorContainerDark -> "error_container_dark"
@@ -1082,7 +1081,6 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.outlineDark -> "outline_dark"
 		palette.colorRoles.outlineVariantDark -> "outline_variant_dark"
 		palette.colorRoles.scrimDark -> "scrim_dark"
-		palette.colorRoles.surfaceElevationLevel3Dark -> "surface_elevation_level_3_dark"
 		palette.primary_0 -> "primary_0"
 		palette.primary_10 -> "primary_10"
 		palette.primary_20 -> "primary_20"
