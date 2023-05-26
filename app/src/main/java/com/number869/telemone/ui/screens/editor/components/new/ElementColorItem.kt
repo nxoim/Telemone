@@ -1,5 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,10 +40,12 @@ fun ElementColorItem(
 	lastIndexInList: Int,
 	palette: FullPaletteList
 ) {
-	val backgroundColor = when (themeMap.containsKey(uiElementData.first)) {
-		true -> themeMap[uiElementData.first]!!.second
-		else -> Color.Red
-	}
+	val backgroundColor by animateColorAsState(
+		when (themeMap.containsKey(uiElementData.first)) {
+			true -> themeMap[uiElementData.first]!!.second
+			else -> Color.Red
+		}, label = ""
+	)
 
 	val roundedCornerShape = if (index == 0)
 		RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
