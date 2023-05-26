@@ -50,7 +50,7 @@ import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.screens.editor.components.new.AlternativeEditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
-import com.number869.telemone.ui.screens.editor.components.old.SavedThemeItem
+import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
 
 

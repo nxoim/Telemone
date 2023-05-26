@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.Screens
-import com.number869.telemone.ui.screens.editor.components.old.ClearBeforeLoadDialog
 import com.number869.telemone.ui.theme.fullPalette
 
 @OptIn(ExperimentalMaterial3Api::class)

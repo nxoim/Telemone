@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.editor.components.old
+package com.number869.telemone.ui.screens.editor.components.new
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text

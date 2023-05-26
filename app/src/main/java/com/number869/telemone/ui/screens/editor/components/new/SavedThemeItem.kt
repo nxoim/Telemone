@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.screens.editor.components.old
+package com.number869.telemone.ui.screens.editor.components.new
 
 import android.content.Context
 import android.widget.Toast
