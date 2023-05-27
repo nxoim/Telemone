@@ -57,7 +57,7 @@ import com.number869.telemone.ui.theme.fullPalette
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(navController: NavController, vm: MainViewModel) {
-	val topAppBarState = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 	val context = LocalContext.current
 	val palette = fullPalette()
 
