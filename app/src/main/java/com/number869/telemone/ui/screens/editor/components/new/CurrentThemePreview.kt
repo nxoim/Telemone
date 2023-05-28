@@ -34,10 +34,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -367,6 +371,13 @@ fun ChatItem(
 			Color.Red
 		}
 	}
+
+	val avatarBackgroundNumber by remember {
+		derivedStateOf {
+			(1..7).random()
+		}
+	}
+
 	val backgroundColor = colorOf("windowBackgroundWhite")
 	val unreadCounterColor = colorOf("chats_unreadCounter")
 	val unreadMutedCounterColor = colorOf("chats_unreadCounterMuted")
@@ -388,10 +399,35 @@ fun ChatItem(
 	val verifiedIconColor = colorOf("chats_verifiedCheck")
 	val avatarTextColor = colorOf("avatar_text")
 
-	// TODO: put all of the colors
-	// TODO randomize these maybe
-	val avatarCyan1BackgroundColor = colorOf("avatar_backgroundCyan")
-	val avatarCyan2BackgroundColor = colorOf("avatar_backgroundCyan")
+	val avatarColor1 by remember {
+		derivedStateOf {
+			when (avatarBackgroundNumber) {
+				1 -> colorOf("avatar_backgroundBlue")
+				2 -> colorOf("avatar_backgroundGreen")
+				3 -> colorOf("avatar_backgroundOrange")
+				4 -> colorOf("avatar_backgroundPink")
+				5 -> colorOf("avatar_backgroundRed")
+				6 -> colorOf("avatar_backgroundViolet")
+				7 -> colorOf("avatar_backgroundCyan")
+				else -> colorOf("avatar_backgroundBlue")
+			}
+		}
+	}
+
+	val avatarColor2 by remember {
+		derivedStateOf {
+			when (avatarBackgroundNumber) {
+				1 -> colorOf("avatar_background2Blue")
+				2 -> colorOf("avatar_background2Green")
+				3 -> colorOf("avatar_background2Orange")
+				4 -> colorOf("avatar_background2Pink")
+				5 -> colorOf("avatar_background2Red")
+				6 -> colorOf("avatar_background2Violet")
+				7 -> colorOf("avatar_background2Cyan")
+				else -> colorOf("avatar_background2Blue")
+			}
+		}
+	}
 
 	Column {
 		Row(
@@ -406,7 +442,11 @@ fun ChatItem(
 				Modifier
 					.size(18.dp)
 					.clip(CircleShape)
-					.background(avatarCyan1BackgroundColor)
+					.background(
+						brush = Brush.verticalGradient(
+							listOf(avatarColor1, avatarColor2)
+						)
+					)
 			) {
 				Column(
 					modifier = Modifier.fillMaxSize(),
