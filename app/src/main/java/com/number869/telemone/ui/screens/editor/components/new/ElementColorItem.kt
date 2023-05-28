@@ -30,6 +30,7 @@ import androidx.compose.ui.window.Popup
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.theme.FullPaletteList
+import kotlinx.coroutines.delay
 
 @Composable
 fun ElementColorItem(
@@ -99,13 +100,28 @@ fun ElementColorItem(
 
 			Popup(
 				alignment = Alignment.TopCenter,
-				onDismissRequest = { showPopUp = false }
+				onDismissRequest = { startPopupAnimation = false }
 			) {
-				PalettePopup(uiElementData.first, vm, palette, backgroundColor, startPopupAnimation)
+				PalettePopup(
+					uiElementData.first,
+					vm,
+					palette,
+					backgroundColor,
+					startPopupAnimation,
+					hidePopup = { startPopupAnimation = false }
+				)
 			}
 
 			LaunchedEffect(Unit) {
 				startPopupAnimation = true
+			}
+
+			LaunchedEffect(startPopupAnimation) {
+				delay(300)
+
+				if (!startPopupAnimation) {
+					showPopUp = false
+				}
 			}
 		}
 	}

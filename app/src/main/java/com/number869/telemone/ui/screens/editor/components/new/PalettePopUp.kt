@@ -34,6 +34,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +43,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -142,10 +144,12 @@ fun PalettePopup(
 	vm: MainViewModel,
 	palette: FullPaletteList,
 	currentColor: Color,
-	showPopUp: Boolean
+	isPopupVisible: Boolean,
+	hidePopup: () -> Unit
 ) {
-	AnimatedVisibility(visible = showPopUp, enter = fadeIn(), exit = fadeOut()) {
+	AnimatedVisibility(visible = isPopupVisible, enter = fadeIn(), exit = fadeOut()) {
 		var currentPopupContentType by remember { mutableStateOf(PaletteMenuCategories.Home) }
+		val isOnHomePage by remember { derivedStateOf { currentPopupContentType == PaletteMenuCategories.Home } }
 
 		OutlinedCard(
 			Modifier
@@ -153,9 +157,22 @@ fun PalettePopup(
 				.animateContentSize(spring(0.97f, 200f)),
 			shape = RoundedCornerShape(32.dp)
 		) {
-			Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+			Row(Modifier.fillMaxWidth()) {
+				Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
+					if (isOnHomePage) {
+						IconButton(onClick = { hidePopup() }) {
+							Icon(Icons.Default.Close, contentDescription = "Close popup")
+						}
+					} else {
+						IconButton(onClick = { currentPopupContentType = PaletteMenuCategories.Home }) {
+							Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+						}
+					}
+				}
+
+
 				Row(
-					Modifier.padding(top = 24.dp, start = 16.dp, bottom = 16.dp),
+					Modifier.padding(top = 24.dp, bottom = 16.dp),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Box(
@@ -165,7 +182,6 @@ fun PalettePopup(
 							.width(24.dp)
 							.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
 							.height(16.dp)
-
 					)
 
 					Spacer(modifier = Modifier.width(8.dp))
@@ -177,20 +193,12 @@ fun PalettePopup(
 					)
 				}
 
-				AnimatedVisibility(
-					visible = currentPopupContentType != PaletteMenuCategories.Home,
-					modifier = Modifier
-						.padding(top = 8.dp, end = 8.dp),
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
-				) {
-					IconButton(onClick = { currentPopupContentType = PaletteMenuCategories.Home }) {
-						Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+				BackHandler(enabled = isPopupVisible) {
+					if (isOnHomePage) {
+						hidePopup()
+					} else {
+						currentPopupContentType = PaletteMenuCategories.Home
 					}
-				}
-
-				BackHandler(enabled = currentPopupContentType != PaletteMenuCategories.Home) {
-					currentPopupContentType = PaletteMenuCategories.Home
 				}
 			}
 
