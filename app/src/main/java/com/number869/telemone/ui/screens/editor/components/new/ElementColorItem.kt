@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,11 +93,20 @@ fun ElementColorItem(
 			)
 		}
 
-		Popup(
-			alignment = Alignment.TopCenter,
-			onDismissRequest = { showPopUp = false }
-		) {
-			PalettePopup(uiElementData.first, vm, palette, backgroundColor, showPopUp)
+		if (showPopUp) {
+			// so that the performance does not suffer
+			var startPopupAnimation by remember { mutableStateOf(false) }
+
+			Popup(
+				alignment = Alignment.TopCenter,
+				onDismissRequest = { showPopUp = false }
+			) {
+				PalettePopup(uiElementData.first, vm, palette, backgroundColor, startPopupAnimation)
+			}
+
+			LaunchedEffect(Unit) {
+				startPopupAnimation = true
+			}
 		}
 	}
 }
