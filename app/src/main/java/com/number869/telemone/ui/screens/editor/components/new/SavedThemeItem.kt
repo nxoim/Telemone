@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -109,7 +110,7 @@ fun SavedThemeItem(
 				colorOf("actionBarDefaultTitle"),
 				colorOf("actionBarDefaultSubtitle")
 			)
-			Messages(colorOf("windowBackgroundWhite"))
+			Messages(Modifier.weight(1f), colorOf("windowBackgroundWhite"))
 			ChatBottomAppBar(
 				colorOf("chat_messagePanelBackground"),
 				colorOf("chat_messagePanelIcons"),
@@ -287,11 +288,10 @@ private fun ChatTopAppBar(
 }
 
 @Composable
-private fun Messages(backgroundColor: Color) {
+private fun Messages(modifier: Modifier = Modifier, backgroundColor: Color) {
 	Column(
-		Modifier
-			.fillMaxWidth()
-			.height(122.dp)
+		modifier
+			.fillMaxSize()
 			.background(backgroundColor)
 	) {
 

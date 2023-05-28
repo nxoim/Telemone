@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -50,8 +52,11 @@ fun OverwriteChoiceDialog(
 			title = { Text(text = "Which Theme to Overwrite?") },
 			confirmButton = {
 				Column {
-					Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-						Column(horizontalAlignment = Alignment.CenterHorizontally) {
+					Row(Modifier.widthIn(max = 320.dp).fillMaxWidth().padding(bottom = 8.dp)) {
+						Column(
+							Modifier.weight(1f),
+							horizontalAlignment = Alignment.CenterHorizontally
+						) {
 							SavedThemeItem(
 								Modifier
 									.width(120.dp)
@@ -65,12 +70,17 @@ fun OverwriteChoiceDialog(
 								context
 							)
 
-							TextButton(onClick = { chooseLight() }) {
-								Text("Overwrite Light")
+							Spacer(modifier = Modifier.height(16.dp))
+
+							FilledTonalButton(onClick = { chooseLight() }) {
+								Text("Light")
 							}
 						}
 
-						Column(horizontalAlignment = Alignment.CenterHorizontally) {
+						Column(
+							Modifier.weight(1f),
+							horizontalAlignment = Alignment.CenterHorizontally
+						) {
 							SavedThemeItem(
 								Modifier
 									.width(120.dp)
@@ -84,13 +94,15 @@ fun OverwriteChoiceDialog(
 								context
 							)
 
-							TextButton(onClick = { chooseDark() }) {
-								Text("Overwrite Dark")
+							Spacer(modifier = Modifier.height(16.dp))
+
+							FilledTonalButton(onClick = { chooseDark() }) {
+								Text("Dark")
 							}
 						}
 					}
 
-					FilledTonalButton(onClick = { close() }, modifier = Modifier.align(End)) {
+					TextButton(onClick = { close() }, modifier = Modifier.align(End)) {
 						Text("Cancel")
 					}
 				}
@@ -132,40 +144,42 @@ fun OverwriteDefaultsDialog(
 			title = { Text("Do you really want to overwrite the $thingThatsBeingOverwritten?")},
 			text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. You can revert this change any time inside the theme editor.""") },
 			icon = {
-				Column(Modifier.fillMaxWidth()) {
-					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
-						// current default
-						SavedThemeItem(
-							Modifier
-								.width(110.dp)
-								.height(140.dp)
-								.clip(RoundedCornerShape(16.dp)),
-							vm,
-							uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
-							palette,
-							context
-						)
+				Row(
+					Modifier.widthIn(max = 280.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.SpaceAround
+				) {
+					// current default
+					SavedThemeItem(
+						Modifier
+							.weight(1f)
+							.width(110.dp)
+							.height(140.dp)
+							.clip(RoundedCornerShape(16.dp)),
+						vm,
+						uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
+						palette,
+						context
+					)
 
-						Spacer(Modifier.width(8.dp))
-						Icon(
-							Icons.Default.ArrowForward,
-							contentDescription = "Arrow pointing at the prompted new default theme.",
-							modifier = Modifier.size(32.dp)
-						)
-						Spacer(Modifier.width(8.dp))
+					Icon(
+						Icons.Default.ArrowForward,
+						contentDescription = "Arrow pointing at the prompted new default theme.",
+						modifier = Modifier.size(32.dp).weight(1f)
+					)
 
-						// new default
-						SavedThemeItem(
-							Modifier
-								.width(110.dp)
-								.height(140.dp)
-								.clip(RoundedCornerShape(16.dp)),
-							vm,
-							uuid = overwriteWith,
-							palette,
-							context
-						)
-					}
+					// new default
+					SavedThemeItem(
+						Modifier
+							.weight(1f)
+							.width(110.dp)
+							.height(140.dp)
+							.clip(RoundedCornerShape(16.dp)),
+						vm,
+						uuid = overwriteWith,
+						palette,
+						context
+					)
 				}
 			}
 		)
