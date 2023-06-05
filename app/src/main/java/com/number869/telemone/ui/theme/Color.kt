@@ -65,6 +65,7 @@ import android.R.color.system_neutral2_600
 import android.R.color.system_neutral2_700
 import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
+import androidx.annotation.ColorRes
 import androidx.annotation.FloatRange
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
@@ -87,7 +88,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // this is used for checking if the a token is present in a theme
-// TODO ! UPDATE WHEN ADDING NEW COLOR TOKENS !
+// TODO turn this into a function that takes names from the enum classes
 val allColorTokensAsList = listOf(
 	"primary_light",
 	"on_primary_light",
@@ -452,278 +453,127 @@ data class FullPaletteList(
 	val pink: Map<Int, Color>
 )
 
-enum class Primary {
-	Primary0,
-	Primary10,
-	Primary20,
-	Primary30,
-	Primary40,
-	Primary50,
-	Primary60,
-	Primary70,
-	Primary80,
-	Primary90,
-	Primary95,
-	Primary99,
-	Primary100;
+enum class Primary(val colorToken: String, @ColorRes val colorValue: Int) {
+	Primary0("primary_0", system_accent1_1000),
+	Primary10("primary_10", system_accent1_900),
+	Primary20("primary_20", system_accent1_800),
+	Primary30("primary_30", system_accent1_700),
+	Primary40("primary_40", system_accent1_600),
+	Primary50("primary_50", system_accent1_500),
+	Primary60("primary_60", system_accent1_400),
+	Primary70("primary_70", system_accent1_300),
+	Primary80("primary_80", system_accent1_200),
+	Primary90("primary_90", system_accent1_100),
+	Primary95("primary_95", system_accent1_50),
+	Primary99("primary_99", system_accent1_10),
+	Primary100("primary_100", system_accent1_0);
 
-	// assign colors to each thing
 	@Composable
 	operator fun component1(): Color {
-		return when (this) {
-			Primary0 -> colorResource(system_accent1_1000)
-			Primary10 -> colorResource(system_accent1_900)
-			Primary20 -> colorResource(system_accent1_800)
-			Primary30 -> colorResource(system_accent1_700)
-			Primary40 -> colorResource(system_accent1_600)
-			Primary50 -> colorResource(system_accent1_500)
-			Primary60 -> colorResource(system_accent1_400)
-			Primary70 -> colorResource(system_accent1_300)
-			Primary80 -> colorResource(system_accent1_200)
-			Primary90 -> colorResource(system_accent1_100)
-			Primary95 -> colorResource(system_accent1_50)
-			Primary99 -> colorResource(system_accent1_10)
-			Primary100 -> colorResource(system_accent1_0)
-		}
+		return colorResource(this.colorValue)
 	}
 
-	// assign names to each thing
 	operator fun component2(): String {
-		return when (this) {
-			Primary0 -> "primary_0"
-			Primary10 -> "primary_10"
-			Primary20 -> "primary_20"
-			Primary30 -> "primary_30"
-			Primary40 -> "primary_40"
-			Primary50 -> "primary_50"
-			Primary60 -> "primary_60"
-			Primary70 -> "primary_70"
-			Primary80 -> "primary_80"
-			Primary90 -> "primary_90"
-			Primary95 -> "primary_95"
-			Primary99 -> "primary_99"
-			Primary100 -> "primary_100"
-		}
+		return this.colorToken
 	}
 }
 
-enum class Secondary {
-	Secondary0,
-	Secondary10,
-	Secondary20,
-	Secondary30,
-	Secondary40,
-	Secondary50,
-	Secondary60,
-	Secondary70,
-	Secondary80,
-	Secondary90,
-	Secondary95,
-	Secondary99,
-	Secondary100;
+enum class Secondary(val colorToken: String, @ColorRes val colorValue: Int) {
+	Secondary0("secondary_0", system_accent2_1000),
+	Secondary10("secondary_10", system_accent2_900),
+	Secondary20("secondary_20", system_accent2_800),
+	Secondary30("secondary_30", system_accent2_700),
+	Secondary40("secondary_40", system_accent2_600),
+	Secondary50("secondary_50", system_accent2_500),
+	Secondary60("secondary_60", system_accent2_400),
+	Secondary70("secondary_70", system_accent2_300),
+	Secondary80("secondary_80", system_accent2_200),
+	Secondary90("secondary_90", system_accent2_100),
+	Secondary95("secondary_95", system_accent2_50),
+	Secondary99("secondary_99", system_accent2_10),
+	Secondary100("secondary_100", system_accent2_0);
 
-	// assign colors to each thing
 	@Composable
 	operator fun component1(): Color {
-		return when (this) {
-			Secondary0 -> colorResource(system_accent2_1000)
-			Secondary10 -> colorResource(system_accent2_900)
-			Secondary20 -> colorResource(system_accent2_800)
-			Secondary30 -> colorResource(system_accent2_700)
-			Secondary40 -> colorResource(system_accent2_600)
-			Secondary50 -> colorResource(system_accent2_500)
-			Secondary60 -> colorResource(system_accent2_400)
-			Secondary70 -> colorResource(system_accent2_300)
-			Secondary80 -> colorResource(system_accent2_200)
-			Secondary90 -> colorResource(system_accent2_100)
-			Secondary95 -> colorResource(system_accent2_50)
-			Secondary99 -> colorResource(system_accent2_10)
-			Secondary100 -> colorResource(system_accent2_0)
-		}
+		return colorResource(this.colorValue)
 	}
 
-	// assign names to each thing
 	operator fun component2(): String {
-		return when (this) {
-			Secondary0 -> "secondary_0"
-			Secondary10 -> "secondary_10"
-			Secondary20 -> "secondary_20"
-			Secondary30 -> "secondary_30"
-			Secondary40 -> "secondary_40"
-			Secondary50 -> "secondary_50"
-			Secondary60 -> "secondary_60"
-			Secondary70 -> "secondary_70"
-			Secondary80 -> "secondary_80"
-			Secondary90 -> "secondary_90"
-			Secondary95 -> "secondary_95"
-			Secondary99 -> "secondary_99"
-			Secondary100 -> "secondary_100"
-		}
+		return this.colorToken
 	}
 }
 
-enum class Tertiary {
-	Tertiary0,
-	Tertiary10,
-	Tertiary20,
-	Tertiary30,
-	Tertiary40,
-	Tertiary50,
-	Tertiary60,
-	Tertiary70,
-	Tertiary80,
-	Tertiary90,
-	Tertiary95,
-	Tertiary99,
-	Tertiary100;
+enum class Tertiary(val colorToken: String, @ColorRes val colorValue: Int) {
+	Tertiary0("tertiary_0", system_accent3_1000),
+	Tertiary10("tertiary_10", system_accent3_900),
+	Tertiary20("tertiary_20", system_accent3_800),
+	Tertiary30("tertiary_30", system_accent3_700),
+	Tertiary40("tertiary_40", system_accent3_600),
+	Tertiary50("tertiary_50", system_accent3_500),
+	Tertiary60("tertiary_60", system_accent3_400),
+	Tertiary70("tertiary_70", system_accent3_300),
+	Tertiary80("tertiary_80", system_accent3_200),
+	Tertiary90("tertiary_90", system_accent3_100),
+	Tertiary95("tertiary_95", system_accent3_50),
+	Tertiary99("tertiary_99", system_accent3_10),
+	Tertiary100("tertiary_100", system_accent3_0);
 
-	// assign colors to each thing
 	@Composable
 	operator fun component1(): Color {
-		return when (this) {
-			Tertiary0 -> colorResource(system_accent3_1000)
-			Tertiary10 -> colorResource(system_accent3_900)
-			Tertiary20 -> colorResource(system_accent3_800)
-			Tertiary30 -> colorResource(system_accent3_700)
-			Tertiary40 -> colorResource(system_accent3_600)
-			Tertiary50 -> colorResource(system_accent3_500)
-			Tertiary60 -> colorResource(system_accent3_400)
-			Tertiary70 -> colorResource(system_accent3_300)
-			Tertiary80 -> colorResource(system_accent3_200)
-			Tertiary90 -> colorResource(system_accent3_100)
-			Tertiary95 -> colorResource(system_accent3_50)
-			Tertiary99 -> colorResource(system_accent3_10)
-			Tertiary100 -> colorResource(system_accent3_0)
-		}
+		return colorResource(this.colorValue)
 	}
 
-	// assign names to each thing
 	operator fun component2(): String {
-		return when (this) {
-			Tertiary0 -> "tertiary_0"
-			Tertiary10 -> "tertiary_10"
-			Tertiary20 -> "tertiary_20"
-			Tertiary30 -> "tertiary_30"
-			Tertiary40 -> "tertiary_40"
-			Tertiary50 -> "tertiary_50"
-			Tertiary60 -> "tertiary_60"
-			Tertiary70 -> "tertiary_70"
-			Tertiary80 -> "tertiary_80"
-			Tertiary90 -> "tertiary_90"
-			Tertiary95 -> "tertiary_95"
-			Tertiary99 -> "tertiary_99"
-			Tertiary100 -> "tertiary_100"
-		}
+		return this.colorToken
 	}
 }
 
-enum class Neutral {
-	Neutral0,
-	Neutral10,
-	Neutral20,
-	Neutral30,
-	Neutral40,
-	Neutral50,
-	Neutral60,
-	Neutral70,
-	Neutral80,
-	Neutral90,
-	Neutral95,
-	Neutral99,
-	Neutral100;
+enum class Neutral(val colorToken: String, @ColorRes val colorValue: Int) {
+	Neutral0("neutral_0", system_neutral1_1000),
+	Neutral10("neutral_10", system_neutral1_900),
+	Neutral20("neutral_20", system_neutral1_800),
+	Neutral30("neutral_30", system_neutral1_700),
+	Neutral40("neutral_40", system_neutral1_600),
+	Neutral50("neutral_50", system_neutral1_500),
+	Neutral60("neutral_60", system_neutral1_400),
+	Neutral70("neutral_70", system_neutral1_300),
+	Neutral80("neutral_80", system_neutral1_200),
+	Neutral90("neutral_90", system_neutral1_100),
+	Neutral95("neutral_95", system_neutral1_50),
+	Neutral99("neutral_99", system_neutral1_10),
+	Neutral100("neutral_100", system_neutral1_0);
 
-	// assign colors to each thing
 	@Composable
 	operator fun component1(): Color {
-		return when (this) {
-			Neutral0 -> colorResource(system_neutral1_1000)
-			Neutral10 -> colorResource(system_neutral1_900)
-			Neutral20 -> colorResource(system_neutral1_800)
-			Neutral30 -> colorResource(system_neutral1_700)
-			Neutral40 -> colorResource(system_neutral1_600)
-			Neutral50 -> colorResource(system_neutral1_500)
-			Neutral60 -> colorResource(system_neutral1_400)
-			Neutral70 -> colorResource(system_neutral1_300)
-			Neutral80 -> colorResource(system_neutral1_200)
-			Neutral90 -> colorResource(system_neutral1_100)
-			Neutral95 -> colorResource(system_neutral1_50)
-			Neutral99 -> colorResource(system_neutral1_10)
-			Neutral100 -> colorResource(system_neutral1_0)
-		}
+		return colorResource(this.colorValue)
 	}
 
-	// assign names to each thing
 	operator fun component2(): String {
-		return when (this) {
-			Neutral0 -> "neutral_0"
-			Neutral10 -> "neutral_10"
-			Neutral20 -> "neutral_20"
-			Neutral30 -> "neutral_30"
-			Neutral40 -> "neutral_40"
-			Neutral50 -> "neutral_50"
-			Neutral60 -> "neutral_60"
-			Neutral70 -> "neutral_70"
-			Neutral80 -> "neutral_80"
-			Neutral90 -> "neutral_90"
-			Neutral95 -> "neutral_95"
-			Neutral99 -> "neutral_99"
-			Neutral100 -> "neutral_100"
-		}
+		return this.colorToken
 	}
 }
+enum class NeutralVariant(val colorToken: String, @ColorRes val colorValue: Int) {
+	NeutralVariant0("neutral_variant_0", system_neutral2_1000),
+	NeutralVariant10("neutral_variant_10", system_neutral2_900),
+	NeutralVariant20("neutral_variant_20", system_neutral2_800),
+	NeutralVariant30("neutral_variant_30", system_neutral2_700),
+	NeutralVariant40("neutral_variant_40", system_neutral2_600),
+	NeutralVariant50("neutral_variant_50", system_neutral2_500),
+	NeutralVariant60("neutral_variant_60", system_neutral2_400),
+	NeutralVariant70("neutral_variant_70", system_neutral2_300),
+	NeutralVariant80("neutral_variant_80", system_neutral2_200),
+	NeutralVariant90("neutral_variant_90", system_neutral2_100),
+	NeutralVariant95("neutral_variant_95", system_neutral2_50),
+	NeutralVariant99("neutral_variant_99", system_neutral2_10),
+	NeutralVariant100("neutral_variant_100", system_neutral2_0);
 
-enum class NeutralVariant {
-	NeutralVariant0,
-	NeutralVariant10,
-	NeutralVariant20,
-	NeutralVariant30,
-	NeutralVariant40,
-	NeutralVariant50,
-	NeutralVariant60,
-	NeutralVariant70,
-	NeutralVariant80,
-	NeutralVariant90,
-	NeutralVariant95,
-	NeutralVariant99,
-	NeutralVariant100;
-
-	// assign colors to each thing
 	@Composable
 	operator fun component1(): Color {
-		return when (this) {
-			NeutralVariant0 -> colorResource(system_neutral2_1000)
-			NeutralVariant10 -> colorResource(system_neutral2_900)
-			NeutralVariant20 -> colorResource(system_neutral2_800)
-			NeutralVariant30 -> colorResource(system_neutral2_700)
-			NeutralVariant40 -> colorResource(system_neutral2_600)
-			NeutralVariant50 -> colorResource(system_neutral2_500)
-			NeutralVariant60 -> colorResource(system_neutral2_400)
-			NeutralVariant70 -> colorResource(system_neutral2_300)
-			NeutralVariant80 -> colorResource(system_neutral2_200)
-			NeutralVariant90 -> colorResource(system_neutral2_100)
-			NeutralVariant95 -> colorResource(system_neutral2_50)
-			NeutralVariant99 -> colorResource(system_neutral2_10)
-			NeutralVariant100 -> colorResource(system_neutral2_0)
-		}
+		return colorResource(this.colorValue)
 	}
 
-	// assign name to each thing
 	operator fun component2(): String {
-		return when (this) {
-			NeutralVariant0 -> "neutral_variant_0"
-			NeutralVariant10 -> "neutral_variant_10"
-			NeutralVariant20 -> "neutral_variant_20"
-			NeutralVariant30 -> "neutral_variant_30"
-			NeutralVariant40 -> "neutral_variant_40"
-			NeutralVariant50 -> "neutral_variant_50"
-			NeutralVariant60 -> "neutral_variant_60"
-			NeutralVariant70 -> "neutral_variant_70"
-			NeutralVariant80 -> "neutral_variant_80"
-			NeutralVariant90 -> "neutral_variant_90"
-			NeutralVariant95 -> "neutral_variant_95"
-			NeutralVariant99 -> "neutral_variant_99"
-			NeutralVariant100 -> "neutral_variant_100"
-		}
+		return this.colorToken
 	}
 }
 
