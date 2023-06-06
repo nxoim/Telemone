@@ -72,7 +72,7 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 			},
 			exitTransition = {
 				when (targetState.destination.route) {
-					Screens.EditorScreen.route -> slideOutVertically(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetY = { -screenWidth }) + fadeOut(tween(300, 100))
+					Screens.MainScreen.route -> slideOutVertically(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetY = { -screenWidth }) + fadeOut(tween(300, 100))
 					else -> null
 				}
 			}
