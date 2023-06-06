@@ -333,7 +333,7 @@ private fun ListPreviewHeader(
 			Spacer(modifier = Modifier.width(2.dp))
 
 			Text(
-				"TeleMone",
+				"Telemone",
 				fontSize = 8.sp,
 				fontWeight = FontWeight.Medium,
 				style = TextStyle(

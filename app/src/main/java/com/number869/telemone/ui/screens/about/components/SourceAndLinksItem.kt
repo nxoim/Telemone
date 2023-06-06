@@ -24,7 +24,7 @@ fun SourceAndLinksItem() {
 	val context = LocalContext.current
 
 	AboutCard(label = "Source and Links") {
-		val sourceCodeLink = "https://github.com/Number869/TeleMone"
+		val sourceCodeLink = "https://github.com/Number869/Telemone"
 		val supportLink = "https://t.me/number869community"
 
 		Spacer(modifier = Modifier.height(4.dp))

@@ -60,7 +60,7 @@ private fun MainScreenAppBar(navController: NavHostController) {
 	var showMenu by remember { mutableStateOf(false) }
 
 	CenterAlignedTopAppBar(
-		title = { Text(text = "TeleMone") },
+		title = { Text(text = "Telemone") },
 		actions = {
 			IconButton(onClick = { showMenu = true }) {
 				Icon(Icons.Filled.MoreVert, contentDescription = "Menu")

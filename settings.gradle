@@ -13,6 +13,6 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "TeleMone"
+rootProject.name = "Telemone"
 include ':app'
 

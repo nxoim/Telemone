@@ -47,7 +47,7 @@ fun AboutScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "About TeleMone") },
+                title = { Text(text = "About Telemone") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 fun DescriptionItem() {
 	AboutCard(label = "About") {
 		Text(
-			text = "TeleMone is an app that allows you to create custom Telegram Monet Themes.",
+			text = "Telemone is an app that allows you to create custom Telegram Monet Themes.",
 			style = MaterialTheme.typography.bodyLarge
 		)
 	}

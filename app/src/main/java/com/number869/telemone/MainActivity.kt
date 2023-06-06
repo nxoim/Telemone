@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.number869.telemone.ui.Navigator
-import com.number869.telemone.ui.theme.TeleMoneTheme
+import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.fullPalette
 import kotlinx.coroutines.launch
 
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			TeleMoneTheme {
+			TelemoneTheme {
 				val navController = rememberAnimatedNavController()
 				val isDarkMode = isSystemInDarkTheme()
 				val palette = fullPalette()
