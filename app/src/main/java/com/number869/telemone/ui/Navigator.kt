@@ -1,5 +1,6 @@
 package com.number869.telemone.ui
 
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
@@ -11,22 +12,38 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.dialog
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.data.AppSettings
 import com.number869.telemone.ui.screens.about.AboutScreen
+import com.number869.telemone.ui.screens.about.components.PrivacyPolicyDialog
+import com.number869.telemone.ui.screens.about.components.TosDialog
 import com.number869.telemone.ui.screens.editor.EditorScreen
 import com.number869.telemone.ui.screens.main.MainScreen
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
+import com.number869.telemone.ui.screens.welcome.WelcomeScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Navigator(navController: NavHostController, vm: MainViewModel) {
 	val screenWidth = LocalConfiguration.current.screenWidthDp
 	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
+	val preferences = LocalContext.current.getSharedPreferences(
+		"AppPreferences",
+		Context.MODE_PRIVATE
+	)
+	val skipWelcomeScreen = preferences.getBoolean(AppSettings.AgreedToPpAndTos.id, false)
+	val startDestination = if (skipWelcomeScreen) Screens.MainScreen.route else Screens.WelcomeScreen.route
 
-	AnimatedNavHost(navController, Screens.MainScreen.route) {
+	AnimatedNavHost(navController, startDestination) {
+		composable(Screens.WelcomeScreen.route) {
+			WelcomeScreen(navController)
+		}
+
 		composable(
 			Screens.MainScreen.route,
 			enterTransition = {
@@ -100,12 +117,26 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 		) {
 			ThemeValuesScreen(vm)
 		}
+
+		dialog(Dialogs.PrivacyPolicyDialog.route) {
+			PrivacyPolicyDialog(navController)
+		}
+
+		dialog(Dialogs.TosDialog.route) {
+			TosDialog(navController)
+		}
 	}
 }
 
 enum class Screens(val route: String) {
+	WelcomeScreen("WelcomeScreen"),
 	MainScreen("MainScreen"),
 	EditorScreen("EditorScreen"),
 	ThemeValuesScreen("ThemeValuesScreen"),
 	AboutScreen("AboutScreen")
+}
+
+enum class Dialogs(val route: String) {
+	PrivacyPolicyDialog("PrivacyPolicyDialog"),
+	TosDialog("TosDialog")
 }

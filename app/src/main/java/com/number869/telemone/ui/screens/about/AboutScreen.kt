@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.number869.telemone.ui.screens.about.components.DescriptionItem
 import com.number869.telemone.ui.screens.about.components.DevelopersItem
+import com.number869.telemone.ui.screens.about.components.LegalItem
 import com.number869.telemone.ui.screens.about.components.SourceAndLinksItem
 import com.number869.telemone.ui.screens.about.components.SpecialMentionsItem
 import com.number869.telemone.ui.screens.about.components.VersionItem
@@ -39,7 +40,8 @@ fun AboutScreen(navController: NavHostController) {
         { VersionItem() },
         { DevelopersItem() },
         { SourceAndLinksItem() },
-        { SpecialMentionsItem() }
+        { SpecialMentionsItem() },
+        { LegalItem(navController) }
     )
 
     Scaffold(
