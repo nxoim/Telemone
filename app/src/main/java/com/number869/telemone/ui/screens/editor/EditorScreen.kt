@@ -53,7 +53,7 @@ import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
 
-
+// this is prob gonna get redesigned
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(navController: NavController, vm: MainViewModel) {
@@ -90,6 +90,8 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 			) {
 				item {
 					CurrentThemePreview(vm)
+
+					Spacer(modifier = Modifier.height(8.dp))
 
 					Text(
 						text = "Saved Themes",
@@ -148,7 +150,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 								}
 							}
 
-							Spacer(modifier = Modifier.height(16.dp))
+							Spacer(modifier = Modifier.height(24.dp))
 						}
 					}
 				}
@@ -163,26 +165,28 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							modifier = Modifier.padding(start = 16.dp),
 							color = MaterialTheme.colorScheme.onPrimaryContainer
 						)
-						Spacer(modifier = Modifier.height(12.dp))
+						Spacer(modifier = Modifier.height(16.dp))
 					}
-				}
 
-				mappedValuesAsList.forEachIndexed { index, uiElementData ->
-					when(uiElementData.second.first) {
-						"INCOMPATIBLE VALUE" -> item {
-							ElementColorItem(
-								Modifier
-									.padding(horizontal = 16.dp)
-									.animateItemPlacement(),
-								uiElementData = uiElementData,
-								vm = vm,
-								index = index,
-								themeMap = mappedValues,
-								lastIndexInList = mappedValuesAsList.lastIndex,
-								palette = palette,
-							)
+					mappedValuesAsList.forEachIndexed { index, uiElementData ->
+						when(uiElementData.second.first) {
+							"INCOMPATIBLE VALUE" -> item {
+								ElementColorItem(
+									Modifier
+										.padding(horizontal = 16.dp)
+										.animateItemPlacement(),
+									uiElementData = uiElementData,
+									vm = vm,
+									index = index,
+									themeMap = mappedValues,
+									lastIndexInList = mappedValuesAsList.lastIndex,
+									palette = palette,
+								)
+							}
 						}
 					}
+
+					item { Spacer(modifier = Modifier.height(24.dp)) }
 				}
 
 				if (vm.differencesBetweenFileAndCurrent.isNotEmpty()) {
@@ -195,7 +199,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							modifier = Modifier.padding(start = 16.dp),
 							color = MaterialTheme.colorScheme.onPrimaryContainer
 						)
-						Spacer(modifier = Modifier.height(12.dp))
+						Spacer(modifier = Modifier.height(16.dp))
 					}
 
 					itemsIndexed(vm.differencesBetweenFileAndCurrent.toList()) { index, uiElementData ->
@@ -211,7 +215,8 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							palette = palette,
 						)
 					}
-					item { Spacer(modifier = Modifier.height(16.dp)) }
+
+					item { Spacer(modifier = Modifier.height(24.dp)) }
 				}
 
 				item {
@@ -222,7 +227,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 						modifier = Modifier.padding(start = 16.dp),
 						color = MaterialTheme.colorScheme.onPrimaryContainer
 					)
-					Spacer(modifier = Modifier.height(12.dp))
+					Spacer(modifier = Modifier.height(16.dp))
 				}
 
 				itemsIndexed(mappedValuesAsList, key = { index, item ->  item.first }) {index, uiElementData ->
