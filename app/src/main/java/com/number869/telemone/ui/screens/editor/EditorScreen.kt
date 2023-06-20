@@ -53,6 +53,7 @@ import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
 
+
 // this is prob gonna get redesigned
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +72,9 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 		}
 	}
 	val mappedValues by remember { derivedStateOf { vm.mappedValues }  }
-	val mappedValuesAsList = mappedValues.toList().sortedBy { it.first }
+	val mappedValuesAsList by remember { derivedStateOf { mappedValues.toList().sortedBy { it.first } } }
+	val newUiElementsColors by remember { derivedStateOf { mappedValues.filter { !vm.defaultCurrentTheme.keys.contains(it.key) }.toList() } }
+	val incompatibleValues by remember { derivedStateOf { mappedValues.filter { it.value.first == "INCOMPATIBLE VALUE" }.toList() } }
 	val savedThemesRowState = rememberLazyListState()
 
 	LaunchedEffect(themeList) {
@@ -155,11 +158,40 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 					}
 				}
 
-				// TODO this will be its own list. in fact there will be more categories
-				if (mappedValues.values.contains(Pair("INCOMPATIBLE VALUE", Color.Red))) {
+//				if (vm.differencesBetweenFileAndCurrent.isNotEmpty()) {
+//					item {
+//						Spacer(modifier = Modifier.height(16.dp))
+//						Text(
+//							text = "Incompatible Values",
+//							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
+//								MaterialTheme.typography.labelLarge),
+//							modifier = Modifier.padding(start = 16.dp),
+//							color = MaterialTheme.colorScheme.onPrimaryContainer
+//						)
+//						Spacer(modifier = Modifier.height(16.dp))
+//					}
+//
+//					itemsIndexed(vm.differencesBetweenFileAndCurrent.toList()) { index, uiElementData ->
+//						ElementColorItem(
+//							Modifier
+//								.padding(horizontal = 16.dp)
+//								.animateItemPlacement(),
+//							uiElementData = uiElementData,
+//							vm = vm,
+//							index = index,
+//							themeMap = vm.differencesBetweenFileAndCurrent as LoadedTheme,
+//							lastIndexInList = vm.differencesBetweenFileAndCurrent.toList().lastIndex,
+//							palette = palette,
+//						)
+//					}
+//
+//					item { Spacer(modifier = Modifier.height(24.dp)) }
+//				}
+//
+				if (newUiElementsColors.isNotEmpty()) {
 					item {
 						Text(
-							text = "Incompatible Values",
+							text = "New Values",
 							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
 								MaterialTheme.typography.labelLarge),
 							modifier = Modifier.padding(start = 16.dp),
@@ -168,41 +200,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 						Spacer(modifier = Modifier.height(16.dp))
 					}
 
-					mappedValuesAsList.forEachIndexed { index, uiElementData ->
-						when(uiElementData.second.first) {
-							"INCOMPATIBLE VALUE" -> item {
-								ElementColorItem(
-									Modifier
-										.padding(horizontal = 16.dp)
-										.animateItemPlacement(),
-									uiElementData = uiElementData,
-									vm = vm,
-									index = index,
-									themeMap = mappedValues,
-									lastIndexInList = mappedValuesAsList.lastIndex,
-									palette = palette,
-								)
-							}
-						}
-					}
-
-					item { Spacer(modifier = Modifier.height(24.dp)) }
-				}
-
-				if (vm.differencesBetweenFileAndCurrent.isNotEmpty()) {
-					item {
-						Spacer(modifier = Modifier.height(16.dp))
-						Text(
-							text = "Incompatible Values",
-							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-								MaterialTheme.typography.labelLarge),
-							modifier = Modifier.padding(start = 16.dp),
-							color = MaterialTheme.colorScheme.onPrimaryContainer
-						)
-						Spacer(modifier = Modifier.height(16.dp))
-					}
-
-					itemsIndexed(vm.differencesBetweenFileAndCurrent.toList()) { index, uiElementData ->
+					itemsIndexed(newUiElementsColors) { index, uiElementData ->
 						ElementColorItem(
 							Modifier
 								.padding(horizontal = 16.dp)
@@ -210,13 +208,43 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							uiElementData = uiElementData,
 							vm = vm,
 							index = index,
-							themeMap = vm.differencesBetweenFileAndCurrent as LoadedTheme,
-							lastIndexInList = vm.differencesBetweenFileAndCurrent.toList().lastIndex,
+							themeMap = mappedValues,
+							lastIndexInList = newUiElementsColors.lastIndex,
 							palette = palette,
 						)
 					}
 
 					item { Spacer(modifier = Modifier.height(24.dp)) }
+				}
+
+				if (incompatibleValues.isNotEmpty()) {
+					item {
+						Text(
+							text = "Incompatible Values",
+							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
+								MaterialTheme.typography.labelLarge
+							),
+							modifier = Modifier.padding(start = 16.dp),
+							color = MaterialTheme.colorScheme.onPrimaryContainer
+						)
+						Spacer(modifier = Modifier.height(16.dp))
+					}
+
+					itemsIndexed(
+						incompatibleValues,
+						key = { index, item -> item.first }) { index, uiElementData ->
+						ElementColorItem(
+							Modifier
+								.padding(horizontal = 16.dp)
+								.animateItemPlacement(),
+							uiElementData = uiElementData,
+							vm = vm,
+							index = index,
+							themeMap = mappedValues,
+							lastIndexInList = mappedValuesAsList.lastIndex,
+							palette = palette,
+						)
+					}
 				}
 
 				item {

@@ -55,15 +55,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	// crash.
 	// don't ask me why i don't keep ulong and use ints instead
 	// i recommend you checking out
+	// i tried savedStateHandle with state flows and i couldnt figure out
+	// how to save the maps
 	private var _themeList: ThemeList = mutableStateListOf()
 	val themeList: ThemeList get() = _themeList
 	private var _mappedValues: LoadedTheme = mutableStateMapOf()
 	val mappedValues: LoadedTheme get() = _mappedValues
-	private var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
+	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
-	// will need this to update source theme files or something
-	// TODO DEBUG THIS
-	val differencesBetweenFileAndCurrent = loadedFromFileTheme.filterKeys { it !in _mappedValues.keys }
+
 	val savedShadowValues: LoadedTheme = mutableStateMapOf()
 	var disableShadows by mutableStateOf(true)
 
@@ -137,7 +137,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 		if (loadedMap != null) {
 			if (withTokens) {
-				if (clearCurrentTheme) { _mappedValues.clear() }
+				if (clearCurrentTheme) {
+					_mappedValues.clear()
+					loadedFromFileTheme.clear()
+				}
 				loadedMap.let {
 					it.forEach { colorPair ->
 						val colorToken = colorPair.value.first
@@ -150,7 +153,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 					}
 				}
 			} else {
-				if (clearCurrentTheme) { _mappedValues.clear() }
+				if (clearCurrentTheme) {
+					_mappedValues.clear()
+					loadedFromFileTheme.clear()
+				}
 				loadedMap.let {
 					it.forEach { colorPair ->
 						_mappedValues.putIfAbsent(
@@ -161,6 +167,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				}
 			}
 		}
+
+		loadedFromFileTheme.clear()
 	}
 
 	// idk if im dum but i don't think this is able to properly load telegrams
@@ -171,6 +179,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		palette: FullPaletteList,
 		clearCurrentTheme: Boolean
 	) {
+		loadedFromFileTheme.clear()
+
 		val loadedMap: LoadedTheme = mutableStateMapOf()
 		var containsIncompatibleValues = false
 		var isCorrectFormat = false
@@ -204,7 +214,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 									loadedMap[uiElementName] = Pair(colorToken, colorValue)
 								} else if (isValueActuallyAColorToken) {
-									// checks if the contents are like "uiElelemnt=n1_800"
+									// checks if the contents are like "uiElelemnt=neutral_80
 									val colorToken = colorValueAsString
 									val colorValue = getColorValueFromColorToken(colorToken, palette)
 
@@ -287,6 +297,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun resetCurrentTheme() {
 		_mappedValues.clear()
 		_mappedValues.putAll(defaultCurrentTheme)
+		loadedFromFileTheme.clear()
 	}
 
 	fun overwriteDefaultLightTheme(uuid: String, palette: FullPaletteList) {
@@ -465,6 +476,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				_mappedValues[uiItemName] = Pair(it.value.first, colorValue)
 				defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
 			}
+
+		loadedFromFileTheme.clear()
 	}
 
 	fun loadDefaultLightTheme(palette: FullPaletteList) {
@@ -477,6 +490,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				_mappedValues[uiItemName] = Pair(colorToken, colorValue)
 				defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
 			}
+
+		loadedFromFileTheme.clear()
 	}
 
 	fun loadStockDarkTheme(palette: FullPaletteList, context: Context) {
@@ -490,6 +505,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
 			defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
 		}
+
+		loadedFromFileTheme.clear()
 	}
 
 	fun loadStockLightTheme(palette: FullPaletteList, context: Context) {
@@ -503,6 +520,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
 			defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
 		}
+
+		loadedFromFileTheme.clear()
+
 	}
 
 	fun exportCustomTheme(context: Context) {
