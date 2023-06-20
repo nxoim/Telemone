@@ -53,23 +53,14 @@ import com.number869.telemone.ui.theme.fullPalette
 
 @Composable
 fun CurrentThemePreview(vm: MainViewModel) {
-	Column {
-		Text(
-			text = "Current theme",
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-				MaterialTheme.typography.labelLarge),
-			modifier = Modifier.padding(start = 16.dp),
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-		Row(
-			Modifier
-				.padding(16.dp)
-				.fillMaxWidth(),
-			horizontalArrangement = Arrangement.SpaceEvenly
-		) {
-			PreviewHomeScreen(vm)
-			PreviewChat(vm)
-		}
+	Row(
+		Modifier
+			.padding(16.dp)
+			.fillMaxWidth(),
+		horizontalArrangement = Arrangement.SpaceEvenly
+	) {
+		PreviewHomeScreen(vm)
+		PreviewChat(vm)
 	}
 }
 

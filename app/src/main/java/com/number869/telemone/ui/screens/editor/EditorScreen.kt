@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.ui.screens.editor.components.new.AlternativeEditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
@@ -92,17 +93,12 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 				contentPadding = PaddingValues(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp)
 			) {
 				item {
+					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "CurrentTheme")
 					CurrentThemePreview(vm)
 
 					Spacer(modifier = Modifier.height(8.dp))
 
-					Text(
-						text = "Saved Themes",
-						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.labelLarge),
-						modifier = Modifier.padding(start = 16.dp),
-						color = MaterialTheme.colorScheme.onPrimaryContainer
-					)
-
+					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Saved Themes")
 					AnimatedVisibility(visible = themeList.isEmpty()) {
 						Box(
 							Modifier
@@ -158,46 +154,17 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 					}
 				}
 
-//				if (vm.differencesBetweenFileAndCurrent.isNotEmpty()) {
-//					item {
-//						Spacer(modifier = Modifier.height(16.dp))
-//						Text(
-//							text = "Incompatible Values",
-//							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-//								MaterialTheme.typography.labelLarge),
-//							modifier = Modifier.padding(start = 16.dp),
-//							color = MaterialTheme.colorScheme.onPrimaryContainer
-//						)
-//						Spacer(modifier = Modifier.height(16.dp))
-//					}
-//
-//					itemsIndexed(vm.differencesBetweenFileAndCurrent.toList()) { index, uiElementData ->
-//						ElementColorItem(
-//							Modifier
-//								.padding(horizontal = 16.dp)
-//								.animateItemPlacement(),
-//							uiElementData = uiElementData,
-//							vm = vm,
-//							index = index,
-//							themeMap = vm.differencesBetweenFileAndCurrent as LoadedTheme,
-//							lastIndexInList = vm.differencesBetweenFileAndCurrent.toList().lastIndex,
-//							palette = palette,
-//						)
-//					}
-//
-//					item { Spacer(modifier = Modifier.height(24.dp)) }
-//				}
-//
 				if (newUiElementsColors.isNotEmpty()) {
 					item {
-						Text(
-							text = "New Values",
-							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-								MaterialTheme.typography.labelLarge),
-							modifier = Modifier.padding(start = 16.dp),
-							color = MaterialTheme.colorScheme.onPrimaryContainer
+						SmallTintedLabel(
+							Modifier
+								.padding(start = 16.dp)
+								.animateItemPlacement(),
+							labelText = "New Values"
 						)
-						Spacer(modifier = Modifier.height(16.dp))
+						Spacer(modifier = Modifier
+							.height(16.dp)
+							.animateItemPlacement())
 					}
 
 					itemsIndexed(newUiElementsColors) { index, uiElementData ->
@@ -219,20 +186,17 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 
 				if (incompatibleValues.isNotEmpty()) {
 					item {
-						Text(
-							text = "Incompatible Values",
-							style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-								MaterialTheme.typography.labelLarge
-							),
-							modifier = Modifier.padding(start = 16.dp),
-							color = MaterialTheme.colorScheme.onPrimaryContainer
+						SmallTintedLabel(
+							Modifier
+								.padding(start = 16.dp)
+								.animateItemPlacement(),
+							labelText = "Incompatible Values"
 						)
-						Spacer(modifier = Modifier.height(16.dp))
+
+						Spacer(modifier = Modifier.height(16.dp).animateItemPlacement())
 					}
 
-					itemsIndexed(
-						incompatibleValues,
-						key = { index, item -> item.first }) { index, uiElementData ->
+					itemsIndexed(incompatibleValues, key = { index, item -> item.first }) { index, uiElementData ->
 						ElementColorItem(
 							Modifier
 								.padding(horizontal = 16.dp)
@@ -248,13 +212,13 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 				}
 
 				item {
-					Text(
-						text = "All Colors",
-						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-							MaterialTheme.typography.labelLarge),
-						modifier = Modifier.padding(start = 16.dp),
-						color = MaterialTheme.colorScheme.onPrimaryContainer
+					SmallTintedLabel(
+						Modifier
+							.padding(start = 16.dp)
+							.animateItemPlacement(),
+						labelText = "All Colors"
 					)
+
 					Spacer(modifier = Modifier.height(16.dp))
 				}
 
