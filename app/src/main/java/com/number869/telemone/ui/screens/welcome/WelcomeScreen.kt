@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
+import com.number869.telemone.shared.ui.LargeTonalButton
 import com.number869.telemone.ui.Screens
 
 @Composable
@@ -68,7 +69,10 @@ fun WelcomeScreen(navController: NavHostController) {
 				modifier = Modifier.align(Alignment.CenterHorizontally))
 		}
 
-		Column(Modifier.fillMaxSize().weight(4f)) {
+		Column(
+			Modifier
+				.fillMaxSize()
+				.weight(4f)) {
 			OutlinedCard(
 				Modifier
 					.padding(vertical = 16.dp)
@@ -90,16 +94,13 @@ fun WelcomeScreen(navController: NavHostController) {
 			}
 		}
 
-		Button(
+		LargeTonalButton(
 			onClick = {
 				preferences.edit().putBoolean(AppSettings.AgreedToPpAndTos.id, true).apply()
 				navController.navigate(Screens.MainScreen.route)
 			},
-			modifier = Modifier
-				.align(Alignment.End)
-				.weight(1f, false)
-		) {
-			Text(text = "I Agree")
-		}
+			label = "I Agree",
+			modifier = Modifier.weight(1f, false)
+		)
 	}
 }
