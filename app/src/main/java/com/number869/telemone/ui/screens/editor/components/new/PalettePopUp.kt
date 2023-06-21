@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -49,6 +52,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -62,78 +66,9 @@ import com.number869.telemone.ui.theme.Neutral
 import com.number869.telemone.ui.theme.NeutralVariant
 import com.number869.telemone.ui.theme.Primary
 import com.number869.telemone.ui.theme.Secondary
+import com.number869.telemone.ui.theme.SolarSet
 import com.number869.telemone.ui.theme.Tertiary
 import com.number869.telemone.ui.theme.fullPalette
-
-private enum class PaletteMenuCategories() {
-	Home,
-	ColorRoles,
-	Primary,
-	Secondary,
-	Tertiary,
-	Neutral,
-	NeutralVariant,
-	Blue,
-	Green,
-	Orange,
-	Red,
-	Violet,
-	Pink,
-	Cyan;
-
-	operator fun component1(): PaletteMenuCategories {
-		return this
-	}
-
-	operator fun component2(): String {
-		return when (this) {
-			ColorRoles -> "Color Roles"
-			NeutralVariant -> "Neutral Variant"
-			else -> this.name
-		}
-	}
-
-	@Composable
-	operator fun component3(): Color {
-		return when (this) {
-			Primary -> MaterialTheme.colorScheme.primary
-			Secondary -> MaterialTheme.colorScheme.secondary
-			Tertiary -> MaterialTheme.colorScheme.tertiary
-			Neutral -> if (isSystemInDarkTheme()) fullPalette().neutral_60 else fullPalette().neutral_40
-			NeutralVariant -> if (isSystemInDarkTheme()) fullPalette().neutralVariant_60 else fullPalette().neutralVariant_40
-			Blue -> if (isSystemInDarkTheme()) fullPalette().blue.getValue(60) else fullPalette().blue.getValue(
-				40
-			)
-
-			Green -> if (isSystemInDarkTheme()) fullPalette().green.getValue(60) else fullPalette().green.getValue(
-				40
-			)
-
-			Orange -> if (isSystemInDarkTheme()) fullPalette().orange.getValue(60) else fullPalette().orange.getValue(
-				40
-			)
-
-			Red -> if (isSystemInDarkTheme()) fullPalette().red.getValue(60) else fullPalette().red.getValue(
-				40
-			)
-
-			Violet -> if (isSystemInDarkTheme()) fullPalette().violet.getValue(60) else fullPalette().violet.getValue(
-				40
-			)
-
-			Pink -> if (isSystemInDarkTheme()) fullPalette().pink.getValue(60) else fullPalette().pink.getValue(
-				40
-			)
-
-			Cyan -> if (isSystemInDarkTheme()) fullPalette().cyan.getValue(60) else fullPalette().cyan.getValue(
-				40
-			)
-
-			else -> Color.Transparent
-		}
-	}
-}
-
 
 // maybe i should use my overlay lib later
 // animations are very much TODO
@@ -611,15 +546,71 @@ private fun CategoryButton(
 	}
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ColorRolesMenu(vm: MainViewModel, palette: FullPaletteList, key: String) {
-	Column(verticalArrangement = spacedBy(8.dp)) {
+	val colorRolesCategoryPagerState = rememberPagerState(
+		initialPage = 0,
+		initialPageOffsetFraction = 0f,
+		pageCount = { 2 }
+	)
+
+	val indicatorHorizontalAlignment by remember {
+		derivedStateOf {
+			-1f + (colorRolesCategoryPagerState.getOffsetFractionForPage(0) * 2)
+		}
+	}
+
+	Column {
+		Box(contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)) {
+			Divider()
+			Divider(
+				color = MaterialTheme.colorScheme.onSurface,
+				modifier = Modifier.fillMaxWidth(0.5f)
+			)
+		}
+
+		Spacer(modifier = Modifier.height(16.dp))
+
+		HorizontalPager(
+			state = colorRolesCategoryPagerState,
+			pageSpacing = 16.dp
+		){
+			if (it == 0) LightColorRoles(vm, palette, key) else DarkColorRoles(vm, palette, key)
+		}
+	}
+
+}
+
+@Composable
+fun LightColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
+	Column(verticalArrangement = spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+		Icon(
+			SolarSet.Sun,
+			contentDescription = "Light theme color roles",
+			Modifier.size(32.dp)
+		)
+
+		Spacer(modifier = Modifier.height(8.dp))
+
 		PrimarySecondaryTertiaryErrorLight(vm, palette, key)
 		SurfacesLight(vm, palette, key)
 		SurfaceContainersLight(vm, palette, key)
 		OnSurfacesAndOutlinesLight(vm, palette, key)
+	}
+}
 
-		Divider(modifier = Modifier.padding(vertical = 16.dp))
+@Composable
+fun DarkColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
+	Column(verticalArrangement = spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+		Icon(
+			SolarSet.Moon,
+			contentDescription = "Light theme color roles",
+			Modifier.size(32.dp)
+		)
+
+		Spacer(modifier = Modifier.height(8.dp))
+//		Divider(modifier = Modifier.padding(vertical = 16.dp))
 
 		PrimarySecondaryTertiaryErrorDark(vm, palette, key)
 		SurfacesDark(vm, palette, key)
@@ -1213,5 +1204,74 @@ private fun SurfacesLight(vm: MainViewModel, palette: FullPaletteList, key: Stri
 //          key,
 //          vm
 //      )
+	}
+}
+
+private enum class PaletteMenuCategories() {
+	Home,
+	ColorRoles,
+	Primary,
+	Secondary,
+	Tertiary,
+	Neutral,
+	NeutralVariant,
+	Blue,
+	Green,
+	Orange,
+	Red,
+	Violet,
+	Pink,
+	Cyan;
+
+	operator fun component1(): PaletteMenuCategories {
+		return this
+	}
+
+	operator fun component2(): String {
+		return when (this) {
+			ColorRoles -> "Color Roles"
+			NeutralVariant -> "Neutral Variant"
+			else -> this.name
+		}
+	}
+
+	@Composable
+	operator fun component3(): Color {
+		return when (this) {
+			Primary -> MaterialTheme.colorScheme.primary
+			Secondary -> MaterialTheme.colorScheme.secondary
+			Tertiary -> MaterialTheme.colorScheme.tertiary
+			Neutral -> if (isSystemInDarkTheme()) fullPalette().neutral_60 else fullPalette().neutral_40
+			NeutralVariant -> if (isSystemInDarkTheme()) fullPalette().neutralVariant_60 else fullPalette().neutralVariant_40
+			Blue -> if (isSystemInDarkTheme()) fullPalette().blue.getValue(60) else fullPalette().blue.getValue(
+				40
+			)
+
+			Green -> if (isSystemInDarkTheme()) fullPalette().green.getValue(60) else fullPalette().green.getValue(
+				40
+			)
+
+			Orange -> if (isSystemInDarkTheme()) fullPalette().orange.getValue(60) else fullPalette().orange.getValue(
+				40
+			)
+
+			Red -> if (isSystemInDarkTheme()) fullPalette().red.getValue(60) else fullPalette().red.getValue(
+				40
+			)
+
+			Violet -> if (isSystemInDarkTheme()) fullPalette().violet.getValue(60) else fullPalette().violet.getValue(
+				40
+			)
+
+			Pink -> if (isSystemInDarkTheme()) fullPalette().pink.getValue(60) else fullPalette().pink.getValue(
+				40
+			)
+
+			Cyan -> if (isSystemInDarkTheme()) fullPalette().cyan.getValue(60) else fullPalette().cyan.getValue(
+				40
+			)
+
+			else -> Color.Transparent
+		}
 	}
 }
