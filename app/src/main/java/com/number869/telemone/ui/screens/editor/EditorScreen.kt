@@ -93,7 +93,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 				contentPadding = PaddingValues(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp)
 			) {
 				item {
-					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "CurrentTheme")
+					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
 					CurrentThemePreview(vm)
 
 					Spacer(modifier = Modifier.height(8.dp))
