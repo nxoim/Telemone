@@ -107,6 +107,7 @@ val allColorTokensAsList = listOf(
 	"on_background_light",
 	"surface_light",
 	"on_surface_light",
+	"surface_elevation_level_3_light",
 	"surface_container_lowest_light",
 	"surface_container_low_light",
 	"surface_container_light",
@@ -140,6 +141,7 @@ val allColorTokensAsList = listOf(
 	"on_background_dark",
 	"surface_dark",
 	"on_surface_dark",
+	"surface_elevation_level_3_dark",
 	"surface_container_lowest_dark",
 	"surface_container_low_dark",
 	"surface_container_dark",
@@ -156,6 +158,7 @@ val allColorTokensAsList = listOf(
 	"outline_dark",
 	"outline_variant_dark",
 	"scrim_dark",
+	"transparent",
 	"primary_0",
 	"primary_10",
 	"primary_20",
@@ -327,10 +330,9 @@ data class ColorRoles(
 	val onTertiaryLight: Color,
 	val tertiaryContainerLight: Color,
 	val onTertiaryContainerLight: Color,
-	// TODO WHERE GOOOGLE???? WHERE
-	// val surfaceDimLight: Color,
-	// val surfaceBrightLight: Color,
 	val surfaceLight: Color,
+	val surfaceDimLight: Color,
+	val surfaceBrightLight: Color,
 	val onSurfaceLight: Color,
 	val surfaceContainerLowestLight: Color,
 	val surfaceContainerLowLight: Color,
@@ -357,9 +359,9 @@ data class ColorRoles(
 	val onTertiaryDark: Color,
 	val tertiaryContainerDark: Color,
 	val onTertiaryContainerDark: Color,
-	// val surfaceDimDark: Color,
-	// val surfaceBrightDark: Color,
 	val surfaceDark: Color,
+	val surfaceDimDark: Color,
+	val surfaceBrightDark: Color,
 	val onSurfaceDark: Color,
 	val surfaceContainerLowestDark: Color,
 	val surfaceContainerLowDark: Color,
@@ -367,7 +369,6 @@ data class ColorRoles(
 	val surfaceContainerHighDark: Color,
 	val surfaceContainerHighestDark: Color,
 	val onSurfaceVariantDark: Color,
-	val surfaceTintDark: Color,
 	val errorDark: Color,
 	val onErrorDark: Color,
 	val errorContainerDark: Color,
@@ -379,6 +380,8 @@ data class ColorRoles(
 
 data class FullPaletteList(
 	val colorRoles: ColorRoles,
+	val surfaceElevationLevel3Light: Color,
+	val surfaceElevationLevel3Dark: Color,
 	val primary_0: Color,
 	val primary_10: Color,
 	val primary_20: Color,
@@ -583,7 +586,6 @@ fun fullPalette(): FullPaletteList {
 	var onPrimaryLight = Color.Red
 	var primaryContainerLight = Color.Red
 	var onPrimaryContainerLight = Color.Red
-	var inversePrimaryLight = Color.Red
 	var secondaryLight = Color.Red
 	var onSecondaryLight = Color.Red
 	var secondaryContainerLight = Color.Red
@@ -592,21 +594,17 @@ fun fullPalette(): FullPaletteList {
 	var onTertiaryLight = Color.Red
 	var tertiaryContainerLight = Color.Red
 	var onTertiaryContainerLight = Color.Red
-	var backgroundLight = Color.Red
-	var onBackgroundLight = Color.Red
 	var surfaceLight = Color.Red
-//	var surfaceDimLight = Color.Red
-//	var surfaceBrightLight = Color.Red
+	var surfaceDimLight = Color.Red
+	var surfaceBrightLight = Color.Red
 	var onSurfaceLight = Color.Red
+	var surfaceElevationLevel3Light = Color.Red
 	var surfaceContainerLowestLight = Color.Red
 	var surfaceContainerLowLight = Color.Red
 	var surfaceContainerLight = Color.Red
 	var surfaceContainerHighLight = Color.Red
 	var surfaceContainerHighestLight = Color.Red
 	var onSurfaceVariantLight = Color.Red
-	var surfaceTintLight = Color.Red
-	var inverseSurfaceLight = Color.Red
-	var inverseOnSurfaceLight = Color.Red
 	var errorLight = Color.Red
 	var onErrorLight = Color.Red
 	var errorContainerLight = Color.Red
@@ -614,11 +612,11 @@ fun fullPalette(): FullPaletteList {
 	var outlineLight = Color.Red
 	var outlineVariantLight = Color.Red
 	var scrimLight = Color.Red
+
 	var primaryDark = Color.Red
 	var onPrimaryDark = Color.Red
 	var primaryContainerDark = Color.Red
 	var onPrimaryContainerDark = Color.Red
-	var inversePrimaryDark = Color.Red
 	var secondaryDark = Color.Red
 	var onSecondaryDark = Color.Red
 	var secondaryContainerDark = Color.Red
@@ -627,21 +625,17 @@ fun fullPalette(): FullPaletteList {
 	var onTertiaryDark = Color.Red
 	var tertiaryContainerDark = Color.Red
 	var onTertiaryContainerDark = Color.Red
-	var backgroundDark = Color.Red
-	var onBackgroundDark = Color.Red
 	var surfaceDark = Color.Red
-//	var surfaceDimDark = Color.Red
-//	var surfaceBrightDark = Color.Red
+	var surfaceDimDark = Color.Red
+	var surfaceBrightDark = Color.Red
 	var onSurfaceDark = Color.Red
+	var surfaceElevationLevel3Dark = Color.Red
 	var surfaceContainerLowestDark = Color.Red
 	var surfaceContainerLowDark = Color.Red
 	var surfaceContainerDark = Color.Red
 	var surfaceContainerHighDark = Color.Red
 	var surfaceContainerHighestDark = Color.Red
 	var onSurfaceVariantDark = Color.Red
-	var surfaceTintDark = Color.Red
-	var inverseSurfaceDark = Color.Red
-	var inverseOnSurfaceDark = Color.Red
 	var errorDark = Color.Red
 	var onErrorDark = Color.Red
 	var errorContainerDark = Color.Red
@@ -685,7 +679,6 @@ fun fullPalette(): FullPaletteList {
 		onPrimaryLight = MaterialTheme.colorScheme.onPrimary
 		primaryContainerLight = MaterialTheme.colorScheme.primaryContainer
 		onPrimaryContainerLight = MaterialTheme.colorScheme.onPrimaryContainer
-		inversePrimaryLight = MaterialTheme.colorScheme.inversePrimary
 		secondaryLight = MaterialTheme.colorScheme.secondary
 		onSecondaryLight = MaterialTheme.colorScheme.onSecondary
 		secondaryContainerLight = MaterialTheme.colorScheme.secondaryContainer
@@ -694,23 +687,17 @@ fun fullPalette(): FullPaletteList {
 		onTertiaryLight = MaterialTheme.colorScheme.onTertiary
 		tertiaryContainerLight = MaterialTheme.colorScheme.tertiaryContainer
 		onTertiaryContainerLight = MaterialTheme.colorScheme.onTertiaryContainer
-		backgroundLight = MaterialTheme.colorScheme.background
-		onBackgroundLight = MaterialTheme.colorScheme.onBackground
 		surfaceLight = MaterialTheme.colorScheme.surface
-//		surfaceDimLight = MaterialTheme.colorScheme.surfaceDim
-//		surfaceBrightLight = MaterialTheme.colorScheme.surfaceBright
+		surfaceDimLight = MaterialTheme.colorScheme.surfaceDim
+		surfaceBrightLight = MaterialTheme.colorScheme.surfaceBright
 		onSurfaceLight = MaterialTheme.colorScheme.onSurface
-		// TODO i think the specs will change in the future
-		// TODO SURFACE CONTAINER LOWEST IS WRONG BRUHHHHHHHHHHHHH
-		surfaceContainerLowestLight = MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp)
-		surfaceContainerLowLight = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-		surfaceContainerLight = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-		surfaceContainerHighLight = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-		surfaceContainerHighestLight = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+		surfaceElevationLevel3Light = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+		surfaceContainerLowestLight = MaterialTheme.colorScheme.surfaceContainerLowest
+		surfaceContainerLowLight = MaterialTheme.colorScheme.surfaceContainerLow
+		surfaceContainerLight = MaterialTheme.colorScheme.surfaceContainer
+		surfaceContainerHighLight = MaterialTheme.colorScheme.surfaceContainerHigh
+		surfaceContainerHighestLight = MaterialTheme.colorScheme.surfaceContainerHighest
 		onSurfaceVariantLight = MaterialTheme.colorScheme.onSurfaceVariant
-		surfaceTintLight = MaterialTheme.colorScheme.surfaceTint
-		inverseSurfaceLight = MaterialTheme.colorScheme.inverseSurface
-		inverseOnSurfaceLight = MaterialTheme.colorScheme.inverseOnSurface
 		errorLight = MaterialTheme.colorScheme.error
 		onErrorLight = MaterialTheme.colorScheme.onError
 		errorContainerLight = MaterialTheme.colorScheme.errorContainer
@@ -718,7 +705,6 @@ fun fullPalette(): FullPaletteList {
 		outlineLight = MaterialTheme.colorScheme.outline
 		outlineVariantLight = MaterialTheme.colorScheme.outlineVariant
 		scrimLight = MaterialTheme.colorScheme.scrim
-		backgroundLight = MaterialTheme.colorScheme.background
 		surfaceLight = MaterialTheme.colorScheme.surface
 	}
 
@@ -727,7 +713,6 @@ fun fullPalette(): FullPaletteList {
 		onPrimaryDark = MaterialTheme.colorScheme.onPrimary
 		primaryContainerDark = MaterialTheme.colorScheme.primaryContainer
 		onPrimaryContainerDark = MaterialTheme.colorScheme.onPrimaryContainer
-		inversePrimaryDark = MaterialTheme.colorScheme.inversePrimary
 		secondaryDark = MaterialTheme.colorScheme.secondary
 		onSecondaryDark = MaterialTheme.colorScheme.onSecondary
 		secondaryContainerDark = MaterialTheme.colorScheme.secondaryContainer
@@ -736,21 +721,17 @@ fun fullPalette(): FullPaletteList {
 		onTertiaryDark = MaterialTheme.colorScheme.onTertiary
 		tertiaryContainerDark = MaterialTheme.colorScheme.tertiaryContainer
 		onTertiaryContainerDark = MaterialTheme.colorScheme.onTertiaryContainer
-		backgroundDark = MaterialTheme.colorScheme.background
-		onBackgroundDark = MaterialTheme.colorScheme.onBackground
 		surfaceDark = MaterialTheme.colorScheme.surface
-//		surfaceDimDark = MaterialTheme.colorScheme.surfaceDim
-//		surfaceBrightDark = MaterialTheme.colorScheme.surfaceBright
+		surfaceDimDark = MaterialTheme.colorScheme.surfaceDim
+		surfaceBrightDark = MaterialTheme.colorScheme.surfaceBright
 		onSurfaceDark = MaterialTheme.colorScheme.onSurface
-		surfaceContainerLowestDark = MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp)
-		surfaceContainerLowDark = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-		surfaceContainerDark = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-		surfaceContainerHighDark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-		surfaceContainerHighestDark = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+		surfaceElevationLevel3Dark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+		surfaceContainerLowestDark = MaterialTheme.colorScheme.surfaceContainerLowest
+		surfaceContainerLowDark = MaterialTheme.colorScheme.surfaceContainerLow
+		surfaceContainerDark = MaterialTheme.colorScheme.surfaceContainer
+		surfaceContainerHighDark = MaterialTheme.colorScheme.surfaceContainerHigh
+		surfaceContainerHighestDark = MaterialTheme.colorScheme.surfaceContainerHighest
 		onSurfaceVariantDark = MaterialTheme.colorScheme.onSurfaceVariant
-		surfaceTintDark = MaterialTheme.colorScheme.surfaceTint
-		inverseSurfaceDark = MaterialTheme.colorScheme.inverseSurface
-		inverseOnSurfaceDark = MaterialTheme.colorScheme.inverseOnSurface
 		errorDark = MaterialTheme.colorScheme.error
 		onErrorDark = MaterialTheme.colorScheme.onError
 		errorContainerDark = MaterialTheme.colorScheme.errorContainer
@@ -775,6 +756,8 @@ fun fullPalette(): FullPaletteList {
 			tertiaryContainerLight = tertiaryContainerLight,
 			onTertiaryContainerLight = onTertiaryContainerLight,
 			surfaceLight = surfaceLight,
+			surfaceDimLight = surfaceDimLight,
+			surfaceBrightLight = surfaceBrightLight,
 			onSurfaceLight = onSurfaceLight,
 			surfaceContainerLowestLight = surfaceContainerLowestLight,
 			surfaceContainerLowLight = surfaceContainerLowLight,
@@ -802,6 +785,8 @@ fun fullPalette(): FullPaletteList {
 			tertiaryContainerDark = tertiaryContainerDark,
 			onTertiaryContainerDark = onTertiaryContainerDark,
 			surfaceDark = surfaceDark,
+			surfaceDimDark = surfaceDimDark,
+			surfaceBrightDark = surfaceBrightDark,
 			onSurfaceDark = onSurfaceDark,
 			surfaceContainerLowestDark = surfaceContainerLowestDark,
 			surfaceContainerLowDark = surfaceContainerLowDark,
@@ -809,7 +794,6 @@ fun fullPalette(): FullPaletteList {
 			surfaceContainerHighDark = surfaceContainerHighDark,
 			surfaceContainerHighestDark = surfaceContainerHighestDark,
 			onSurfaceVariantDark = onSurfaceVariantDark,
-			surfaceTintDark = surfaceTintDark,
 			errorDark = errorDark,
 			onErrorDark = onErrorDark,
 			errorContainerDark = errorContainerDark,
@@ -818,6 +802,8 @@ fun fullPalette(): FullPaletteList {
 			outlineVariantDark = outlineVariantDark,
 			scrimDark = scrimDark,
 		),
+		surfaceElevationLevel3Light = surfaceElevationLevel3Light,
+		surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
 		primary_0 = colorResource(system_accent1_1000),
 		primary_10 = colorResource(system_accent1_900),
 		primary_20 = colorResource(system_accent1_800),

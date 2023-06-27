@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
@@ -10,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,7 +17,6 @@ import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,11 +33,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -59,7 +54,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.theme.FullPaletteList
 import com.number869.telemone.ui.theme.Neutral
@@ -72,10 +66,11 @@ import com.number869.telemone.ui.theme.fullPalette
 
 // maybe i should use my overlay lib later
 // animations are very much TODO
+// TODO organize
 @OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun PalettePopup(
-	key: String,
+	currentUiElement: String,
 	vm: MainViewModel,
 	palette: FullPaletteList,
 	currentColor: Color,
@@ -92,50 +87,14 @@ fun PalettePopup(
 				.animateContentSize(spring(0.97f, 200f)),
 			shape = RoundedCornerShape(32.dp)
 		) {
-			Row(Modifier.fillMaxWidth()) {
-				Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
-					if (isOnHomePage) {
-						IconButton(onClick = { hidePopup() }) {
-							Icon(Icons.Default.Close, contentDescription = "Close popup")
-						}
-					} else {
-						IconButton(onClick = { currentPopupContentType = PaletteMenuCategories.Home }) {
-							Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-						}
-					}
-				}
-
-
-				Row(
-					Modifier.padding(top = 24.dp, bottom = 16.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Box(
-						Modifier
-							.clip(CircleShape)
-							.background(currentColor)
-							.width(24.dp)
-							.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-							.height(16.dp)
-					)
-
-					Spacer(modifier = Modifier.width(8.dp))
-
-					Text(
-						text = key,
-						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
-						modifier = Modifier.basicMarquee()
-					)
-				}
-
-				BackHandler(enabled = isPopupVisible) {
-					if (isOnHomePage) {
-						hidePopup()
-					} else {
-						currentPopupContentType = PaletteMenuCategories.Home
-					}
-				}
-			}
+			PalettePopupAppBar(
+				isOnHomePage,
+				isPopupVisible,
+				currentUiElement,
+				currentColor,
+				hidePopup = { hidePopup() },
+				openHome = { currentPopupContentType = PaletteMenuCategories.Home }
+			)
 
 
 			Box(Modifier.padding(16.dp)) {
@@ -151,14 +110,19 @@ fun PalettePopup(
 						) {
 							items(
 								PaletteMenuCategories.values()
-									// hide home and color roles from the grid.
+									// hide home, other, and color roles from the grid.
 									// color roles button is shown separately, at
 									// the bottom of the popup.
-									.filter { it != PaletteMenuCategories.Home }
-									.filter { it != PaletteMenuCategories.ColorRoles }
+									.filter {
+										it != PaletteMenuCategories.Home
+												&&
+										it != PaletteMenuCategories.ColorRoles
+												&&
+										it != PaletteMenuCategories.Additional
+									}
 							) { (categoryType, categoryName, categoryColor) ->
 								CategoryButton(
-									isLarge = categoryType == PaletteMenuCategories.ColorRoles,
+									isLarge = false,
 									text = categoryName,
 									categoryColor = categoryColor,
 									onClick = { currentPopupContentType = categoryType }
@@ -168,11 +132,32 @@ fun PalettePopup(
 
 						Spacer(modifier = Modifier.height(16.dp))
 
-						CategoryButton(
-							isLarge = true,
-							text = "Color Roles",
-							onClick = { currentPopupContentType = PaletteMenuCategories.ColorRoles }
-						)
+						Row(Modifier.fillMaxWidth()) {
+							CategoryButton(
+								Modifier.weight(1f, fill = false),
+								isLarge = true,
+								text = "Color Roles",
+								onClick = { currentPopupContentType = PaletteMenuCategories.ColorRoles }
+							)
+							
+							Spacer(modifier = Modifier.width(8.dp))
+
+							Box(
+								Modifier
+									.size(44.dp, 88.dp)
+									.clip(RoundedCornerShape(16.dp))
+									.background(MaterialTheme.colorScheme.surfaceContainerHigh)
+									.clickable {
+										currentPopupContentType = PaletteMenuCategories.Additional
+									},
+								contentAlignment = Alignment.Center
+							) {
+								Icon(
+									Icons.Filled.MoreVert,
+									contentDescription = "Additional Colors"
+								)
+							}
+						}
 					}
 				}
 
@@ -181,7 +166,15 @@ fun PalettePopup(
 					enter = fadeIn() + expandVertically(clip = false),
 					exit = fadeOut() + shrinkVertically(clip = false)
 				) {
-					ColorRolesMenu(vm, palette, key)
+					ColorRolesMenu(vm, palette, currentUiElement)
+				}
+				
+				this@OutlinedCard.AnimatedVisibility(
+					visible = currentPopupContentType == PaletteMenuCategories.Additional,
+					enter = fadeIn() + expandVertically(clip = false),
+					exit = fadeOut() + shrinkVertically(clip = false)
+				) {
+					OtherMenu(vm, palette, currentUiElement)
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
@@ -192,7 +185,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Primary.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 
@@ -200,7 +193,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Primary.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 					}
@@ -214,7 +207,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Secondary.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 
@@ -222,7 +215,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Secondary.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 					}
@@ -236,7 +229,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Tertiary.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 
@@ -244,7 +237,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Tertiary.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 					}
@@ -258,7 +251,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Neutral.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 
@@ -266,7 +259,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							Neutral.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 					}
@@ -280,7 +273,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							NeutralVariant.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 
@@ -288,7 +281,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							NeutralVariant.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, key, vm)
+								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
 							}
 						}
 					}
@@ -302,7 +295,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.blue.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "blue_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "blue_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -310,7 +303,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.blue.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "blue_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "blue_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -323,7 +316,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.green.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "green_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "green_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -331,7 +324,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.green.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "green_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "green_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -344,7 +337,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.orange.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "orange_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "orange_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -352,7 +345,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.orange.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "orange_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "orange_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -365,7 +358,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.red.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "red_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "red_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -373,7 +366,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.red.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "red_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "red_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -386,7 +379,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.violet.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "violet_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "violet_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -394,7 +387,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.violet.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "violet_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "violet_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -407,7 +400,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.pink.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "pink_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "pink_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -415,7 +408,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.pink.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "pink_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "pink_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -428,7 +421,7 @@ fun PalettePopup(
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.cyan.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "cyan_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "cyan_$tone", currentUiElement, vm)
 							}
 						}
 
@@ -436,7 +429,7 @@ fun PalettePopup(
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
 							palette.cyan.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "cyan_$tone", key, vm)
+								TonalPaletteItem(Modifier.weight(1f), value, "cyan_$tone", currentUiElement, vm)
 							}
 						}
 					}
@@ -460,13 +453,7 @@ private fun TonalPaletteItem(
 			.width(30.dp)
 			.clip(CircleShape)
 			.background(value)
-			.clickable {
-				vm.changeValue(
-					key,
-					value,
-					tone
-				)
-			}
+			.clickable { vm.changeValue(key, value, tone) }
 	)
 }
 
@@ -579,7 +566,40 @@ private fun ColorRolesMenu(vm: MainViewModel, palette: FullPaletteList, key: Str
 			if (it == 0) LightColorRoles(vm, palette, key) else DarkColorRoles(vm, palette, key)
 		}
 	}
+}
 
+@Composable
+fun OtherMenu(vm: MainViewModel, palette: FullPaletteList, key: String) {
+	Column(verticalArrangement = spacedBy(8.dp)) {
+		Row(horizontalArrangement = spacedBy(8.dp)) {
+			ColorRoleItem(
+				Modifier.weight(1f),
+				value = palette.surfaceElevationLevel3Light,
+				tone = "surface_elevation_level_3_light",
+				key = key,
+				vm = vm
+			)
+
+			ColorRoleItem(
+				Modifier.weight(1f),
+				value = palette.surfaceElevationLevel3Dark,
+				tone = "surface_elevation_level_3_dark",
+				key = key,
+				vm = vm
+			)
+		}
+		
+		Box(contentAlignment = Alignment.Center) {
+			ColorRoleItem(
+				value = Color.Transparent,
+				tone = "transparent",
+				key = key,
+				vm = vm
+			)
+			
+			Text(text = "Transparent")
+		}
+	}
 }
 
 @Composable
@@ -610,7 +630,6 @@ fun DarkColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
 		)
 
 		Spacer(modifier = Modifier.height(8.dp))
-//		Divider(modifier = Modifier.padding(vertical = 16.dp))
 
 		PrimarySecondaryTertiaryErrorDark(vm, palette, key)
 		SurfacesDark(vm, palette, key)
@@ -621,7 +640,7 @@ fun DarkColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
 
 @Composable
 private fun ColorRoleItem(
-	modifier: Modifier,
+	modifier: Modifier = Modifier,
 	value: Color,
 	tone: String,
 	key: String,
@@ -632,6 +651,7 @@ private fun ColorRoleItem(
 			.height(40.dp)
 			.fillMaxWidth()
 			.clip(CircleShape)
+			.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
 			.background(value)
 			.clickable {
 				vm.changeValue(
@@ -885,43 +905,29 @@ private fun SurfaceContainersDark(vm: MainViewModel, palette: FullPaletteList, k
 @Composable
 private fun SurfacesDark(vm: MainViewModel, palette: FullPaletteList, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
-		Text(
-			text = "No surface dim because of google",
-			fontSize = 12.sp,
-			modifier = Modifier.weight(1f),
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+		ColorRoleItem(
+			Modifier.weight(1f),
+			palette.colorRoles.surfaceDimDark,
+			tone = "surface_dim_dark",
+			key,
+			vm
 		)
-//		ColorRoleItem(
-//			Modifier,
-//			palette.colorRoles.surfaceDimDark,
-//			tone = "surface_dark",
-//			key,
-//			vm
-//		)
 
 		ColorRoleItem(
-			Modifier
-				.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-				.weight(1f),
+			Modifier.weight(1f),
 			palette.colorRoles.surfaceDark,
 			tone = "surface_dark",
 			key,
 			vm
 		)
 
-		Text(
-			text = "No surface bright because of google",
-			fontSize = 12.sp,
-			modifier = Modifier.weight(1f),
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+		ColorRoleItem(
+			Modifier.weight(1f),
+			palette.colorRoles.surfaceBrightDark,
+			tone = "surface_bright_dark",
+			key,
+			vm
 		)
-//		ColorRoleItem(
-//			Modifier,
-//			palette.colorRoles.surfaceBrightDark,
-//			tone = "surface_dark",
-//			key,
-//			vm
-//		)
 	}
 }
 
@@ -1167,47 +1173,33 @@ private fun SurfaceContainersLight(vm: MainViewModel, palette: FullPaletteList, 
 @Composable
 private fun SurfacesLight(vm: MainViewModel, palette: FullPaletteList, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
-		Text(
-			text = "No surface dim because of google",
-			fontSize = 12.sp,
-			modifier = Modifier.weight(1f),
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+		ColorRoleItem(
+			Modifier.weight(1f),
+			palette.colorRoles.surfaceDimLight,
+			tone = "surface_dim_light",
+			key,
+			vm
 		)
-//      ColorRoleItem(
-//          Modifier,
-//          palette.colorRoles.surfaceDimLight,
-//          tone = "surface_light",
-//          key,
-//          vm
-//      )
 
 		ColorRoleItem(
-			Modifier
-				.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-				.weight(1f),
+			Modifier.weight(1f),
 			palette.colorRoles.surfaceLight,
 			tone = "surface_light",
 			key,
 			vm
 		)
 
-		Text(
-			text = "No surface bright because of google",
-			fontSize = 12.sp,
-			modifier = Modifier.weight(1f),
-			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+		ColorRoleItem(
+			Modifier.weight(1f),
+			palette.colorRoles.surfaceBrightLight,
+			tone = "surface_bright_light",
+			key,
+			vm
 		)
-//      ColorRoleItem(
-//          Modifier,
-//          palette.colorRoles.surfaceBrightLight,
-//          tone = "surface_light",
-//          key,
-//          vm
-//      )
 	}
 }
 
-private enum class PaletteMenuCategories() {
+enum class PaletteMenuCategories() {
 	Home,
 	ColorRoles,
 	Primary,
@@ -1221,7 +1213,8 @@ private enum class PaletteMenuCategories() {
 	Red,
 	Violet,
 	Pink,
-	Cyan;
+	Cyan,
+	Additional;
 
 	operator fun component1(): PaletteMenuCategories {
 		return this

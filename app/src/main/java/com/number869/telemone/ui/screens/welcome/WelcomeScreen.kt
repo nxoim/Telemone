@@ -33,7 +33,7 @@ import com.number869.telemone.ui.Screens
 @Composable
 fun WelcomeScreen(navController: NavHostController) {
 	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences",
+		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
 	)
 

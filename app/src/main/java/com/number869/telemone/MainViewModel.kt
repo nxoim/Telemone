@@ -672,9 +672,10 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"tertiary_container_light" -> palette.colorRoles.tertiaryContainerLight
 		"on_tertiary_container_light" -> palette.colorRoles.onTertiaryContainerLight
 		"surface_light" -> palette.colorRoles.surfaceLight
-		// "surface_dim_light" -> palette.colorRoles.surfaceDimLight
-		// "surface_bright_light" -> palette.colorRoles.surfaceBrightLight
+		"surface_dim_light" -> palette.colorRoles.surfaceDimLight
+		"surface_bright_light" -> palette.colorRoles.surfaceBrightLight
 		"on_surface_light" -> palette.colorRoles.onSurfaceLight
+		"surface_elevation_level_3_light" -> palette.surfaceElevationLevel3Light
 		"surface_container_lowest_light" -> palette.colorRoles.surfaceContainerLowestLight
 		"surface_container_low_light" -> palette.colorRoles.surfaceContainerLowLight
 		"surface_container_light" -> palette.colorRoles.surfaceContainerLight
@@ -701,16 +702,16 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"tertiary_container_dark" -> palette.colorRoles.tertiaryContainerDark
 		"on_tertiary_container_dark" -> palette.colorRoles.onTertiaryContainerDark
 		"surface_dark" -> palette.colorRoles.surfaceDark
-		// "surface_dim_dark" -> palette.colorRoles.surfaceDimDark
-		// "surface_bright_dark" -> palette.colorRoles.surfaceBrightDark
+		"surface_dim_dark" -> palette.colorRoles.surfaceDimDark
+		"surface_bright_dark" -> palette.colorRoles.surfaceBrightDark
 		"on_surface_dark" -> palette.colorRoles.onSurfaceDark
+		"surface_elevation_level_3_dark" -> palette.surfaceElevationLevel3Dark
 		"surface_container_lowest_dark" -> palette.colorRoles.surfaceContainerLowestDark
 		"surface_container_low_dark" -> palette.colorRoles.surfaceContainerLowDark
 		"surface_container_dark" -> palette.colorRoles.surfaceContainerDark
 		"surface_container_high_dark" -> palette.colorRoles.surfaceContainerHighDark
 		"surface_container_highest_dark" -> palette.colorRoles.surfaceContainerHighestDark
 		"on_surface_variant_dark" -> palette.colorRoles.onSurfaceVariantDark
-		"surface_tint_dark" -> palette.colorRoles.surfaceTintDark
 		"error_dark" -> palette.colorRoles.errorDark
 		"on_error_dark" -> palette.colorRoles.onErrorDark
 		"error_container_dark" -> palette.colorRoles.errorContainerDark
@@ -718,6 +719,7 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"outline_dark" -> palette.colorRoles.outlineDark
 		"outline_variant_dark" -> palette.colorRoles.outlineVariantDark
 		"scrim_dark" -> palette.colorRoles.scrimDark
+		"transparent" -> Color.Transparent
 		"primary_0" -> palette.primary_0
 		"primary_10" -> palette.primary_10
 		"primary_20" -> palette.primary_20
@@ -783,7 +785,6 @@ fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color 
 		"neutral_variant_95" -> palette.neutralVariant_95
 		"neutral_variant_99" -> palette.neutralVariant_99
 		"neutral_variant_100" -> palette.neutralVariant_100
-		"TRANSPARENT" -> Color.Transparent
 		"blue_0" -> palette.blue.getValue(0)
 		"blue_10" -> palette.blue.getValue(10)
 		"blue_20" -> palette.blue.getValue(20)
@@ -1055,9 +1056,10 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.tertiaryContainerLight -> "tertiary_container_light"
 		palette.colorRoles.onTertiaryContainerLight -> "on_tertiary_container_light"
 		palette.colorRoles.surfaceLight -> "surface_light"
-		// palette.colorRoles.surfaceDimLight -> "surface_dim_light"
-		// palette.colorRoles.surfaceBrightLight -> "surface_bright_light"
+		palette.colorRoles.surfaceDimLight -> "surface_dim_light"
+		palette.colorRoles.surfaceBrightLight -> "surface_bright_light"
 		palette.colorRoles.onSurfaceLight -> "on_surface_light"
+		palette.surfaceElevationLevel3Light -> "surface_elevation_level_3_light"
 		palette.colorRoles.surfaceContainerLowestLight -> "surface_container_lowest_light"
 		palette.colorRoles.surfaceContainerLowLight -> "surface_container_low_light"
 		palette.colorRoles.surfaceContainerLight -> "surface_container_light"
@@ -1084,16 +1086,16 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.tertiaryContainerDark -> "tertiary_container_dark"
 		palette.colorRoles.onTertiaryContainerDark -> "on_tertiary_container_dark"
 		palette.colorRoles.surfaceDark -> "surface_dark"
-		// palette.colorRoles.surfaceDimDark -> "surface_dim_dark"
-		// palette.colorRoles.surfaceBrightDark -> "surface_bright_dark"
+		palette.colorRoles.surfaceDimDark -> "surface_dim_dark"
+		palette.colorRoles.surfaceBrightDark -> "surface_bright_dark"
 		palette.colorRoles.onSurfaceDark -> "on_surface_dark"
+		palette.surfaceElevationLevel3Dark -> "surface_elevation_level_3_dark"
 		palette.colorRoles.surfaceContainerLowestDark -> "surface_container_lowest_dark"
 		palette.colorRoles.surfaceContainerLowDark -> "surface_container_low_dark"
 		palette.colorRoles.surfaceContainerDark -> "surface_container_dark"
 		palette.colorRoles.surfaceContainerHighDark -> "surface_container_high_dark"
 		palette.colorRoles.surfaceContainerHighestDark -> "surface_container_highest_dark"
 		palette.colorRoles.onSurfaceVariantDark -> "on_surface_variant_dark"
-		palette.colorRoles.surfaceTintDark -> "surface_tint_dark"
 		palette.colorRoles.errorDark -> "error_dark"
 		palette.colorRoles.onErrorDark -> "on_error_dark"
 		palette.colorRoles.errorContainerDark -> "error_container_dark"
@@ -1101,6 +1103,7 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.colorRoles.outlineDark -> "outline_dark"
 		palette.colorRoles.outlineVariantDark -> "outline_variant_dark"
 		palette.colorRoles.scrimDark -> "scrim_dark"
+		Color.Transparent -> "transparent"
 		palette.primary_0 -> "primary_0"
 		palette.primary_10 -> "primary_10"
 		palette.primary_20 -> "primary_20"
@@ -1166,7 +1169,6 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 		palette.neutralVariant_95 -> "neutral_variant_95"
 		palette.neutralVariant_99 -> "neutral_variant_99"
 		palette.neutralVariant_100 -> "neutral_variant_100"
-		Color.Transparent -> "TRANSPARENT"
 		palette.blue.getValue(0) -> "blue_0"
 		palette.blue.getValue(10) -> "blue_10"
 		palette.blue.getValue(20) -> "blue_20"

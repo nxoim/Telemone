@@ -447,11 +447,14 @@ fun ChatItem(
 					Text(
 						text = "A",
 						color = avatarTextColor,
-						fontSize = 6.sp
+						fontSize = 6.sp,
+						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
 					)
 				}
 			}
+			
 			Spacer(modifier = Modifier.width(4.dp))
+			
 			Column(verticalArrangement = Arrangement.Center) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					if (secret) {
@@ -468,7 +471,8 @@ fun ChatItem(
 						text = "Chat Name",
 						fontWeight = FontWeight.Bold,
 						fontSize = 6.sp,
-						color = if (secret) chatSecretNameColor else chatNameColor
+						color = if (secret) chatSecretNameColor else chatNameColor,
+						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
 					)
 					if (muted) {
 						Spacer(modifier = Modifier.width(2.dp))
@@ -488,16 +492,22 @@ fun ChatItem(
 						)
 					}
 				}
+				
+				Spacer(modifier = Modifier.height(2.dp))
+				
 				val message = "Lorem ipsum dolor"
 				Text(
 					text = if (sent) "You: $message" else message,
 					fontSize = 6.sp,
 					maxLines = 1,
 					color = messageTextColor,
-					modifier = Modifier.weight(1f, false)
+					modifier = Modifier.weight(1f, false),
+					style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
 				)
 			}
+			
 			Spacer(modifier = Modifier.weight(1f))
+			
 			Column(
 				horizontalAlignment = Alignment.End,
 				verticalArrangement = Arrangement.Top
@@ -518,7 +528,8 @@ fun ChatItem(
 						maxLines = 1,
 						text = "12:00",
 						fontSize = 5.sp,
-						color = dateColor
+						color = dateColor,
+						style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
 					)
 				}
 				if (pinned) {

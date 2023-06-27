@@ -33,7 +33,7 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 	val screenWidth = LocalConfiguration.current.screenWidthDp
 	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
 	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences",
+		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
 	)
 	val skipWelcomeScreen = preferences.getBoolean(AppSettings.AgreedToPpAndTos.id, false)
