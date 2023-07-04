@@ -79,7 +79,7 @@ fun AlternativeEditorTopAppBar(
 			IconButton(onClick = { vm.exportCustomTheme(context) }) {
 				Icon(Icons.Default.Upload, contentDescription = "Export current theme")
 			}
-			IconButton(onClick = { vm.saveCurrentTheme() }) {
+			IconButton(onClick = { vm.saveCurrentTheme(context) }) {
 				Icon(Icons.Default.Save, contentDescription = "Save current theme")
 			}
 			Box {
@@ -90,7 +90,7 @@ fun AlternativeEditorTopAppBar(
 				DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
 					DropdownMenuItem(
 						text = { Text(text = "Reset current theme") },
-						onClick = { vm.resetCurrentTheme() },
+						onClick = { vm.resetCurrentTheme(context) },
 						leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reset current theme") }
 					)
 					DropdownMenuItem(
@@ -113,12 +113,12 @@ fun AlternativeEditorTopAppBar(
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default light theme") },
-						onClick = { vm.loadDefaultLightTheme(palette) },
+						onClick = { vm.loadDefaultLightTheme(palette, context) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load default light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default dark theme") },
-						onClick = { vm.loadDefaultDarkTheme(palette) },
+						onClick = { vm.loadDefaultDarkTheme(palette, context) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load default dark theme") }
 					)
 					DropdownMenuItem(
@@ -143,12 +143,12 @@ fun AlternativeEditorTopAppBar(
 			{ showClearBeforeLoadDialog = false },
 			{
 				showClearBeforeLoadDialog = false
-				vm.saveCurrentTheme()
+				vm.saveCurrentTheme(context)
 				launcherThatClears.launch(arrayOf("*/*"))
 			},
 			{
 				showClearBeforeLoadDialog = false
-				vm.saveCurrentTheme()
+				vm.saveCurrentTheme(context)
 				launcherThatDoesnt.launch(arrayOf("*/*"))
 			}
 		)

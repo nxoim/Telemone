@@ -102,7 +102,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	fun saveCurrentTheme() {
+	fun saveCurrentTheme(context: Context) {
 		val mapWithUuid = mutableMapOf<String, Map<String, Pair<String, Int>>>()
 		val uuid = UUID.randomUUID().toString()
 		val map = mutableMapOf<String, Pair<String, Int>>()
@@ -117,21 +117,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 		val contents = Gson().toJson(_themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
+
+		Toast.makeText(
+			context,
+			"Theme has been saved successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
-	fun deleteTheme(uuid: String) {
+	fun deleteTheme(uuid: String, context: Context) {
 		val mapToRemove = _themeList.find { it.containsKey(uuid) }
 		_themeList.remove(mapToRemove)
 
 		val contents = Gson().toJson(_themeList)
 		preferences.edit().clear().putString(themeListKey, contents).apply()
+
+		Toast.makeText(
+			context,
+			"Theme has been deleted successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	fun loadTheme(
 		uuid: String,
 		withTokens: Boolean,
 		palette: FullPaletteList,
-		clearCurrentTheme: Boolean
+		clearCurrentTheme: Boolean,
+		context: Context
 	) {
 		val loadedMap = _themeList.firstOrNull { it.containsKey(uuid) }?.get(uuid)
 
@@ -169,6 +182,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 
 		loadedFromFileTheme.clear()
+
+		Toast.makeText(
+			context,
+			"Theme loaded successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	// idk if im dum but i don't think this is able to properly load telegrams
@@ -273,6 +292,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 					loadedFromFileTheme.clear()
 					_mappedValues.putAll(loadedMap)
 					loadedFromFileTheme.putAll(loadedMap)
+
+					Toast.makeText(
+						context,
+						"File loaded successfully",
+						Toast.LENGTH_LONG
+					).show()
 				} else {
 					Toast.makeText(
 						context,
@@ -294,13 +319,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	fun resetCurrentTheme() {
+	fun resetCurrentTheme(context: Context) {
 		_mappedValues.clear()
 		_mappedValues.putAll(defaultCurrentTheme)
 		loadedFromFileTheme.clear()
+
+		Toast.makeText(
+			context,
+			"Reset completed.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
-	fun overwriteDefaultLightTheme(uuid: String, palette: FullPaletteList) {
+	fun overwriteDefaultLightTheme(
+		uuid: String,
+		palette: FullPaletteList,
+		context: Context
+	) {
 		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
 		val index = _themeList.indexOfFirst { it.containsKey("defaultLightThemeUUID") }
@@ -332,9 +367,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 		val contents = Gson().toJson(_themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
+
+		Toast.makeText(
+			context,
+			"Default light theme has been overwritten successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
-	fun overwriteDefaultDarkTheme(uuid: String, palette: FullPaletteList) {
+	fun overwriteDefaultDarkTheme(
+		uuid: String,
+		palette: FullPaletteList,
+		context: Context
+	) {
 		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
 		val index = _themeList.indexOfFirst { it.containsKey("defaultDarkThemeUUID") }
@@ -361,6 +406,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 		val contents = Gson().toJson(_themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
+
+		Toast.makeText(
+			context,
+			"Default dark theme has been overwritten successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	fun changeValue(key: String, colorValue: Color, colorToken: String) {
@@ -466,7 +517,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "Telemone Export"))
 	}
 
-	fun loadDefaultDarkTheme(palette: FullPaletteList) {
+	fun loadDefaultDarkTheme(palette: FullPaletteList, context: Context) {
 		_themeList.find { it.containsKey("defaultDarkThemeUUID") }
 			?.getValue("defaultDarkThemeUUID")?.map {
 				val uiItemName = it.key
@@ -478,9 +529,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			}
 
 		loadedFromFileTheme.clear()
+
+		Toast.makeText(
+			context,
+			"Default dark theme has been loaded successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
-	fun loadDefaultLightTheme(palette: FullPaletteList) {
+	fun loadDefaultLightTheme(palette: FullPaletteList, context: Context) {
 		_themeList.find { it.containsKey("defaultLightThemeUUID") }
 			?.getValue("defaultLightThemeUUID")?.map {
 				val uiItemName = it.key
@@ -492,6 +549,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			}
 
 		loadedFromFileTheme.clear()
+
+		Toast.makeText(
+			context,
+			"Default light theme has been loaded successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	fun loadStockDarkTheme(palette: FullPaletteList, context: Context) {
@@ -507,6 +570,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 
 		loadedFromFileTheme.clear()
+
+		Toast.makeText(
+			context,
+			"Stock dark theme has been loaded successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	fun loadStockLightTheme(palette: FullPaletteList, context: Context) {
@@ -523,6 +592,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 		loadedFromFileTheme.clear()
 
+		Toast.makeText(
+			context,
+			"Stock light theme has been loaded successfully.",
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	fun exportCustomTheme(context: Context) {

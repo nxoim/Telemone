@@ -84,7 +84,8 @@ fun SavedThemeItem(
 									uuid,
 									withTokens = false,
 									palette,
-									clearCurrentTheme = true
+									clearCurrentTheme = true,
+									context
 								)
 
 								Toast
@@ -184,7 +185,7 @@ fun SavedThemeItem(
 		showOverwriteDarkThemeDialog,
 		overwrite = {
 			showOverwriteDarkThemeDialog = false
-			vm.overwriteDefaultDarkTheme(uuid, palette)
+			vm.overwriteDefaultDarkTheme(uuid, palette, context)
 		},
 		vm = vm,
 		overwriteDark = true,
@@ -198,7 +199,7 @@ fun SavedThemeItem(
 		showOverwriteLightThemeDialog,
 		overwrite = {
 			showOverwriteLightThemeDialog = false
-			vm.overwriteDefaultLightTheme(uuid, palette)
+			vm.overwriteDefaultLightTheme(uuid, palette, context)
 		},
 		vm = vm,
 		overwriteDark = false,

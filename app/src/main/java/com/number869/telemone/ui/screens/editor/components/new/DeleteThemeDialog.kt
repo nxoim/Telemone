@@ -47,7 +47,7 @@ fun DeleteThemeDialog(
 				Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",)
 			},
 			confirmButton = {
-				FilledTonalButton(onClick = { vm.deleteTheme(uuid) }) {
+				FilledTonalButton(onClick = { vm.deleteTheme(uuid, context) }) {
 					Text("Delete")
 				}
 			},
