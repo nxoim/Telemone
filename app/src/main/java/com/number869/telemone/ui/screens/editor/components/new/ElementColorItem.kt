@@ -3,10 +3,12 @@ package com.number869.telemone.ui.screens.editor.components.new
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -98,20 +100,35 @@ fun ElementColorItem(
 			// so that the performance does not suffer
 			var startPopupAnimation by remember { mutableStateOf(false) }
 
-			Popup(
-				alignment = Alignment.TopCenter,
-				onDismissRequest = { startPopupAnimation = false }
-			) {
-				PalettePopup(
-					uiElementData.first,
-					vm,
-					palette,
-					backgroundColor,
-					uiElementData.second.first,
-					startPopupAnimation,
-					hidePopup = { startPopupAnimation = false }
-				)
+			Box {
+				// helps avoid accidental input like accidentally opening
+				// another popup when clicking outside of the popup,
+				// accidentally closing the popup when using gestures
+				Popup {
+					Box(
+						Modifier
+							.fillMaxSize()
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() } ,
+								indication = null,
+								onClick = { startPopupAnimation = false }
+							)
+					)
+				}
+
+				Popup(alignment = Alignment.TopCenter) {
+					PalettePopup(
+						uiElementData.first,
+						vm,
+						palette,
+						backgroundColor,
+						uiElementData.second.first,
+						startPopupAnimation,
+						hidePopup = { startPopupAnimation = false }
+					)
+				}
 			}
+
 
 			LaunchedEffect(Unit) {
 				startPopupAnimation = true
