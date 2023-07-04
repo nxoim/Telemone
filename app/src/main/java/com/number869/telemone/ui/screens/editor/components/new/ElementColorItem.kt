@@ -107,6 +107,7 @@ fun ElementColorItem(
 					vm,
 					palette,
 					backgroundColor,
+					uiElementData.second.first,
 					startPopupAnimation,
 					hidePopup = { startPopupAnimation = false }
 				)

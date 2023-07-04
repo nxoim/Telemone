@@ -5,7 +5,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,10 +39,11 @@ fun PalettePopupAppBar(
 	isPopupVisible: Boolean,
 	currentUiElement: String,
 	currentColor: Color,
+	currentColorName: String,
 	openHome: () -> Unit,
 	hidePopup: () -> Unit,
 ) {
-	Row(Modifier.fillMaxWidth()) {
+	Row(Modifier.fillMaxWidth(), horizontalArrangement = spacedBy(4.dp)) {
 		Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
 			if (isOnHomePage) {
 				IconButton(onClick = { hidePopup() }) {
@@ -52,9 +56,8 @@ fun PalettePopupAppBar(
 			}
 		}
 
-
 		Row(
-			Modifier.padding(top = 24.dp, bottom = 16.dp),
+			Modifier.padding(top = 16.dp, bottom = 16.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Box(
@@ -66,13 +69,23 @@ fun PalettePopupAppBar(
 					.height(16.dp)
 			)
 
-			Spacer(modifier = Modifier.width(8.dp))
+			Spacer(modifier = Modifier.width(12.dp))
 
-			Text(
-				text = currentUiElement,
-				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
-				modifier = Modifier.basicMarquee()
-			)
+			Column(verticalArrangement = spacedBy(2.dp)) {
+				Text(
+					text = currentUiElement,
+					style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+					modifier = Modifier.basicMarquee()
+				)
+
+				Text(
+					text = currentColorName,
+					style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					fontSize = 12.sp,
+					modifier = Modifier.basicMarquee()
+				)
+			}
 		}
 
 		BackHandler(enabled = isPopupVisible) {

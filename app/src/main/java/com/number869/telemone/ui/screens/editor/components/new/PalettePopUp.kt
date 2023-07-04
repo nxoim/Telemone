@@ -74,6 +74,7 @@ fun PalettePopup(
 	vm: MainViewModel,
 	palette: FullPaletteList,
 	currentColor: Color,
+	currentColorName: String,
 	isPopupVisible: Boolean,
 	hidePopup: () -> Unit
 ) {
@@ -92,6 +93,7 @@ fun PalettePopup(
 				isPopupVisible,
 				currentUiElement,
 				currentColor,
+				currentColorName,
 				hidePopup = { hidePopup() },
 				openHome = { currentPopupContentType = PaletteMenuCategories.Home }
 			)
