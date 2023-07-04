@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +54,7 @@ import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePrevi
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
+import my.nanihadesuka.compose.LazyColumnScrollbar
 
 
 // this is prob gonna get redesigned
@@ -77,6 +79,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 	val newUiElementsColors by remember { derivedStateOf { mappedValues.filter { !vm.defaultCurrentTheme.keys.contains(it.key) }.toList() } }
 	val incompatibleValues by remember { derivedStateOf { mappedValues.filter { it.value.first == "INCOMPATIBLE VALUE" }.toList() } }
 	val savedThemesRowState = rememberLazyListState()
+	val wholeThingListState = rememberLazyListState()
 
 	LaunchedEffect(themeList) {
 		savedThemesRowState.animateScrollToItem(0)
@@ -88,86 +91,149 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 		bottomBar = { Box {} }, // edge to edge hello
 	) { scaffoldPadding ->
 		Column(Modifier.padding(scaffoldPadding)) {
-			LazyColumn(
-				verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
-				contentPadding = PaddingValues(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp)
+			LazyColumnScrollbar(
+				listState = wholeThingListState,
+				thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+				thumbSelectedColor = MaterialTheme.colorScheme.primary
 			) {
-				item {
-					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
-					CurrentThemePreview(vm)
+				LazyColumn(
+					state = wholeThingListState,
+					verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
+					contentPadding = PaddingValues(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp)
+				) {
+					item {
+						SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
+						CurrentThemePreview(vm)
 
-					Spacer(modifier = Modifier.height(8.dp))
+						Spacer(modifier = Modifier.height(8.dp))
 
-					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Saved Themes")
-					AnimatedVisibility(visible = themeList.isEmpty()) {
-						Box(
-							Modifier
-								.fillMaxWidth(1f)
-								.height(120.dp)
-								.clip(RoundedCornerShape(16.dp))
-								.animateItemPlacement()
-								.animateContentSize()
-						) {
-							Column(
+						SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Saved Themes")
+						AnimatedVisibility(visible = themeList.isEmpty()) {
+							Box(
 								Modifier
-									.fillMaxSize()
-									.padding(horizontal = 32.dp, vertical = 16.dp)
-									.clip(CircleShape)
-									.background(MaterialTheme.colorScheme.surfaceVariant),
-								horizontalAlignment = Alignment.CenterHorizontally,
-								verticalArrangement = Arrangement.Center
+									.fillMaxWidth(1f)
+									.height(120.dp)
+									.clip(RoundedCornerShape(16.dp))
+									.animateItemPlacement()
+									.animateContentSize()
 							) {
-								Text(
-									"No saved themes",
-									style = TextStyle(platformStyle = PlatformTextStyle(
-										includeFontPadding = false
-									)).plus(MaterialTheme.typography.headlineSmall),
-									textAlign = TextAlign.Center
-								)
-							}
-						}
-					}
-
-
-					AnimatedVisibility(visible = themeList.isNotEmpty()) {
-						Column {
-							LazyRow(
-								state = savedThemesRowState,
-								contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
-								horizontalArrangement = Arrangement.spacedBy(16.dp),
-								modifier = Modifier.animateContentSize()
-							) {
-								itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
-									SavedThemeItem(
-										Modifier.animateItemPlacement(),
-										vm,
-										uuid,
-										palette,
-										context,
-										true
+								Column(
+									Modifier
+										.fillMaxSize()
+										.padding(horizontal = 32.dp, vertical = 16.dp)
+										.clip(CircleShape)
+										.background(MaterialTheme.colorScheme.surfaceVariant),
+									horizontalAlignment = Alignment.CenterHorizontally,
+									verticalArrangement = Arrangement.Center
+								) {
+									Text(
+										"No saved themes",
+										style = TextStyle(platformStyle = PlatformTextStyle(
+											includeFontPadding = false
+										)).plus(MaterialTheme.typography.headlineSmall),
+										textAlign = TextAlign.Center
 									)
 								}
 							}
+						}
 
-							Spacer(modifier = Modifier.height(24.dp))
+
+						AnimatedVisibility(visible = themeList.isNotEmpty()) {
+							Column {
+								LazyRow(
+									state = savedThemesRowState,
+									contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
+									horizontalArrangement = Arrangement.spacedBy(16.dp),
+									modifier = Modifier.animateContentSize()
+								) {
+									itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
+										SavedThemeItem(
+											Modifier.animateItemPlacement(),
+											vm,
+											uuid,
+											palette,
+											context,
+											true
+										)
+									}
+								}
+
+								Spacer(modifier = Modifier.height(24.dp))
+							}
 						}
 					}
-				}
 
-				if (newUiElementsColors.isNotEmpty()) {
+					if (newUiElementsColors.isNotEmpty()) {
+						item {
+							SmallTintedLabel(
+								Modifier
+									.padding(start = 16.dp)
+									.animateItemPlacement(),
+								labelText = "New Values"
+							)
+							Spacer(modifier = Modifier
+								.height(16.dp)
+								.animateItemPlacement())
+						}
+
+						itemsIndexed(newUiElementsColors) { index, uiElementData ->
+							ElementColorItem(
+								Modifier
+									.padding(horizontal = 16.dp)
+									.animateItemPlacement(),
+								uiElementData = uiElementData,
+								vm = vm,
+								index = index,
+								themeMap = mappedValues,
+								lastIndexInList = newUiElementsColors.lastIndex,
+								palette = palette,
+							)
+						}
+
+						item { Spacer(modifier = Modifier.height(24.dp)) }
+					}
+
+					if (incompatibleValues.isNotEmpty()) {
+						item {
+							SmallTintedLabel(
+								Modifier
+									.padding(start = 16.dp)
+									.animateItemPlacement(),
+								labelText = "Incompatible Values"
+							)
+
+							Spacer(modifier = Modifier
+								.height(16.dp)
+								.animateItemPlacement())
+						}
+
+						itemsIndexed(incompatibleValues) { index, uiElementData ->
+							ElementColorItem(
+								Modifier
+									.padding(horizontal = 16.dp)
+									.animateItemPlacement(),
+								uiElementData = uiElementData,
+								vm = vm,
+								index = index,
+								themeMap = mappedValues,
+								lastIndexInList = mappedValuesAsList.lastIndex,
+								palette = palette,
+							)
+						}
+					}
+
 					item {
 						SmallTintedLabel(
 							Modifier
 								.padding(start = 16.dp)
 								.animateItemPlacement(),
-							labelText = "New Values"
+							labelText = "All Colors"
 						)
-						Spacer(modifier = Modifier
-							.height(16.dp)
-							.animateItemPlacement())
+
+						Spacer(modifier = Modifier.height(16.dp))
 					}
 
-					itemsIndexed(newUiElementsColors) { index, uiElementData ->
+					itemsIndexed(mappedValuesAsList) {index, uiElementData ->
 						ElementColorItem(
 							Modifier
 								.padding(horizontal = 16.dp)
@@ -176,62 +242,10 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							vm = vm,
 							index = index,
 							themeMap = mappedValues,
-							lastIndexInList = newUiElementsColors.lastIndex,
-							palette = palette,
-						)
-					}
-
-					item { Spacer(modifier = Modifier.height(24.dp)) }
-				}
-
-				if (incompatibleValues.isNotEmpty()) {
-					item {
-						SmallTintedLabel(
-							Modifier
-								.padding(start = 16.dp)
-								.animateItemPlacement(),
-							labelText = "Incompatible Values"
-						)
-
-						Spacer(modifier = Modifier.height(16.dp).animateItemPlacement())
-					}
-
-					itemsIndexed(incompatibleValues) { index, uiElementData ->
-						ElementColorItem(
-							Modifier.padding(horizontal = 16.dp).animateItemPlacement(),
-							uiElementData = uiElementData,
-							vm = vm,
-							index = index,
-							themeMap = mappedValues,
 							lastIndexInList = mappedValuesAsList.lastIndex,
 							palette = palette,
 						)
 					}
-				}
-
-				item {
-					SmallTintedLabel(
-						Modifier
-							.padding(start = 16.dp)
-							.animateItemPlacement(),
-						labelText = "All Colors"
-					)
-
-					Spacer(modifier = Modifier.height(16.dp))
-				}
-
-				itemsIndexed(mappedValuesAsList) {index, uiElementData ->
-					ElementColorItem(
-						Modifier
-							.padding(horizontal = 16.dp)
-							.animateItemPlacement(),
-						uiElementData = uiElementData,
-						vm = vm,
-						index = index,
-						themeMap = mappedValues,
-						lastIndexInList = mappedValuesAsList.lastIndex,
-						palette = palette,
-					)
 				}
 			}
 		}
