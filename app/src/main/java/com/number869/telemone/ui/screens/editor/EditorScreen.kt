@@ -196,11 +196,9 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 						Spacer(modifier = Modifier.height(16.dp).animateItemPlacement())
 					}
 
-					itemsIndexed(incompatibleValues, key = { index, item -> item.first }) { index, uiElementData ->
+					itemsIndexed(incompatibleValues) { index, uiElementData ->
 						ElementColorItem(
-							Modifier
-								.padding(horizontal = 16.dp)
-								.animateItemPlacement(),
+							Modifier.padding(horizontal = 16.dp).animateItemPlacement(),
 							uiElementData = uiElementData,
 							vm = vm,
 							index = index,
@@ -222,7 +220,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 					Spacer(modifier = Modifier.height(16.dp))
 				}
 
-				itemsIndexed(mappedValuesAsList, key = { index, item ->  item.first }) {index, uiElementData ->
+				itemsIndexed(mappedValuesAsList) {index, uiElementData ->
 					ElementColorItem(
 						Modifier
 							.padding(horizontal = 16.dp)
