@@ -20,8 +20,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.R
+import com.number869.telemone.shared.ui.TextWithFixedSize
 import com.number869.telemone.ui.theme.SolarSet
 import com.number869.telemone.ui.theme.fullPalette
 
@@ -53,8 +58,9 @@ private fun LightThemeButton(modifier: Modifier = Modifier, save: () -> Unit) {
 				contentDescription = "",
 				Modifier.size(64.dp).align(Alignment.End)
 			)
-			Text(
+			TextWithFixedSize(
 				text = "Save Light",
+				fontSize = 35.sp,
 				style = MaterialTheme.typography.displaySmall.plus(
 					// this removes default padding around text
 					TextStyle(platformStyle = PlatformTextStyle(false))
@@ -77,11 +83,14 @@ private fun DarkThemeButton(modifier: Modifier = Modifier, save: () -> Unit) {
 			Modifier.padding(24.dp).fillMaxSize(),
 			verticalArrangement = Arrangement.SpaceEvenly
 		) {
-			Text(
+			TextWithFixedSize(
 				text = "Save Dark",
-				style = MaterialTheme.typography.displaySmall .plus(
+				fontSize = 35.sp,
+				style = MaterialTheme.typography.displaySmall.plus(
 					// this removes default padding around text
-					TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+					TextStyle(
+						platformStyle = PlatformTextStyle(includeFontPadding = false)
+					)
 				),
 				modifier = Modifier.width(78.dp).align(Alignment.End)
 			)
