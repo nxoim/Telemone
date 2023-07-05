@@ -492,7 +492,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	fun exportTheme(uuid: String, context: Context) {
+	fun exportThemeWithColorValues(uuid: String, context: Context) {
 		val map = _themeList.find { it.containsKey(uuid) }?.getValue(uuid)
 			?.mapValues { it.value.second }
 			?.entries?.joinToString("\n")
@@ -515,6 +515,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		intent.type = "*/attheme"
 		intent.putExtra(Intent.EXTRA_STREAM, uri)
 		context.startActivity(Intent.createChooser(intent, "Telemone Export"))
+	}
+
+	fun exportThemeWithColorTokens(uuid: String, context: Context) {
+		val map = _themeList.find { it.containsKey(uuid) }?.getValue(uuid)
+			?.mapValues { it.value.first }
+			?.entries?.joinToString("\n")
+		val result = "${
+			map?.replace(")", "")
+				?.replace("(", "")
+				?.replace(", ", "=")
+		}\n"
+
+		File(
+			context.cacheDir,
+			"Telemone Export (Telemone Format).attheme"
+		).writeText(result)
+
+		val uri = FileProvider.getUriForFile(
+			context,
+			"${context.packageName}.provider",
+			File(context.cacheDir, "Telemone Export (Telemone Format).attheme")
+		)
+
+		val intent = Intent(Intent.ACTION_SEND)
+		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+		intent.type = "*/attheme"
+		intent.putExtra(Intent.EXTRA_STREAM, uri)
+		context.startActivity(
+			Intent.createChooser(
+				intent,
+				"Telemone Export (Telemone Format)"
+			)
+		)
 	}
 
 	fun loadDefaultDarkTheme(palette: FullPaletteList, context: Context) {

@@ -131,7 +131,14 @@ fun SavedThemeItem(
 				text = { Text("Export this theme")},
 				onClick = {
 					showMenu = false
-					vm.exportTheme(uuid, context)
+					vm.exportThemeWithColorValues(uuid, context)
+				}
+			)
+			DropdownMenuItem(
+				text = { Text("Export this theme in Telemone format")},
+				onClick = {
+					showMenu = false
+					vm.exportThemeWithColorTokens(uuid, context)
 				}
 			)
 			DropdownMenuItem(
