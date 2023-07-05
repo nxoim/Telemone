@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -100,23 +101,24 @@ fun ElementColorItem(
 			// so that the performance does not suffer
 			var startPopupAnimation by remember { mutableStateOf(false) }
 
-			Box {
-				// helps avoid accidental input like accidentally opening
-				// another popup when clicking outside of the popup,
-				// accidentally closing the popup when using gestures
-				Popup {
+			Popup(alignment = Alignment.TopCenter) {
+				Box(
+					Modifier.fillMaxSize(),
+					contentAlignment = BiasAlignment(0f, 0.8f)
+				) {
+					// helps avoid accidental input like accidentally opening
+					// another popup when clicking outside of the popup,
+					// accidentally closing the popup when using gestures
 					Box(
 						Modifier
 							.fillMaxSize()
 							.clickable(
-								interactionSource = remember { MutableInteractionSource() } ,
+								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
 								onClick = { startPopupAnimation = false }
 							)
 					)
-				}
 
-				Popup(alignment = Alignment.TopCenter) {
 					PalettePopup(
 						uiElementData.first,
 						vm,
@@ -128,7 +130,6 @@ fun ElementColorItem(
 					)
 				}
 			}
-
 
 			LaunchedEffect(Unit) {
 				startPopupAnimation = true

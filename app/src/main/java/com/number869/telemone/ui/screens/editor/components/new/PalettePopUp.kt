@@ -2,10 +2,14 @@ package com.number869.telemone.ui.screens.editor.components.new
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -78,14 +82,28 @@ fun PalettePopup(
 	isPopupVisible: Boolean,
 	hidePopup: () -> Unit
 ) {
-	AnimatedVisibility(visible = isPopupVisible, enter = fadeIn(), exit = fadeOut()) {
+	AnimatedVisibility(
+		visible = isPopupVisible,
+		enter = expandVertically(),
+		exit = shrinkVertically()
+	) {
 		var currentPopupContentType by remember { mutableStateOf(PaletteMenuCategories.Home) }
 		val isOnHomePage by remember { derivedStateOf { currentPopupContentType == PaletteMenuCategories.Home } }
+		val animatedPopupHeight by animateDpAsState(
+			when (currentPopupContentType) {
+				PaletteMenuCategories.Home -> 608.dp
+				PaletteMenuCategories.Additional -> 184.dp
+				PaletteMenuCategories.ColorRoles -> 497.dp
+				else -> 264.dp
+			},
+			animationSpec = spring(0.9f, 200f),
+			label = ""
+		)
 
 		OutlinedCard(
 			Modifier
-				.widthIn(max = 364.dp)
-				.animateContentSize(spring(0.97f, 200f)),
+				.height(animatedPopupHeight)
+				.widthIn(max = 364.dp),
 			shape = RoundedCornerShape(32.dp)
 		) {
 			PalettePopupAppBar(
@@ -102,8 +120,9 @@ fun PalettePopup(
 			Box(Modifier.padding(16.dp)) {
 				// literally why
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Home, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Home,
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					Column {
 						LazyVerticalGrid(
@@ -165,24 +184,24 @@ fun PalettePopup(
 
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.ColorRoles,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					ColorRolesMenu(vm, palette, currentUiElement)
 				}
 				
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.Additional,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					OtherMenu(vm, palette, currentUiElement)
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.Primary,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -203,8 +222,8 @@ fun PalettePopup(
 
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.Secondary,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -225,8 +244,8 @@ fun PalettePopup(
 
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.Tertiary,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -247,8 +266,8 @@ fun PalettePopup(
 
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.Neutral,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -269,8 +288,8 @@ fun PalettePopup(
 
 				this@OutlinedCard.AnimatedVisibility(
 					visible = currentPopupContentType == PaletteMenuCategories.NeutralVariant,
-					enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -291,8 +310,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Blue, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Blue, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -312,8 +331,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Green, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Green, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -333,8 +352,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Orange, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Orange, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -354,8 +373,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Red, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Red, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -375,8 +394,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Violet, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Violet, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -396,8 +415,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Pink, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Pink, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -417,8 +436,8 @@ fun PalettePopup(
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Cyan, enter = fadeIn() + expandVertically(clip = false),
-					exit = fadeOut() + shrinkVertically(clip = false)
+					visible = currentPopupContentType == PaletteMenuCategories.Cyan, enter = fadeIn() + expandVertically(),
+					exit = fadeOut()
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
