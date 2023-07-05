@@ -11,7 +11,7 @@ Telemone is a theme builder made to bring Material You-like themes to Telegram f
 - **Individual Primary, Secondary, Tertiary, Neutral, and Neutral Variant Tonal Palettes.**
 - **Custom Harmonized Chroma Corrected Tonal Palettes.**
 - **Saving Themes.**
-- **Exporting Themes.** Export themes both in the app's own format and in the standard format.
+- **Exporting Themes:** Export themes both in the app's own format and in the standard format.
 - **Importing Themes:** Import themes in both Telemone's format and standard formats to incorporate new themes into the app.
 - **Theme Previews.**
 - **Relatively User-Friendly UI.**
