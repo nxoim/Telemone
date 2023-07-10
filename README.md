@@ -2,6 +2,8 @@
 
 Telemone is a theme builder made to bring Material You-like themes to Telegram for Android.
 
+### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/Number869/TeleMone/releases "Github Releases")
+
 ![SCREENSHOTS](https://github.com/Number869/TeleMone/assets/52751853/7bb2bc44-9cdb-401e-9759-b249f785eef7)
 
 ## Features
