@@ -97,7 +97,9 @@ fun WelcomeScreen(navController: NavHostController) {
 		LargeTonalButton(
 			onClick = {
 				preferences.edit().putBoolean(AppSettings.AgreedToPpAndTos.id, true).apply()
-				navController.navigate(Screens.MainScreen.route)
+				navController.navigate(Screens.MainScreen.route) {
+					popUpTo(0)
+				}
 			},
 			label = "I Agree",
 			modifier = Modifier.weight(1f, false)
