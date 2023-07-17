@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
@@ -46,10 +44,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.shared.ui.SmallTintedLabel
-import com.number869.telemone.ui.screens.editor.components.new.AlternativeEditorTopAppBar
+import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
@@ -87,7 +84,14 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 
 	Scaffold(
 		Modifier.nestedScroll(topAppBarState.nestedScrollConnection),
-		topBar = { AlternativeEditorTopAppBar(topAppBarState, navController, vm) },
+		topBar = {
+			EditorTopAppBar(
+				topAppBarState,
+				navController,
+				vm,
+				mappedValues = { mappedValues }
+			) { mappedValuesAsList }
+		},
 		bottomBar = { Box {} }, // edge to edge hello
 	) { scaffoldPadding ->
 		Column(Modifier.padding(scaffoldPadding)) {
