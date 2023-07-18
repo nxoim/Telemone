@@ -2,6 +2,7 @@ package com.number869.telemone.ui.screens.editor.components.new
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -38,12 +39,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.data.AppSettings
+import com.number869.telemone.getColorValueFromColorToken
 import com.number869.telemone.ui.theme.FullPaletteList
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -54,7 +58,8 @@ fun SavedThemeItem(
 	uuid: String,
 	palette: FullPaletteList,
 	context: Context,
-	isInSavedThemesRow: Boolean = false
+	isInSavedThemesRow: Boolean = false,
+	colorDisplayTypeOverwrite: String? = null
 ) {
 	var showMenu by remember { mutableStateOf(false) }
 	var showDeleteDialog by remember { mutableStateOf(false) }
@@ -63,11 +68,58 @@ fun SavedThemeItem(
 	var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
 	var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
 
+	val preferences = LocalContext.current.getSharedPreferences(
+		"AppPreferences.Settings",
+		Context.MODE_PRIVATE
+	)
+
+	// 1 - Saved color values
+	// 2 - Current color scheme (fallback to saved colors)
+	// 3 - Current color scheme
+	val colorDisplayType = preferences.getString(
+		AppSettings.SavedThemeItemDisplayType.id,
+		"1"
+	)
+
+	// cry about it being here
+	// tho this whole file could be prettier, yes
+	@Composable
 	fun colorOf(colorValueOf: String): Color {
-		return vm.themeList.find { it.containsKey(uuid) }
-			?.get(uuid)
-			?.get(colorValueOf)
-			?.let { Color(it.second) } ?: Color.Red
+		return animateColorAsState(
+			when (
+				if (colorDisplayTypeOverwrite == null)
+					colorDisplayType
+				else
+					colorDisplayTypeOverwrite
+			) {
+				"1" -> {
+					vm.themeList.find { it.containsKey(uuid) }
+						?.get(uuid)
+						?.get(colorValueOf)
+						?.let { Color(it.second) } ?: Color.Red
+				}
+				"2" -> { // in case theres a need to show monet colors only when available
+					vm.themeList.find { it.containsKey(uuid) }
+						?.get(uuid)
+						?.get(colorValueOf)
+						?.let {
+							val colorFromToken = getColorValueFromColorToken(it.first, palette)
+							val colorAsSaved = Color(it.second)
+
+							// colorFromToken prob should be Color? so it can
+							// be null
+							if (colorFromToken == Color.Red) colorAsSaved else colorFromToken
+						} ?: Color.Red
+				}
+				else -> {
+					vm.themeList.find { it.containsKey(uuid) }
+						?.get(uuid)
+						?.get(colorValueOf)
+						?.let { getColorValueFromColorToken(it.first, palette) } ?: Color.Red
+				}
+			},
+			label = "i hate these labels"
+		).value
 	}
 
 	Box {
@@ -78,7 +130,7 @@ fun SavedThemeItem(
 				.clip(RoundedCornerShape(16.dp))
 				.let {
 					return@let if (isInSavedThemesRow)
-						it.combinedClickable (
+						it.combinedClickable(
 							onClick = {
 								vm.loadTheme(
 									uuid,
