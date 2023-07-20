@@ -67,6 +67,7 @@ import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDis
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
 import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
 
 // this is prob gonna get redesigned
@@ -129,7 +130,8 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 			LazyColumnScrollbar(
 				listState = wholeThingListState,
 				thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-				thumbSelectedColor = MaterialTheme.colorScheme.primary
+				thumbSelectedColor = MaterialTheme.colorScheme.primary,
+				selectionActionable = ScrollbarSelectionActionable.WhenVisible
 			) {
 				LazyColumn(
 					state = wholeThingListState,

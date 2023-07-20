@@ -39,7 +39,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.4'
+        kotlinCompilerExtensionVersion '1.5.0'
     }
     packagingOptions {
         resources {
@@ -75,5 +75,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'androidx.compose.material:material-icons-extended:1.6.0-alpha01'
-    implementation 'com.github.nanihadesuka:LazyColumnScrollbar:1.6.3'
+    implementation 'com.github.nanihadesuka:LazyColumnScrollbar:1.7.2'
 }
