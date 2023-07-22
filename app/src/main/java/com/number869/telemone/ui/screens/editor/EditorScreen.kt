@@ -126,7 +126,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 			hideDialog = { showSavedThemeTypeDialog = false }
 		)
 
-		Column(Modifier.padding(scaffoldPadding)) {
+		Column {
 			LazyColumnScrollbar(
 				listState = wholeThingListState,
 				thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -141,6 +141,8 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 					)
 				) {
 					item {
+						Spacer(modifier = Modifier.padding(top = scaffoldPadding.calculateTopPadding()))
+
 						SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
 						CurrentThemePreview(vm)
 
