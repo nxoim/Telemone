@@ -35,8 +35,8 @@ fun DefaultThemesButtons(vm: MainViewModel) {
 	val context = LocalContext.current
 	val palette = fullPalette()
 	Column(Modifier.fillMaxWidth()) {
-		LightThemeButton { vm.saveLightTheme(context, palette) }
-		DarkThemeButton(Modifier.align(Alignment.End).padding(top = 16.dp)) { vm.saveDarkTheme(context, palette) }
+		LightThemeButton { vm.saveLightTheme(context) }
+		DarkThemeButton(Modifier.align(Alignment.End).padding(top = 16.dp)) { vm.saveDarkTheme(context) }
 	}
 }
 
