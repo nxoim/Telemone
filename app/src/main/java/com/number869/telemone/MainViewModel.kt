@@ -1325,7 +1325,7 @@ private fun getThemeAsStringByUUID(
 		?.getValue(uuid)
 		?.mapValues {
 			when (loadThemeUsing) {
-				ThemeAsStringType.ColorValues -> it.value.second.toArgbString()
+				ThemeAsStringType.ColorValues -> Color(it.value.second).toArgb()
 				ThemeAsStringType.ColorTokens -> it.value.first
 				ThemeAsStringType.ColorValuesFromDevicesColorScheme -> {
 					if (palette != null) {
@@ -1336,7 +1336,7 @@ private fun getThemeAsStringByUUID(
 				}
 			}
 		}
-		?.entries?.joinToString("\n")
+		?.toList()?.sortedBy { it.first }?.joinToString("\n")
 
 	val themeAsString = "${
 		chosenTheme?.replace(")", "")
