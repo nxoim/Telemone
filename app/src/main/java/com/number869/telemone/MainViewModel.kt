@@ -20,8 +20,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.number869.telemone.ui.theme.FullPaletteList
 import com.number869.telemone.ui.theme.allColorTokensAsList
-import com.number869.telemone.ui.theme.fullPalette
 import com.smarttoolfactory.extendedcolors.util.RGBUtil.toArgbString
+import kotlinx.coroutines.delay
 import java.io.File
 import java.lang.Exception
 import java.util.UUID
@@ -188,88 +188,85 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		var isCorrectFormat = false
 
 		context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
-			if (
-				uri.path.toString().contains(".txt")
-				||
-				uri.path.toString().contains(".attheme")
-			)  {
-				reader.forEachLine { line ->
-					if (
-						line.contains("=")
-						&&
-						line.replace(" ", "") != ""
-					) {
-						line.replace(" ", "").split("=").let { splitLine ->
-							// check if tere is the ui components name is present
-							if (splitLine[0].isNotEmpty()) {
-								isCorrectFormat = true
+			Log.d(TAG,"Loaded Theme: is txt or attheme")
 
-								val uiElementName = splitLine[0]
-								val colorValueAsString = splitLine[1]
+			reader.forEachLine { line ->
+				if (
+					line.contains("=")
+					&&
+					line.replace(" ", "") != ""
+				) {
+					// remove spaces and split lines into 2 elements
+					line.replace(" ", "").split("=").let { splitLine ->
+						val uiElementName = splitLine[0]
+						val colorEitherValueOrTokenAsString = splitLine[1]
 
-								val isValueANumber = colorValueAsString.replace("-", "").isDigitsOnly()
-								val isValueActuallyAColorToken = allColorTokensAsList.contains(splitLine[1])
+						// check if there is the ui components name is present
+						if (uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()) {
+							isCorrectFormat = true
 
-								if (isValueANumber) {
-									val colorValue = Color(colorValueAsString.toLong())
-									val colorToken = getColorTokenFromColorValue(palette, colorValue)
+							val isValueANumber = colorEitherValueOrTokenAsString.replace("-", "").isDigitsOnly()
+							val isValueActuallyAColorToken = allColorTokensAsList.contains(colorEitherValueOrTokenAsString)
 
-									loadedMap[uiElementName] = Pair(colorToken, colorValue)
-								} else if (isValueActuallyAColorToken) {
-									// checks if the contents are like "uiElelemnt=neutral_80
-									val colorToken = colorValueAsString
-									val colorValue = getColorValueFromColorToken(colorToken, palette)
+							if (isValueANumber) {
+								val colorValue = Color(colorEitherValueOrTokenAsString.toLong())
+								// also seeing if colors match the device's
+								// color scheme
+								val colorToken = getColorTokenFromColorValue(palette, colorValue)
 
-									loadedMap[uiElementName] = Pair(colorToken, colorValue)
-								} else {
-									loadedMap[uiElementName] = Pair("INCOMPATIBLE VALUE", Color.Red)
-									containsIncompatibleValues = true
-								}
+								loadedMap[uiElementName] = Pair(colorToken, colorValue)
+							} else if (isValueActuallyAColorToken) {
+								// checks if the contents are like "uiElelemnt=neutral_80
+								val colorToken = colorEitherValueOrTokenAsString
+								// use device's color scheme when loading
+								// telemone format themes
+								val colorValue = getColorValueFromColorToken(colorToken, palette)
+
+								loadedMap[uiElementName] = Pair(colorToken, colorValue)
+							} else {
+								loadedMap[uiElementName] = Pair("INCOMPATIBLE VALUE", Color.Red)
+								containsIncompatibleValues = true
 							}
 						}
 					}
 				}
+			}
 
-				if (containsIncompatibleValues) {
-					Toast.makeText(
-						context,
-						"Some colors are incompatible and were marked as such.",
-						Toast.LENGTH_LONG
-					).show()
-				}
+			Log.d(TAG, "Loaded Theme: processed")
 
-				if (isCorrectFormat) {
-					if (clearCurrentTheme) _mappedValues.clear()
+			if (containsIncompatibleValues) {
+				Toast.makeText(
+					context,
+					"Some colors are incompatible and were marked as such.",
+					Toast.LENGTH_LONG
+				).show()
+			}
 
-					for ((key, value) in fallbackKeys) {
-						if (!_mappedValues.contains(key)) {
-							//	Find the key in _mappedValues that matches the value in
-							// fallbackKeys
-							val matchedKey = _mappedValues.keys.find { it == value }
-							//	If there is a match, clone the key-value pair from
-							// _mappedValues and add it with the new key
-							if (matchedKey != null) {
-								_mappedValues[key] = _mappedValues[matchedKey]!!
-							}
+			if (isCorrectFormat) {
+				if (clearCurrentTheme) _mappedValues.clear()
+
+				for ((key, value) in fallbackKeys) {
+					if (!_mappedValues.contains(key)) {
+						//	Find the key in _mappedValues that matches the value in
+						// fallbackKeys
+						val matchedKey = _mappedValues.keys.find { it == value }
+						//	If there is a match, clone the key-value pair from
+						// _mappedValues and add it with the new key
+						if (matchedKey != null) {
+							_mappedValues[key] = _mappedValues[matchedKey]!!
 						}
 					}
-
-					loadedFromFileTheme.clear()
-					_mappedValues.putAll(loadedMap)
-					loadedFromFileTheme.putAll(loadedMap)
-
-					Toast.makeText(
-						context,
-						"File loaded successfully",
-						Toast.LENGTH_LONG
-					).show()
-				} else {
-					Toast.makeText(
-						context,
-						"Chosen file isn't a Telegram (not Telegram X) theme.",
-						Toast.LENGTH_LONG
-					).show()
 				}
+
+				loadedFromFileTheme.clear()
+				_mappedValues.putAll(loadedMap)
+				loadedFromFileTheme.putAll(loadedMap)
+
+				Toast.makeText(
+					context,
+					"File loaded successfully",
+					Toast.LENGTH_LONG
+				).show()
 			} else {
 				Toast.makeText(
 					context,
