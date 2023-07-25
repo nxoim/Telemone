@@ -66,6 +66,7 @@ import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.theme.fullPalette
+import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
@@ -127,12 +128,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 		)
 
 		Column {
-			LazyColumnScrollbar(
-				listState = wholeThingListState,
-				thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-				thumbSelectedColor = MaterialTheme.colorScheme.primary,
-				selectionActionable = ScrollbarSelectionActionable.WhenVisible
-			) {
+			Box() {
 				LazyColumn(
 					state = wholeThingListState,
 					verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
@@ -165,7 +161,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							}
 						}
 
-						AnimatedVisibility(visible = themeList.isEmpty()) {
+						this@Column.AnimatedVisibility(visible = themeList.isEmpty()) {
 							Box(
 								Modifier
 									.fillMaxWidth(1f)
@@ -194,7 +190,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							}
 						}
 
-						AnimatedVisibility(visible = themeList.isNotEmpty()) {
+						this@Column.AnimatedVisibility(visible = themeList.isNotEmpty()) {
 							Column {
 								LazyRow(
 									state = savedThemesRowState,
@@ -303,6 +299,17 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 						)
 					}
 				}
+
+				InternalLazyColumnScrollbar(
+					listState = wholeThingListState,
+					thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+					thumbSelectedColor = MaterialTheme.colorScheme.primary,
+					selectionActionable = ScrollbarSelectionActionable.WhenVisible,
+					modifier = Modifier.padding(
+						top = scaffoldPadding.calculateTopPadding() + 8.dp,
+						bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
+					)
+				)
 			}
 		}
 	}
