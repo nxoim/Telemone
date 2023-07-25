@@ -3,7 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-def version = "1.0.0"
+def version = "1.1.0"
+def versionNumber = 2
 
 android {
     namespace 'com.number869.telemone'
@@ -19,7 +20,7 @@ android {
         }
         signingConfig signingConfigs.debug
         versionName version
-        versionCode 1
+        versionCode versionNumber
     }
 
     buildTypes {
