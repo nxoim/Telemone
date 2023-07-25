@@ -7,11 +7,8 @@ import android.net.Uri
 import android.service.controls.ControlsProviderService.TAG
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
@@ -23,7 +20,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.number869.telemone.ui.theme.FullPaletteList
 import com.number869.telemone.ui.theme.allColorTokensAsList
+import com.smarttoolfactory.extendedcolors.util.RGBUtil.toArgbString
+import kotlinx.coroutines.delay
 import java.io.File
+import java.lang.Exception
 import java.util.UUID
 
 // no im not making a data class
@@ -64,9 +64,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 
-	val savedShadowValues: LoadedTheme = mutableStateMapOf()
-	var disableShadows by mutableStateOf(true)
-
 	init {
 		val savedThemeList = preferences.getString(themeListKey, "[]")
 		val type = object : TypeToken<ThemeList>() {}.type
@@ -85,20 +82,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
 		} catch (e: NoSuchElementException) {
 			Color.Red
-		}
-	}
-
-	fun switchShadowsOnOff() {
-		disableShadows = !disableShadows
-
-		if (disableShadows) {
-			defaultShadowTokens.forEach { (key, value) ->
-				_mappedValues[key] = value
-			}
-		} else {
-			savedShadowValues.forEach { (key, value) ->
-				_mappedValues[key] = value
-			}
 		}
 	}
 
@@ -205,106 +188,85 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		var isCorrectFormat = false
 
 		context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
-			if (
-				uri.path.toString().contains(".txt")
-				||
-				uri.path.toString().contains(".attheme")
-			)  {
-				reader.forEachLine { line ->
-					if (
-						line.contains("=")
-						&&
-						line.replace(" ", "") != ""
-					) {
-						line.replace(" ", "").split("=").let { splitLine ->
-							// check if tere is the ui components name is present
-							if (splitLine[0].isNotEmpty()) {
-								isCorrectFormat = true
+			Log.d(TAG,"Loaded Theme: is txt or attheme")
 
-								val uiElementName = splitLine[0]
-								val colorValueAsString = splitLine[1]
+			reader.forEachLine { line ->
+				if (
+					line.contains("=")
+					&&
+					line.replace(" ", "") != ""
+				) {
+					// remove spaces and split lines into 2 elements
+					line.replace(" ", "").split("=").let { splitLine ->
+						val uiElementName = splitLine[0]
+						val colorEitherValueOrTokenAsString = splitLine[1]
 
-								val isValueANumber = colorValueAsString.replace("-", "").isDigitsOnly()
-								val isValueActuallyAColorToken = allColorTokensAsList.contains(splitLine[1])
+						// check if there is the ui components name is present
+						if (uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()) {
+							isCorrectFormat = true
 
-								if (isValueANumber) {
-									val colorValue = Color(colorValueAsString.toLong())
-									val colorToken = getColorTokenFromColorValue(palette, colorValue)
+							val isValueANumber = colorEitherValueOrTokenAsString.replace("-", "").isDigitsOnly()
+							val isValueActuallyAColorToken = allColorTokensAsList.contains(colorEitherValueOrTokenAsString)
 
-									loadedMap[uiElementName] = Pair(colorToken, colorValue)
-								} else if (isValueActuallyAColorToken) {
-									// checks if the contents are like "uiElelemnt=neutral_80
-									val colorToken = colorValueAsString
-									val colorValue = getColorValueFromColorToken(colorToken, palette)
+							if (isValueANumber) {
+								val colorValue = Color(colorEitherValueOrTokenAsString.toLong())
+								// also seeing if colors match the device's
+								// color scheme
+								val colorToken = getColorTokenFromColorValue(palette, colorValue)
 
-									loadedMap[uiElementName] = Pair(colorToken, colorValue)
-								} else {
-									loadedMap[uiElementName] = Pair("INCOMPATIBLE VALUE", Color.Red)
-									containsIncompatibleValues = true
-								}
+								loadedMap[uiElementName] = Pair(colorToken, colorValue)
+							} else if (isValueActuallyAColorToken) {
+								// checks if the contents are like "uiElelemnt=neutral_80
+								val colorToken = colorEitherValueOrTokenAsString
+								// use device's color scheme when loading
+								// telemone format themes
+								val colorValue = getColorValueFromColorToken(colorToken, palette)
+
+								loadedMap[uiElementName] = Pair(colorToken, colorValue)
+							} else {
+								loadedMap[uiElementName] = Pair("INCOMPATIBLE VALUE", Color.Red)
+								containsIncompatibleValues = true
 							}
 						}
 					}
 				}
+			}
 
-				if (containsIncompatibleValues) {
-					Toast.makeText(
-						context,
-						"Some colors are incompatible and were marked as such.",
-						Toast.LENGTH_LONG
-					).show()
+			Log.d(TAG, "Loaded Theme: processed")
+
+			if (containsIncompatibleValues) {
+				Toast.makeText(
+					context,
+					"Some colors are incompatible and were marked as such.",
+					Toast.LENGTH_LONG
+				).show()
+			}
+
+			if (isCorrectFormat) {
+				if (clearCurrentTheme) _mappedValues.clear()
+
+				for ((key, value) in fallbackKeys) {
+					if (!_mappedValues.contains(key)) {
+						//	Find the key in _mappedValues that matches the value in
+						// fallbackKeys
+						val matchedKey = _mappedValues.keys.find { it == value }
+						//	If there is a match, clone the key-value pair from
+						// _mappedValues and add it with the new key
+						if (matchedKey != null) {
+							_mappedValues[key] = _mappedValues[matchedKey]!!
+						}
+					}
 				}
 
-				if (isCorrectFormat) {
-					if (clearCurrentTheme) _mappedValues.clear()
+				loadedFromFileTheme.clear()
+				_mappedValues.putAll(loadedMap)
+				loadedFromFileTheme.putAll(loadedMap)
 
-					// check if has shadows specified
-					for ((key, value) in defaultShadowTokens) {
-						if (!_mappedValues.contains(key)) {
-							_mappedValues[key] = value
-							savedShadowValues[key] = value
-						}
-					}
-
-					for ((key, value) in fallbackKeys) {
-						if (!_mappedValues.contains(key)) {
-							//	Find the key in _mappedValues that matches the value in
-							// fallbackKeys
-							val matchedKey = _mappedValues.keys.find { it == value }
-							//	If there is a match, clone the key-value pair from
-							// _mappedValues and add it with the new key
-							if (matchedKey != null) {
-								_mappedValues[key] = _mappedValues[matchedKey]!!
-							}
-						}
-					}
-
-					if (disableShadows) {
-						defaultShadowTokens.forEach { (key, value) ->
-							_mappedValues[key] = value
-						}
-					} else {
-						savedShadowValues.forEach { (key, value) ->
-							_mappedValues[key] = value
-						}
-					}
-
-					loadedFromFileTheme.clear()
-					_mappedValues.putAll(loadedMap)
-					loadedFromFileTheme.putAll(loadedMap)
-
-					Toast.makeText(
-						context,
-						"File loaded successfully",
-						Toast.LENGTH_LONG
-					).show()
-				} else {
-					Toast.makeText(
-						context,
-						"Chosen file isn't a Telegram (not Telegram X) theme.",
-						Toast.LENGTH_LONG
-					).show()
-				}
+				Toast.makeText(
+					context,
+					"File loaded successfully",
+					Toast.LENGTH_LONG
+				).show()
 			} else {
 				Toast.makeText(
 					context,
@@ -458,15 +420,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				}
 			}
 
-		// check if has shadows specified
-		for ((key, value) in defaultShadowTokens) {
-			if (!_mappedValues.contains(key)) {
-				_mappedValues[key] = value
-				defaultCurrentTheme[key] = value
-				savedShadowValues[key] = value
-			}
-		}
-
 		for ((key, value) in fallbackKeys) {
 			if (!_mappedValues.contains(key)) {
 				//Find the key in _mappedValues that matches the value in
@@ -480,29 +433,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				}
 			}
 		}
-
-		if (disableShadows) {
-			defaultShadowTokens.forEach { (key, value) ->
-				_mappedValues[key] = value
-			}
-		} else {
-			savedShadowValues.forEach { (key, value) ->
-				_mappedValues[key] = value
-			}
-		}
 	}
 
 	fun exportThemeWithColorValues(uuid: String, context: Context) {
-		val map = _themeList.find { it.containsKey(uuid) }?.getValue(uuid)
-			?.mapValues { it.value.second }
-			?.entries?.joinToString("\n")
-		val result = "${
-			map?.replace(")", "")
-				?.replace("(", "")
-				?.replace(", ", "=")
-		}\n"
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			uuid
+		)
 
-		File(context.cacheDir, "Telemone Export.attheme").writeText(result)
+		File(context.cacheDir, "Telemone Export.attheme").writeText(theme)
 
 		val uri = FileProvider.getUriForFile(
 			context,
@@ -518,19 +457,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun exportThemeWithColorTokens(uuid: String, context: Context) {
-		val map = _themeList.find { it.containsKey(uuid) }?.getValue(uuid)
-			?.mapValues { it.value.first }
-			?.entries?.joinToString("\n")
-		val result = "${
-			map?.replace(")", "")
-				?.replace("(", "")
-				?.replace(", ", "=")
-		}\n"
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			uuid,
+			ThemeAsStringType.ColorTokens
+		)
 
 		File(
 			context.cacheDir,
 			"Telemone Export (Telemone Format).attheme"
-		).writeText(result)
+		).writeText(theme)
 
 		val uri = FileProvider.getUriForFile(
 			context,
@@ -658,17 +594,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun saveLightTheme(context: Context, palette: FullPaletteList) {
-		val source = _themeList.find { it.containsKey("defaultLightThemeUUID") }
-			?.getValue("defaultLightThemeUUID")
-		// prints ui element name = the color we gave it
-		val result = source!!.run {
-			this.mapNotNull {
-				val colorValue = getColorValueFromColorToken(it.value.first, palette)
-				"${it.key}=${colorValue.toArgb()}"
-			}
-		}.joinToString("\n")
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			"defaultLightThemeUUID",
+			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
+			palette = palette
+		)
 
-		File(context.cacheDir, "Telemone Light.attheme").writeText(result)
+		File(context.cacheDir, "Telemone Light.attheme").writeText(theme)
 
 		val uri = FileProvider.getUriForFile(
 			context,
@@ -684,17 +617,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun saveDarkTheme(context: Context, palette: FullPaletteList) {
-		val source = _themeList.find { it.containsKey("defaultDarkThemeUUID") }
-			?.getValue("defaultDarkThemeUUID")
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			"defaultDarkThemeUUID",
+			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
+			palette = palette
+		)
 
-		val result = source!!.run {
-			this.mapNotNull {
-				val colorValue = getColorValueFromColorToken(it.value.first, palette)
-				"${it.key}=${colorValue.toArgb()}"
-			}
-		}.joinToString("\n")
-
-		File(context.cacheDir, "Telemone Dark.attheme").writeText(result)
+		File(context.cacheDir, "Telemone Dark.attheme").writeText(theme)
 
 		val uri = FileProvider.getUriForFile(
 			context,
@@ -1372,15 +1302,53 @@ fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String 
 }
 
 val defaultShadowTokens = mapOf(
-	"windowBackgroundGrayShadow" to Pair("TRANSPARENT", Color.Transparent),
-	"chat_inBubbleShadow" to Pair("TRANSPARENT", Color.Transparent),
-	"chat_outBubbleShadow" to Pair("TRANSPARENT", Color.Transparent),
-	"chats_menuTopShadow" to Pair("TRANSPARENT", Color.Transparent),
-	"chats_menuTopShadowCats" to Pair("TRANSPARENT", Color.Transparent),
-	"dialogShadowLine" to Pair("TRANSPARENT", Color.Transparent),
-	"key_chat_messagePanelVoiceLockShadow" to Pair("TRANSPARENT", Color.Transparent),
-	"chat_emojiPanelShadowLine" to Pair("TRANSPARENT", Color.Transparent),
-	"chat_messagePanelShadow" to Pair("TRANSPARENT", Color.Transparent),
+	"windowBackgroundGrayShadow" to Pair("transparent", Color.Transparent),
+	"chat_inBubbleShadow" to Pair("transparent", Color.Transparent),
+	"chat_outBubbleShadow" to Pair("transparent", Color.Transparent),
+	"chats_menuTopShadow" to Pair("transparent", Color.Transparent),
+	"chats_menuTopShadowCats" to Pair("transparent", Color.Transparent),
+	"dialogShadowLine" to Pair("transparent", Color.Transparent),
+	"key_chat_messagePanelVoiceLockShadow" to Pair("transparent", Color.Transparent),
+	"chat_emojiPanelShadowLine" to Pair("transparent", Color.Transparent),
+	"chat_messagePanelShadow" to Pair("transparent", Color.Transparent),
 	// TODO choose which shadows you want to be gone
-//	"chat_goDownButtonShadow" to Pair("TRANSPARENT", Color.Transparent)
+//	"chat_goDownButtonShadow" to Pair("transparent", Color.Transparent)
 )
+
+private fun getThemeAsStringByUUID(
+	themeList: ThemeList,
+	uuid: String,
+	loadThemeUsing: ThemeAsStringType = ThemeAsStringType.ColorValues,
+	palette: FullPaletteList? = null
+): String {
+	val chosenTheme = themeList.find { it.containsKey(uuid) }
+		?.getValue(uuid)
+		?.mapValues {
+			when (loadThemeUsing) {
+				ThemeAsStringType.ColorValues -> Color(it.value.second).toArgb()
+				ThemeAsStringType.ColorTokens -> it.value.first
+				ThemeAsStringType.ColorValuesFromDevicesColorScheme -> {
+					if (palette != null) {
+						getColorValueFromColorToken(it.value.first, palette).toArgb()
+					} else {
+						throw Exception("palette is null in getThemeAsStringByUUID(). pass palette to the function where getThemeAsStringByUUID() was called.")
+					}
+				}
+			}
+		}
+		?.toList()?.sortedBy { it.first }?.joinToString("\n")
+
+	val themeAsString = "${
+		chosenTheme?.replace(")", "")
+			?.replace("(", "")
+			?.replace(", ", "=")
+	}\n"
+
+	return themeAsString
+}
+
+private enum class ThemeAsStringType {
+	ColorValues,
+	ColorTokens,
+	ColorValuesFromDevicesColorScheme
+}
