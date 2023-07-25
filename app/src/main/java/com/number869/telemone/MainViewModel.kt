@@ -20,8 +20,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.number869.telemone.ui.theme.FullPaletteList
 import com.number869.telemone.ui.theme.allColorTokensAsList
+import com.number869.telemone.ui.theme.fullPalette
 import com.smarttoolfactory.extendedcolors.util.RGBUtil.toArgbString
 import java.io.File
+import java.lang.Exception
 import java.util.UUID
 
 // no im not making a data class
@@ -437,7 +439,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun exportThemeWithColorValues(uuid: String, context: Context) {
-		val theme = getThemeAsStringByUUID(_themeList, uuid)
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			uuid
+		)
 
 		File(context.cacheDir, "Telemone Export.attheme").writeText(theme)
 
@@ -458,7 +463,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		val theme = getThemeAsStringByUUID(
 			_themeList,
 			uuid,
-			asColorTokens = true
+			ThemeAsStringType.ColorTokens
 		)
 
 		File(
@@ -591,8 +596,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "Telemone Custom"))
 	}
 
-	fun saveLightTheme(context: Context) {
-		val theme = getThemeAsStringByUUID(_themeList, "defaultLightThemeUUID")
+	fun saveLightTheme(context: Context, palette: FullPaletteList) {
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			"defaultLightThemeUUID",
+			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
+			palette = palette
+		)
 
 		File(context.cacheDir, "Telemone Light.attheme").writeText(theme)
 
@@ -609,8 +619,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "Telemone Light"))
 	}
 
-	fun saveDarkTheme(context: Context) {
-		val theme = getThemeAsStringByUUID(_themeList, "defaultDarkThemeUUID")
+	fun saveDarkTheme(context: Context, palette: FullPaletteList) {
+		val theme = getThemeAsStringByUUID(
+			_themeList,
+			"defaultDarkThemeUUID",
+			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
+			palette = palette
+		)
 
 		File(context.cacheDir, "Telemone Dark.attheme").writeText(theme)
 
@@ -1306,11 +1321,24 @@ val defaultShadowTokens = mapOf(
 private fun getThemeAsStringByUUID(
 	themeList: ThemeList,
 	uuid: String,
-	asColorTokens: Boolean = false
+	loadThemeUsing: ThemeAsStringType = ThemeAsStringType.ColorValues,
+	palette: FullPaletteList? = null
 ): String {
 	val chosenTheme = themeList.find { it.containsKey(uuid) }
 		?.getValue(uuid)
-		?.mapValues { if (asColorTokens) it.value.first else it.value.second.toArgbString() }
+		?.mapValues {
+			when (loadThemeUsing) {
+				ThemeAsStringType.ColorValues -> it.value.second.toArgbString()
+				ThemeAsStringType.ColorTokens -> it.value.first
+				ThemeAsStringType.ColorValuesFromDevicesColorScheme -> {
+					if (palette != null) {
+						getColorValueFromColorToken(it.value.first, palette).toArgb()
+					} else {
+						throw Exception("palette is null in getThemeAsStringByUUID(). pass palette to the function where getThemeAsStringByUUID() was called.")
+					}
+				}
+			}
+		}
 		?.entries?.joinToString("\n")
 
 	val themeAsString = "${
@@ -1320,4 +1348,10 @@ private fun getThemeAsStringByUUID(
 	}\n"
 
 	return themeAsString
+}
+
+private enum class ThemeAsStringType {
+	ColorValues,
+	ColorTokens,
+	ColorValuesFromDevicesColorScheme
 }
