@@ -20,10 +20,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.number869.telemone.ui.theme.FullPaletteList
 import com.number869.telemone.ui.theme.allColorTokensAsList
-import com.smarttoolfactory.extendedcolors.util.RGBUtil.toArgbString
-import kotlinx.coroutines.delay
 import java.io.File
-import java.lang.Exception
 import java.util.UUID
 
 // no im not making a data class
@@ -33,8 +30,8 @@ typealias ColorToken = String
 typealias ColorValue = Int
 typealias DataAboutColors = Pair<ColorToken, ColorValue>
 typealias UiElementData = Map<UiElementName, DataAboutColors>
-typealias Themes = Map<ThemeUUID, UiElementData>
-typealias ThemeList = SnapshotStateList<Themes>
+typealias Theme = Map<ThemeUUID, UiElementData>
+typealias ThemeList = SnapshotStateList<Theme>
 typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
 
@@ -62,6 +59,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	private var _mappedValues: LoadedTheme = mutableStateMapOf()
 	val mappedValues: LoadedTheme get() = _mappedValues
 	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
+	val selectedThemes = mutableStateListOf<String>()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 
 	init {
@@ -83,6 +81,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		} catch (e: NoSuchElementException) {
 			Color.Red
 		}
+	}
+
+	fun selectOrUnselectSavedTheme(uuid: String) {
+		if (selectedThemes.contains(uuid))
+			selectedThemes.remove(uuid)
+		else
+			selectedThemes.add(uuid)
+	}
+
+	fun selectAllThemes() {
+		selectedThemes.clear()
+		themeList.forEach {
+			val uuid = it.keys.first()
+
+			if (
+				!selectedThemes.contains(uuid)
+				&&
+				uuid != "defaultLightThemeUUID"
+				&&
+				uuid != "defaultDarkThemeUUID"
+			) {
+				selectedThemes.add(uuid)
+			}
+		}
+	}
+	fun unselectAllThemes() {
+		selectedThemes.clear()
+	}
+	
+	fun deleteSelectedThemes() {
+		_themeList.removeIf {
+			selectedThemes.contains(it.keys.first())
+		}
+
+		// save changes locally
+		val contents = Gson().toJson(_themeList)
+		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
 	fun saveCurrentTheme(context: Context) {

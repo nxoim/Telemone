@@ -5,6 +5,10 @@ package com.number869.telemone.ui.screens.editor
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,12 +34,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,14 +62,14 @@ import androidx.navigation.NavController
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.SmallTintedLabel
-import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
+import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
-import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
+import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
+import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
 import com.number869.telemone.ui.theme.fullPalette
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
-import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
 
@@ -102,6 +104,8 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 	val incompatibleValues by remember { derivedStateOf { mappedValues.filter { it.value.first == "INCOMPATIBLE VALUE" }.toList() } }
 	val savedThemesRowState = rememberLazyListState()
 	val wholeThingListState = rememberLazyListState()
+
+	var themeSelectionModeIsActive by remember { mutableStateOf(false) }
 
 	LaunchedEffect(themeList) {
 		savedThemesRowState.animateScrollToItem(0)
@@ -205,12 +209,36 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 											uuid,
 											palette,
 											context,
-											true
+											true,
+											changeSelectionMode = { themeSelectionModeIsActive = !themeSelectionModeIsActive },
+											themeSelectionModeIsActive = themeSelectionModeIsActive
 										)
 									}
 								}
 
-								Spacer(modifier = Modifier.height(24.dp))
+								Row(
+									Modifier.fillMaxWidth(),
+									horizontalArrangement = Arrangement.Center
+								) {
+									AnimatedVisibility(
+										themeSelectionModeIsActive,
+										enter = expandVertically(expandFrom = Alignment.CenterVertically) + fadeIn(),
+										exit = shrinkVertically(shrinkTowards = Alignment.CenterVertically) + fadeOut(),
+									) {
+										ThemeSelectionToolbar(
+											Modifier.padding(top = 16.dp),
+											vm,
+											hideToolbarAction = { themeSelectionModeIsActive = false },
+											context
+										)
+									}
+								}
+
+								Spacer(
+									Modifier
+										.animateContentSize()
+										.height(if (themeSelectionModeIsActive) 12.dp else 24.dp)
+								)
 							}
 						}
 					}

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,7 +49,13 @@ fun DeleteThemeDialog(
 				Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",)
 			},
 			confirmButton = {
-				FilledTonalButton(onClick = { vm.deleteTheme(uuid, context) }) {
+				FilledTonalButton(
+					onClick = { vm.deleteTheme(uuid, context) },
+					colors = ButtonDefaults.filledTonalButtonColors(
+						containerColor = MaterialTheme.colorScheme.errorContainer,
+						contentColor = MaterialTheme.colorScheme.onErrorContainer
+					)
+				) {
 					Text("Delete")
 				}
 			},
