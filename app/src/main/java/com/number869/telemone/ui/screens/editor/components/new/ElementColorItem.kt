@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.FullPaletteList
 import kotlinx.coroutines.delay
 
 @Composable
@@ -42,8 +41,7 @@ fun ElementColorItem(
 	vm: MainViewModel,
 	index: Int,
 	themeMap: LoadedTheme,
-	lastIndexInList: Int,
-	palette: FullPaletteList
+	lastIndexInList: Int
 ) {
 	val backgroundColor by animateColorAsState(
 		when (themeMap.containsKey(uiElementData.first)) {
@@ -122,12 +120,10 @@ fun ElementColorItem(
 					PalettePopup(
 						uiElementData.first,
 						vm,
-						palette,
 						backgroundColor,
 						uiElementData.second.first,
-						startPopupAnimation,
-						hidePopup = { startPopupAnimation = false }
-					)
+						startPopupAnimation
+					) { startPopupAnimation = false }
 				}
 			}
 

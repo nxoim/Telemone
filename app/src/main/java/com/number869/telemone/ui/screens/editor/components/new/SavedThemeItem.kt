@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.getColorValueFromColorToken
-import com.number869.telemone.ui.theme.FullPaletteList
+import com.number869.telemone.ui.theme.PaletteState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -66,7 +66,7 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	uuid: String,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context,
 	isInSavedThemesRow: Boolean = false,
 	colorDisplayTypeOverwrite: String? = null,
@@ -124,7 +124,7 @@ fun SavedThemeItem(
 						?.get(uuid)
 						?.get(colorValueOf)
 						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.first, palette)
+							val colorFromToken = getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap)
 							val colorAsSaved = Color(it.second)
 
 							// colorFromToken prob should be Color? so it can
@@ -136,7 +136,7 @@ fun SavedThemeItem(
 					vm.themeList.find { it.containsKey(uuid) }
 						?.get(uuid)
 						?.get(colorValueOf)
-						?.let { getColorValueFromColorToken(it.first, palette) } ?: Color.Red
+						?.let { getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap) } ?: Color.Red
 				}
 			},
 			label = "i hate these labels"
@@ -156,7 +156,7 @@ fun SavedThemeItem(
 								vm.loadTheme(
 									uuid,
 									withTokens = false,
-									palette,
+									paletteState.entirePaletteAsMap,
 									clearCurrentTheme = true,
 									context
 								)
@@ -270,7 +270,7 @@ fun SavedThemeItem(
 		{ showLoadWithOptionsDialog = false },
 		showLoadWithOptionsDialog,
 		vm,
-		palette,
+		paletteState.entirePaletteAsMap,
 		uuid
 	)
 
@@ -279,7 +279,7 @@ fun SavedThemeItem(
 		showDeleteDialog,
 		vm,
 		uuid,
-		palette,
+		paletteState,
 		context
 	)
 
@@ -289,7 +289,7 @@ fun SavedThemeItem(
 		{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
 		{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
 		vm,
-		palette,
+		paletteState,
 		context
 	)
 
@@ -298,12 +298,12 @@ fun SavedThemeItem(
 		showOverwriteDarkThemeDialog,
 		overwrite = {
 			showOverwriteDarkThemeDialog = false
-			vm.overwriteDefaultDarkTheme(uuid, palette, context)
+			vm.overwriteDefaultDarkTheme(uuid, paletteState, context)
 		},
 		vm = vm,
 		overwriteDark = true,
 		uuid,
-		palette,
+		paletteState,
 		context
 	)
 
@@ -312,12 +312,12 @@ fun SavedThemeItem(
 		showOverwriteLightThemeDialog,
 		overwrite = {
 			showOverwriteLightThemeDialog = false
-			vm.overwriteDefaultLightTheme(uuid, palette, context)
+			vm.overwriteDefaultLightTheme(uuid, paletteState, context)
 		},
 		vm = vm,
 		overwriteDark = false,
 		uuid,
-		palette,
+		paletteState,
 		context
 	)
 }

@@ -1,15 +1,11 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -59,14 +55,23 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.FullPaletteList
-import com.number869.telemone.ui.theme.Neutral
-import com.number869.telemone.ui.theme.NeutralVariant
-import com.number869.telemone.ui.theme.Primary
-import com.number869.telemone.ui.theme.Secondary
+import com.number869.telemone.ui.theme.BlueTones
+import com.number869.telemone.ui.theme.ColorRolesDark
+import com.number869.telemone.ui.theme.ColorRolesLight
+import com.number869.telemone.ui.theme.CyanTones
+import com.number869.telemone.ui.theme.DataAboutColors
+import com.number869.telemone.ui.theme.GreenTones
+import com.number869.telemone.ui.theme.NeutralTones
+import com.number869.telemone.ui.theme.NeutralVariantTones
+import com.number869.telemone.ui.theme.OrangeTones
+import com.number869.telemone.ui.theme.OtherColors
+import com.number869.telemone.ui.theme.PinkTones
+import com.number869.telemone.ui.theme.PrimaryTones
+import com.number869.telemone.ui.theme.RedTones
+import com.number869.telemone.ui.theme.SecondaryTones
 import com.number869.telemone.ui.theme.SolarSet
-import com.number869.telemone.ui.theme.Tertiary
-import com.number869.telemone.ui.theme.fullPalette
+import com.number869.telemone.ui.theme.TertiaryTones
+import com.number869.telemone.ui.theme.VioletTones
 
 // maybe i should use my overlay lib later
 // animations are very much TODO
@@ -76,7 +81,6 @@ import com.number869.telemone.ui.theme.fullPalette
 fun PalettePopup(
 	currentUiElement: String,
 	vm: MainViewModel,
-	palette: FullPaletteList,
 	currentColor: Color,
 	currentColorName: String,
 	isPopupVisible: Boolean,
@@ -112,7 +116,7 @@ fun PalettePopup(
 				currentUiElement,
 				currentColor,
 				currentColorName,
-				hidePopup = { hidePopup() },
+				hidePopup = hidePopup,
 				openHome = { currentPopupContentType = PaletteMenuCategories.Home }
 			)
 
@@ -136,9 +140,9 @@ fun PalettePopup(
 									// the bottom of the popup.
 									.filter {
 										it != PaletteMenuCategories.Home
-												&&
+										&&
 										it != PaletteMenuCategories.ColorRoles
-												&&
+										&&
 										it != PaletteMenuCategories.Additional
 									}
 							) { (categoryType, categoryName, categoryColor) ->
@@ -187,7 +191,7 @@ fun PalettePopup(
 					enter = fadeIn(),
 					exit = fadeOut()
 				) {
-					ColorRolesMenu(vm, palette, currentUiElement)
+					ColorRolesMenu(vm, currentUiElement)
 				}
 				
 				this@OutlinedCard.AnimatedVisibility(
@@ -195,7 +199,7 @@ fun PalettePopup(
 					enter = fadeIn(),
 					exit = fadeOut()
 				) {
-					OtherMenu(vm, palette, currentUiElement)
+					OtherMenu(vm, currentUiElement)
 				}
 
 				this@OutlinedCard.AnimatedVisibility(
@@ -205,16 +209,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Primary.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							PrimaryTones.entries.subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Primary.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							PrimaryTones.entries.subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f),it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -227,16 +231,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Secondary.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							SecondaryTones.entries.subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Secondary.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							SecondaryTones.entries.subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -249,16 +253,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Tertiary.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							TertiaryTones.entries.subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Tertiary.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							TertiaryTones.entries.subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -271,16 +275,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Neutral.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							NeutralTones.entries.subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							Neutral.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							NeutralTones.entries.subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -293,16 +297,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							NeutralVariant.values().toList().subList(0, 6).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							NeutralVariantTones.entries.subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							NeutralVariant.values().toList().subList(6, 13).forEach { (color, name) ->
-								TonalPaletteItem(Modifier.weight(1f), color, name, currentUiElement, vm)
+							NeutralVariantTones.entries.subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -315,16 +319,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.blue.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "blue_$tone", currentUiElement, vm)
+							BlueTones.entries.subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.blue.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "blue_$tone", currentUiElement, vm)
+							BlueTones.entries.subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -336,16 +340,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.green.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "green_$tone", currentUiElement, vm)
+							GreenTones.entries.toList().subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.green.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "green_$tone", currentUiElement, vm)
+							GreenTones.entries.toList().subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -357,16 +361,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.orange.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "orange_$tone", currentUiElement, vm)
+							OrangeTones.entries.toList().subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.orange.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "orange_$tone", currentUiElement, vm)
+							OrangeTones.entries.toList().subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -378,16 +382,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.red.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "red_$tone", currentUiElement, vm)
+							RedTones.entries.toList().subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.red.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "red_$tone", currentUiElement, vm)
+							RedTones.entries.toList().subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -399,16 +403,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.violet.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "violet_$tone", currentUiElement, vm)
+							VioletTones.entries.toList().subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.violet.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "violet_$tone", currentUiElement, vm)
+							VioletTones.entries.toList().subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -420,16 +424,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.pink.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "pink_$tone", currentUiElement, vm)
+							PinkTones.entries.toList().subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.pink.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "pink_$tone", currentUiElement, vm)
+							PinkTones.entries.toList().subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -441,16 +445,16 @@ fun PalettePopup(
 				) {
 					Column {
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.cyan.toList().subList(0, 6).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "cyan_$tone", currentUiElement, vm)
+							CyanTones.entries.toList().subList(0, 6).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 
 						Spacer(modifier = Modifier.height(8.dp))
 
 						Row(horizontalArrangement = spacedBy(8.dp)) {
-							palette.cyan.toList().subList(6, 13).forEach { (tone, value) ->
-								TonalPaletteItem(Modifier.weight(1f), value, "cyan_$tone", currentUiElement, vm)
+							CyanTones.entries.toList().subList(6, 13).forEach {
+								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
 							}
 						}
 					}
@@ -463,18 +467,20 @@ fun PalettePopup(
 @Composable
 private fun TonalPaletteItem(
 	modifier: Modifier = Modifier,
-	value: Color,
-	tone: String,
+	dataAboutColors: DataAboutColors,
 	key: String,
 	vm: MainViewModel
 ) {
+	val colorToken = dataAboutColors.colorToken
+	val colorValue = dataAboutColors.colorValue()
+
 	Box(
 		modifier
 			.height(80.dp)
 			.width(30.dp)
 			.clip(CircleShape)
-			.background(value)
-			.clickable { vm.changeValue(key, value, tone) }
+			.background(colorValue)
+			.clickable { vm.changeValue(key, colorToken, colorValue) }
 	)
 }
 
@@ -556,7 +562,7 @@ private fun CategoryButton(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ColorRolesMenu(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun ColorRolesMenu(vm: MainViewModel, key: String) {
 	val colorRolesCategoryPagerState = rememberPagerState(
 		initialPage = 0,
 		initialPageOffsetFraction = 0f,
@@ -584,27 +590,25 @@ private fun ColorRolesMenu(vm: MainViewModel, palette: FullPaletteList, key: Str
 			state = colorRolesCategoryPagerState,
 			pageSpacing = 16.dp
 		){
-			if (it == 0) LightColorRoles(vm, palette, key) else DarkColorRoles(vm, palette, key)
+			if (it == 0) LightColorRoles(vm, key) else DarkColorRoles(vm, key)
 		}
 	}
 }
 
 @Composable
-fun OtherMenu(vm: MainViewModel, palette: FullPaletteList, key: String) {
+fun OtherMenu(vm: MainViewModel, key: String) {
 	Column(verticalArrangement = spacedBy(8.dp)) {
 		Row(horizontalArrangement = spacedBy(8.dp)) {
 			ColorRoleItem(
 				Modifier.weight(1f),
-				value = palette.surfaceElevationLevel3Light,
-				tone = "surface_elevation_level_3_light",
+				OtherColors.SurfaceElevationLevel3Light.dataAboutColors,
 				key = key,
 				vm = vm
 			)
 
 			ColorRoleItem(
 				Modifier.weight(1f),
-				value = palette.surfaceElevationLevel3Dark,
-				tone = "surface_elevation_level_3_dark",
+				OtherColors.SurfaceElevationLevel3Dark.dataAboutColors,
 				key = key,
 				vm = vm
 			)
@@ -612,8 +616,8 @@ fun OtherMenu(vm: MainViewModel, palette: FullPaletteList, key: String) {
 		
 		Box(contentAlignment = Alignment.Center) {
 			ColorRoleItem(
-				value = Color.Transparent,
-				tone = "transparent",
+				Modifier,
+				OtherColors.Transparent.dataAboutColors,
 				key = key,
 				vm = vm
 			)
@@ -624,7 +628,7 @@ fun OtherMenu(vm: MainViewModel, palette: FullPaletteList, key: String) {
 }
 
 @Composable
-fun LightColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
+fun LightColorRoles(vm: MainViewModel, key: String) {
 	Column(verticalArrangement = spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 		Icon(
 			SolarSet.Sun,
@@ -634,15 +638,15 @@ fun LightColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
 
 		Spacer(modifier = Modifier.height(8.dp))
 
-		PrimarySecondaryTertiaryErrorLight(vm, palette, key)
-		SurfacesLight(vm, palette, key)
-		SurfaceContainersLight(vm, palette, key)
-		OnSurfacesAndOutlinesLight(vm, palette, key)
+		PrimarySecondaryTertiaryErrorLight(vm, key)
+		SurfacesLight(vm, key)
+		SurfaceContainersLight(vm, key)
+		OnSurfacesAndOutlinesLight(vm, key)
 	}
 }
 
 @Composable
-fun DarkColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
+fun DarkColorRoles(vm: MainViewModel, key: String) {
 	Column(verticalArrangement = spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 		Icon(
 			SolarSet.Moon,
@@ -652,33 +656,35 @@ fun DarkColorRoles(vm: MainViewModel, palette: FullPaletteList, key: String) {
 
 		Spacer(modifier = Modifier.height(8.dp))
 
-		PrimarySecondaryTertiaryErrorDark(vm, palette, key)
-		SurfacesDark(vm, palette, key)
-		SurfaceContainersDark(vm, palette, key)
-		OnSurfacesAndOutlinesDark(vm, palette, key)
+		PrimarySecondaryTertiaryErrorDark(vm, key)
+		SurfacesDark(vm, key)
+		SurfaceContainersDark(vm, key)
+		OnSurfacesAndOutlinesDark(vm, key)
 	}
 }
 
 @Composable
 private fun ColorRoleItem(
 	modifier: Modifier = Modifier,
-	value: Color,
-	tone: String,
+	dataAboutColors: DataAboutColors,
 	key: String,
 	vm: MainViewModel
 ) {
+	val colorToken = dataAboutColors.colorToken
+	val colorValue = dataAboutColors.colorValue()
+
 	Box(
 		modifier
 			.height(40.dp)
 			.fillMaxWidth()
 			.clip(CircleShape)
 			.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-			.background(value)
+			.background(colorValue)
 			.clickable {
 				vm.changeValue(
 					key,
-					value,
-					tone
+					colorToken,
+					colorValue
 				)
 			}
 	)
@@ -687,7 +693,6 @@ private fun ColorRoleItem(
 @Composable
 private fun PrimarySecondaryTertiaryErrorDark(
 	vm: MainViewModel,
-	palette: FullPaletteList,
 	key: String
 ) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -697,32 +702,28 @@ private fun PrimarySecondaryTertiaryErrorDark(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.primaryDark,
-				"primary_dark",
+				ColorRolesDark.PrimaryDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onPrimaryDark,
-				"on_primary_dark",
+				ColorRolesDark.OnPrimaryDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.primaryContainerDark,
-				"primary_container_dark",
+				ColorRolesDark.PrimaryContainerDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onPrimaryContainerDark,
-				"on_primary_container_dark",
+				ColorRolesDark.OnPrimaryContainerDark.dataAboutColors,
 				key,
 				vm
 			)
@@ -734,32 +735,28 @@ private fun PrimarySecondaryTertiaryErrorDark(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.secondaryDark,
-				"secondary_dark",
+				ColorRolesDark.SecondaryDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onSecondaryDark,
-				"on_secondary_dark",
+				ColorRolesDark.OnSecondaryDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.secondaryContainerDark,
-				"secondary_container_dark",
+				ColorRolesDark.SecondaryContainerDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onSecondaryContainerDark,
-				"on_secondary_container_dark",
+				ColorRolesDark.OnSecondaryContainerDark.dataAboutColors,
 				key,
 				vm
 			)
@@ -771,32 +768,28 @@ private fun PrimarySecondaryTertiaryErrorDark(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.tertiaryDark,
-				"tertiary_dark",
+				ColorRolesDark.TertiaryDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onTertiaryDark,
-				"on_tertiary_dark",
+				ColorRolesDark.OnTertiaryDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.tertiaryContainerDark,
-				"tertiary_container_dark",
+				ColorRolesDark.TertiaryContainerDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onTertiaryContainerDark,
-				"on_tertiary_container_dark",
+				ColorRolesDark.OnTertiaryContainerDark.dataAboutColors,
 				key,
 				vm
 			)
@@ -808,32 +801,28 @@ private fun PrimarySecondaryTertiaryErrorDark(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.errorDark,
-				"error_dark",
+				ColorRolesDark.ErrorDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onErrorDark,
-				"on_error_dark",
+				ColorRolesDark.OnErrorDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.errorContainerDark,
-				"error_container_dark",
+				ColorRolesDark.ErrorContainerDark.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onErrorContainerDark,
-				"on_error_container_dark",
+				ColorRolesDark.OnErrorContainerDark.dataAboutColors,
 				key,
 				vm
 			)
@@ -842,36 +831,32 @@ private fun PrimarySecondaryTertiaryErrorDark(
 }
 
 @Composable
-private fun OnSurfacesAndOutlinesDark(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun OnSurfacesAndOutlinesDark(vm: MainViewModel, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.onSurfaceDark,
-			tone = "on_surface_dark",
+			ColorRolesDark.OnSurfaceDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.onSurfaceVariantDark,
-			tone = "on_surface_variant_dark",
+			ColorRolesDark.OnSurfaceVariantDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.outlineDark,
-			tone = "outline_dark",
+			ColorRolesDark.OutlineDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.outlineVariantDark,
-			tone = "outline_variant_dark",
+			ColorRolesDark.OutlineVariantDark.dataAboutColors,
 			key,
 			vm
 		)
@@ -879,44 +864,39 @@ private fun OnSurfacesAndOutlinesDark(vm: MainViewModel, palette: FullPaletteLis
 }
 
 @Composable
-private fun SurfaceContainersDark(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun SurfaceContainersDark(vm: MainViewModel, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerLowestDark,
-			tone = "surface_container_lowest_dark",
+			ColorRolesDark.SurfaceContainerLowestDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerLowDark,
-			tone = "surface_container_low_dark",
+			ColorRolesDark.SurfaceContainerLowDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerDark,
-			tone = "surface_container_dark",
+			ColorRolesDark.SurfaceContainerDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerHighDark,
-			tone = "surface_container_high_dark",
+			ColorRolesDark.SurfaceContainerHighDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerHighestDark,
-			tone = "surface_container_highest_dark",
+			ColorRolesDark.SurfaceContainerHighestDark.dataAboutColors,
 			key,
 			vm
 		)
@@ -924,28 +904,25 @@ private fun SurfaceContainersDark(vm: MainViewModel, palette: FullPaletteList, k
 }
 
 @Composable
-private fun SurfacesDark(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun SurfacesDark(vm: MainViewModel, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceDimDark,
-			tone = "surface_dim_dark",
+			ColorRolesDark.SurfaceDimDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceDark,
-			tone = "surface_dark",
+			ColorRolesDark.SurfaceDark.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceBrightDark,
-			tone = "surface_bright_dark",
+			ColorRolesDark.SurfaceBrightDark.dataAboutColors,
 			key,
 			vm
 		)
@@ -955,7 +932,6 @@ private fun SurfacesDark(vm: MainViewModel, palette: FullPaletteList, key: Strin
 @Composable
 private fun PrimarySecondaryTertiaryErrorLight(
 	vm: MainViewModel,
-	palette: FullPaletteList,
 	key: String
 ) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
@@ -965,32 +941,28 @@ private fun PrimarySecondaryTertiaryErrorLight(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.primaryLight,
-				"primary_light",
+				ColorRolesLight.PrimaryLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onPrimaryLight,
-				"on_primary_light",
+				ColorRolesLight.OnPrimaryLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.primaryContainerLight,
-				"primary_container_light",
+				ColorRolesLight.PrimaryContainerLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onPrimaryContainerLight,
-				"on_primary_container_light",
+				ColorRolesLight.OnPrimaryContainerLight.dataAboutColors,
 				key,
 				vm
 			)
@@ -1002,32 +974,28 @@ private fun PrimarySecondaryTertiaryErrorLight(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.secondaryLight,
-				"secondary_light",
+				ColorRolesLight.SecondaryLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onSecondaryLight,
-				"on_secondary_light",
+				ColorRolesLight.OnSecondaryLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.secondaryContainerLight,
-				"secondary_container_light",
+				ColorRolesLight.SecondaryContainerLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onSecondaryContainerLight,
-				"on_secondary_container_light",
+				ColorRolesLight.OnSecondaryContainerLight.dataAboutColors,
 				key,
 				vm
 			)
@@ -1039,32 +1007,28 @@ private fun PrimarySecondaryTertiaryErrorLight(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.tertiaryLight,
-				"tertiary_light",
+				ColorRolesLight.TertiaryLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onTertiaryLight,
-				"on_tertiary_light",
+				ColorRolesLight.OnTertiaryLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.tertiaryContainerLight,
-				"tertiary_container_light",
+				ColorRolesLight.TertiaryContainerLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onTertiaryContainerLight,
-				"on_tertiary_container_light",
+				ColorRolesLight.OnTertiaryContainerLight.dataAboutColors,
 				key,
 				vm
 			)
@@ -1076,32 +1040,28 @@ private fun PrimarySecondaryTertiaryErrorLight(
 		) {
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.errorLight,
-				"error_light",
+				ColorRolesLight.ErrorLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onErrorLight,
-				"on_error_light",
+				ColorRolesLight.OnErrorLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.errorContainerLight,
-				"error_container_light",
+				ColorRolesLight.ErrorContainerLight.dataAboutColors,
 				key,
 				vm
 			)
 
 			ColorRoleItem(
 				Modifier,
-				palette.colorRoles.onErrorContainerLight,
-				"on_error_container_light",
+				ColorRolesLight.OnErrorContainerLight.dataAboutColors,
 				key,
 				vm
 			)
@@ -1110,36 +1070,32 @@ private fun PrimarySecondaryTertiaryErrorLight(
 }
 
 @Composable
-private fun OnSurfacesAndOutlinesLight(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun OnSurfacesAndOutlinesLight(vm: MainViewModel, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.onSurfaceLight,
-			tone = "on_surface_light",
+			ColorRolesLight.OnSurfaceLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.onSurfaceVariantLight,
-			tone = "on_surface_variant_light",
+			ColorRolesLight.OnSurfaceVariantLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.outlineLight,
-			tone = "outline_light",
+			ColorRolesLight.OutlineLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.outlineVariantLight,
-			tone = "outline_variant_light",
+			ColorRolesLight.OutlineVariantLight.dataAboutColors,
 			key,
 			vm
 		)
@@ -1147,44 +1103,39 @@ private fun OnSurfacesAndOutlinesLight(vm: MainViewModel, palette: FullPaletteLi
 }
 
 @Composable
-private fun SurfaceContainersLight(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun SurfaceContainersLight(vm: MainViewModel, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerLowestLight,
-			tone = "surface_container_lowest_light",
+			ColorRolesLight.SurfaceContainerLowestLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerLowLight,
-			tone = "surface_container_low_light",
+			ColorRolesLight.SurfaceContainerLowLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerLight,
-			tone = "surface_container_light",
+			ColorRolesLight.SurfaceContainerLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerHighLight,
-			tone = "surface_container_high_light",
+			ColorRolesLight.SurfaceContainerHighLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceContainerHighestLight,
-			tone = "surface_container_highest_light",
+			ColorRolesLight.SurfaceContainerHighestLight.dataAboutColors,
 			key,
 			vm
 		)
@@ -1192,28 +1143,25 @@ private fun SurfaceContainersLight(vm: MainViewModel, palette: FullPaletteList, 
 }
 
 @Composable
-private fun SurfacesLight(vm: MainViewModel, palette: FullPaletteList, key: String) {
+private fun SurfacesLight(vm: MainViewModel, key: String) {
 	Row(horizontalArrangement = spacedBy(8.dp)) {
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceDimLight,
-			tone = "surface_dim_light",
+			ColorRolesLight.SurfaceDimLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceLight,
-			tone = "surface_light",
+			ColorRolesLight.SurfaceLight.dataAboutColors,
 			key,
 			vm
 		)
 
 		ColorRoleItem(
 			Modifier.weight(1f),
-			palette.colorRoles.surfaceBrightLight,
-			tone = "surface_bright_light",
+			ColorRolesLight.SurfaceBrightLight.dataAboutColors,
 			key,
 			vm
 		)
@@ -1255,35 +1203,21 @@ enum class PaletteMenuCategories() {
 			Primary -> MaterialTheme.colorScheme.primary
 			Secondary -> MaterialTheme.colorScheme.secondary
 			Tertiary -> MaterialTheme.colorScheme.tertiary
-			Neutral -> if (isSystemInDarkTheme()) fullPalette().neutral_60 else fullPalette().neutral_40
-			NeutralVariant -> if (isSystemInDarkTheme()) fullPalette().neutralVariant_60 else fullPalette().neutralVariant_40
-			Blue -> if (isSystemInDarkTheme()) fullPalette().blue.getValue(60) else fullPalette().blue.getValue(
-				40
-			)
+			Neutral -> if (isSystemInDarkTheme()) NeutralTones.T60.dataAboutColors.colorValue() else NeutralTones.T40.dataAboutColors.colorValue()
+			NeutralVariant -> if (isSystemInDarkTheme()) NeutralVariantTones.T60.dataAboutColors.colorValue() else NeutralVariantTones.T40.dataAboutColors.colorValue()
+			Blue -> if (isSystemInDarkTheme()) BlueTones.T60.dataAboutColors.colorValue() else BlueTones.T40.dataAboutColors.colorValue()
 
-			Green -> if (isSystemInDarkTheme()) fullPalette().green.getValue(60) else fullPalette().green.getValue(
-				40
-			)
+			Green -> if (isSystemInDarkTheme()) GreenTones.T60.dataAboutColors.colorValue() else GreenTones.T40.dataAboutColors.colorValue()
 
-			Orange -> if (isSystemInDarkTheme()) fullPalette().orange.getValue(60) else fullPalette().orange.getValue(
-				40
-			)
+			Orange -> if (isSystemInDarkTheme()) OrangeTones.T60.dataAboutColors.colorValue() else OrangeTones.T40.dataAboutColors.colorValue()
 
-			Red -> if (isSystemInDarkTheme()) fullPalette().red.getValue(60) else fullPalette().red.getValue(
-				40
-			)
+			Red -> if (isSystemInDarkTheme()) RedTones.T60.dataAboutColors.colorValue() else RedTones.T40.dataAboutColors.colorValue()
 
-			Violet -> if (isSystemInDarkTheme()) fullPalette().violet.getValue(60) else fullPalette().violet.getValue(
-				40
-			)
+			Violet -> if (isSystemInDarkTheme()) VioletTones.T60.dataAboutColors.colorValue() else VioletTones.T40.dataAboutColors.colorValue()
 
-			Pink -> if (isSystemInDarkTheme()) fullPalette().pink.getValue(60) else fullPalette().pink.getValue(
-				40
-			)
+			Pink -> if (isSystemInDarkTheme()) PinkTones.T60.dataAboutColors.colorValue() else PinkTones.T40.dataAboutColors.colorValue()
 
-			Cyan -> if (isSystemInDarkTheme()) fullPalette().cyan.getValue(60) else fullPalette().cyan.getValue(
-				40
-			)
+			Cyan -> if (isSystemInDarkTheme()) CyanTones.T60.dataAboutColors.colorValue() else CyanTones.T40.dataAboutColors.colorValue()
 
 			else -> Color.Transparent
 		}

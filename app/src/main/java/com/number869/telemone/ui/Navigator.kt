@@ -26,10 +26,15 @@ import com.number869.telemone.ui.screens.editor.EditorScreen
 import com.number869.telemone.ui.screens.main.MainScreen
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.number869.telemone.ui.screens.welcome.WelcomeScreen
+import com.number869.telemone.ui.theme.PaletteState
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Navigator(navController: NavHostController, vm: MainViewModel) {
+fun Navigator(
+	navController: NavHostController,
+	vm: MainViewModel,
+	paletteState: PaletteState
+) {
 	val screenWidth = LocalConfiguration.current.screenWidthDp
 	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
 	val preferences = LocalContext.current.getSharedPreferences(
@@ -59,7 +64,7 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 				}
 			}
 		) {
-			MainScreen(navController, vm)
+			MainScreen(navController, vm, paletteState)
 		}
 
 		composable(
@@ -97,7 +102,7 @@ fun Navigator(navController: NavHostController, vm: MainViewModel) {
 				}
 			}
 		) {
-			EditorScreen(navController, vm)
+			EditorScreen(navController, vm, paletteState)
 		}
 
 		composable(

@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,24 +19,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.R
 import com.number869.telemone.shared.ui.TextWithFixedSize
+import com.number869.telemone.ui.theme.PaletteState
 import com.number869.telemone.ui.theme.SolarSet
-import com.number869.telemone.ui.theme.fullPalette
 
 @Composable
-fun DefaultThemesButtons(vm: MainViewModel) {
+fun DefaultThemesButtons(vm: MainViewModel, paletteState: PaletteState) {
 	val context = LocalContext.current
-	val palette = fullPalette()
 	Column(Modifier.fillMaxWidth()) {
-		LightThemeButton { vm.saveLightTheme(context, palette) }
+		LightThemeButton { vm.saveLightTheme(context, paletteState.entirePaletteAsMap) }
 		DarkThemeButton(Modifier.align(Alignment.End).padding(top = 16.dp)) {
-			vm.saveDarkTheme(context, palette)
+			vm.saveDarkTheme(context, paletteState.entirePaletteAsMap)
 		}
 	}
 }

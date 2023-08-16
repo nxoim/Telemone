@@ -5,16 +5,16 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.FullPaletteList
 
 @Composable
 fun LoadWithOptionsDialog(
 	close: () -> Unit,
 	isShowingApplyDialog: Boolean,
 	vm: MainViewModel,
-	palette: FullPaletteList,
+	palette: Map<String, Color>,
 	uuid: String
 ) {
 	val context = LocalContext.current

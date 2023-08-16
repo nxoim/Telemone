@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.FullPaletteList
+import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun OverwriteChoiceDialog(
@@ -39,7 +39,7 @@ fun OverwriteChoiceDialog(
 	chooseLight: () -> Unit,
 	chooseDark: () -> Unit,
 	vm: MainViewModel,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context
 ) {
 	AnimatedVisibility(
@@ -66,7 +66,7 @@ fun OverwriteChoiceDialog(
 									.weight(1f, false),
 								vm,
 								"defaultLightThemeUUID",
-								palette,
+								paletteState,
 								context
 							)
 
@@ -90,7 +90,7 @@ fun OverwriteChoiceDialog(
 									.weight(1f, false),
 								vm,
 								"defaultDarkThemeUUID",
-								palette,
+								paletteState,
 								context
 							)
 
@@ -119,7 +119,7 @@ fun OverwriteDefaultsDialog(
 	vm: MainViewModel,
 	overwriteDark: Boolean,
 	overwriteWith: String,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context
 ) {
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
@@ -158,7 +158,7 @@ fun OverwriteDefaultsDialog(
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
 						uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
-						palette,
+						paletteState,
 						context
 					)
 
@@ -177,7 +177,7 @@ fun OverwriteDefaultsDialog(
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
 						uuid = overwriteWith,
-						palette,
+						paletteState,
 						context
 					)
 				}

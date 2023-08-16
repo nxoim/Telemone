@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,21 +63,20 @@ import androidx.navigation.NavController
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.Screens
-import com.number869.telemone.ui.theme.FullPaletteList
-import com.number869.telemone.ui.theme.fullPalette
+import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditorTopAppBar(
 	topAppBarState: TopAppBarScrollBehavior,
+	paletteState: PaletteState,
 	navController: NavController,
 	vm: MainViewModel,
 	mappedValues: () -> LoadedTheme,
 	mappedValuesAsList: () -> List<Pair<String, Pair<String, Color>>>
 ) {
 	val context = LocalContext.current
-	val palette = fullPalette()
 	var showingClearBeforeLoadDialog by remember { mutableStateOf(false) }
 	val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
 
@@ -90,7 +90,12 @@ fun EditorTopAppBar(
 		pickedFileUriState.value = result
 
 		result?.let { uri ->
-			vm.loadThemeFromFile(context, uri, palette, true)
+			vm.loadThemeFromFile(
+				context,
+				uri,
+				paletteState,
+				true
+			)
 		}
 	}
 	// this one is used when pressing the "leave as is" button
@@ -100,7 +105,12 @@ fun EditorTopAppBar(
 		pickedFileUriState.value = result
 
 		result?.let { uri ->
-			vm.loadThemeFromFile(context, uri, palette, false)
+			vm.loadThemeFromFile(
+				context,
+				uri,
+				paletteState,
+				false
+			)
 		}
 	}
 
@@ -118,7 +128,7 @@ fun EditorTopAppBar(
 				showSearchbar = { searchbarVisible = true },
 				showClearBeforeLoadDialog = { showingClearBeforeLoadDialog = true },
 				context,
-				palette,
+				paletteState.entirePaletteAsMap,
 				vm,
 				topAppBarState
 			)
@@ -133,8 +143,7 @@ fun EditorTopAppBar(
 				mappedValues = mappedValues ,
 				mappedValuesAsList = mappedValuesAsList,
 				hideSearchbar = { searchbarVisible = false },
-				vm,
-				palette
+				vm
 			)
 		}
 	}
@@ -169,7 +178,7 @@ private fun TheAppBar(
 	showSearchbar: () -> Unit,
 	showClearBeforeLoadDialog: () -> Unit,
 	context: Context,
-	palette: FullPaletteList,
+	palette: SnapshotStateMap<String, Color>,
 	vm: MainViewModel,
 	topAppBarState: TopAppBarScrollBehavior
 ) {
@@ -270,8 +279,7 @@ private fun TheSearchbar(
 	mappedValues: () -> LoadedTheme,
 	mappedValuesAsList: () -> List<Pair<String, Pair<String, Color>>>,
 	hideSearchbar: () -> Unit,
-	vm: MainViewModel,
-	palette: FullPaletteList
+	vm: MainViewModel
 ) {
 	var searchQuery by remember { mutableStateOf("") }
 	val searchQueryIsEmpty by remember { derivedStateOf { searchQuery == "" } }
@@ -344,8 +352,7 @@ private fun TheSearchbar(
 						vm = vm,
 						index = index,
 						themeMap = mappedValues(),
-						lastIndexInList = mappedValuesAsList().lastIndex,
-						palette = palette,
+						lastIndexInList = mappedValuesAsList().lastIndex
 					)
 				}
 			}

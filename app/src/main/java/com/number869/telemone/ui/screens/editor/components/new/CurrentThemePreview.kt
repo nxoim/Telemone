@@ -30,7 +30,6 @@ import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,7 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.fullPalette
 
 @Composable
 fun CurrentThemePreview(vm: MainViewModel) {
@@ -151,8 +149,6 @@ private fun ChatTopAppBar(
 	titleTextColor: Color,
 	membersTextColor: Color
 ) {
-	val palette = fullPalette()
-
 	Row(
 		Modifier
 			.fillMaxWidth()

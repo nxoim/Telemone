@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.FullPaletteList
+import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun DeleteThemeDialog(
@@ -24,7 +24,7 @@ fun DeleteThemeDialog(
 	isShowingDeleteDialog: Boolean,
 	vm: MainViewModel,
 	uuid: String,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context
 ) {
 	AnimatedVisibility(
@@ -41,7 +41,7 @@ fun DeleteThemeDialog(
 						.clip(RoundedCornerShape(16.dp)),
 					vm,
 					uuid,
-					palette,
+					paletteState,
 					context
 				)
 			},
