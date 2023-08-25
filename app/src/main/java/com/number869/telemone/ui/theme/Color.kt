@@ -102,15 +102,15 @@ class PaletteState(val entirePaletteAsMap: SnapshotStateMap<String, Color>) {
 fun rememberPaletteState(): PaletteState {
 	val entirePaletteAsMap = remember { mutableStateMapOf<String, Color>()  }
 
+	AdditionalColors.entries.forEach {
+		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+	}
+
 	ColorRolesLight.entries.forEach {
 		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
 	}
 
 	ColorRolesDark.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
-	}
-
-	OtherColors.entries.forEach {
 		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
 	}
 
@@ -611,7 +611,13 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	}
 }
 
-enum class OtherColors(val dataAboutColors: DataAboutColors) {
+enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
+	White(
+		DataAboutColors("white") { Color.White }
+	),
+	Black(
+		DataAboutColors("black") { Color.Black }
+	),
 	SurfaceElevationLevel3Light(
 		DataAboutColors("surface_elevation_level_3_light") {
 			var color = Color.Red

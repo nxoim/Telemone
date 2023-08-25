@@ -1,48 +1,46 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseOutCirc
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,11 +48,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.zIndex
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.shared.ui.animateMovableContent
+import com.number869.telemone.ui.theme.AdditionalColors
 import com.number869.telemone.ui.theme.BlueTones
 import com.number869.telemone.ui.theme.ColorRolesDark
 import com.number869.telemone.ui.theme.ColorRolesLight
@@ -64,7 +74,6 @@ import com.number869.telemone.ui.theme.GreenTones
 import com.number869.telemone.ui.theme.NeutralTones
 import com.number869.telemone.ui.theme.NeutralVariantTones
 import com.number869.telemone.ui.theme.OrangeTones
-import com.number869.telemone.ui.theme.OtherColors
 import com.number869.telemone.ui.theme.PinkTones
 import com.number869.telemone.ui.theme.PrimaryTones
 import com.number869.telemone.ui.theme.RedTones
@@ -72,11 +81,9 @@ import com.number869.telemone.ui.theme.SecondaryTones
 import com.number869.telemone.ui.theme.SolarSet
 import com.number869.telemone.ui.theme.TertiaryTones
 import com.number869.telemone.ui.theme.VioletTones
+import kotlinx.coroutines.delay
 
-// maybe i should use my overlay lib later
-// animations are very much TODO
-// TODO organize
-@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
+// ⚠️if anyone knows how to make this pipipopo decently shorter - hmu
 @Composable
 fun PalettePopup(
 	currentUiElement: String,
@@ -86,375 +93,1457 @@ fun PalettePopup(
 	isPopupVisible: Boolean,
 	hidePopup: () -> Unit
 ) {
-	AnimatedVisibility(
-		visible = isPopupVisible,
-		enter = expandVertically(),
-		exit = shrinkVertically()
-	) {
+	LookaheadScope {
 		var currentPopupContentType by remember { mutableStateOf(PaletteMenuCategories.Home) }
+		var currentPopupContentTypeAnimated by remember { mutableStateOf(PaletteMenuCategories.Home) }
 		val isOnHomePage by remember { derivedStateOf { currentPopupContentType == PaletteMenuCategories.Home } }
+		val targetHeight by remember {
+			derivedStateOf {
+				when (currentPopupContentType) {
+					PaletteMenuCategories.Home -> 516.dp
+					PaletteMenuCategories.AdditionalColors -> 226.dp
+					PaletteMenuCategories.ColorRoles -> 482.dp
+					else -> 256.dp
+				}
+			}
+		}
 		val animatedPopupHeight by animateDpAsState(
-			when (currentPopupContentType) {
-				PaletteMenuCategories.Home -> 608.dp
-				PaletteMenuCategories.Additional -> 184.dp
-				PaletteMenuCategories.ColorRoles -> 497.dp
-				else -> 264.dp
-			},
+			targetHeight,
 			animationSpec = spring(0.9f, 200f),
 			label = ""
 		)
 
-		OutlinedCard(
-			Modifier
-				.height(animatedPopupHeight)
-				.widthIn(max = 364.dp),
-			shape = RoundedCornerShape(32.dp)
+		@Composable
+		fun Modifier.animateTonalItem(lookaheadScope: LookaheadScope) = this.then(
+			Modifier.animateMovableContent(
+				lookaheadScope,
+				offsetAnimationSpec = spring(0.9f, 600f),
+				sizeAnimationSpec = spring(0.9f, 200f)
+			)
+		)
+
+		@Composable
+		fun Modifier.animateCategoryButton(lookaheadScope: LookaheadScope) = this.then(
+			Modifier.animateMovableContent(
+				lookaheadScope,
+				offsetAnimationSpec = spring(0.9f, 600f),
+				sizeAnimationSpec = if (isOnHomePage) spring() else tween(easing = EaseOutCirc)
+			)
+		)
+
+		val primaryTonesAsListOfMovableContent = remember {
+			PrimaryTones.entries.map {
+				movableContentOf {
+					val inPreview = it == PrimaryTones.T40 || it == PrimaryTones.T50 || it == PrimaryTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 1f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Primary }
+					)
+				}
+			}
+		}
+
+		val primaryAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					label = "Primary",
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Primary
+					},
+					listOfColors = { primaryTonesAsListOfMovableContent },
+					displayStaticPlaceholder = {
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Primary }
+			}
+		}
+
+		val secondaryTonesAsListOfMovableContent = remember {
+			SecondaryTones.entries.map {
+				movableContentOf {
+					val inPreview = it == SecondaryTones.T40 || it == SecondaryTones.T50 || it == SecondaryTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Secondary }
+					)
+				}
+			}
+		}
+
+		val secondaryAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Secondary
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Secondary
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Secondary",
+					listOfColors = { secondaryTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Secondary }
+			}
+		}
+
+		val tertiaryTonesAsListOfMovableContent = remember {
+			TertiaryTones.entries.map {
+				movableContentOf {
+					val inPreview = it == TertiaryTones.T40 || it == TertiaryTones.T50 || it == TertiaryTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Tertiary }
+					)
+				}
+			}
+		}
+
+		val tertiaryAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Tertiary
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Tertiary
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Tertiary",
+					listOfColors = { tertiaryTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Tertiary }
+			}
+		}
+
+		val neutralTonesAsListOfMovableContent = remember {
+			NeutralTones.entries.map {
+				movableContentOf {
+					val inPreview = it == NeutralTones.T40 || it == NeutralTones.T50 || it == NeutralTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Neutral }
+					)
+				}
+			}
+		}
+
+		val neutralAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Neutral
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Neutral
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Neutral",
+					listOfColors = { neutralTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Neutral }
+			}
+		}
+
+		val neutralVariantTonesAsListOfMovableContent = remember {
+			NeutralVariantTones.entries.map {
+				movableContentOf {
+					val inPreview = it == NeutralVariantTones.T40 || it == NeutralVariantTones.T50 || it == NeutralVariantTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.NeutralVariant }
+					)
+				}
+			}
+		}
+
+		val neutralVariantAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.NeutralVariant
+						currentPopupContentTypeAnimated = PaletteMenuCategories.NeutralVariant
+
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Neutral Variant",
+					listOfColors = { neutralVariantTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.NeutralVariant }
+			}
+		}
+
+		val blueTonesAsListOfMovableContent = remember {
+			BlueTones.entries.map {
+				movableContentOf {
+					val inPreview = it == BlueTones.T40 || it == BlueTones.T50 || it == BlueTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Blue }
+					)
+				}
+			}
+		}
+
+		val blueAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Blue
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Blue
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Blue",
+					listOfColors = { blueTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Blue }
+			}
+		}
+
+		val redTonesAsListOfMovableContent = remember {
+			RedTones.entries.map {
+				movableContentOf {
+					val inPreview = it == RedTones.T40 || it == RedTones.T50 || it == RedTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Red }
+					)
+				}
+			}
+		}
+
+		val redAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Red
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Red
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Red",
+					listOfColors = { redTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Red }
+			}
+		}
+
+		val greenTonesAsListOfMovableContent = remember {
+			GreenTones.entries.map {
+				movableContentOf {
+					val inPreview = it == GreenTones.T40 || it == GreenTones.T50 || it == GreenTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Green }
+					)
+				}
+			}
+		}
+
+		val greenAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Green
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Green
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Green",
+					listOfColors = { greenTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Green }
+			}
+		}
+
+		val orangeTonesAsListOfMovableContent = remember {
+			OrangeTones.entries.map {
+				movableContentOf {
+					val inPreview = it == OrangeTones.T40 || it == OrangeTones.T50 || it == OrangeTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Orange }
+					)
+				}
+			}
+		}
+
+		val orangeAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Orange
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Orange
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Orange",
+					listOfColors = { orangeTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Orange }
+			}
+		}
+
+		val violetTonesAsListOfMovableContent = remember {
+			VioletTones.entries.map {
+				movableContentOf {
+					val inPreview = it == VioletTones.T40 || it == VioletTones.T50 || it == VioletTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Violet }
+					)
+				}
+			}
+		}
+
+		val violetAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Violet
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Violet
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Violet",
+					listOfColors = { violetTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Violet }
+			}
+		}
+
+		val pinkTonesAsListOfMovableContent = remember {
+			PinkTones.entries.map {
+				movableContentOf {
+					val inPreview = it == PinkTones.T40 || it == PinkTones.T50 || it == PinkTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Pink }
+					)
+				}
+			}
+		}
+
+		val pinkAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Pink
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Pink
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Pink",
+					listOfColors = { pinkTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Pink }
+			}
+		}
+
+		val cyanTonesAsListOfMovableContent = remember {
+			CyanTones.entries.map {
+				movableContentOf {
+					val inPreview = it == CyanTones.T40 || it == CyanTones.T50 || it == CyanTones.T60
+
+					TonalPaletteItem(
+						Modifier
+							.zIndex(if (inPreview) 999f else 0f)
+							.animateTonalItem(this),
+						dataAboutColors = it.dataAboutColors,
+						key = currentUiElement,
+						vm = vm,
+						{ currentPopupContentType == PaletteMenuCategories.Cyan }
+					)
+				}
+			}
+		}
+
+		val cyanAsMovableContent = remember {
+			movableContentOf {
+				SmallAnimatedExpandableCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					expand = {
+						if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.Cyan
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Cyan
+					},
+					{
+						currentPopupContentTypeAnimated = PaletteMenuCategories.Home
+					},
+					label = "Cyan",
+					listOfColors = { cyanTonesAsListOfMovableContent },
+					isOnHomePage = { isOnHomePage }
+				) { currentPopupContentType == PaletteMenuCategories.Cyan }
+			}
+		}
+
+		val firstColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.PrimaryLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SecondaryLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.TertiaryLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.ErrorLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val secondColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnPrimaryLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnSecondaryLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnTertiaryLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnErrorLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val thirdColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.PrimaryContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SecondaryContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.TertiaryContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.ErrorContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val fourthColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnPrimaryContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnSecondaryContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnTertiaryContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnErrorContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val fifthColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceDimLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceBrightLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val sixthColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceContainerLowestLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceContainerLowLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceContainerLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceContainerHighLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.SurfaceContainerHighestLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val seventhColorRolesRowLight = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnSurfaceLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OnSurfaceVariantLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OutlineLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesLight.OutlineVariantLight.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val firstColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.PrimaryDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SecondaryDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.TertiaryDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.ErrorDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val secondColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnPrimaryDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnSecondaryDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnTertiaryDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnErrorDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val thirdColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.PrimaryContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SecondaryContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.TertiaryContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.ErrorContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val fourthColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnPrimaryContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnSecondaryContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnTertiaryContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnErrorContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val fifthColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceDimDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceBrightDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val sixthColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceContainerLowestDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceContainerLowDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceContainerDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceContainerHighDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.SurfaceContainerHighestDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val seventhColorRolesRowDark = remember {
+			listOf<@Composable () -> Unit>(
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnSurfaceDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OnSurfaceVariantDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OutlineDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				},
+				movableContentOf {
+					ColorRoleItem(
+						Modifier.animateTonalItem(this),
+						ColorRolesDark.OutlineVariantDark.dataAboutColors,
+						currentUiElement,
+						vm
+					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
+				}
+			)
+		}
+
+		val listOfColorRolesRowsLight = remember {
+			listOf(
+				firstColorRolesRowLight,
+				secondColorRolesRowLight,
+				thirdColorRolesRowLight,
+				fourthColorRolesRowLight,
+				fifthColorRolesRowLight,
+				sixthColorRolesRowLight,
+				seventhColorRolesRowLight
+			)
+		}
+		
+		val listOfColorRolesRowsDark = remember {
+			listOf(
+				firstColorRolesRowDark,
+				secondColorRolesRowDark,
+				thirdColorRolesRowDark,
+				fourthColorRolesRowDark,
+				fifthColorRolesRowDark,
+				sixthColorRolesRowDark,
+				seventhColorRolesRowDark
+			)
+		}
+		
+		val colorRolesAsMovableContent = remember {
+			movableContentOf {
+				ColorRolesAnimatedCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					label = "Color Roles",
+					expand = { if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.ColorRoles },
+					isOnHomePage = { isOnHomePage },
+					expanded = { currentPopupContentType == PaletteMenuCategories.ColorRoles },
+					displayStaticPlaceholder = { currentPopupContentTypeAnimated = PaletteMenuCategories.Home },
+					listOfColorRolesRowsLight = listOfColorRolesRowsLight,
+					listOfColorRolesRowsDark = listOfColorRolesRowsDark
+				)
+			}
+		}
+
+		val additionalColorsAsMovableContent = remember {
+			movableContentOf {
+				AdditionalColorsAnimatedCategoryContainer(
+					Modifier.animateCategoryButton(this),
+					vm,
+					currentUiElement,
+					expand = { if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.AdditionalColors },
+					isOnHomePage = { isOnHomePage },
+					expanded = { currentPopupContentType == PaletteMenuCategories.AdditionalColors },
+					displayStaticPlaceholder = { currentPopupContentTypeAnimated = PaletteMenuCategories.Home }
+				)
+			}
+		}
+
+		AnimatedVisibility(
+			visible = isPopupVisible,
+			enter = expandVertically(),
+			exit = shrinkVertically() + fadeOut(tween(150, 100))
 		) {
-			PalettePopupAppBar(
-				isOnHomePage,
-				isPopupVisible,
-				currentUiElement,
-				currentColor,
-				currentColorName,
-				hidePopup = hidePopup,
-				openHome = { currentPopupContentType = PaletteMenuCategories.Home }
+			val animatedPlaceholderAlpha by animateFloatAsState(
+				if (isOnHomePage) 1f else 0f,
+				label = ""
 			)
 
+			Column(
+				Modifier
+					.clip(RoundedCornerShape(32.dp))
+					.border(
+						1.dp,
+						MaterialTheme.colorScheme.outlineVariant,
+						RoundedCornerShape(32.dp)
+					)
+					.clickable(false) {}
+					.height(animatedPopupHeight)
+					.widthIn(max = 364.dp)
+					.background(MaterialTheme.colorScheme.background),
+			) {
+				PalettePopupAppBar(
+					isOnHomePage,
+					isPopupVisible,
+					currentUiElement,
+					currentColor,
+					currentColorName,
+					hidePopup = hidePopup,
+					openHome = { currentPopupContentType = PaletteMenuCategories.Home }
+				)
 
-			Box(Modifier.padding(16.dp)) {
-				// literally why
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Home,
-					enter = fadeIn(),
-					exit = fadeOut()
+				Box(
+					Modifier.padding(
+						start = 16.dp,
+						end = 16.dp,
+						top = 8.dp,
+						bottom = 16.dp
+					)
 				) {
-					Column {
-						LazyVerticalGrid(
-							columns = GridCells.Fixed(2),
-							verticalArrangement = spacedBy(24.dp),
+					when (currentPopupContentType) {
+						PaletteMenuCategories.Primary -> primaryAsMovableContent()
+						PaletteMenuCategories.Secondary -> secondaryAsMovableContent()
+						PaletteMenuCategories.Tertiary -> tertiaryAsMovableContent()
+						PaletteMenuCategories.Neutral -> neutralAsMovableContent()
+						PaletteMenuCategories.NeutralVariant -> neutralVariantAsMovableContent()
+						PaletteMenuCategories.Blue -> blueAsMovableContent()
+						PaletteMenuCategories.Red -> redAsMovableContent()
+						PaletteMenuCategories.Green -> greenAsMovableContent()
+						PaletteMenuCategories.Orange -> orangeAsMovableContent()
+						PaletteMenuCategories.Violet -> violetAsMovableContent()
+						PaletteMenuCategories.Pink -> pinkAsMovableContent()
+						PaletteMenuCategories.Cyan -> cyanAsMovableContent()
+						PaletteMenuCategories.ColorRoles -> colorRolesAsMovableContent()
+						PaletteMenuCategories.AdditionalColors -> additionalColorsAsMovableContent()
+						else -> {}
+					}
+
+					Column(
+						horizontalAlignment = Alignment.CenterHorizontally,
+						verticalArrangement = spacedBy(8.dp)
+					) {
+						Row(
+							Modifier
+								.weight(1f)
+								.zIndex(
+									if (
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Primary
+										||
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Secondary
+										||
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Tertiary
+									)
+										1f
+									else
+										0f
+								),
+							horizontalArrangement = spacedBy(8.dp)
 						) {
-							items(
-								PaletteMenuCategories.values()
-									// hide home, other, and color roles from the grid.
-									// color roles button is shown separately, at
-									// the bottom of the popup.
-									.filter {
-										it != PaletteMenuCategories.Home
-										&&
-										it != PaletteMenuCategories.ColorRoles
-										&&
-										it != PaletteMenuCategories.Additional
-									}
-							) { (categoryType, categoryName, categoryColor) ->
-								CategoryButton(
-									isLarge = false,
-									text = categoryName,
-									categoryColor = categoryColor,
-									onClick = { currentPopupContentType = categoryType }
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Primary)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
 								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Primary) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Primary },
+									enabled =  { isOnHomePage },
+									listOfColors = PrimaryTones.entries.map { it.name to it.dataAboutColors },
+									label = "Primary",
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Primary) primaryAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Secondary)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Secondary) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Secondary },
+									enabled = { isOnHomePage },
+									label = "Secondary",
+									listOfColors = SecondaryTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Secondary) secondaryAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Tertiary)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Tertiary) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Tertiary },
+									enabled = { isOnHomePage },
+									label = "Tertiary",
+									listOfColors = TertiaryTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Tertiary) tertiaryAsMovableContent()
 							}
 						}
 
-						Spacer(modifier = Modifier.height(16.dp))
+						Row(
+							Modifier
+								.weight(1f)
+								.zIndex(
+									if (
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Neutral
+										||
+										currentPopupContentTypeAnimated == PaletteMenuCategories.NeutralVariant
+									)
+										1f
+									else
+										0f
+								),
+							horizontalArrangement = spacedBy(8.dp)
+						) {
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Neutral)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Neutral) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Neutral },
+									enabled = { isOnHomePage },
+									label = "Neutral",
+									listOfColors = NeutralTones.entries.map { it.name to it.dataAboutColors },
+								)
 
-						Row(Modifier.fillMaxWidth()) {
-							CategoryButton(
-								Modifier.weight(1f, fill = false),
-								isLarge = true,
-								text = "Color Roles",
-								onClick = { currentPopupContentType = PaletteMenuCategories.ColorRoles }
-							)
-							
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Neutral) neutralAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.NeutralVariant)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.NeutralVariant) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.NeutralVariant },
+									enabled = { isOnHomePage },
+									label = "Neutral Variant",
+									listOfColors = NeutralVariantTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.NeutralVariant) neutralVariantAsMovableContent()
+							}
+						}
+
+						Row(
+							Modifier
+								.weight(1f)
+								.zIndex(
+									if (
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Blue
+										||
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Red
+										||
+										currentPopupContentTypeAnimated == PaletteMenuCategories.Green
+									)
+										1f
+									else
+										0f
+								),
+							horizontalArrangement = spacedBy(8.dp)
+						) {
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Blue)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Blue) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Blue },
+									enabled = { isOnHomePage },
+									label = "Blue",
+									listOfColors = BlueTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Blue) blueAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Red)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Red) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Red },
+									enabled = { isOnHomePage },
+									label = "Red",
+									listOfColors = RedTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Red) redAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Green)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Green) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Green },
+									enabled = { isOnHomePage },
+									label = "Green",
+									listOfColors = GreenTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Green) greenAsMovableContent()
+							}
+						}
+
+						Row(
+							Modifier.weight(1f),
+							horizontalArrangement = spacedBy(8.dp)
+						) {
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Orange)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Orange) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Orange },
+									enabled = { isOnHomePage },
+									label = "Orange",
+									listOfColors = OrangeTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Orange) orangeAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Violet)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Violet) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Violet },
+									enabled = { isOnHomePage },
+									label = "Violet",
+									listOfColors = VioletTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Violet) violetAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Pink)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Pink) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Pink },
+									enabled = { isOnHomePage },
+									label = "Pink",
+									listOfColors = PinkTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Pink) pinkAsMovableContent()
+							}
+
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.Cyan)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								SmallStaticExpandableCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Cyan) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Cyan },
+									enabled = { isOnHomePage },
+									label = "Cyan",
+									listOfColors = CyanTones.entries.map { it.name to it.dataAboutColors },
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Cyan) cyanAsMovableContent()
+							}
+						}
+
+						Spacer(modifier = Modifier.height(4.dp))
+
+						Row(
+							Modifier
+								.fillMaxWidth()
+								.weight(1f)) {
+							Box(Modifier.weight(1f)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.ColorRoles)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
+								)
+								ColorRolesStaticCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.ColorRoles) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.ColorRoles },
+									isOnHomePage = { isOnHomePage },
+									label = "Color Roles",
+									listOfColors = listOf(
+										Pair(ColorRolesDark.PrimaryDark.name, ColorRolesDark.PrimaryDark.dataAboutColors),
+										Pair(ColorRolesDark.SecondaryDark.name, ColorRolesDark.SecondaryDark.dataAboutColors),
+										Pair(ColorRolesDark.TertiaryDark.name, ColorRolesDark.TertiaryDark.dataAboutColors)
+									),
+									key = currentUiElement,
+									vm = vm
+								)
+
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.ColorRoles) colorRolesAsMovableContent()
+							}
+
 							Spacer(modifier = Modifier.width(8.dp))
 
-							Box(
-								Modifier
-									.size(44.dp, 88.dp)
-									.clip(RoundedCornerShape(16.dp))
-									.background(MaterialTheme.colorScheme.surfaceContainerHigh)
-									.clickable {
-										currentPopupContentType = PaletteMenuCategories.Additional
-									},
-								contentAlignment = Alignment.Center
-							) {
-								Icon(
-									Icons.Filled.MoreVert,
-									contentDescription = "Additional Colors"
+							Box(Modifier.width(44.dp)) {
+								val visibilityAlpha by animateFloatAsState(
+									if (currentPopupContentTypeAnimated == PaletteMenuCategories.AdditionalColors)
+										0f
+									else
+										animatedPlaceholderAlpha,
+									animationSpec = if (isOnHomePage) tween(0) else tween(10),
+									label = ""
 								)
-							}
-						}
-					}
-				}
+								AdditionalColorsStaticCategoryContainer(
+									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.AdditionalColors) visibilityAlpha else animatedPlaceholderAlpha },
+									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.AdditionalColors },
+									isOnHomePage = { isOnHomePage }
+								)
 
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.ColorRoles,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					ColorRolesMenu(vm, currentUiElement)
-				}
-				
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Additional,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					OtherMenu(vm, currentUiElement)
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Primary,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							PrimaryTones.entries.subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							PrimaryTones.entries.subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f),it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Secondary,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							SecondaryTones.entries.subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							SecondaryTones.entries.subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Tertiary,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							TertiaryTones.entries.subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							TertiaryTones.entries.subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Neutral,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							NeutralTones.entries.subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							NeutralTones.entries.subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.NeutralVariant,
-					enter = fadeIn(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							NeutralVariantTones.entries.subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							NeutralVariantTones.entries.subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Blue, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							BlueTones.entries.subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							BlueTones.entries.subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Green, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							GreenTones.entries.toList().subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							GreenTones.entries.toList().subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Orange, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							OrangeTones.entries.toList().subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							OrangeTones.entries.toList().subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Red, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							RedTones.entries.toList().subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							RedTones.entries.toList().subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Violet, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							VioletTones.entries.toList().subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							VioletTones.entries.toList().subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Pink, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							PinkTones.entries.toList().subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							PinkTones.entries.toList().subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-					}
-				}
-
-				this@OutlinedCard.AnimatedVisibility(
-					visible = currentPopupContentType == PaletteMenuCategories.Cyan, enter = fadeIn() + expandVertically(),
-					exit = fadeOut()
-				) {
-					Column {
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							CyanTones.entries.toList().subList(0, 6).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
-							}
-						}
-
-						Spacer(modifier = Modifier.height(8.dp))
-
-						Row(horizontalArrangement = spacedBy(8.dp)) {
-							CyanTones.entries.toList().subList(6, 13).forEach {
-								TonalPaletteItem(Modifier.weight(1f), it.dataAboutColors, currentUiElement, vm)
+								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.AdditionalColors) additionalColorsAsMovableContent()
 							}
 						}
 					}
@@ -469,197 +1558,510 @@ private fun TonalPaletteItem(
 	modifier: Modifier = Modifier,
 	dataAboutColors: DataAboutColors,
 	key: String,
-	vm: MainViewModel
+	vm: MainViewModel,
+	enabled: () -> Boolean
 ) {
 	val colorToken = dataAboutColors.colorToken
 	val colorValue = dataAboutColors.colorValue()
+	
+	val size = if (!enabled())
+		Size(32f, 24f)
+	else
+		Size(9999f, 80f)
 
 	Box(
 		modifier
-			.height(80.dp)
-			.width(30.dp)
+			.width(size.width.dp)
+			.height(size.height.dp)
 			.clip(CircleShape)
 			.background(colorValue)
-			.clickable { vm.changeValue(key, colorToken, colorValue) }
+			.let {
+				// no, the enabled parameter in the clickable modifier
+				// doesn't cut it
+				return@let if (enabled()) it.clickable {
+					vm.changeValue(
+						key,
+						colorToken,
+						colorValue
+					)
+				} else it
+			}
 	)
 }
 
 @Composable
-private fun CategoryButton(
-	modifier: Modifier = Modifier,
-	isLarge: Boolean = false,
-	text: String,
-	categoryColor: Color = Color.Transparent,
-	onClick: () -> Unit
+private fun ColorRolesAnimatedCategoryContainer(
+	modifier: Modifier,
+	expand: () -> Unit,
+	label: String,
+	isOnHomePage: () -> Boolean,
+	displayStaticPlaceholder: () -> Unit,
+	expanded: () -> Boolean,
+	listOfColorRolesRowsLight: List<List<@Composable () -> Unit>>,
+	listOfColorRolesRowsDark: List<List<@Composable () -> Unit>>
 ) {
-	if (isLarge) {
+	val density = LocalDensity.current
+
+	var allowSwitchingToStatic by remember { mutableStateOf(false) }
+
+	var maxSize by remember { mutableStateOf(Size.Unspecified) }
+	val notPagerScrollState = rememberScrollState()
+
+	val indicatorHorizontalAlignment by remember {
+		derivedStateOf {
+			-1f + ((1 + notPagerScrollState.value.toFloat()) / (1 + notPagerScrollState.maxValue.toFloat())) * 2
+		}
+	}
+
+	val backgroundAndContentAlpha by animateFloatAsState(
+		if (expanded()) 0f else 1f,
+		label = ""
+	)
+
+	val wholeAlpha by animateFloatAsState(
+		if (!isOnHomePage() && !expanded()) 0f else 1f,
+		label = ""
+	)
+
+	Box(
+		modifier
+			.onGloballyPositioned { maxSize = it.size.toSize() / density.density }
+			.clip(RoundedCornerShape(16.dp))
+			.let {
+				return@let if (isOnHomePage()) it.clickable { expand() } else it
+			}
+	) {
 		Row(
-			modifier
-				.clickable { onClick.invoke() }
-				.fillMaxWidth()
-				.height(88.dp)
-				.clip(RoundedCornerShape(18.dp))
-				.background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+			Modifier
+				.fillMaxSize()
+				.graphicsLayer { alpha = wholeAlpha }
+
+				.border(
+					1.dp,
+					MaterialTheme.colorScheme.outlineVariant.copy(backgroundAndContentAlpha),
+					RoundedCornerShape(16.dp)
+				),
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.Center
 		) {
-			Box(Modifier.width(96.dp)) {
-				Box(
-					Modifier
-						.size(48.dp)
-						.clip(CircleShape)
-						.background(MaterialTheme.colorScheme.primary)
-				)
-				Box(
-					Modifier
-						.size(48.dp)
-						.clip(CircleShape)
-						.background(MaterialTheme.colorScheme.secondary)
-						.align(Alignment.Center)
-				)
-				Box(
-					Modifier
-						.size(48.dp)
-						.clip(CircleShape)
-						.background(MaterialTheme.colorScheme.tertiary)
-						.align(Alignment.CenterEnd)
-				)
+			Box(Modifier.width(72.dp).height(32.dp)) {
+				if (!expanded()) {
+					listOfColorRolesRowsLight.forEachIndexed { listIndex, rowItems ->
+						rowItems.forEachIndexed { itemIndex, item ->
+							item()
+						}
+					}
+
+					listOfColorRolesRowsDark.forEachIndexed { listIndex, rowItems ->
+						rowItems.forEachIndexed { itemIndex, item ->
+							// if is the first row and the first 3 colors in it, i.e.
+							// primary, secondary, and tertiary. error is 4th
+							val zIndex = if (listIndex == 0 && itemIndex != 3) 1f else 0f
+							val padding = when (itemIndex) {
+								1 -> 12.dp
+								2 -> 24.dp
+								else -> 0.dp
+							}
+
+							Box(Modifier.zIndex(zIndex).padding(start = padding)) {
+								item()
+							}
+						}
+					}
+
+					LaunchedEffect(expanded()) {
+						if (allowSwitchingToStatic && !expanded()) {
+							delay(500)
+							displayStaticPlaceholder()
+						}
+					}
+				}
 			}
 
 			Spacer(modifier = Modifier.size(12.dp))
 
 			Text(
-				text = text,
-				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-					MaterialTheme.typography.headlineSmall
-				)
+				text = label,
+				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+				fontSize = 20.sp,
+				fontWeight = FontWeight.W400,
+				modifier = Modifier.graphicsLayer { alpha = backgroundAndContentAlpha }
 			)
 		}
-	} else {
-		Row(
-			modifier.clickable { onClick.invoke() },
-			verticalAlignment = Alignment.CenterVertically
+
+		Column {
+			Box(
+				Modifier.graphicsLayer { alpha = 1f - backgroundAndContentAlpha },
+				contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)
+			) {
+				HorizontalDivider()
+				HorizontalDivider(
+					modifier = Modifier.fillMaxWidth(0.5f),
+					color = MaterialTheme.colorScheme.onSurface
+				)
+			}
+
+			Spacer(modifier = Modifier.height(16.dp))
+
+			Row(Modifier.horizontalScroll(notPagerScrollState)) {
+				if (maxSize != Size.Unspecified) Box(Modifier.size(maxSize.width.dp, maxSize.height.dp)) {
+					// light
+					Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+						Icon(
+							SolarSet.Sun,
+							contentDescription = "Light theme color roles",
+							Modifier
+								.size(32.dp)
+								.graphicsLayer { alpha = 1f - backgroundAndContentAlpha }
+						)
+
+						Spacer(modifier = Modifier.height(16.dp))
+
+						if (expanded()) Column(verticalArrangement = spacedBy(8.dp)) {
+							listOfColorRolesRowsLight.forEach { rowItems ->
+								ColorRolesPaletteRow(listWithMovableContent = rowItems)
+							}
+						}
+					}
+				}
+
+				Spacer(modifier = Modifier.width(16.dp))
+
+				if (maxSize != Size.Unspecified) Box(Modifier.size(maxSize.width.dp, maxSize.height.dp)) {
+					Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+						Icon(
+							SolarSet.Moon,
+							contentDescription = "Dark theme color roles",
+							Modifier
+								.size(32.dp)
+								.graphicsLayer { alpha = 1f - backgroundAndContentAlpha }
+						)
+
+						Spacer(modifier = Modifier.height(16.dp))
+
+						if (expanded()) Column(verticalArrangement = spacedBy(8.dp)) {
+							listOfColorRolesRowsDark.forEachIndexed { index, rowItems ->
+								ColorRolesPaletteRow(modifier = Modifier.zIndex(-index.toFloat()), rowItems)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// as soon as this is rendered - launch animation
+	LaunchedEffect(Unit) {
+		expand()
+		allowSwitchingToStatic = true
+	}
+}
+
+@Composable
+private fun ColorRolesStaticCategoryContainer(
+	modifier: Modifier,
+	expand: () -> Unit,
+	isOnHomePage: () -> Boolean,
+	label: String,
+	listOfColors: List<Pair<String, DataAboutColors>>,
+	key: String,
+	vm: MainViewModel
+) {
+	Row(
+		modifier
+			.fillMaxSize()
+			.clip(RoundedCornerShape(16.dp))
+			.let { return@let if (isOnHomePage()) it.clickable { expand() } else it }
+			.border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.Center
+	) {
+		Box(Modifier.width(72.dp).height(32.dp)) {
+			listOfColors.forEachIndexed { index, it ->
+				ColorRoleItem(
+					Modifier.padding(start = (index * 12).dp),
+					dataAboutColors = it.second,
+					key = key,
+					vm = vm,
+					enabled = { false }
+				)
+			}
+		}
+
+		Spacer(modifier = Modifier.size(12.dp))
+
+		Text(
+			text = label,
+			style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+			fontSize = 20.sp,
+			fontWeight = FontWeight.W400,
+		)
+	}
+}
+
+@Composable
+private fun SmallAnimatedExpandableCategoryContainer(
+	modifier: Modifier = Modifier,
+	expand: () -> Unit,
+	displayStaticPlaceholder: () -> Unit,
+	label: String,
+	listOfColors: () -> List<@Composable () -> Unit>,
+	isOnHomePage: () -> Boolean,
+	chosen: () -> Boolean,
+) {
+	var allowSwitchingToStatic by remember { mutableStateOf(false) }
+
+	val backgroundAndTextAlpha by animateFloatAsState(
+		if (chosen()) 0f else 1f,
+		label = ""
+	)
+
+	val wholeAlpha by animateFloatAsState(
+		if (!isOnHomePage() && !chosen()) 0f else 1f,
+		label = ""
+	)
+
+	Box(
+		modifier
+			.graphicsLayer { alpha = wholeAlpha }
+			.clip(RoundedCornerShape(16.dp))
+			.let {
+				return@let if (isOnHomePage()) it.clickable { expand() } else it
+			}
+			.background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(backgroundAndTextAlpha))
+	) {
+		if (chosen()) TonalPaletteFromType(listOfColors())
+
+		Column(
+			Modifier
+				.let { return@let if (chosen()) it else it.clickable { expand() } }
+				.fillMaxSize(),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center
+		) {
+			if (!chosen()) Box(
+				Modifier
+					.height(24.dp)
+					.width(48.dp)
+					// zIndex of 1f so the tones are displayed over the
+					// label during the animation
+					.zIndex(1f)
+			) {
+				CategoryButtonColorsFromList(listOfColors())
+			}
+
+			Spacer(modifier = Modifier.height(10.dp))
+
+			LaunchedEffect(chosen()) {
+				if (allowSwitchingToStatic && !chosen()) {
+					delay(500)
+					displayStaticPlaceholder()
+				}
+			}
+
+			Text(
+				text = label,
+				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
+					MaterialTheme.typography.labelMedium
+				),
+				textAlign = TextAlign.Center,
+				modifier = Modifier.graphicsLayer { alpha = backgroundAndTextAlpha }
+			)
+		}
+	}
+
+	// as soon as this is rendered - launch animation
+	LaunchedEffect(Unit) {
+		expand()
+		allowSwitchingToStatic = true
+	}
+}
+
+@Composable
+private fun SmallStaticExpandableCategoryContainer(
+	modifier: Modifier = Modifier,
+	expand: () -> Unit,
+	enabled: () -> Boolean,
+	label: String,
+	listOfColors: List<Pair<String, DataAboutColors>>
+) {
+	Box(
+		modifier
+			.clip(RoundedCornerShape(16.dp))
+			.background(MaterialTheme.colorScheme.surfaceContainerHigh)
+	) {
+		Column(
+			Modifier
+				.let { return@let if (enabled()) it.clickable { expand() } else it }
+				.fillMaxSize(),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center
 		) {
 			Box(
 				Modifier
-					.size(48.dp)
-					.clip(CircleShape)
-					.background(categoryColor)
-			)
+					.height(24.dp)
+					.width(48.dp)) {
+				listOfColors.subList(4, 7).forEachIndexed { index, it ->
+					Box(
+						modifier
+							.padding(start = (index * 8).dp)
+							.width(32.dp)
+							.height(24.dp)
+							.clip(CircleShape)
+							.background(it.second.colorValue())
+					)
+				}
+			}
 
-			Spacer(modifier = Modifier.size(12.dp))
+			Spacer(modifier = Modifier.height(10.dp))
 
 			Text(
-				text = text,
+				text = label,
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(
-					MaterialTheme.typography.bodyLarge
+					MaterialTheme.typography.labelMedium
 				),
-				modifier = Modifier.width(100.dp)
+				textAlign = TextAlign.Center
 			)
 		}
 	}
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ColorRolesMenu(vm: MainViewModel, key: String) {
-	val colorRolesCategoryPagerState = rememberPagerState(
-		initialPage = 0,
-		initialPageOffsetFraction = 0f,
-		pageCount = { 2 }
+fun AdditionalColorsAnimatedCategoryContainer(
+	modifier: Modifier = Modifier,
+	vm: MainViewModel,
+	key: String,
+	expand: () -> Unit,
+	isOnHomePage: () -> Boolean,
+	expanded: () -> Boolean,
+	displayStaticPlaceholder: () -> Unit
+) {
+	var allowSwitchingToStatic by remember { mutableStateOf(false) }
+
+	val backgroundAndTextAlpha by animateFloatAsState(
+		if (expanded()) 0f else 1f,
+		label = ""
 	)
 
-	val indicatorHorizontalAlignment by remember {
-		derivedStateOf {
-			-1f + (colorRolesCategoryPagerState.getOffsetFractionForPage(0) * 2)
-		}
-	}
+	val wholeAlpha by animateFloatAsState(
+		if (!isOnHomePage() && !expanded()) 0f else 1f,
+		label = ""
+	)
 
-	Column {
-		Box(contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)) {
-			Divider()
-			Divider(
-				color = MaterialTheme.colorScheme.onSurface,
-				modifier = Modifier.fillMaxWidth(0.5f)
+	Box(
+		modifier
+			.fillMaxSize()
+			.graphicsLayer { alpha = wholeAlpha }
+			.border(
+				1.dp,
+				MaterialTheme.colorScheme.outlineVariant.copy(backgroundAndTextAlpha),
+				RoundedCornerShape(16.dp)
 			)
-		}
-
-		Spacer(modifier = Modifier.height(16.dp))
-
-		HorizontalPager(
-			state = colorRolesCategoryPagerState,
-			pageSpacing = 16.dp
-		){
-			if (it == 0) LightColorRoles(vm, key) else DarkColorRoles(vm, key)
-		}
-	}
-}
-
-@Composable
-fun OtherMenu(vm: MainViewModel, key: String) {
-	Column(verticalArrangement = spacedBy(8.dp)) {
-		Row(horizontalArrangement = spacedBy(8.dp)) {
-			ColorRoleItem(
-				Modifier.weight(1f),
-				OtherColors.SurfaceElevationLevel3Light.dataAboutColors,
-				key = key,
-				vm = vm
-			)
-
-			ColorRoleItem(
-				Modifier.weight(1f),
-				OtherColors.SurfaceElevationLevel3Dark.dataAboutColors,
-				key = key,
-				vm = vm
-			)
-		}
-		
-		Box(contentAlignment = Alignment.Center) {
-			ColorRoleItem(
-				Modifier,
-				OtherColors.Transparent.dataAboutColors,
-				key = key,
-				vm = vm
-			)
-			
-			Text(text = "Transparent")
-		}
-	}
-}
-
-@Composable
-fun LightColorRoles(vm: MainViewModel, key: String) {
-	Column(verticalArrangement = spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+			.let {
+				return@let if (isOnHomePage())
+					it.clickable { expand() }
+				else
+					it
+			},
+		contentAlignment = Alignment.Center
+	) {
 		Icon(
-			SolarSet.Sun,
-			contentDescription = "Light theme color roles",
-			Modifier.size(32.dp)
+			Icons.Filled.MoreVert,
+			contentDescription = "Additional Colors",
+			modifier = Modifier.graphicsLayer { alpha  = backgroundAndTextAlpha }
 		)
 
-		Spacer(modifier = Modifier.height(8.dp))
+		AnimatedVisibility(
+			visible = expanded(),
+			enter = fadeIn(),
+			exit = fadeOut()
+		) {
+			Column(verticalArrangement = spacedBy(8.dp)) {
+				Row(horizontalArrangement = spacedBy(8.dp)) {
+					ColorRoleItem(
+						Modifier.weight(1f),
+						AdditionalColors.White.dataAboutColors,
+						key = key,
+						vm = vm
+					) { true }
 
-		PrimarySecondaryTertiaryErrorLight(vm, key)
-		SurfacesLight(vm, key)
-		SurfaceContainersLight(vm, key)
-		OnSurfacesAndOutlinesLight(vm, key)
+					ColorRoleItem(
+						Modifier.weight(1f),
+						AdditionalColors.Black.dataAboutColors,
+						key = key,
+						vm = vm
+					) { true }
+				}
+				Row(horizontalArrangement = spacedBy(8.dp)) {
+					ColorRoleItem(
+						Modifier.weight(1f),
+						AdditionalColors.SurfaceElevationLevel3Light.dataAboutColors,
+						key = key,
+						vm = vm
+					) { true }
+
+					ColorRoleItem(
+						Modifier.weight(1f),
+						AdditionalColors.SurfaceElevationLevel3Dark.dataAboutColors,
+						key = key,
+						vm = vm
+					) { true }
+				}
+
+				Box(contentAlignment = Alignment.Center) {
+					ColorRoleItem(
+						Modifier,
+						AdditionalColors.Transparent.dataAboutColors,
+						key = key,
+						vm = vm
+					) { true }
+
+					Text(text = "Transparent")
+				}
+			}
+		}
+
+		LaunchedEffect(expanded()) {
+			if (allowSwitchingToStatic && !expanded()) {
+				delay(500)
+				displayStaticPlaceholder()
+			}
+		}
+	}
+
+	// as soon as this is rendered - launch animation
+	LaunchedEffect(Unit) {
+		expand()
+		allowSwitchingToStatic = true
 	}
 }
 
 @Composable
-fun DarkColorRoles(vm: MainViewModel, key: String) {
-	Column(verticalArrangement = spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+fun AdditionalColorsStaticCategoryContainer(
+	modifier: Modifier = Modifier,
+	expand: () -> Unit,
+	isOnHomePage: () -> Boolean
+) {
+	Box(
+		modifier
+			.fillMaxSize()
+			.border(
+				1.dp,
+				MaterialTheme.colorScheme.outlineVariant,
+				RoundedCornerShape(16.dp)
+			)
+			.let {
+				return@let if (isOnHomePage())
+					it.clickable { expand() }
+				else
+					it
+			},
+		contentAlignment = Alignment.Center
+	) {
 		Icon(
-			SolarSet.Moon,
-			contentDescription = "Light theme color roles",
-			Modifier.size(32.dp)
+			Icons.Filled.MoreVert,
+			contentDescription = "Additional Colors"
 		)
-
-		Spacer(modifier = Modifier.height(8.dp))
-
-		PrimarySecondaryTertiaryErrorDark(vm, key)
-		SurfacesDark(vm, key)
-		SurfaceContainersDark(vm, key)
-		OnSurfacesAndOutlinesDark(vm, key)
 	}
 }
 
@@ -668,504 +2070,30 @@ private fun ColorRoleItem(
 	modifier: Modifier = Modifier,
 	dataAboutColors: DataAboutColors,
 	key: String,
-	vm: MainViewModel
+	vm: MainViewModel,
+	enabled: () -> Boolean,
 ) {
 	val colorToken = dataAboutColors.colorToken
 	val colorValue = dataAboutColors.colorValue()
+
+	val outlineAlpha by animateFloatAsState(
+		if (enabled()) 1f else 0f, label = ""
+	)
 
 	Box(
 		modifier
 			.height(40.dp)
 			.fillMaxWidth()
 			.clip(CircleShape)
-			.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+			.border(1.dp, MaterialTheme.colorScheme.outline.copy(outlineAlpha), CircleShape)
 			.background(colorValue)
-			.clickable {
-				vm.changeValue(
-					key,
-					colorToken,
-					colorValue
-				)
+			.let {
+				return@let if (enabled())
+					it.clickable { vm.changeValue(key, colorToken, colorValue) }
+				else
+					it
 			}
 	)
-}
-
-@Composable
-private fun PrimarySecondaryTertiaryErrorDark(
-	vm: MainViewModel,
-	key: String
-) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.PrimaryDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnPrimaryDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.PrimaryContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnPrimaryContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-		}
-
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.SecondaryDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnSecondaryDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.SecondaryContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnSecondaryContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-		}
-
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.TertiaryDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnTertiaryDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.TertiaryContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnTertiaryContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-		}
-
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.ErrorDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnErrorDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.ErrorContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesDark.OnErrorContainerDark.dataAboutColors,
-				key,
-				vm
-			)
-		}
-	}
-}
-
-@Composable
-private fun OnSurfacesAndOutlinesDark(vm: MainViewModel, key: String) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.OnSurfaceDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.OnSurfaceVariantDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.OutlineDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.OutlineVariantDark.dataAboutColors,
-			key,
-			vm
-		)
-	}
-}
-
-@Composable
-private fun SurfaceContainersDark(vm: MainViewModel, key: String) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceContainerLowestDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceContainerLowDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceContainerDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceContainerHighDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceContainerHighestDark.dataAboutColors,
-			key,
-			vm
-		)
-	}
-}
-
-@Composable
-private fun SurfacesDark(vm: MainViewModel, key: String) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceDimDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceDark.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesDark.SurfaceBrightDark.dataAboutColors,
-			key,
-			vm
-		)
-	}
-}
-
-@Composable
-private fun PrimarySecondaryTertiaryErrorLight(
-	vm: MainViewModel,
-	key: String
-) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.PrimaryLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnPrimaryLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.PrimaryContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnPrimaryContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-		}
-
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.SecondaryLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnSecondaryLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.SecondaryContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnSecondaryContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-		}
-
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.TertiaryLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnTertiaryLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.TertiaryContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnTertiaryContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-		}
-
-		Column(
-			verticalArrangement = spacedBy(8.dp),
-			modifier = Modifier.weight(1f)
-		) {
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.ErrorLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnErrorLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.ErrorContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-
-			ColorRoleItem(
-				Modifier,
-				ColorRolesLight.OnErrorContainerLight.dataAboutColors,
-				key,
-				vm
-			)
-		}
-	}
-}
-
-@Composable
-private fun OnSurfacesAndOutlinesLight(vm: MainViewModel, key: String) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.OnSurfaceLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.OnSurfaceVariantLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.OutlineLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.OutlineVariantLight.dataAboutColors,
-			key,
-			vm
-		)
-	}
-}
-
-@Composable
-private fun SurfaceContainersLight(vm: MainViewModel, key: String) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceContainerLowestLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceContainerLowLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceContainerLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceContainerHighLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceContainerHighestLight.dataAboutColors,
-			key,
-			vm
-		)
-	}
-}
-
-@Composable
-private fun SurfacesLight(vm: MainViewModel, key: String) {
-	Row(horizontalArrangement = spacedBy(8.dp)) {
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceDimLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceLight.dataAboutColors,
-			key,
-			vm
-		)
-
-		ColorRoleItem(
-			Modifier.weight(1f),
-			ColorRolesLight.SurfaceBrightLight.dataAboutColors,
-			key,
-			vm
-		)
-	}
 }
 
 enum class PaletteMenuCategories() {
@@ -1177,13 +2105,13 @@ enum class PaletteMenuCategories() {
 	Neutral,
 	NeutralVariant,
 	Blue,
+	Red,
 	Green,
 	Orange,
-	Red,
 	Violet,
 	Pink,
 	Cyan,
-	Additional;
+	AdditionalColors;
 
 	operator fun component1(): PaletteMenuCategories {
 		return this
@@ -1196,30 +2124,77 @@ enum class PaletteMenuCategories() {
 			else -> this.name
 		}
 	}
+}
 
-	@Composable
-	operator fun component3(): Color {
-		return when (this) {
-			Primary -> MaterialTheme.colorScheme.primary
-			Secondary -> MaterialTheme.colorScheme.secondary
-			Tertiary -> MaterialTheme.colorScheme.tertiary
-			Neutral -> if (isSystemInDarkTheme()) NeutralTones.T60.dataAboutColors.colorValue() else NeutralTones.T40.dataAboutColors.colorValue()
-			NeutralVariant -> if (isSystemInDarkTheme()) NeutralVariantTones.T60.dataAboutColors.colorValue() else NeutralVariantTones.T40.dataAboutColors.colorValue()
-			Blue -> if (isSystemInDarkTheme()) BlueTones.T60.dataAboutColors.colorValue() else BlueTones.T40.dataAboutColors.colorValue()
+@Composable
+fun CategoryButtonColorsFromList(listWithMovableContent: List<@Composable () -> Unit>) {
+	listWithMovableContent.subList(1, 12).forEachIndexed { index, content ->
+		val padding = if (listWithMovableContent.lastIndex <= 2) when (index) {
+			0 -> 0.dp
+			1 -> 8.dp
+			2 -> 16.dp
+			else -> 8.dp
+		} else when (index) {
+			3 -> 0.dp
+			4 -> 8.dp
+			5 -> 16.dp
+			else -> 8.dp
+		}
 
-			Green -> if (isSystemInDarkTheme()) GreenTones.T60.dataAboutColors.colorValue() else GreenTones.T40.dataAboutColors.colorValue()
+		val zIndex = if (index == 5 || index == 4 || index == 3) 1f else 0f
 
-			Orange -> if (isSystemInDarkTheme()) OrangeTones.T60.dataAboutColors.colorValue() else OrangeTones.T40.dataAboutColors.colorValue()
+		Box(
+			Modifier
+				.zIndex(zIndex) // putting nice tones on top so it looks nice
+				.padding(start = padding)
+		) {
+			content()
+		}
+	}
+}
 
-			Red -> if (isSystemInDarkTheme()) RedTones.T60.dataAboutColors.colorValue() else RedTones.T40.dataAboutColors.colorValue()
+@Composable
+fun TonalPaletteFromType(listWithMovableContent: List<@Composable () -> Unit>) {
+	Column {
+		Row(horizontalArrangement = spacedBy(8.dp)) {
+			listWithMovableContent.subList(1, 6).forEachIndexed { index, content ->
+				val zIndex = if (index == 6 || index == 5 || index == 4) 1f else 0f
 
-			Violet -> if (isSystemInDarkTheme()) VioletTones.T60.dataAboutColors.colorValue() else VioletTones.T40.dataAboutColors.colorValue()
+				Box(Modifier.weight(1f).zIndex(zIndex)) { content() }
+			}
+		}
 
-			Pink -> if (isSystemInDarkTheme()) PinkTones.T60.dataAboutColors.colorValue() else PinkTones.T40.dataAboutColors.colorValue()
+		Spacer(modifier = Modifier.height(8.dp))
 
-			Cyan -> if (isSystemInDarkTheme()) CyanTones.T60.dataAboutColors.colorValue() else CyanTones.T40.dataAboutColors.colorValue()
+		// giving it zIndex of -1f because otherwise the white
+		// tonal item shows up in the middle  when the animation starts
+		// and it just looks bad, but TODO: the first element of this row is
+		// displayed under the last one of the top row at the
+		// beginning of the expansion animation, and so it doesnt match
+		// the preview
+		Row(horizontalArrangement = spacedBy(8.dp), modifier = Modifier.zIndex(-1f)) {
+			listWithMovableContent.subList(6, 12).forEachIndexed { index, content ->
+				val zIndex = if (index == 0 ) 1f else 0f
 
-			else -> Color.Transparent
+				Box(Modifier.weight(1f).zIndex(zIndex)) { content() }
+			}
+		}
+	}
+}
+
+@Composable
+fun ColorRolesPaletteRow(modifier: Modifier = Modifier, listWithMovableContent: List<@Composable () -> Unit>) {
+	Row(modifier, horizontalArrangement = spacedBy(8.dp)) {
+		listWithMovableContent.forEachIndexed { index, item ->
+			val zIndex = when(index) {
+				0 -> 0f
+				1 -> 1f
+				2 -> 2f
+				3 -> -1f
+				else -> 0f
+			}
+
+			Box(Modifier.weight(1f).zIndex(zIndex)) { item() }
 		}
 	}
 }
