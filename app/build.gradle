@@ -3,8 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-def version = "1.1.0"
-def versionNumber = 2
+def version = "1.2.0"
+def versionNumber = 3
 
 android {
     namespace 'com.number869.telemone'
