@@ -5,6 +5,10 @@ package com.number869.telemone.ui.screens.editor
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,12 +34,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -58,33 +60,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.SmallTintedLabel
-import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
+import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
-import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
-import com.number869.telemone.ui.theme.fullPalette
+import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
+import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
+import com.number869.telemone.ui.theme.PaletteState
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
-import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
 
 // this is prob gonna get redesigned
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun EditorScreen(navController: NavController, vm: MainViewModel) {
+fun EditorScreen(
+	navController: NavController,
+	vm: MainViewModel,
+	paletteState: PaletteState
+) {
 	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 	val context = LocalContext.current
-	val palette = fullPalette()
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
-	)
-	val savedThemeItemDisplayType = preferences.getString(
-		AppSettings.SavedThemeItemDisplayType.id,
-		"1"
 	)
 
 	val themeList by remember {
@@ -103,6 +103,8 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 	val savedThemesRowState = rememberLazyListState()
 	val wholeThingListState = rememberLazyListState()
 
+	var themeSelectionModeIsActive by remember { mutableStateOf(false) }
+
 	LaunchedEffect(themeList) {
 		savedThemesRowState.animateScrollToItem(0)
 	}
@@ -112,6 +114,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 		topBar = {
 			EditorTopAppBar(
 				topAppBarState,
+				paletteState,
 				navController,
 				vm,
 				mappedValues = { mappedValues }
@@ -195,7 +198,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 								LazyRow(
 									state = savedThemesRowState,
 									contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
-									horizontalArrangement = Arrangement.spacedBy(16.dp),
+									horizontalArrangement = spacedBy(16.dp),
 									modifier = Modifier.animateContentSize()
 								) {
 									itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
@@ -203,14 +206,38 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 											Modifier.animateItemPlacement(),
 											vm,
 											uuid,
-											palette,
+											paletteState,
 											context,
-											true
+											true,
+											changeSelectionMode = { themeSelectionModeIsActive = !themeSelectionModeIsActive },
+											themeSelectionModeIsActive = themeSelectionModeIsActive
 										)
 									}
 								}
 
-								Spacer(modifier = Modifier.height(24.dp))
+								Row(
+									Modifier.fillMaxWidth(),
+									horizontalArrangement = Arrangement.Center
+								) {
+									AnimatedVisibility(
+										themeSelectionModeIsActive,
+										enter = expandVertically(expandFrom = Alignment.CenterVertically) + fadeIn(),
+										exit = shrinkVertically(shrinkTowards = Alignment.CenterVertically) + fadeOut(),
+									) {
+										ThemeSelectionToolbar(
+											Modifier.padding(top = 16.dp),
+											vm,
+											hideToolbarAction = { themeSelectionModeIsActive = false },
+											context
+										)
+									}
+								}
+
+								Spacer(
+									Modifier
+										.animateContentSize()
+										.height(if (themeSelectionModeIsActive) 12.dp else 24.dp)
+								)
 							}
 						}
 					}
@@ -237,8 +264,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 								vm = vm,
 								index = index,
 								themeMap = mappedValues,
-								lastIndexInList = newUiElementsColors.lastIndex,
-								palette = palette,
+								lastIndexInList = newUiElementsColors.lastIndex
 							)
 						}
 
@@ -268,8 +294,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 								vm = vm,
 								index = index,
 								themeMap = mappedValues,
-								lastIndexInList = mappedValuesAsList.lastIndex,
-								palette = palette,
+								lastIndexInList = mappedValuesAsList.lastIndex
 							)
 						}
 					}
@@ -294,8 +319,7 @@ fun EditorScreen(navController: NavController, vm: MainViewModel) {
 							vm = vm,
 							index = index,
 							themeMap = mappedValues,
-							lastIndexInList = mappedValuesAsList.lastIndex,
-							palette = palette,
+							lastIndexInList = mappedValuesAsList.lastIndex
 						)
 					}
 				}

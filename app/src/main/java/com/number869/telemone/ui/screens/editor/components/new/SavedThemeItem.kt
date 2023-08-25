@@ -2,9 +2,14 @@ package com.number869.telemone.ui.screens.editor.components.new
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,12 +30,16 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
@@ -48,7 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.getColorValueFromColorToken
-import com.number869.telemone.ui.theme.FullPaletteList
+import com.number869.telemone.ui.theme.PaletteState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -56,10 +66,12 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	uuid: String,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context,
 	isInSavedThemesRow: Boolean = false,
-	colorDisplayTypeOverwrite: String? = null
+	colorDisplayTypeOverwrite: String? = null,
+	changeSelectionMode: () -> Unit = { },
+	themeSelectionModeIsActive: Boolean = false
 ) {
 	var showMenu by remember { mutableStateOf(false) }
 	var showDeleteDialog by remember { mutableStateOf(false) }
@@ -67,6 +79,15 @@ fun SavedThemeItem(
 	var showOverwriteChoiceDialog by remember { mutableStateOf(false) }
 	var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
 	var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
+
+	val selected by remember { derivedStateOf { vm.selectedThemes.contains(uuid) } }
+	val selectedOverlayColor by animateColorAsState(
+		if (themeSelectionModeIsActive && selected)
+			MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+		else
+			Color.Transparent,
+		label = ""
+	)
 
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
@@ -103,7 +124,7 @@ fun SavedThemeItem(
 						?.get(uuid)
 						?.get(colorValueOf)
 						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.first, palette)
+							val colorFromToken = getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap.value)
 							val colorAsSaved = Color(it.second)
 
 							// colorFromToken prob should be Color? so it can
@@ -115,7 +136,7 @@ fun SavedThemeItem(
 					vm.themeList.find { it.containsKey(uuid) }
 						?.get(uuid)
 						?.get(colorValueOf)
-						?.let { getColorValueFromColorToken(it.first, palette) } ?: Color.Red
+						?.let { getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap.value) } ?: Color.Red
 				}
 			},
 			label = "i hate these labels"
@@ -125,17 +146,17 @@ fun SavedThemeItem(
 	Box {
 		OutlinedCard(
 			modifier
+				.clip(RoundedCornerShape(16.dp))
 				.width(150.dp)
 				.height(180.dp)
-				.clip(RoundedCornerShape(16.dp))
 				.let {
-					return@let if (isInSavedThemesRow)
+					return@let if (isInSavedThemesRow && !themeSelectionModeIsActive)
 						it.combinedClickable(
 							onClick = {
 								vm.loadTheme(
 									uuid,
 									withTokens = false,
-									palette,
+									paletteState.entirePaletteAsMap.value,
 									clearCurrentTheme = true,
 									context
 								)
@@ -150,8 +171,14 @@ fun SavedThemeItem(
 							},
 							onLongClick = { showMenu = true }
 						)
+					else if (themeSelectionModeIsActive)
+						it.clickable { vm.selectOrUnselectSavedTheme(uuid) }
 					else
 						it
+				}
+				.drawWithContent {
+					drawContent()
+					drawRect(selectedOverlayColor)
 				},
 			shape = RoundedCornerShape(16.dp)
 		) {
@@ -168,6 +195,25 @@ fun SavedThemeItem(
 				colorOf("chat_messagePanelBackground"),
 				colorOf("chat_messagePanelIcons"),
 				colorOf("chat_messagePanelHint")
+			)
+		}
+
+		AnimatedVisibility(
+			visible = themeSelectionModeIsActive,
+			enter = scaleIn(),
+			exit = scaleOut()
+		) {
+			Checkbox(
+				checked = selected,
+				onCheckedChange = { vm.selectOrUnselectSavedTheme(uuid) },
+				colors = CheckboxDefaults.colors(
+					uncheckedColor = Color.Transparent
+				),
+				modifier = Modifier
+					.padding(8.dp)
+					.clip(CircleShape)
+					.border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
+					.size(24.dp)
 			)
 		}
 
@@ -207,6 +253,14 @@ fun SavedThemeItem(
 					showDeleteDialog = true
 				}
 			)
+			DropdownMenuItem(
+				text = { Text("Select") },
+				onClick = {
+					showMenu = false
+					changeSelectionMode()
+					vm.selectOrUnselectSavedTheme(uuid)
+				}
+			)
 		}
 	}
 
@@ -216,7 +270,7 @@ fun SavedThemeItem(
 		{ showLoadWithOptionsDialog = false },
 		showLoadWithOptionsDialog,
 		vm,
-		palette,
+		paletteState.entirePaletteAsMap.value,
 		uuid
 	)
 
@@ -225,7 +279,7 @@ fun SavedThemeItem(
 		showDeleteDialog,
 		vm,
 		uuid,
-		palette,
+		paletteState,
 		context
 	)
 
@@ -235,7 +289,7 @@ fun SavedThemeItem(
 		{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
 		{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
 		vm,
-		palette,
+		paletteState,
 		context
 	)
 
@@ -244,12 +298,12 @@ fun SavedThemeItem(
 		showOverwriteDarkThemeDialog,
 		overwrite = {
 			showOverwriteDarkThemeDialog = false
-			vm.overwriteDefaultDarkTheme(uuid, palette, context)
+			vm.overwriteDefaultDarkTheme(uuid, paletteState, context)
 		},
 		vm = vm,
 		overwriteDark = true,
 		uuid,
-		palette,
+		paletteState,
 		context
 	)
 
@@ -258,12 +312,12 @@ fun SavedThemeItem(
 		showOverwriteLightThemeDialog,
 		overwrite = {
 			showOverwriteLightThemeDialog = false
-			vm.overwriteDefaultLightTheme(uuid, palette, context)
+			vm.overwriteDefaultLightTheme(uuid, paletteState, context)
 		},
 		vm = vm,
 		overwriteDark = false,
 		uuid,
-		palette,
+		paletteState,
 		context
 	)
 }
@@ -414,3 +468,4 @@ private fun ChatBottomAppBar(
 		}
 	}
 }
+

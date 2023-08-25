@@ -27,13 +27,15 @@ import androidx.navigation.NavHostController
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.Screens
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
+import com.number869.telemone.ui.theme.PaletteState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
 	navController: NavHostController,
-	vm: MainViewModel = viewModel()
+	vm: MainViewModel = viewModel(),
+	paletteState: PaletteState
 ) {
 	Column(Modifier.fillMaxSize()) {
 		MainScreenAppBar(navController)
@@ -45,7 +47,7 @@ fun MainScreen(
 			verticalArrangement = Arrangement.SpaceAround,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			DefaultThemesButtons(vm)
+			DefaultThemesButtons(vm, paletteState)
 
 			OutlinedButton(onClick = { navController.navigate("EditorScreen") }) {
 				Text(text = "Go to theme editor")

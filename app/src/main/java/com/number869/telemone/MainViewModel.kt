@@ -18,12 +18,8 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.AndroidViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.number869.telemone.ui.theme.FullPaletteList
-import com.number869.telemone.ui.theme.allColorTokensAsList
-import com.smarttoolfactory.extendedcolors.util.RGBUtil.toArgbString
-import kotlinx.coroutines.delay
+import com.number869.telemone.ui.theme.PaletteState
 import java.io.File
-import java.lang.Exception
 import java.util.UUID
 
 // no im not making a data class
@@ -33,8 +29,8 @@ typealias ColorToken = String
 typealias ColorValue = Int
 typealias DataAboutColors = Pair<ColorToken, ColorValue>
 typealias UiElementData = Map<UiElementName, DataAboutColors>
-typealias Themes = Map<ThemeUUID, UiElementData>
-typealias ThemeList = SnapshotStateList<Themes>
+typealias Theme = Map<ThemeUUID, UiElementData>
+typealias ThemeList = SnapshotStateList<Theme>
 typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
 
@@ -62,6 +58,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	private var _mappedValues: LoadedTheme = mutableStateMapOf()
 	val mappedValues: LoadedTheme get() = _mappedValues
 	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
+	val selectedThemes = mutableStateListOf<String>()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 
 	init {
@@ -83,6 +80,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		} catch (e: NoSuchElementException) {
 			Color.Red
 		}
+	}
+
+	fun selectOrUnselectSavedTheme(uuid: String) {
+		if (selectedThemes.contains(uuid))
+			selectedThemes.remove(uuid)
+		else
+			selectedThemes.add(uuid)
+	}
+
+	fun selectAllThemes() {
+		selectedThemes.clear()
+		themeList.forEach {
+			val uuid = it.keys.first()
+
+			if (
+				!selectedThemes.contains(uuid)
+				&&
+				uuid != "defaultLightThemeUUID"
+				&&
+				uuid != "defaultDarkThemeUUID"
+			) {
+				selectedThemes.add(uuid)
+			}
+		}
+	}
+	fun unselectAllThemes() {
+		selectedThemes.clear()
+	}
+
+	fun deleteSelectedThemes() {
+		_themeList.removeIf {
+			selectedThemes.contains(it.keys.first())
+		}
+
+		// save changes locally
+		val contents = Gson().toJson(_themeList)
+		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
 	fun saveCurrentTheme(context: Context) {
@@ -125,7 +159,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun loadTheme(
 		uuid: String,
 		withTokens: Boolean,
-		palette: FullPaletteList,
+		palette: Map<String, Color>,
 		clearCurrentTheme: Boolean,
 		context: Context
 	) {
@@ -178,7 +212,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun loadThemeFromFile(
 		context: Context,
 		uri: Uri,
-		palette: FullPaletteList,
+		paletteState: PaletteState,
 		clearCurrentTheme: Boolean
 	) {
 		loadedFromFileTheme.clear()
@@ -206,13 +240,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 							isCorrectFormat = true
 
 							val isValueANumber = colorEitherValueOrTokenAsString.replace("-", "").isDigitsOnly()
-							val isValueActuallyAColorToken = allColorTokensAsList.contains(colorEitherValueOrTokenAsString)
+							val isValueActuallyAColorToken = paletteState.allPossibleColorTokensAsList.contains(colorEitherValueOrTokenAsString)
 
 							if (isValueANumber) {
 								val colorValue = Color(colorEitherValueOrTokenAsString.toLong())
 								// also seeing if colors match the device's
 								// color scheme
-								val colorToken = getColorTokenFromColorValue(palette, colorValue)
+								val colorToken = getColorTokenFromColorValue(colorValue, paletteState.entirePaletteAsMap.value)
 
 								loadedMap[uiElementName] = Pair(colorToken, colorValue)
 							} else if (isValueActuallyAColorToken) {
@@ -220,7 +254,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 								val colorToken = colorEitherValueOrTokenAsString
 								// use device's color scheme when loading
 								// telemone format themes
-								val colorValue = getColorValueFromColorToken(colorToken, palette)
+								val colorValue = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 								loadedMap[uiElementName] = Pair(colorToken, colorValue)
 							} else {
@@ -295,7 +329,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 	fun overwriteDefaultLightTheme(
 		uuid: String,
-		palette: FullPaletteList,
+		paletteState: PaletteState,
 		context: Context
 	) {
 		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
@@ -311,14 +345,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		newDefaultTheme.forEach { (key, value) ->
 			val colorToken = value.first
 			val colorValueLoaded = value.second
-			val colorValueFromToken = getColorValueFromColorToken(colorToken, palette)
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 			// this will check if the color tokens name equals one of the
 			// supported color tokens prom the palette list. if it does
 			// then it will write not the color value thats loaded,
 			// but will write a color value that matches the device's
 			// current color scheme
-			if (allColorTokensAsList.contains(colorToken)) {
+			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
 				defaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
 			} else {
 				defaultTheme[key] = Pair(colorToken, colorValueLoaded)
@@ -339,7 +373,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 	fun overwriteDefaultDarkTheme(
 		uuid: String,
-		palette: FullPaletteList,
+		paletteState: PaletteState,
 		context: Context
 	) {
 		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
@@ -355,9 +389,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		newDefaultTheme.forEach { (key, value) ->
 			val colorToken = value.first
 			val colorValueAsItWasLoaded = value.second
-			val colorValueFromToken = getColorValueFromColorToken(colorToken, palette)
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
-			if (allColorTokensAsList.contains(colorToken)) {
+			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
 				defaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
 			} else {
 				defaultTheme[key] = Pair(colorToken, colorValueAsItWasLoaded)
@@ -376,7 +410,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun changeValue(key: String, colorValue: Color, colorToken: String) {
+	fun changeValue(key: String, colorToken: String, colorValue: Color) {
 		// lets not use getColorTokenFromColorValue() to not run a loop
 		// each time
 		_mappedValues[key] = Pair(colorToken, colorValue)
@@ -384,9 +418,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		Log.d(TAG, "color value replaced at $key with $colorValue")
 	}
 
-	fun startupConfigProcess(palette: FullPaletteList, isDarkMode: Boolean, context: Context) {
-		val darkTheme = stockDarkTheme(palette, context)
-		val lightTheme = stockLightTheme(palette, context)
+	fun startupConfigProcess(
+		paletteState: PaletteState,
+		isDarkMode: Boolean,
+		context: Context
+	) {
+		val darkTheme = stockDarkTheme(paletteState.entirePaletteAsMap.value, context)
+		val lightTheme = stockLightTheme(paletteState.entirePaletteAsMap.value, context)
 		val defaultThemeKey = if (isDarkMode)
 			"defaultDarkThemeUUID"
 		else
@@ -407,11 +445,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				val uiItemName = it.key
 				val colorToken = it.value.first
 				val colorValueAsItWasSaved = Color(it.value.second)
-				val colorValueFromToken = getColorValueFromColorToken(colorToken, palette)
+				val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 				// if color token is something that is in the palette
 				// list - load it. if not - load what was saved
-				if (allColorTokensAsList.contains(colorToken)) {
+				if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
 					_mappedValues[uiItemName] = Pair(colorToken, colorValueFromToken)
 					defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValueFromToken)
 				} else {
@@ -486,7 +524,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		)
 	}
 
-	fun loadDefaultDarkTheme(palette: FullPaletteList, context: Context) {
+	fun loadDefaultDarkTheme(palette: Map<String, Color>, context: Context) {
 		_themeList.find { it.containsKey("defaultDarkThemeUUID") }
 			?.getValue("defaultDarkThemeUUID")?.map {
 				val uiItemName = it.key
@@ -506,7 +544,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun loadDefaultLightTheme(palette: FullPaletteList, context: Context) {
+	fun loadDefaultLightTheme(palette: Map<String, Color>, context: Context) {
 		_themeList.find { it.containsKey("defaultLightThemeUUID") }
 			?.getValue("defaultLightThemeUUID")?.map {
 				val uiItemName = it.key
@@ -526,7 +564,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun loadStockDarkTheme(palette: FullPaletteList, context: Context) {
+	fun loadStockDarkTheme(palette: Map<String, Color>, context: Context) {
 		_mappedValues.clear()
 
 		stockDarkTheme(palette, context).map {
@@ -547,7 +585,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun loadStockLightTheme(palette: FullPaletteList, context: Context) {
+	fun loadStockLightTheme(palette: Map<String, Color>, context: Context) {
 		_mappedValues.clear()
 
 		stockLightTheme(palette, context).map {
@@ -593,7 +631,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "Telemone Custom"))
 	}
 
-	fun saveLightTheme(context: Context, palette: FullPaletteList) {
+	fun saveLightTheme(context: Context, palette: Map<String, Color>) {
 		val theme = getThemeAsStringByUUID(
 			_themeList,
 			"defaultLightThemeUUID",
@@ -616,7 +654,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		context.startActivity(Intent.createChooser(intent, "Telemone Light"))
 	}
 
-	fun saveDarkTheme(context: Context, palette: FullPaletteList) {
+	fun saveDarkTheme(context: Context, palette: Map<String, Color>) {
 		val theme = getThemeAsStringByUUID(
 			_themeList,
 			"defaultDarkThemeUUID",
@@ -640,13 +678,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 }
 
-
-// at the moment the defaults are kanged from c3r5b8's app.
-// at the moment(!!)
-
-// themes in assets folder MUST have values existent in fullPalette()
 private fun stockLightTheme(
-	palette: FullPaletteList,
+	palette: Map<String, Color>,
 	context: Context
 ): Map<String, Pair<String, Int>> {
 	val themeMap = mutableMapOf<String, Pair<String, Int>>()
@@ -671,7 +704,7 @@ private fun stockLightTheme(
 
 // also at least pretend to like these funny little silly haha comments
 private fun stockDarkTheme(
-	palette: FullPaletteList,
+	palette: Map<String, Color>,
 	context: Context
 ): Map<String, Pair<String, Int>> {
 	val themeMap = mutableMapOf<String, Pair<String, Int>>()
@@ -694,228 +727,22 @@ private fun stockDarkTheme(
 	return themeMap.toMap()
 }
 
-fun getColorValueFromColorToken(token: String, palette: FullPaletteList): Color {
-	return when (token) {
-		"primary_light" -> palette.colorRoles.primaryLight
-		"on_primary_light" -> palette.colorRoles.onPrimaryLight
-		"primary_container_light" -> palette.colorRoles.primaryContainerLight
-		"on_primary_container_light" -> palette.colorRoles.onPrimaryContainerLight
-		"secondary_light" -> palette.colorRoles.secondaryLight
-		"on_secondary_light" -> palette.colorRoles.onSecondaryLight
-		"secondary_container_light" -> palette.colorRoles.secondaryContainerLight
-		"on_secondary_container_light" -> palette.colorRoles.onSecondaryContainerLight
-		"tertiary_light" -> palette.colorRoles.tertiaryLight
-		"on_tertiary_light" -> palette.colorRoles.onTertiaryLight
-		"tertiary_container_light" -> palette.colorRoles.tertiaryContainerLight
-		"on_tertiary_container_light" -> palette.colorRoles.onTertiaryContainerLight
-		"surface_light" -> palette.colorRoles.surfaceLight
-		"surface_dim_light" -> palette.colorRoles.surfaceDimLight
-		"surface_bright_light" -> palette.colorRoles.surfaceBrightLight
-		"on_surface_light" -> palette.colorRoles.onSurfaceLight
-		"surface_elevation_level_3_light" -> palette.surfaceElevationLevel3Light
-		"surface_container_lowest_light" -> palette.colorRoles.surfaceContainerLowestLight
-		"surface_container_low_light" -> palette.colorRoles.surfaceContainerLowLight
-		"surface_container_light" -> palette.colorRoles.surfaceContainerLight
-		"surface_container_high_light" -> palette.colorRoles.surfaceContainerHighLight
-		"surface_container_highest_light" -> palette.colorRoles.surfaceContainerHighestLight
-		"on_surface_variant_light" -> palette.colorRoles.onSurfaceVariantLight
-		"error_light" -> palette.colorRoles.errorLight
-		"on_error_light" -> palette.colorRoles.onErrorLight
-		"error_container_light" -> palette.colorRoles.errorContainerLight
-		"on_error_container_light" -> palette.colorRoles.onErrorContainerLight
-		"outline_light" -> palette.colorRoles.outlineLight
-		"outline_variant_light" -> palette.colorRoles.outlineVariantLight
-		"scrim_light" -> palette.colorRoles.scrimLight
-		"primary_dark" -> palette.colorRoles.primaryDark
-		"on_primary_dark" -> palette.colorRoles.onPrimaryDark
-		"primary_container_dark" -> palette.colorRoles.primaryContainerDark
-		"on_primary_container_dark" -> palette.colorRoles.onPrimaryContainerDark
-		"secondary_dark" -> palette.colorRoles.secondaryDark
-		"on_secondary_dark" -> palette.colorRoles.onSecondaryDark
-		"secondary_container_dark" -> palette.colorRoles.secondaryContainerDark
-		"on_secondary_container_dark" -> palette.colorRoles.onSecondaryContainerDark
-		"tertiary_dark" -> palette.colorRoles.tertiaryDark
-		"on_tertiary_dark" -> palette.colorRoles.onTertiaryDark
-		"tertiary_container_dark" -> palette.colorRoles.tertiaryContainerDark
-		"on_tertiary_container_dark" -> palette.colorRoles.onTertiaryContainerDark
-		"surface_dark" -> palette.colorRoles.surfaceDark
-		"surface_dim_dark" -> palette.colorRoles.surfaceDimDark
-		"surface_bright_dark" -> palette.colorRoles.surfaceBrightDark
-		"on_surface_dark" -> palette.colorRoles.onSurfaceDark
-		"surface_elevation_level_3_dark" -> palette.surfaceElevationLevel3Dark
-		"surface_container_lowest_dark" -> palette.colorRoles.surfaceContainerLowestDark
-		"surface_container_low_dark" -> palette.colorRoles.surfaceContainerLowDark
-		"surface_container_dark" -> palette.colorRoles.surfaceContainerDark
-		"surface_container_high_dark" -> palette.colorRoles.surfaceContainerHighDark
-		"surface_container_highest_dark" -> palette.colorRoles.surfaceContainerHighestDark
-		"on_surface_variant_dark" -> palette.colorRoles.onSurfaceVariantDark
-		"error_dark" -> palette.colorRoles.errorDark
-		"on_error_dark" -> palette.colorRoles.onErrorDark
-		"error_container_dark" -> palette.colorRoles.errorContainerDark
-		"on_error_container_dark" -> palette.colorRoles.onErrorContainerDark
-		"outline_dark" -> palette.colorRoles.outlineDark
-		"outline_variant_dark" -> palette.colorRoles.outlineVariantDark
-		"scrim_dark" -> palette.colorRoles.scrimDark
-		"transparent" -> Color.Transparent
-		"primary_0" -> palette.primary_0
-		"primary_10" -> palette.primary_10
-		"primary_20" -> palette.primary_20
-		"primary_30" -> palette.primary_30
-		"primary_40" -> palette.primary_40
-		"primary_50" -> palette.primary_50
-		"primary_60" -> palette.primary_60
-		"primary_70" -> palette.primary_70
-		"primary_80" -> palette.primary_80
-		"primary_90" -> palette.primary_90
-		"primary_95" -> palette.primary_95
-		"primary_99" -> palette.primary_99
-		"primary_100" -> palette.primary_100
-		"secondary_0" -> palette.secondary_0
-		"secondary_10" -> palette.secondary_10
-		"secondary_20" -> palette.secondary_20
-		"secondary_30" -> palette.secondary_30
-		"secondary_40" -> palette.secondary_40
-		"secondary_50" -> palette.secondary_50
-		"secondary_60" -> palette.secondary_60
-		"secondary_70" -> palette.secondary_70
-		"secondary_80" -> palette.secondary_80
-		"secondary_90" -> palette.secondary_90
-		"secondary_95" -> palette.secondary_95
-		"secondary_99" -> palette.secondary_99
-		"secondary_100" -> palette.secondary_100
-		"tertiary_0" -> palette.tertiary_0
-		"tertiary_10" -> palette.tertiary_10
-		"tertiary_20" -> palette.tertiary_20
-		"tertiary_30" -> palette.tertiary_30
-		"tertiary_40" -> palette.tertiary_40
-		"tertiary_50" -> palette.tertiary_50
-		"tertiary_60" -> palette.tertiary_60
-		"tertiary_70" -> palette.tertiary_70
-		"tertiary_80" -> palette.tertiary_80
-		"tertiary_90" -> palette.tertiary_90
-		"tertiary_95" -> palette.tertiary_95
-		"tertiary_99" -> palette.tertiary_99
-		"tertiary_100" -> palette.tertiary_100
-		"neutral_0" -> palette.neutral_0
-		"neutral_10" -> palette.neutral_10
-		"neutral_20" -> palette.neutral_20
-		"neutral_30" -> palette.neutral_30
-		"neutral_40" -> palette.neutral_40
-		"neutral_50" -> palette.neutral_50
-		"neutral_60" -> palette.neutral_60
-		"neutral_70" -> palette.neutral_70
-		"neutral_80" -> palette.neutral_80
-		"neutral_90" -> palette.neutral_90
-		"neutral_95" -> palette.neutral_95
-		"neutral_99" -> palette.neutral_99
-		"neutral_100" -> palette.neutral_100
-		"neutral_variant_0" -> palette.neutralVariant_0
-		"neutral_variant_10" -> palette.neutralVariant_10
-		"neutral_variant_20" -> palette.neutralVariant_20
-		"neutral_variant_30" -> palette.neutralVariant_30
-		"neutral_variant_40" -> palette.neutralVariant_40
-		"neutral_variant_50" -> palette.neutralVariant_50
-		"neutral_variant_60" -> palette.neutralVariant_60
-		"neutral_variant_70" -> palette.neutralVariant_70
-		"neutral_variant_80" -> palette.neutralVariant_80
-		"neutral_variant_90" -> palette.neutralVariant_90
-		"neutral_variant_95" -> palette.neutralVariant_95
-		"neutral_variant_99" -> palette.neutralVariant_99
-		"neutral_variant_100" -> palette.neutralVariant_100
-		"blue_0" -> palette.blue.getValue(0)
-		"blue_10" -> palette.blue.getValue(10)
-		"blue_20" -> palette.blue.getValue(20)
-		"blue_30" -> palette.blue.getValue(30)
-		"blue_40" -> palette.blue.getValue(40)
-		"blue_50" -> palette.blue.getValue(50)
-		"blue_60" -> palette.blue.getValue(60)
-		"blue_70" -> palette.blue.getValue(70)
-		"blue_80" -> palette.blue.getValue(80)
-		"blue_90" -> palette.blue.getValue(90)
-		"blue_95" -> palette.blue.getValue(95)
-		"blue_99" -> palette.blue.getValue(99)
-		"blue_100" -> palette.blue.getValue(100)
-		"red_0" -> palette.red.getValue(0)
-		"red_10" -> palette.red.getValue(10)
-		"red_20" -> palette.red.getValue(20)
-		"red_30" -> palette.red.getValue(30)
-		"red_40" -> palette.red.getValue(40)
-		"red_50" -> palette.red.getValue(50)
-		"red_60" -> palette.red.getValue(60)
-		"red_70" -> palette.red.getValue(70)
-		"red_80" -> palette.red.getValue(80)
-		"red_90" -> palette.red.getValue(90)
-		"red_95" -> palette.red.getValue(95)
-		"red_99" -> palette.red.getValue(99)
-		"red_100" -> palette.red.getValue(100)
-		"green_0" -> palette.green.getValue(0)
-		"green_10" -> palette.green.getValue(10)
-		"green_20" -> palette.green.getValue(20)
-		"green_30" -> palette.green.getValue(30)
-		"green_40" -> palette.green.getValue(40)
-		"green_50" -> palette.green.getValue(50)
-		"green_60" -> palette.green.getValue(60)
-		"green_70" -> palette.green.getValue(70)
-		"green_80" -> palette.green.getValue(80)
-		"green_90" -> palette.green.getValue(90)
-		"green_95" -> palette.green.getValue(95)
-		"green_99" -> palette.green.getValue(99)
-		"green_100" -> palette.green.getValue(100)
-		"orange_0" -> palette.orange.getValue(0)
-		"orange_10" -> palette.orange.getValue(10)
-		"orange_20" -> palette.orange.getValue(20)
-		"orange_30" -> palette.orange.getValue(30)
-		"orange_40" -> palette.orange.getValue(40)
-		"orange_50" -> palette.orange.getValue(50)
-		"orange_60" -> palette.orange.getValue(60)
-		"orange_70" -> palette.orange.getValue(70)
-		"orange_80" -> palette.orange.getValue(80)
-		"orange_90" -> palette.orange.getValue(90)
-		"orange_95" -> palette.orange.getValue(95)
-		"orange_99" -> palette.orange.getValue(99)
-		"orange_100" -> palette.orange.getValue(100)
-		"violet_0" -> palette.violet.getValue(0)
-		"violet_10" -> palette.violet.getValue(10)
-		"violet_20" -> palette.violet.getValue(20)
-		"violet_30" -> palette.violet.getValue(30)
-		"violet_40" -> palette.violet.getValue(40)
-		"violet_50" -> palette.violet.getValue(50)
-		"violet_60" -> palette.violet.getValue(60)
-		"violet_70" -> palette.violet.getValue(70)
-		"violet_80" -> palette.violet.getValue(80)
-		"violet_90" -> palette.violet.getValue(90)
-		"violet_95" -> palette.violet.getValue(95)
-		"violet_99" -> palette.violet.getValue(99)
-		"violet_100" -> palette.violet.getValue(100)
-		"cyan_0" -> palette.cyan.getValue(0)
-		"cyan_10" -> palette.cyan.getValue(10)
-		"cyan_20" -> palette.cyan.getValue(20)
-		"cyan_30" -> palette.cyan.getValue(30)
-		"cyan_40" -> palette.cyan.getValue(40)
-		"cyan_50" -> palette.cyan.getValue(50)
-		"cyan_60" -> palette.cyan.getValue(60)
-		"cyan_70" -> palette.cyan.getValue(70)
-		"cyan_80" -> palette.cyan.getValue(80)
-		"cyan_90" -> palette.cyan.getValue(90)
-		"cyan_95" -> palette.cyan.getValue(95)
-		"cyan_99" -> palette.cyan.getValue(99)
-		"cyan_100" -> palette.cyan.getValue(100)
-		"pink_0" -> palette.pink.getValue(0)
-		"pink_10" -> palette.pink.getValue(10)
-		"pink_20" -> palette.pink.getValue(20)
-		"pink_30" -> palette.pink.getValue(30)
-		"pink_40" -> palette.pink.getValue(40)
-		"pink_50" -> palette.pink.getValue(50)
-		"pink_60" -> palette.pink.getValue(60)
-		"pink_70" -> palette.pink.getValue(70)
-		"pink_80" -> palette.pink.getValue(80)
-		"pink_90" -> palette.pink.getValue(90)
-		"pink_95" -> palette.pink.getValue(95)
-		"pink_99" -> palette.pink.getValue(99)
-		"pink_100" -> palette.pink.getValue(100)
-		else -> Color.Red
-	}
+fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
+	return if (palette.containsKey(tokenToLookFor))
+		palette.getValue(tokenToLookFor)
+	else
+		Color.Red
 }
+
+fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Color>): String {
+	val tokenIndex = palette.values.indexOf(valueToLookFor)
+
+	return if (palette.containsValue(valueToLookFor))
+		palette.keys.elementAt(tokenIndex)
+	else
+		""
+}
+
 
 val fallbackKeys = mapOf(
 	"chat_inAdminText" to "chat_inTimeText",
@@ -1077,230 +904,6 @@ val fallbackKeys = mapOf(
 	"statisticChartLine_cyan" to "color_cyan"
 )
 
-// maybe we'll still need this in the future
-fun getColorTokenFromColorValue(palette: FullPaletteList, color: Color): String {
-	return when(color) {
-		palette.colorRoles.primaryLight -> "primary_light"
-		palette.colorRoles.onPrimaryLight -> "on_primary_light"
-		palette.colorRoles.primaryContainerLight -> "primary_container_light"
-		palette.colorRoles.onPrimaryContainerLight -> "on_primary_container_light"
-		palette.colorRoles.secondaryLight -> "secondary_light"
-		palette.colorRoles.onSecondaryLight -> "on_secondary_light"
-		palette.colorRoles.secondaryContainerLight -> "secondary_container_light"
-		palette.colorRoles.onSecondaryContainerLight -> "on_secondary_container_light"
-		palette.colorRoles.tertiaryLight -> "tertiary_light"
-		palette.colorRoles.onTertiaryLight -> "on_tertiary_light"
-		palette.colorRoles.tertiaryContainerLight -> "tertiary_container_light"
-		palette.colorRoles.onTertiaryContainerLight -> "on_tertiary_container_light"
-		palette.colorRoles.surfaceLight -> "surface_light"
-		palette.colorRoles.surfaceDimLight -> "surface_dim_light"
-		palette.colorRoles.surfaceBrightLight -> "surface_bright_light"
-		palette.colorRoles.onSurfaceLight -> "on_surface_light"
-		palette.surfaceElevationLevel3Light -> "surface_elevation_level_3_light"
-		palette.colorRoles.surfaceContainerLowestLight -> "surface_container_lowest_light"
-		palette.colorRoles.surfaceContainerLowLight -> "surface_container_low_light"
-		palette.colorRoles.surfaceContainerLight -> "surface_container_light"
-		palette.colorRoles.surfaceContainerHighLight -> "surface_container_high_light"
-		palette.colorRoles.surfaceContainerHighestLight -> "surface_container_highest_light"
-		palette.colorRoles.onSurfaceVariantLight -> "on_surface_variant_light"
-		palette.colorRoles.errorLight -> "error_light"
-		palette.colorRoles.onErrorLight -> "on_error_light"
-		palette.colorRoles.errorContainerLight -> "error_container_light"
-		palette.colorRoles.onErrorContainerLight -> "on_error_container_light"
-		palette.colorRoles.outlineLight -> "outline_light"
-		palette.colorRoles.outlineVariantLight -> "outline_variant_light"
-		palette.colorRoles.scrimLight -> "scrim_light"
-		palette.colorRoles.primaryDark -> "primary_dark"
-		palette.colorRoles.onPrimaryDark -> "on_primary_dark"
-		palette.colorRoles.primaryContainerDark -> "primary_container_dark"
-		palette.colorRoles.onPrimaryContainerDark -> "on_primary_container_dark"
-		palette.colorRoles.secondaryDark -> "secondary_dark"
-		palette.colorRoles.onSecondaryDark -> "on_secondary_dark"
-		palette.colorRoles.secondaryContainerDark -> "secondary_container_dark"
-		palette.colorRoles.onSecondaryContainerDark -> "on_secondary_container_dark"
-		palette.colorRoles.tertiaryDark -> "tertiary_dark"
-		palette.colorRoles.onTertiaryDark -> "on_tertiary_dark"
-		palette.colorRoles.tertiaryContainerDark -> "tertiary_container_dark"
-		palette.colorRoles.onTertiaryContainerDark -> "on_tertiary_container_dark"
-		palette.colorRoles.surfaceDark -> "surface_dark"
-		palette.colorRoles.surfaceDimDark -> "surface_dim_dark"
-		palette.colorRoles.surfaceBrightDark -> "surface_bright_dark"
-		palette.colorRoles.onSurfaceDark -> "on_surface_dark"
-		palette.surfaceElevationLevel3Dark -> "surface_elevation_level_3_dark"
-		palette.colorRoles.surfaceContainerLowestDark -> "surface_container_lowest_dark"
-		palette.colorRoles.surfaceContainerLowDark -> "surface_container_low_dark"
-		palette.colorRoles.surfaceContainerDark -> "surface_container_dark"
-		palette.colorRoles.surfaceContainerHighDark -> "surface_container_high_dark"
-		palette.colorRoles.surfaceContainerHighestDark -> "surface_container_highest_dark"
-		palette.colorRoles.onSurfaceVariantDark -> "on_surface_variant_dark"
-		palette.colorRoles.errorDark -> "error_dark"
-		palette.colorRoles.onErrorDark -> "on_error_dark"
-		palette.colorRoles.errorContainerDark -> "error_container_dark"
-		palette.colorRoles.onErrorContainerDark -> "on_error_container_dark"
-		palette.colorRoles.outlineDark -> "outline_dark"
-		palette.colorRoles.outlineVariantDark -> "outline_variant_dark"
-		palette.colorRoles.scrimDark -> "scrim_dark"
-		Color.Transparent -> "transparent"
-		palette.primary_0 -> "primary_0"
-		palette.primary_10 -> "primary_10"
-		palette.primary_20 -> "primary_20"
-		palette.primary_30 -> "primary_30"
-		palette.primary_40 -> "primary_40"
-		palette.primary_50 -> "primary_50"
-		palette.primary_60 -> "primary_60"
-		palette.primary_70 -> "primary_70"
-		palette.primary_80 -> "primary_80"
-		palette.primary_90 -> "primary_90"
-		palette.primary_95 -> "primary_95"
-		palette.primary_99 -> "primary_99"
-		palette.primary_100 -> "primary_100"
-		palette.secondary_0 -> "secondary_0"
-		palette.secondary_10 -> "secondary_10"
-		palette.secondary_20 -> "secondary_20"
-		palette.secondary_30 -> "secondary_30"
-		palette.secondary_40 -> "secondary_40"
-		palette.secondary_50 -> "secondary_50"
-		palette.secondary_60 -> "secondary_60"
-		palette.secondary_70 -> "secondary_70"
-		palette.secondary_80 -> "secondary_80"
-		palette.secondary_90 -> "secondary_90"
-		palette.secondary_95 -> "secondary_95"
-		palette.secondary_99 -> "secondary_99"
-		palette.secondary_100 -> "secondary_100"
-		palette.tertiary_0 -> "tertiary_0"
-		palette.tertiary_10 -> "tertiary_10"
-		palette.tertiary_20 -> "tertiary_20"
-		palette.tertiary_30 -> "tertiary_30"
-		palette.tertiary_40 -> "tertiary_40"
-		palette.tertiary_50 -> "tertiary_50"
-		palette.tertiary_60 -> "tertiary_60"
-		palette.tertiary_70 -> "tertiary_70"
-		palette.tertiary_80 -> "tertiary_80"
-		palette.tertiary_90 -> "tertiary_90"
-		palette.tertiary_95 -> "tertiary_95"
-		palette.tertiary_99 -> "tertiary_99"
-		palette.tertiary_100 -> "tertiary_100"
-		palette.neutral_0 -> "neutral_0"
-		palette.neutral_10 -> "neutral_10"
-		palette.neutral_20 -> "neutral_20"
-		palette.neutral_30 -> "neutral_30"
-		palette.neutral_40 -> "neutral_40"
-		palette.neutral_50 -> "neutral_50"
-		palette.neutral_60 -> "neutral_60"
-		palette.neutral_70 -> "neutral_70"
-		palette.neutral_80 -> "neutral_80"
-		palette.neutral_90 -> "neutral_90"
-		palette.neutral_95 -> "neutral_95"
-		palette.neutral_99 -> "neutral_99"
-		palette.neutral_100 -> "neutral_100"
-		palette.neutralVariant_0 -> "neutral_variant_0"
-		palette.neutralVariant_10 -> "neutral_variant_10"
-		palette.neutralVariant_20 -> "neutral_variant_20"
-		palette.neutralVariant_30 -> "neutral_variant_30"
-		palette.neutralVariant_40 -> "neutral_variant_40"
-		palette.neutralVariant_50 -> "neutral_variant_50"
-		palette.neutralVariant_60 -> "neutral_variant_60"
-		palette.neutralVariant_70 -> "neutral_variant_70"
-		palette.neutralVariant_80 -> "neutral_variant_80"
-		palette.neutralVariant_90 -> "neutral_variant_90"
-		palette.neutralVariant_95 -> "neutral_variant_95"
-		palette.neutralVariant_99 -> "neutral_variant_99"
-		palette.neutralVariant_100 -> "neutral_variant_100"
-		palette.blue.getValue(0) -> "blue_0"
-		palette.blue.getValue(10) -> "blue_10"
-		palette.blue.getValue(20) -> "blue_20"
-		palette.blue.getValue(30) -> "blue_30"
-		palette.blue.getValue(40) -> "blue_40"
-		palette.blue.getValue(50) -> "blue_50"
-		palette.blue.getValue(60) -> "blue_60"
-		palette.blue.getValue(70) -> "blue_70"
-		palette.blue.getValue(80) -> "blue_80"
-		palette.blue.getValue(90) -> "blue_90"
-		palette.blue.getValue(95) -> "blue_95"
-		palette.blue.getValue(99) -> "blue_99"
-		palette.blue.getValue(100) -> "blue_100"
-		palette.red.getValue(0) -> "red_0"
-		palette.red.getValue(10) -> "red_10"
-		palette.red.getValue(20) -> "red_20"
-		palette.red.getValue(30) -> "red_30"
-		palette.red.getValue(40) -> "red_40"
-		palette.red.getValue(50) -> "red_50"
-		palette.red.getValue(60) -> "red_60"
-		palette.red.getValue(70) -> "red_70"
-		palette.red.getValue(80) -> "red_80"
-		palette.red.getValue(90) -> "red_90"
-		palette.red.getValue(95) -> "red_95"
-		palette.red.getValue(99) -> "red_99"
-		palette.red.getValue(100) -> "red_100"
-		palette.green.getValue(0) -> "green_0"
-		palette.green.getValue(10) -> "green_10"
-		palette.green.getValue(20) -> "green_20"
-		palette.green.getValue(30) -> "green_30"
-		palette.green.getValue(40) -> "green_40"
-		palette.green.getValue(50) -> "green_50"
-		palette.green.getValue(60) -> "green_60"
-		palette.green.getValue(70) -> "green_70"
-		palette.green.getValue(80) -> "green_80"
-		palette.green.getValue(90) -> "green_90"
-		palette.green.getValue(95) -> "green_95"
-		palette.green.getValue(99) -> "green_99"
-		palette.green.getValue(100) -> "green_100"
-		palette.orange.getValue(0) -> "orange_0"
-		palette.orange.getValue(10) -> "orange_10"
-		palette.orange.getValue(20) -> "orange_20"
-		palette.orange.getValue(30) -> "orange_30"
-		palette.orange.getValue(40) -> "orange_40"
-		palette.orange.getValue(50) -> "orange_50"
-		palette.orange.getValue(60) -> "orange_60"
-		palette.orange.getValue(70) -> "orange_70"
-		palette.orange.getValue(80) -> "orange_80"
-		palette.orange.getValue(90) -> "orange_90"
-		palette.orange.getValue(95) -> "orange_95"
-		palette.orange.getValue(99) -> "orange_99"
-		palette.orange.getValue(100) -> "orange_100"
-		palette.violet.getValue(0) -> "violet_0"
-		palette.violet.getValue(10) -> "violet_10"
-		palette.violet.getValue(20) -> "violet_20"
-		palette.violet.getValue(30) -> "violet_30"
-		palette.violet.getValue(40) -> "violet_40"
-		palette.violet.getValue(50) -> "violet_50"
-		palette.violet.getValue(60) -> "violet_60"
-		palette.violet.getValue(70) -> "violet_70"
-		palette.violet.getValue(80) -> "violet_80"
-		palette.violet.getValue(90) -> "violet_90"
-		palette.violet.getValue(95) -> "violet_95"
-		palette.violet.getValue(99) -> "violet_99"
-		palette.violet.getValue(100) -> "violet_100"
-		palette.cyan.getValue(0) -> "cyan_0"
-		palette.cyan.getValue(10) -> "cyan_10"
-		palette.cyan.getValue(20) -> "cyan_20"
-		palette.cyan.getValue(30) -> "cyan_30"
-		palette.cyan.getValue(40) -> "cyan_40"
-		palette.cyan.getValue(50) -> "cyan_50"
-		palette.cyan.getValue(60) -> "cyan_60"
-		palette.cyan.getValue(70) -> "cyan_70"
-		palette.cyan.getValue(80) -> "cyan_80"
-		palette.cyan.getValue(90) -> "cyan_90"
-		palette.cyan.getValue(95) -> "cyan_95"
-		palette.cyan.getValue(99) -> "cyan_99"
-		palette.cyan.getValue(100) -> "cyan_100"
-		palette.pink.getValue(0) -> "pink_0"
-		palette.pink.getValue(10) -> "pink_10"
-		palette.pink.getValue(20) -> "pink_20"
-		palette.pink.getValue(30) -> "pink_30"
-		palette.pink.getValue(40) -> "pink_40"
-		palette.pink.getValue(50) -> "pink_50"
-		palette.pink.getValue(60) -> "pink_60"
-		palette.pink.getValue(70) -> "pink_70"
-		palette.pink.getValue(80) -> "pink_80"
-		palette.pink.getValue(90) -> "pink_90"
-		palette.pink.getValue(95) -> "pink_95"
-		palette.pink.getValue(99) -> "pink_99"
-		palette.pink.getValue(100) -> "pink_100"
-		else -> ""
-	}
-}
-
 val defaultShadowTokens = mapOf(
 	"windowBackgroundGrayShadow" to Pair("transparent", Color.Transparent),
 	"chat_inBubbleShadow" to Pair("transparent", Color.Transparent),
@@ -1319,7 +922,7 @@ private fun getThemeAsStringByUUID(
 	themeList: ThemeList,
 	uuid: String,
 	loadThemeUsing: ThemeAsStringType = ThemeAsStringType.ColorValues,
-	palette: FullPaletteList? = null
+	palette: Map<String, Color>? = null
 ): String {
 	val chosenTheme = themeList.find { it.containsKey(uuid) }
 		?.getValue(uuid)

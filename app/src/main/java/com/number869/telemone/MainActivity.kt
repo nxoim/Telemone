@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
-import com.number869.telemone.ui.theme.fullPalette
+import com.number869.telemone.ui.theme.rememberPaletteState
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -26,13 +26,14 @@ class MainActivity : ComponentActivity() {
 			TelemoneTheme {
 				val navController = rememberAnimatedNavController()
 				val isDarkMode = isSystemInDarkTheme()
-				val palette = fullPalette()
+				// its 4am rn here so excuse me if this is dum
+				val paletteState = rememberPaletteState()
 				val vm: MainViewModel = viewModel()
 				val scope = rememberCoroutineScope()
 
 				LaunchedEffect(Unit) {
 					scope.launch {
-						vm.startupConfigProcess(palette, isDarkMode, applicationContext)
+						vm.startupConfigProcess(paletteState, isDarkMode, applicationContext)
 					}
 				}
 
@@ -40,7 +41,7 @@ class MainActivity : ComponentActivity() {
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colorScheme.background
 				) {
-					Navigator(navController, vm)
+					Navigator(navController, vm, paletteState)
 				}
 			}
 		}

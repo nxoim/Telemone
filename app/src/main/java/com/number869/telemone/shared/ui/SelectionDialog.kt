@@ -31,10 +31,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
@@ -44,6 +44,7 @@ import com.number869.telemone.ui.theme.TelemoneTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SelectionDialog(
+	modifier: Modifier = Modifier,
 	title: String,
 	contentAlpha: () -> Float = { 1f },
 	content: LazyListScope.() -> Unit
@@ -54,28 +55,24 @@ fun SelectionDialog(
 		MaterialTheme.colorScheme.surface
 
 	Box(
-		Modifier
-
+		modifier
 			.widthIn(min = 280.dp, max = 560.dp)
-
 			.padding(horizontal = 48.dp)
 			.shadow(
 				8.dp,
 				RoundedCornerShape(24.dp)
 			)
 			.clip(RoundedCornerShape(24.dp))
-
 			.background(backgroundColor)
-
 	) {
-		Column(
-			Modifier
-				.padding(24.dp)
-				.alpha(contentAlpha())) {
+		Column(Modifier.padding(24.dp)) {
 			Text(
 				title,
 				style = MaterialTheme.typography.headlineSmall,
-				modifier = Modifier.align(Alignment.CenterHorizontally).basicMarquee(),
+				modifier = Modifier
+					.align(Alignment.CenterHorizontally).basicMarquee()
+					.graphicsLayer { alpha = contentAlpha() }
+				,
 				color = MaterialTheme.colorScheme.onSurface,
 				maxLines = 1
 			)
@@ -83,6 +80,7 @@ fun SelectionDialog(
 			Spacer(modifier = Modifier.height(18.dp))
 
 			LazyColumn(
+				modifier = Modifier.graphicsLayer { alpha = contentAlpha() },
 				content = content,
 				verticalArrangement = spacedBy(0.dp)
 			)

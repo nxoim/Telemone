@@ -14,7 +14,7 @@ fun ClearBeforeLoadDialog(
 	AlertDialog(
 		onDismissRequest = { close() },
 		title = { Text("Clear current theme before loading?") },
-		text = { Text("""Loading a theme will save your current theme to "Saved Themes".""") },
+		text = { Text("""Loading a theme will save the current theme to "Saved Themes".""") },
 		confirmButton = {
 			TextButton(onClick = { clear() }) {
 				Text("Clear")

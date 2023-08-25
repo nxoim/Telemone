@@ -65,11 +65,14 @@ import android.R.color.system_neutral2_600
 import android.R.color.system_neutral2_700
 import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
-import androidx.annotation.ColorRes
+import android.annotation.SuppressLint
 import androidx.annotation.FloatRange
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
@@ -87,796 +90,1782 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-// this is used for checking if the a token is present in a theme
-// TODO turn this into a function that takes names from the enum classes
-val allColorTokensAsList = listOf(
-	"primary_light",
-	"on_primary_light",
-	"primary_container_light",
-	"on_primary_container_light",
-	"inverse_primary_light",
-	"secondary_light",
-	"on_secondary_light",
-	"secondary_container_light",
-	"on_secondary_container_light",
-	"tertiary_light",
-	"on_tertiary_light",
-	"tertiary_container_light",
-	"on_tertiary_container_light",
-	"background_light",
-	"on_background_light",
-	"surface_light",
-	"on_surface_light",
-	"surface_elevation_level_3_light",
-	"surface_container_lowest_light",
-	"surface_container_low_light",
-	"surface_container_light",
-	"surface_container_high_light",
-	"surface_container_highest_light",
-	"on_surface_variant_light",
-	"surface_tint_light",
-	"inverse_surface_light",
-	"inverse_on_surface_light",
-	"error_light",
-	"on_error_light",
-	"error_container_light",
-	"on_error_container_light",
-	"outline_light",
-	"outline_variant_light",
-	"scrim_light",
-	"primary_dark",
-	"on_primary_dark",
-	"primary_container_dark",
-	"on_primary_container_dark",
-	"inverse_primary_dark",
-	"secondary_dark",
-	"on_secondary_dark",
-	"secondary_container_dark",
-	"on_secondary_container_dark",
-	"tertiary_dark",
-	"on_tertiary_dark",
-	"tertiary_container_dark",
-	"on_tertiary_container_dark",
-	"background_dark",
-	"on_background_dark",
-	"surface_dark",
-	"on_surface_dark",
-	"surface_elevation_level_3_dark",
-	"surface_container_lowest_dark",
-	"surface_container_low_dark",
-	"surface_container_dark",
-	"surface_container_high_dark",
-	"surface_container_highest_dark",
-	"on_surface_variant_dark",
-	"surface_tint_dark",
-	"inverse_surface_dark",
-	"inverse_on_surface_dark",
-	"error_dark",
-	"on_error_dark",
-	"error_container_dark",
-	"on_error_container_dark",
-	"outline_dark",
-	"outline_variant_dark",
-	"scrim_dark",
-	"transparent",
-	"primary_0",
-	"primary_10",
-	"primary_20",
-	"primary_30",
-	"primary_40",
-	"primary_50",
-	"primary_60",
-	"primary_70",
-	"primary_80",
-	"primary_90",
-	"primary_95",
-	"primary_99",
-	"primary_100",
-	"secondary_0",
-	"secondary_10",
-	"secondary_20",
-	"secondary_30",
-	"secondary_40",
-	"secondary_50",
-	"secondary_60",
-	"secondary_70",
-	"secondary_80",
-	"secondary_90",
-	"secondary_95",
-	"secondary_99",
-	"secondary_100",
-	"tertiary_0",
-	"tertiary_10",
-	"tertiary_20",
-	"tertiary_30",
-	"tertiary_40",
-	"tertiary_50",
-	"tertiary_60",
-	"tertiary_70",
-	"tertiary_80",
-	"tertiary_90",
-	"tertiary_95",
-	"tertiary_99",
-	"tertiary_100",
-	"neutral_0",
-	"neutral_10",
-	"neutral_20",
-	"neutral_30",
-	"neutral_40",
-	"neutral_50",
-	"neutral_60",
-	"neutral_70",
-	"neutral_80",
-	"neutral_90",
-	"neutral_95",
-	"neutral_99",
-	"neutral_100",
-	"neutral_variant_0",
-	"neutral_variant_10",
-	"neutral_variant_20",
-	"neutral_variant_30",
-	"neutral_variant_40",
-	"neutral_variant_50",
-	"neutral_variant_60",
-	"neutral_variant_70",
-	"neutral_variant_80",
-	"neutral_variant_90",
-	"neutral_variant_95",
-	"neutral_variant_99",
-	"neutral_variant_100",
-	"blue_0",
-	"blue_10",
-	"blue_20",
-	"blue_30",
-	"blue_40",
-	"blue_50",
-	"blue_60",
-	"blue_70",
-	"blue_80",
-	"blue_90",
-	"blue_95",
-	"blue_99",
-	"blue_100",
-	"red_0",
-	"red_10",
-	"red_20",
-	"red_30",
-	"red_40",
-	"red_50",
-	"red_60",
-	"red_70",
-	"red_80",
-	"red_90",
-	"red_95",
-	"red_99",
-	"red_100",
-	"green_0",
-	"green_10",
-	"green_20",
-	"green_30",
-	"green_40",
-	"green_50",
-	"green_60",
-	"green_70",
-	"green_80",
-	"green_90",
-	"green_95",
-	"green_99",
-	"green_100",
-	"orange_0",
-	"orange_10",
-	"orange_20",
-	"orange_30",
-	"orange_40",
-	"orange_50",
-	"orange_60",
-	"orange_70",
-	"orange_80",
-	"orange_90",
-	"orange_95",
-	"orange_99",
-	"orange_100",
-	"violet_0",
-	"violet_10",
-	"violet_20",
-	"violet_30",
-	"violet_40",
-	"violet_50",
-	"violet_60",
-	"violet_70",
-	"violet_80",
-	"violet_90",
-	"violet_95",
-	"violet_99",
-	"violet_100",
-	"cyan_0",
-	"cyan_10",
-	"cyan_20",
-	"cyan_30",
-	"cyan_40",
-	"cyan_50",
-	"cyan_60",
-	"cyan_70",
-	"cyan_80",
-	"cyan_90",
-	"cyan_95",
-	"cyan_99",
-	"cyan_100",
-	"pink_0",
-	"pink_10",
-	"pink_20",
-	"pink_30",
-	"pink_40",
-	"pink_50",
-	"pink_60",
-	"pink_70",
-	"pink_80",
-	"pink_90",
-	"pink_95",
-	"pink_99",
-	"pink_100"
+data class DataAboutColors(
+	val colorToken: String,
+	val colorValue: @Composable () -> Color
 )
 
-data class ColorRoles(
-	val primaryLight: Color,
-	val onPrimaryLight: Color,
-	val primaryContainerLight: Color,
-	val onPrimaryContainerLight: Color,
-	val secondaryLight: Color,
-	val onSecondaryLight: Color,
-	val secondaryContainerLight: Color,
-	val onSecondaryContainerLight: Color,
-	val tertiaryLight: Color,
-	val onTertiaryLight: Color,
-	val tertiaryContainerLight: Color,
-	val onTertiaryContainerLight: Color,
-	val surfaceLight: Color,
-	val surfaceDimLight: Color,
-	val surfaceBrightLight: Color,
-	val onSurfaceLight: Color,
-	val surfaceContainerLowestLight: Color,
-	val surfaceContainerLowLight: Color,
-	val surfaceContainerLight: Color,
-	val surfaceContainerHighLight: Color,
-	val surfaceContainerHighestLight: Color,
-	val onSurfaceVariantLight: Color,
-	val errorLight: Color,
-	val onErrorLight: Color,
-	val errorContainerLight: Color,
-	val onErrorContainerLight: Color,
-	val outlineLight: Color,
-	val outlineVariantLight: Color,
-	val scrimLight: Color,
-	val primaryDark: Color,
-	val onPrimaryDark: Color,
-	val primaryContainerDark: Color,
-	val onPrimaryContainerDark: Color,
-	val secondaryDark: Color,
-	val onSecondaryDark: Color,
-	val secondaryContainerDark: Color,
-	val onSecondaryContainerDark: Color,
-	val tertiaryDark: Color,
-	val onTertiaryDark: Color,
-	val tertiaryContainerDark: Color,
-	val onTertiaryContainerDark: Color,
-	val surfaceDark: Color,
-	val surfaceDimDark: Color,
-	val surfaceBrightDark: Color,
-	val onSurfaceDark: Color,
-	val surfaceContainerLowestDark: Color,
-	val surfaceContainerLowDark: Color,
-	val surfaceContainerDark: Color,
-	val surfaceContainerHighDark: Color,
-	val surfaceContainerHighestDark: Color,
-	val onSurfaceVariantDark: Color,
-	val errorDark: Color,
-	val onErrorDark: Color,
-	val errorContainerDark: Color,
-	val onErrorContainerDark: Color,
-	val outlineDark: Color,
-	val outlineVariantDark: Color,
-	val scrimDark: Color
-)
-
-data class FullPaletteList(
-	val colorRoles: ColorRoles,
-	val surfaceElevationLevel3Light: Color,
-	val surfaceElevationLevel3Dark: Color,
-	val primary_0: Color,
-	val primary_10: Color,
-	val primary_20: Color,
-	val primary_30: Color,
-	val primary_40: Color,
-	val primary_50: Color,
-	val primary_60: Color,
-	val primary_70: Color,
-	val primary_80: Color,
-	val primary_90: Color,
-	val primary_95: Color,
-	val primary_99: Color,
-	val primary_100: Color,
-	val secondary_0: Color,
-	val secondary_10: Color,
-	val secondary_20: Color,
-	val secondary_30: Color,
-	val secondary_40: Color,
-	val secondary_50: Color,
-	val secondary_60: Color,
-	val secondary_70: Color,
-	val secondary_80: Color,
-	val secondary_90: Color,
-	val secondary_95: Color,
-	val secondary_99: Color,
-	val secondary_100: Color,
-	val tertiary_0: Color,
-	val tertiary_10: Color,
-	val tertiary_20: Color,
-	val tertiary_30: Color,
-	val tertiary_40: Color,
-	val tertiary_50: Color,
-	val tertiary_60: Color,
-	val tertiary_70: Color,
-	val tertiary_80: Color,
-	val tertiary_90: Color,
-	val tertiary_95: Color,
-	val tertiary_99: Color,
-	val tertiary_100: Color,
-	val neutral_0: Color,
-	val neutral_10: Color,
-	val neutral_20: Color,
-	val neutral_30: Color,
-	val neutral_40: Color,
-	val neutral_50: Color,
-	val neutral_60: Color,
-	val neutral_70: Color,
-	val neutral_80: Color,
-	val neutral_90: Color,
-	val neutral_95: Color,
-	val neutral_99: Color,
-	val neutral_100: Color,
-	val neutralVariant_0: Color,
-	val neutralVariant_10: Color,
-	val neutralVariant_20: Color,
-	val neutralVariant_30: Color,
-	val neutralVariant_40: Color,
-	val neutralVariant_50: Color,
-	val neutralVariant_60: Color,
-	val neutralVariant_70: Color,
-	val neutralVariant_80: Color,
-	val neutralVariant_90: Color,
-	val neutralVariant_95: Color,
-	val neutralVariant_99: Color,
-	val neutralVariant_100: Color,
-	val blue: Map<Int, Color>,
-	val red: Map<Int, Color>,
-	val green: Map<Int, Color>,
-	val orange: Map<Int, Color>,
-	val violet: Map<Int, Color>,
-	val cyan: Map<Int, Color>,
-	val pink: Map<Int, Color>
-)
-
-enum class Primary(val colorToken: String, @ColorRes val colorValue: Int) {
-	Primary0("primary_0", system_accent1_1000),
-	Primary10("primary_10", system_accent1_900),
-	Primary20("primary_20", system_accent1_800),
-	Primary30("primary_30", system_accent1_700),
-	Primary40("primary_40", system_accent1_600),
-	Primary50("primary_50", system_accent1_500),
-	Primary60("primary_60", system_accent1_400),
-	Primary70("primary_70", system_accent1_300),
-	Primary80("primary_80", system_accent1_200),
-	Primary90("primary_90", system_accent1_100),
-	Primary95("primary_95", system_accent1_50),
-	Primary99("primary_99", system_accent1_10),
-	Primary100("primary_100", system_accent1_0);
-
-	@Composable
-	operator fun component1(): Color {
-		return colorResource(this.colorValue)
-	}
-
-	operator fun component2(): String {
-		return this.colorToken
-	}
+class PaletteState(val entirePaletteAsMap: MutableState<LinkedHashMap<String, Color>>) {
+	val allPossibleColorTokensAsList = entirePaletteAsMap.value.keys
 }
 
-enum class Secondary(val colorToken: String, @ColorRes val colorValue: Int) {
-	Secondary0("secondary_0", system_accent2_1000),
-	Secondary10("secondary_10", system_accent2_900),
-	Secondary20("secondary_20", system_accent2_800),
-	Secondary30("secondary_30", system_accent2_700),
-	Secondary40("secondary_40", system_accent2_600),
-	Secondary50("secondary_50", system_accent2_500),
-	Secondary60("secondary_60", system_accent2_400),
-	Secondary70("secondary_70", system_accent2_300),
-	Secondary80("secondary_80", system_accent2_200),
-	Secondary90("secondary_90", system_accent2_100),
-	Secondary95("secondary_95", system_accent2_50),
-	Secondary99("secondary_99", system_accent2_10),
-	Secondary100("secondary_100", system_accent2_0);
-
-	@Composable
-	operator fun component1(): Color {
-		return colorResource(this.colorValue)
-	}
-
-	operator fun component2(): String {
-		return this.colorToken
-	}
-}
-
-enum class Tertiary(val colorToken: String, @ColorRes val colorValue: Int) {
-	Tertiary0("tertiary_0", system_accent3_1000),
-	Tertiary10("tertiary_10", system_accent3_900),
-	Tertiary20("tertiary_20", system_accent3_800),
-	Tertiary30("tertiary_30", system_accent3_700),
-	Tertiary40("tertiary_40", system_accent3_600),
-	Tertiary50("tertiary_50", system_accent3_500),
-	Tertiary60("tertiary_60", system_accent3_400),
-	Tertiary70("tertiary_70", system_accent3_300),
-	Tertiary80("tertiary_80", system_accent3_200),
-	Tertiary90("tertiary_90", system_accent3_100),
-	Tertiary95("tertiary_95", system_accent3_50),
-	Tertiary99("tertiary_99", system_accent3_10),
-	Tertiary100("tertiary_100", system_accent3_0);
-
-	@Composable
-	operator fun component1(): Color {
-		return colorResource(this.colorValue)
-	}
-
-	operator fun component2(): String {
-		return this.colorToken
-	}
-}
-
-enum class Neutral(val colorToken: String, @ColorRes val colorValue: Int) {
-	Neutral0("neutral_0", system_neutral1_1000),
-	Neutral10("neutral_10", system_neutral1_900),
-	Neutral20("neutral_20", system_neutral1_800),
-	Neutral30("neutral_30", system_neutral1_700),
-	Neutral40("neutral_40", system_neutral1_600),
-	Neutral50("neutral_50", system_neutral1_500),
-	Neutral60("neutral_60", system_neutral1_400),
-	Neutral70("neutral_70", system_neutral1_300),
-	Neutral80("neutral_80", system_neutral1_200),
-	Neutral90("neutral_90", system_neutral1_100),
-	Neutral95("neutral_95", system_neutral1_50),
-	Neutral99("neutral_99", system_neutral1_10),
-	Neutral100("neutral_100", system_neutral1_0);
-
-	@Composable
-	operator fun component1(): Color {
-		return colorResource(this.colorValue)
-	}
-
-	operator fun component2(): String {
-		return this.colorToken
-	}
-}
-enum class NeutralVariant(val colorToken: String, @ColorRes val colorValue: Int) {
-	NeutralVariant0("neutral_variant_0", system_neutral2_1000),
-	NeutralVariant10("neutral_variant_10", system_neutral2_900),
-	NeutralVariant20("neutral_variant_20", system_neutral2_800),
-	NeutralVariant30("neutral_variant_30", system_neutral2_700),
-	NeutralVariant40("neutral_variant_40", system_neutral2_600),
-	NeutralVariant50("neutral_variant_50", system_neutral2_500),
-	NeutralVariant60("neutral_variant_60", system_neutral2_400),
-	NeutralVariant70("neutral_variant_70", system_neutral2_300),
-	NeutralVariant80("neutral_variant_80", system_neutral2_200),
-	NeutralVariant90("neutral_variant_90", system_neutral2_100),
-	NeutralVariant95("neutral_variant_95", system_neutral2_50),
-	NeutralVariant99("neutral_variant_99", system_neutral2_10),
-	NeutralVariant100("neutral_variant_100", system_neutral2_0);
-
-	@Composable
-	operator fun component1(): Color {
-		return colorResource(this.colorValue)
-	}
-
-	operator fun component2(): String {
-		return this.colorToken
-	}
-}
-
+@SuppressLint("MutableCollectionMutableState")
 @Composable
-fun fullPalette(): FullPaletteList {
-	var primaryLight = Color.Red
-	var onPrimaryLight = Color.Red
-	var primaryContainerLight = Color.Red
-	var onPrimaryContainerLight = Color.Red
-	var secondaryLight = Color.Red
-	var onSecondaryLight = Color.Red
-	var secondaryContainerLight = Color.Red
-	var onSecondaryContainerLight = Color.Red
-	var tertiaryLight = Color.Red
-	var onTertiaryLight = Color.Red
-	var tertiaryContainerLight = Color.Red
-	var onTertiaryContainerLight = Color.Red
-	var surfaceLight = Color.Red
-	var surfaceDimLight = Color.Red
-	var surfaceBrightLight = Color.Red
-	var onSurfaceLight = Color.Red
-	var surfaceElevationLevel3Light = Color.Red
-	var surfaceContainerLowestLight = Color.Red
-	var surfaceContainerLowLight = Color.Red
-	var surfaceContainerLight = Color.Red
-	var surfaceContainerHighLight = Color.Red
-	var surfaceContainerHighestLight = Color.Red
-	var onSurfaceVariantLight = Color.Red
-	var errorLight = Color.Red
-	var onErrorLight = Color.Red
-	var errorContainerLight = Color.Red
-	var onErrorContainerLight = Color.Red
-	var outlineLight = Color.Red
-	var outlineVariantLight = Color.Red
-	var scrimLight = Color.Red
+fun rememberPaletteState(): PaletteState {
+	val entirePaletteAsMap = remember { mutableStateOf(linkedMapOf<String, Color>()) }
 
-	var primaryDark = Color.Red
-	var onPrimaryDark = Color.Red
-	var primaryContainerDark = Color.Red
-	var onPrimaryContainerDark = Color.Red
-	var secondaryDark = Color.Red
-	var onSecondaryDark = Color.Red
-	var secondaryContainerDark = Color.Red
-	var onSecondaryContainerDark = Color.Red
-	var tertiaryDark = Color.Red
-	var onTertiaryDark = Color.Red
-	var tertiaryContainerDark = Color.Red
-	var onTertiaryContainerDark = Color.Red
-	var surfaceDark = Color.Red
-	var surfaceDimDark = Color.Red
-	var surfaceBrightDark = Color.Red
-	var onSurfaceDark = Color.Red
-	var surfaceElevationLevel3Dark = Color.Red
-	var surfaceContainerLowestDark = Color.Red
-	var surfaceContainerLowDark = Color.Red
-	var surfaceContainerDark = Color.Red
-	var surfaceContainerHighDark = Color.Red
-	var surfaceContainerHighestDark = Color.Red
-	var onSurfaceVariantDark = Color.Red
-	var errorDark = Color.Red
-	var onErrorDark = Color.Red
-	var errorContainerDark = Color.Red
-	var onErrorContainerDark = Color.Red
-	var outlineDark = Color.Red
-	var outlineVariantDark = Color.Red
-	var scrimDark = Color.Red
-
-	val saturationOfPrimary = ColorUtil.colorToHSL(colorResource(system_accent1_600))[1]
-
-	val harmonizedBlue = Color(
-		harmonize(Color.Blue.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	val harmonizedRed = Color(
-		harmonize(Color.Red.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	val harmonizedGreen = Color(
-		harmonize(Color.Green.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	val harmonizedOrange = Color(
-		harmonize(Color(0xFFFFAA00).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	val harmonizedViolet = Color(
-		harmonize(Color(0xFFEB00FF).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	val harmonizedCyan = Color(
-		harmonize(Color.Cyan.toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	val harmonizedPink = Color(
-		harmonize(Color(0xFFFF32AC).toArgb(), MaterialTheme.colorScheme.primary.toArgb())
-	).blendWith(Color.White, 1f - saturationOfPrimary)
-
-	LightTheme {
-		primaryLight = MaterialTheme.colorScheme.primary
-		onPrimaryLight = MaterialTheme.colorScheme.onPrimary
-		primaryContainerLight = MaterialTheme.colorScheme.primaryContainer
-		onPrimaryContainerLight = MaterialTheme.colorScheme.onPrimaryContainer
-		secondaryLight = MaterialTheme.colorScheme.secondary
-		onSecondaryLight = MaterialTheme.colorScheme.onSecondary
-		secondaryContainerLight = MaterialTheme.colorScheme.secondaryContainer
-		onSecondaryContainerLight = MaterialTheme.colorScheme.onSecondaryContainer
-		tertiaryLight = MaterialTheme.colorScheme.tertiary
-		onTertiaryLight = MaterialTheme.colorScheme.onTertiary
-		tertiaryContainerLight = MaterialTheme.colorScheme.tertiaryContainer
-		onTertiaryContainerLight = MaterialTheme.colorScheme.onTertiaryContainer
-		surfaceLight = MaterialTheme.colorScheme.surface
-		surfaceDimLight = MaterialTheme.colorScheme.surfaceDim
-		surfaceBrightLight = MaterialTheme.colorScheme.surfaceBright
-		onSurfaceLight = MaterialTheme.colorScheme.onSurface
-		surfaceElevationLevel3Light = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-		surfaceContainerLowestLight = MaterialTheme.colorScheme.surfaceContainerLowest
-		surfaceContainerLowLight = MaterialTheme.colorScheme.surfaceContainerLow
-		surfaceContainerLight = MaterialTheme.colorScheme.surfaceContainer
-		surfaceContainerHighLight = MaterialTheme.colorScheme.surfaceContainerHigh
-		surfaceContainerHighestLight = MaterialTheme.colorScheme.surfaceContainerHighest
-		onSurfaceVariantLight = MaterialTheme.colorScheme.onSurfaceVariant
-		errorLight = MaterialTheme.colorScheme.error
-		onErrorLight = MaterialTheme.colorScheme.onError
-		errorContainerLight = MaterialTheme.colorScheme.errorContainer
-		onErrorContainerLight = MaterialTheme.colorScheme.onErrorContainer
-		outlineLight = MaterialTheme.colorScheme.outline
-		outlineVariantLight = MaterialTheme.colorScheme.outlineVariant
-		scrimLight = MaterialTheme.colorScheme.scrim
-		surfaceLight = MaterialTheme.colorScheme.surface
+	AdditionalColors.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
-	DarkTheme {
-		primaryDark = MaterialTheme.colorScheme.primary
-		onPrimaryDark = MaterialTheme.colorScheme.onPrimary
-		primaryContainerDark = MaterialTheme.colorScheme.primaryContainer
-		onPrimaryContainerDark = MaterialTheme.colorScheme.onPrimaryContainer
-		secondaryDark = MaterialTheme.colorScheme.secondary
-		onSecondaryDark = MaterialTheme.colorScheme.onSecondary
-		secondaryContainerDark = MaterialTheme.colorScheme.secondaryContainer
-		onSecondaryContainerDark = MaterialTheme.colorScheme.onSecondaryContainer
-		tertiaryDark = MaterialTheme.colorScheme.tertiary
-		onTertiaryDark = MaterialTheme.colorScheme.onTertiary
-		tertiaryContainerDark = MaterialTheme.colorScheme.tertiaryContainer
-		onTertiaryContainerDark = MaterialTheme.colorScheme.onTertiaryContainer
-		surfaceDark = MaterialTheme.colorScheme.surface
-		surfaceDimDark = MaterialTheme.colorScheme.surfaceDim
-		surfaceBrightDark = MaterialTheme.colorScheme.surfaceBright
-		onSurfaceDark = MaterialTheme.colorScheme.onSurface
-		surfaceElevationLevel3Dark = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-		surfaceContainerLowestDark = MaterialTheme.colorScheme.surfaceContainerLowest
-		surfaceContainerLowDark = MaterialTheme.colorScheme.surfaceContainerLow
-		surfaceContainerDark = MaterialTheme.colorScheme.surfaceContainer
-		surfaceContainerHighDark = MaterialTheme.colorScheme.surfaceContainerHigh
-		surfaceContainerHighestDark = MaterialTheme.colorScheme.surfaceContainerHighest
-		onSurfaceVariantDark = MaterialTheme.colorScheme.onSurfaceVariant
-		errorDark = MaterialTheme.colorScheme.error
-		onErrorDark = MaterialTheme.colorScheme.onError
-		errorContainerDark = MaterialTheme.colorScheme.errorContainer
-		onErrorContainerDark = MaterialTheme.colorScheme.onErrorContainer
-		outlineDark = MaterialTheme.colorScheme.outline
-		outlineVariantDark = MaterialTheme.colorScheme.outlineVariant
-		scrimDark = MaterialTheme.colorScheme.scrim
+	ColorRolesLight.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
-	return FullPaletteList(
-		colorRoles = ColorRoles(
-			primaryLight = primaryLight,
-			onPrimaryLight = onPrimaryLight,
-			primaryContainerLight = primaryContainerLight,
-			onPrimaryContainerLight = onPrimaryContainerLight,
-			secondaryLight = secondaryLight,
-			onSecondaryLight = onSecondaryLight,
-			secondaryContainerLight = secondaryContainerLight,
-			onSecondaryContainerLight = onSecondaryContainerLight,
-			tertiaryLight = tertiaryLight,
-			onTertiaryLight = onTertiaryLight,
-			tertiaryContainerLight = tertiaryContainerLight,
-			onTertiaryContainerLight = onTertiaryContainerLight,
-			surfaceLight = surfaceLight,
-			surfaceDimLight = surfaceDimLight,
-			surfaceBrightLight = surfaceBrightLight,
-			onSurfaceLight = onSurfaceLight,
-			surfaceContainerLowestLight = surfaceContainerLowestLight,
-			surfaceContainerLowLight = surfaceContainerLowLight,
-			surfaceContainerLight = surfaceContainerLight,
-			surfaceContainerHighLight = surfaceContainerHighLight,
-			surfaceContainerHighestLight = surfaceContainerHighestLight,
-			onSurfaceVariantLight = onSurfaceVariantLight,
-			errorLight = errorLight,
-			onErrorLight = onErrorLight,
-			errorContainerLight = errorContainerLight,
-			onErrorContainerLight = onErrorContainerLight,
-			outlineLight = outlineLight,
-			outlineVariantLight = outlineVariantLight,
-			scrimLight = scrimLight,
-			primaryDark = primaryDark,
-			onPrimaryDark = onPrimaryDark,
-			primaryContainerDark = primaryContainerDark,
-			onPrimaryContainerDark = onPrimaryContainerDark,
-			secondaryDark = secondaryDark,
-			onSecondaryDark = onSecondaryDark,
-			secondaryContainerDark = secondaryContainerDark,
-			onSecondaryContainerDark = onSecondaryContainerDark,
-			tertiaryDark = tertiaryDark,
-			onTertiaryDark = onTertiaryDark,
-			tertiaryContainerDark = tertiaryContainerDark,
-			onTertiaryContainerDark = onTertiaryContainerDark,
-			surfaceDark = surfaceDark,
-			surfaceDimDark = surfaceDimDark,
-			surfaceBrightDark = surfaceBrightDark,
-			onSurfaceDark = onSurfaceDark,
-			surfaceContainerLowestDark = surfaceContainerLowestDark,
-			surfaceContainerLowDark = surfaceContainerLowDark,
-			surfaceContainerDark = surfaceContainerDark,
-			surfaceContainerHighDark = surfaceContainerHighDark,
-			surfaceContainerHighestDark = surfaceContainerHighestDark,
-			onSurfaceVariantDark = onSurfaceVariantDark,
-			errorDark = errorDark,
-			onErrorDark = onErrorDark,
-			errorContainerDark = errorContainerDark,
-			onErrorContainerDark = onErrorContainerDark,
-			outlineDark = outlineDark,
-			outlineVariantDark = outlineVariantDark,
-			scrimDark = scrimDark,
-		),
-		surfaceElevationLevel3Light = surfaceElevationLevel3Light,
-		surfaceElevationLevel3Dark = surfaceElevationLevel3Dark,
-		primary_0 = colorResource(system_accent1_1000),
-		primary_10 = colorResource(system_accent1_900),
-		primary_20 = colorResource(system_accent1_800),
-		primary_30 = colorResource(system_accent1_700),
-		primary_40 = colorResource(system_accent1_600),
-		primary_50 = colorResource(system_accent1_500),
-		primary_60 = colorResource(system_accent1_400),
-		primary_70 = colorResource(system_accent1_300),
-		primary_80 = colorResource(system_accent1_200),
-		primary_90 = colorResource(system_accent1_100),
-		primary_95 = colorResource(system_accent1_50),
-		primary_99 = colorResource(system_accent1_10),
-		primary_100 = colorResource(system_accent1_0),
-		secondary_0 = colorResource(system_accent2_1000),
-		secondary_10 = colorResource(system_accent2_900),
-		secondary_20 = colorResource(system_accent2_800),
-		secondary_30 = colorResource(system_accent2_700),
-		secondary_40 = colorResource(system_accent2_600),
-		secondary_50 = colorResource(system_accent2_500),
-		secondary_60 = colorResource(system_accent2_400),
-		secondary_70 = colorResource(system_accent2_300),
-		secondary_80 = colorResource(system_accent2_200),
-		secondary_90 = colorResource(system_accent2_100),
-		secondary_95 = colorResource(system_accent2_50),
-		secondary_99 = colorResource(system_accent2_10),
-		secondary_100 = colorResource(system_accent2_0),
-		tertiary_0 = colorResource(system_accent3_1000),
-		tertiary_10 = colorResource(system_accent3_900),
-		tertiary_20 = colorResource(system_accent3_800),
-		tertiary_30 = colorResource(system_accent3_700),
-		tertiary_40 = colorResource(system_accent3_600),
-		tertiary_50 = colorResource(system_accent3_500),
-		tertiary_60 = colorResource(system_accent3_400),
-		tertiary_70 = colorResource(system_accent3_300),
-		tertiary_80 = colorResource(system_accent3_200),
-		tertiary_90 = colorResource(system_accent3_100),
-		tertiary_95 = colorResource(system_accent3_50),
-		tertiary_99 = colorResource(system_accent3_10),
-		tertiary_100 = colorResource(system_accent3_0),
-		neutral_0 = colorResource(system_neutral1_1000),
-		neutral_10 = colorResource(system_neutral1_900),
-		neutral_20 = colorResource(system_neutral1_800),
-		neutral_30 = colorResource(system_neutral1_700),
-		neutral_40 = colorResource(system_neutral1_600),
-		neutral_50 = colorResource(system_neutral1_500),
-		neutral_60 = colorResource(system_neutral1_400),
-		neutral_70 = colorResource(system_neutral1_300),
-		neutral_80 = colorResource(system_neutral1_200),
-		neutral_90 = colorResource(system_neutral1_100),
-		neutral_95 = colorResource(system_neutral1_50),
-		neutral_99 = colorResource(system_neutral1_10),
-		neutral_100 = colorResource(system_neutral1_0),
-		neutralVariant_0 = colorResource(system_neutral2_1000),
-		neutralVariant_10 = colorResource(system_neutral2_900),
-		neutralVariant_20 = colorResource(system_neutral2_800),
-		neutralVariant_30 = colorResource(system_neutral2_700),
-		neutralVariant_40 = colorResource(system_neutral2_600),
-		neutralVariant_50 = colorResource(system_neutral2_500),
-		neutralVariant_60 = colorResource(system_neutral2_400),
-		neutralVariant_70 = colorResource(system_neutral2_300),
-		neutralVariant_80 = colorResource(system_neutral2_200),
-		neutralVariant_90 = colorResource(system_neutral2_100),
-		neutralVariant_95 = colorResource(system_neutral2_50),
-		neutralVariant_99 = colorResource(system_neutral2_10),
-		neutralVariant_100 = colorResource(system_neutral2_0),
-		blue = getColorTonesMap(harmonizedBlue),
-		red = getColorTonesMap(harmonizedRed),
-		green = getColorTonesMap(harmonizedGreen),
-		orange = getColorTonesMap(harmonizedOrange),
-		violet = getColorTonesMap(harmonizedViolet),
-		cyan = getColorTonesMap(harmonizedCyan),
-		pink = getColorTonesMap(harmonizedPink)
-	)
+	ColorRolesDark.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	PrimaryTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	SecondaryTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	TertiaryTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	NeutralTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	NeutralVariantTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	BlueTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	RedTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	GreenTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	OrangeTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	VioletTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	CyanTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+	PinkTones.entries.forEach {
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
+
+	return remember { PaletteState(entirePaletteAsMap) }
+}
+
+enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
+	PrimaryLight(
+		DataAboutColors("primary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.primary }
+			color
+		}
+	),
+	OnPrimaryLight(
+		DataAboutColors("on_primary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onPrimary }
+			color
+		}
+	),
+	PrimaryContainerLight(
+		DataAboutColors("primary_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.primaryContainer }
+			color
+		}
+	),
+	OnPrimaryContainerLight(
+		DataAboutColors("on_primary_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onPrimaryContainer }
+			color
+		}
+	),
+	SecondaryLight(
+		DataAboutColors("secondary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.secondary }
+			color
+		}
+	),
+	OnSecondaryLight(
+		DataAboutColors("on_secondary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onSecondary }
+			color
+		}
+	),
+	SecondaryContainerLight(
+		DataAboutColors("secondary_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.secondaryContainer }
+			color
+		}
+	),
+	OnSecondaryContainerLight(
+		DataAboutColors("on_secondary_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onSecondaryContainer }
+			color
+		}
+	),
+	TertiaryLight(
+		DataAboutColors("tertiary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.tertiary }
+			color
+		}
+	),
+	OnTertiaryLight(
+		DataAboutColors("on_tertiary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onTertiary }
+			color
+		}
+	),
+	TertiaryContainerLight(
+		DataAboutColors("tertiary_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.tertiaryContainer }
+			color
+		}
+	),
+	OnTertiaryContainerLight(
+		DataAboutColors("on_tertiary_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onTertiaryContainer }
+			color
+		}
+	),
+	SurfaceLight(
+		DataAboutColors("surface_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surface }
+			color
+		}
+	),
+	SurfaceDimLight(
+		DataAboutColors("surface_dim_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceDim }
+			color
+		}
+	),
+	SurfaceBrightLight(
+		DataAboutColors("surface_bright_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceBright }
+			color
+		}
+	),
+	OnSurfaceLight(
+		DataAboutColors("on_surface_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onSurface }
+			color
+		}
+	),
+	SurfaceContainerLowestLight(
+		DataAboutColors("surface_container_lowest_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerLowest }
+			color
+		}
+	),
+	SurfaceContainerLowLight(
+		DataAboutColors("surface_container_low_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerLow }
+			color
+		}
+	),
+	SurfaceContainerLight(
+		DataAboutColors("surface_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceContainer }
+			color
+		}
+	),
+	SurfaceContainerHighLight(
+		DataAboutColors("surface_container_high_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerHigh }
+			color
+		}
+	),
+	SurfaceContainerHighestLight(
+		DataAboutColors("surface_container_highest_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerHighest }
+			color
+		}
+	),
+	OnSurfaceVariantLight(
+		DataAboutColors("on_surface_variant_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onSurfaceVariant }
+			color
+		}
+	),
+	ErrorLight(
+		DataAboutColors("error_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.error }
+			color
+		}
+	),
+	OnErrorLight(
+		DataAboutColors("on_error_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onError }
+			color
+		}
+	),
+	ErrorContainerLight(
+		DataAboutColors("error_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.errorContainer }
+			color
+		}
+	),
+	OnErrorContainerLight(
+		DataAboutColors("on_error_container_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.onErrorContainer }
+			color
+		}
+	),
+	OutlineLight(
+		DataAboutColors("outline_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.outline }
+			color
+		}
+	),
+	OutlineVariantLight(
+		DataAboutColors("outline_variant_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.outlineVariant }
+			color
+		}
+	);
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
+	PrimaryDark(
+		DataAboutColors("primary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.primary }
+			color
+		}
+	),
+
+	OnPrimaryDark(
+		DataAboutColors("on_primary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onPrimary }
+			color
+		}
+	),
+
+	PrimaryContainerDark(
+		DataAboutColors("primary_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.primaryContainer }
+			color
+		}
+	),
+
+	OnPrimaryContainerDark(
+		DataAboutColors("on_primary_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onPrimaryContainer }
+			color
+		}
+	),
+
+	SecondaryDark(
+		DataAboutColors("secondary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.secondary }
+			color
+		}
+	),
+
+	OnSecondaryDark(
+		DataAboutColors("on_secondary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onSecondary }
+			color
+		}
+	),
+
+	SecondaryContainerDark(
+		DataAboutColors("secondary_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.secondaryContainer }
+			color
+		}
+	),
+
+	OnSecondaryContainerDark(
+		DataAboutColors("on_secondary_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onSecondaryContainer }
+			color
+		}
+	),
+
+	TertiaryDark(
+		DataAboutColors("tertiary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.tertiary }
+			color
+		}
+	),
+
+	OnTertiaryDark(
+		DataAboutColors("on_tertiary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onTertiary }
+			color
+		}
+	),
+
+	TertiaryContainerDark(
+		DataAboutColors("tertiary_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.tertiaryContainer }
+			color
+		}
+	),
+
+	OnTertiaryContainerDark(
+		DataAboutColors("on_tertiary_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onTertiaryContainer }
+			color
+		}
+	),
+
+	SurfaceDark(
+		DataAboutColors("surface_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surface }
+			color
+		}
+	),
+
+	SurfaceDimDark(
+		DataAboutColors("surface_dim_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceDim }
+			color
+		}
+	),
+
+	SurfaceBrightDark(
+		DataAboutColors("surface_bright_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceBright }
+			color
+		}
+	),
+
+	OnSurfaceDark(
+		DataAboutColors("on_surface_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onSurface }
+			color
+		}
+	),
+
+	SurfaceContainerLowestDark(
+		DataAboutColors("surface_container_lowest_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerLowest }
+			color
+		}
+	),
+
+	SurfaceContainerLowDark(
+		DataAboutColors("surface_container_low_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerLow }
+			color
+		}
+	),
+
+	SurfaceContainerDark(
+		DataAboutColors("surface_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainer }
+			color
+		}
+	),
+
+	SurfaceContainerHighDark(
+		DataAboutColors("surface_container_high_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerHigh }
+			color
+		}
+	),
+
+	SurfaceContainerHighestDark(
+		DataAboutColors("surface_container_highest_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerHighest }
+			color
+		}
+	),
+
+	OnSurfaceVariantDark(
+		DataAboutColors("on_surface_variant_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onSurfaceVariant }
+			color
+		}
+	),
+
+	ErrorDark(
+		DataAboutColors("error_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.error }
+			color
+		}
+	),
+
+	OnErrorDark(
+		DataAboutColors("on_error_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onError }
+			color
+		}
+	),
+
+	ErrorContainerDark(
+		DataAboutColors("error_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.errorContainer }
+			color
+		}
+	),
+
+	OnErrorContainerDark(
+		DataAboutColors("on_error_container_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.onErrorContainer }
+			color
+		}
+	),
+
+	OutlineDark(
+		DataAboutColors("outline_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.outline }
+			color
+		}
+	),
+
+	OutlineVariantDark(
+		DataAboutColors("outline_variant_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.outlineVariant }
+			color
+		}
+	);
+
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
+	White(
+		DataAboutColors("white") { Color.White }
+	),
+	Black(
+		DataAboutColors("black") { Color.Black }
+	),
+	SurfaceElevationLevel3Light(
+		DataAboutColors("surface_elevation_level_3_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
+			color
+		}
+	),
+	SurfaceElevationLevel3Dark(
+		DataAboutColors("surface_elevation_level_3_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
+			color
+		}
+	),
+	Transparent(
+		DataAboutColors("transparent") { Color.Transparent }
+	),
+	ScrimLight(
+		DataAboutColors("scrim_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.scrim }
+			color
+		}
+	),
+	ScrimDark(
+		DataAboutColors("scrim_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.scrim }
+			color
+		}
+	);
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class PrimaryTones(val dataAboutColors: DataAboutColors){
+	T0(DataAboutColors("primary_0") { colorResource(system_accent1_1000) }),
+	T10(DataAboutColors("primary_10") { colorResource(system_accent1_900) }),
+	T20(DataAboutColors("primary_20") { colorResource(system_accent1_800) }),
+	T30(DataAboutColors("primary_30") { colorResource(system_accent1_700) }),
+	T40(DataAboutColors("primary_40") { colorResource(system_accent1_600) }),
+	T50(DataAboutColors("primary_50") { colorResource(system_accent1_500) }),
+	T60(DataAboutColors("primary_60") { colorResource(system_accent1_400) }),
+	T70(DataAboutColors("primary_70") { colorResource(system_accent1_300) }),
+	T80(DataAboutColors("primary_80") { colorResource(system_accent1_200) }),
+	T90(DataAboutColors("primary_90") { colorResource(system_accent1_100) }),
+	T95(DataAboutColors("primary_95") { colorResource(system_accent1_50) }),
+	T99(DataAboutColors("primary_99") { colorResource(system_accent1_10) }),
+	T100(DataAboutColors("primary_100") { colorResource(system_accent1_0) });
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class SecondaryTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("secondary_0") { colorResource(system_accent2_1000) }),
+	T10(DataAboutColors("secondary_10") { colorResource(system_accent2_900) }),
+	T20(DataAboutColors("secondary_20") { colorResource(system_accent2_800) }),
+	T30(DataAboutColors("secondary_30") { colorResource(system_accent2_700) }),
+	T40(DataAboutColors("secondary_40") { colorResource(system_accent2_600) }),
+	T50(DataAboutColors("secondary_50") { colorResource(system_accent2_500) }),
+	T60(DataAboutColors("secondary_60") { colorResource(system_accent2_400) }),
+	T70(DataAboutColors("secondary_70") { colorResource(system_accent2_300) }),
+	T80(DataAboutColors("secondary_80") { colorResource(system_accent2_200) }),
+	T90(DataAboutColors("secondary_90") { colorResource(system_accent2_100) }),
+	T95(DataAboutColors("secondary_95") { colorResource(system_accent2_50) }),
+	T99(DataAboutColors("secondary_99") { colorResource(system_accent2_10) }),
+	T100(DataAboutColors("secondary_100") { colorResource(system_accent2_0) });
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class TertiaryTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("tertiary_0") { colorResource(system_accent3_1000) }),
+	T10(DataAboutColors("tertiary_10") { colorResource(system_accent3_900) }),
+	T20(DataAboutColors("tertiary_20") { colorResource(system_accent3_800) }),
+	T30(DataAboutColors("tertiary_30") { colorResource(system_accent3_700) }),
+	T40(DataAboutColors("tertiary_40") { colorResource(system_accent3_600) }),
+	T50(DataAboutColors("tertiary_50") { colorResource(system_accent3_500) }),
+	T60(DataAboutColors("tertiary_60") { colorResource(system_accent3_400) }),
+	T70(DataAboutColors("tertiary_70") { colorResource(system_accent3_300) }),
+	T80(DataAboutColors("tertiary_80") { colorResource(system_accent3_200) }),
+	T90(DataAboutColors("tertiary_90") { colorResource(system_accent3_100) }),
+	T95(DataAboutColors("tertiary_95") { colorResource(system_accent3_50) }),
+	T99(DataAboutColors("tertiary_99") { colorResource(system_accent3_10) }),
+	T100(DataAboutColors("tertiary_100") { colorResource(system_accent3_0) });
+
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class NeutralTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("neutral_0") { colorResource(system_neutral1_1000) }),
+	T10(DataAboutColors("neutral_10") { colorResource(system_neutral1_900) }),
+	T20(DataAboutColors("neutral_20") { colorResource(system_neutral1_800) }),
+	T30(DataAboutColors("neutral_30") { colorResource(system_neutral1_700) }),
+	T40(DataAboutColors("neutral_40") { colorResource(system_neutral1_600) }),
+	T50(DataAboutColors("neutral_50") { colorResource(system_neutral1_500) }),
+	T60(DataAboutColors("neutral_60") { colorResource(system_neutral1_400) }),
+	T70(DataAboutColors("neutral_70") { colorResource(system_neutral1_300) }),
+	T80(DataAboutColors("neutral_80") { colorResource(system_neutral1_200) }),
+	T90(DataAboutColors("neutral_90") { colorResource(system_neutral1_100) }),
+	T95(DataAboutColors("neutral_95") { colorResource(system_neutral1_50) }),
+	T99(DataAboutColors("neutral_99") { colorResource(system_neutral1_10) }),
+	T100(DataAboutColors("neutral_100") { colorResource(system_neutral1_0) });
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+enum class NeutralVariantTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("neutral_variant_0") { colorResource(system_neutral2_1000) }),
+	T10(DataAboutColors("neutral_variant_10") { colorResource(system_neutral2_900) }),
+	T20(DataAboutColors("neutral_variant_20") { colorResource(system_neutral2_800) }),
+	T30(DataAboutColors("neutral_variant_30") { colorResource(system_neutral2_700) }),
+	T40(DataAboutColors("neutral_variant_40") { colorResource(system_neutral2_600) }),
+	T50(DataAboutColors("neutral_variant_50") { colorResource(system_neutral2_500) }),
+	T60(DataAboutColors("neutral_variant_60") { colorResource(system_neutral2_400) }),
+	T70(DataAboutColors("neutral_variant_70") { colorResource(system_neutral2_300) }),
+	T80(DataAboutColors("neutral_variant_80") { colorResource(system_neutral2_200) }),
+	T90(DataAboutColors("neutral_variant_90") { colorResource(system_neutral2_100) }),
+	T95(DataAboutColors("neutral_variant_95") { colorResource(system_neutral2_50) }),
+	T99(DataAboutColors("neutral_variant_99") { colorResource(system_neutral2_10) }),
+	T100(DataAboutColors("neutral_variant_100") { colorResource(system_neutral2_0) });
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+// i mean yes there has to be a better way to do this without
+// instancing everything for every color
+enum class BlueTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("blue_0") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[0]!!
+	}),
+	T10(DataAboutColors("blue_10") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[10]!!
+	}),
+
+	T20(DataAboutColors("blue_20") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[20]!!
+	}),
+
+	T30(DataAboutColors("blue_30") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[30]!!
+	}),
+
+	T40(DataAboutColors("blue_40") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[40]!!
+	}),
+
+	T50(DataAboutColors("blue_50") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[50]!!
+	}),
+
+	T60(DataAboutColors("blue_60") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[60]!!
+	}),
+
+	T70(DataAboutColors("blue_70") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[70]!!
+	}),
+
+	T80(DataAboutColors("blue_80") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[80]!!
+	}),
+
+	T90(DataAboutColors("blue_90") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[90]!!
+	}),
+
+	T95(DataAboutColors("blue_95") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[95]!!
+	}),
+
+	T99(DataAboutColors("blue_99") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[99]!!
+	}),
+
+	T100(DataAboutColors("blue_100") {
+		val harmonizedBlue = Color(
+			harmonize(
+				blue.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedBlue)[100]!!
+	});
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class RedTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("red_0") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[0]!!
+	}),
+
+	T10(DataAboutColors("red_10") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[10]!!
+	}),
+
+	T20(DataAboutColors("red_20") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[20]!!
+	}),
+
+	T30(DataAboutColors("red_30") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[30]!!
+	}),
+
+	T40(DataAboutColors("red_40") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[40]!!
+	}),
+
+	T50(DataAboutColors("red_50") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[50]!!
+	}),
+
+	T60(DataAboutColors("red_60") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[60]!!
+	}),
+
+	T70(DataAboutColors("red_70") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[70]!!
+	}),
+
+	T80(DataAboutColors("red_80") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[80]!!
+	}),
+
+	T90(DataAboutColors("red_90") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[90]!!
+	}),
+
+	T95(DataAboutColors("red_95") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[95]!!
+	}),
+
+	T99(DataAboutColors("red_99") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[99]!!
+	}),
+
+	T100(DataAboutColors("red_100") {
+		val harmonizedRed = Color(
+			harmonize(
+				red.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedRed)[100]!!
+	});
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class GreenTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("green_0") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[0]!!
+	}),
+
+	T10(DataAboutColors("green_10") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[10]!!
+	}),
+
+	T20(DataAboutColors("green_20") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[20]!!
+	}),
+
+	T30(DataAboutColors("green_30") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[30]!!
+	}),
+
+	T40(DataAboutColors("green_40") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[40]!!
+	}),
+
+	T50(DataAboutColors("green_50") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[50]!!
+	}),
+
+	T60(DataAboutColors("green_60") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[60]!!
+	}),
+
+	T70(DataAboutColors("green_70") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[70]!!
+	}),
+
+	T80(DataAboutColors("green_80") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[80]!!
+	}),
+
+	T90(DataAboutColors("green_90") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[90]!!
+	}),
+
+	T95(DataAboutColors("green_95") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[95]!!
+	}),
+
+	T99(DataAboutColors("green_99") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[99]!!
+	}),
+
+	T100(DataAboutColors("green_100") {
+		val harmonizedGreen = Color(
+			harmonize(
+				green.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedGreen)[100]!!
+	});
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class OrangeTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("orange_0") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[0]!!
+	}),
+
+	T10(DataAboutColors("orange_10") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[10]!!
+	}),
+
+	T20(DataAboutColors("orange_20") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[20]!!
+	}),
+
+	T30(DataAboutColors("orange_30") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[30]!!
+	}),
+
+	T40(DataAboutColors("orange_40") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[40]!!
+	}),
+
+	T50(DataAboutColors("orange_50") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[50]!!
+	}),
+
+	T60(DataAboutColors("orange_60") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[60]!!
+	}),
+
+	T70(DataAboutColors("orange_70") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[70]!!
+	}),
+
+	T80(DataAboutColors("orange_80") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[80]!!
+	}),
+
+	T90(DataAboutColors("orange_90") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[90]!!
+	}),
+
+	T95(DataAboutColors("orange_95") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[95]!!
+	}),
+
+	T99(DataAboutColors("orange_99") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[99]!!
+	}),
+
+	T100(DataAboutColors("orange_100") {
+		val harmonizedOrange = Color(
+			harmonize(
+				orange.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedOrange)[100]!!
+	});
+
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class VioletTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("violet_0") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[0]!!
+	}),
+
+	T10(DataAboutColors("violet_10") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[10]!!
+	}),
+
+	T20(DataAboutColors("violet_20") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[20]!!
+	}),
+
+	T30(DataAboutColors("violet_30") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[30]!!
+	}),
+
+	T40(DataAboutColors("violet_40") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[40]!!
+	}),
+
+	T50(DataAboutColors("violet_50") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[50]!!
+	}),
+
+	T60(DataAboutColors("violet_60") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[60]!!
+	}),
+
+	T70(DataAboutColors("violet_70") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[70]!!
+	}),
+
+	T80(DataAboutColors("violet_80") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[80]!!
+	}),
+
+	T90(DataAboutColors("violet_90") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[90]!!
+	}),
+
+	T95(DataAboutColors("violet_95") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[95]!!
+	}),
+
+	T99(DataAboutColors("violet_99") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[99]!!
+	}),
+
+	T100(DataAboutColors("violet_100") {
+		val harmonizedViolet = Color(
+			harmonize(
+				violet.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedViolet)[100]!!
+	});
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class CyanTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("cyan_0") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[0]!!
+	}),
+
+	T10(DataAboutColors("cyan_10") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[10]!!
+	}),
+
+	T20(DataAboutColors("cyan_20") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[20]!!
+	}),
+
+	T30(DataAboutColors("cyan_30") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[30]!!
+	}),
+
+	T40(DataAboutColors("cyan_40") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[40]!!
+	}),
+
+	T50(DataAboutColors("cyan_50") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[50]!!
+	}),
+
+	T60(DataAboutColors("cyan_60") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[60]!!
+	}),
+
+	T70(DataAboutColors("cyan_70") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[70]!!
+	}),
+
+	T80(DataAboutColors("cyan_80") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[80]!!
+	}),
+
+	T90(DataAboutColors("cyan_90") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[90]!!
+	}),
+
+	T95(DataAboutColors("cyan_95") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[95]!!
+	}),
+
+	T99(DataAboutColors("cyan_99") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[99]!!
+	}),
+
+	T100(DataAboutColors("cyan_100") {
+		val harmonizedCyan = Color(
+			harmonize(
+				cyan.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedCyan)[100]!!
+	});
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
+}
+
+enum class PinkTones(val dataAboutColors: DataAboutColors) {
+	T0(DataAboutColors("pink_0") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[0]!!
+	}),
+
+	T10(DataAboutColors("pink_10") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[10]!!
+	}),
+
+	T20(DataAboutColors("pink_20") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[20]!!
+	}),
+
+	T30(DataAboutColors("pink_30") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[30]!!
+	}),
+
+	T40(DataAboutColors("pink_40") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[40]!!
+	}),
+
+	T50(DataAboutColors("pink_50") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[50]!!
+	}),
+
+	T60(DataAboutColors("pink_60") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[60]!!
+	}),
+
+	T70(DataAboutColors("pink_70") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[70]!!
+	}),
+
+	T80(DataAboutColors("pink_80") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[80]!!
+	}),
+
+	T90(DataAboutColors("pink_90") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[90]!!
+	}),
+
+	T95(DataAboutColors("pink_95") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[95]!!
+	}),
+
+	T99(DataAboutColors("pink_99") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[99]!!
+	}),
+
+	T100(DataAboutColors("pink_100") {
+		val harmonizedPink = Color(
+			harmonize(
+				pink.toArgb(),
+				colorResource(system_accent1_500).toArgb()
+			)
+		).blendWith(Color.White, 1f - getPrimaryColorSaturation())
+
+		getColorTonesMap(harmonizedPink)[100]!!
+	});
+
+
+	operator fun component1(): String {
+		return this.dataAboutColors.colorToken
+	}
+
+	@Composable
+	operator fun component2(): Color {
+		return this.dataAboutColors.colorValue()
+	}
 }
 
 fun Color.blendWith(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float): Color {
@@ -887,3 +1876,17 @@ fun Color.blendWith(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float
 		green = green * inv + color.green * ratio,
 	)
 }
+
+@Composable
+fun getPrimaryColorSaturation(): Float {
+	return ColorUtil.colorToHSL(colorResource(system_accent1_600))[1]
+}
+
+private val blue = Color.Blue
+private val red = Color.Red
+private val green = Color.Green
+private val orange = Color(0xFFFFAA00)
+private val violet = Color(0xFFEB00FF)
+private val pink = Color(0xFFFF32AC)
+private val cyan = Color.Cyan
+

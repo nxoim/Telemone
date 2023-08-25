@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.FullPaletteList
+import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun OverwriteChoiceDialog(
@@ -39,7 +39,7 @@ fun OverwriteChoiceDialog(
 	chooseLight: () -> Unit,
 	chooseDark: () -> Unit,
 	vm: MainViewModel,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context
 ) {
 	AnimatedVisibility(
@@ -49,7 +49,7 @@ fun OverwriteChoiceDialog(
 	) {
 		AlertDialog(
 			onDismissRequest = { close() },
-			title = { Text(text = "Which Theme to Overwrite?") },
+			title = { Text(text = "Which theme to overwrite?") },
 			confirmButton = {
 				Column {
 					Row(Modifier.widthIn(max = 320.dp).fillMaxWidth().padding(bottom = 8.dp)) {
@@ -66,7 +66,7 @@ fun OverwriteChoiceDialog(
 									.weight(1f, false),
 								vm,
 								"defaultLightThemeUUID",
-								palette,
+								paletteState,
 								context
 							)
 
@@ -90,7 +90,7 @@ fun OverwriteChoiceDialog(
 									.weight(1f, false),
 								vm,
 								"defaultDarkThemeUUID",
-								palette,
+								paletteState,
 								context
 							)
 
@@ -119,7 +119,7 @@ fun OverwriteDefaultsDialog(
 	vm: MainViewModel,
 	overwriteDark: Boolean,
 	overwriteWith: String,
-	palette: FullPaletteList,
+	paletteState: PaletteState,
 	context: Context
 ) {
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
@@ -141,8 +141,8 @@ fun OverwriteDefaultsDialog(
 					Text("Cancel")
 				}
 			},
-			title = { Text("Do you really want to overwrite the $thingThatsBeingOverwritten?")},
-			text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. You can revert this change any time inside the theme editor.""") },
+			title = { Text("Overwrite the $thingThatsBeingOverwritten?")},
+			text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. This change can be reverted any time in theme editor.""") },
 			icon = {
 				Row(
 					Modifier.widthIn(max = 280.dp),
@@ -157,9 +157,10 @@ fun OverwriteDefaultsDialog(
 							.height(140.dp)
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
+						colorDisplayTypeOverwrite = "3",
 						uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
-						palette,
-						context
+						paletteState = paletteState,
+						context = context
 					)
 
 					Icon(
@@ -176,9 +177,10 @@ fun OverwriteDefaultsDialog(
 							.height(140.dp)
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
+						colorDisplayTypeOverwrite = "3",
 						uuid = overwriteWith,
-						palette,
-						context
+						paletteState = paletteState,
+						context = context
 					)
 				}
 			}

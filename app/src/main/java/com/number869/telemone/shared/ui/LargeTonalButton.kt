@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +19,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.ui.theme.fullPalette
+import com.number869.telemone.ui.theme.PrimaryTones
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,7 +35,7 @@ fun LargeTonalButton(onClick: () -> Unit, label: String, modifier: Modifier = Mo
 			.fillMaxWidth()
 			.height(64.dp)
 			.clip(RoundedCornerShape(12.dp))
-			.background(fullPalette().primary_90)
+			.background(PrimaryTones.T90.dataAboutColors.colorValue())
 	) {
 		Text(
 			label,
