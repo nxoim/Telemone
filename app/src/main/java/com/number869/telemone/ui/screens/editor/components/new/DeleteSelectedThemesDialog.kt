@@ -24,8 +24,8 @@ fun DeleteSelectedThemesDialog(
 ) {
 	AlertDialog(
 		icon = { Icon(Icons.Default.DeleteForever, contentDescription = "Delete icon") },
-		title = { Text("Do you really want to permanently delete these themes?") },
-		text = { Text("You will not be able to recover the deleted themes.") },
+		title = { Text("Permanently delete these themes?") },
+		text = { Text("These themes will be unrecoverable after deletion.") },
 		confirmButton = {
 			FilledTonalButton(
 				onClick = {

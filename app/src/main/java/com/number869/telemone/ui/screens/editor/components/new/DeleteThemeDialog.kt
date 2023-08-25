@@ -46,7 +46,7 @@ fun DeleteThemeDialog(
 				)
 			},
 			text = {
-				Text(text = "Are you sure you want to delete this theme? You will not be able to recover this theme if you delete it.",)
+				Text(text = "This theme will be unrecoverable after deletion.")
 			},
 			confirmButton = {
 				FilledTonalButton(

@@ -49,7 +49,7 @@ fun OverwriteChoiceDialog(
 	) {
 		AlertDialog(
 			onDismissRequest = { close() },
-			title = { Text(text = "Which Theme to Overwrite?") },
+			title = { Text(text = "Which theme to overwrite?") },
 			confirmButton = {
 				Column {
 					Row(Modifier.widthIn(max = 320.dp).fillMaxWidth().padding(bottom = 8.dp)) {
@@ -141,8 +141,8 @@ fun OverwriteDefaultsDialog(
 					Text("Cancel")
 				}
 			},
-			title = { Text("Do you really want to overwrite the $thingThatsBeingOverwritten?")},
-			text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. You can revert this change any time inside the theme editor.""") },
+			title = { Text("Overwrite the $thingThatsBeingOverwritten?")},
+			text = { Text("""Overwriting will only save the Material You color scheme tokens as their color depends from your device's color scheme settings. This change can be reverted any time in theme editor.""") },
 			icon = {
 				Row(
 					Modifier.widthIn(max = 280.dp),
