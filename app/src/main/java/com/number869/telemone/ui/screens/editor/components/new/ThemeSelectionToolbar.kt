@@ -3,6 +3,7 @@ package com.number869.telemone.ui.screens.editor.components.new
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.theme.blendWith
 
 @Composable
 fun ThemeSelectionToolbar(
@@ -55,7 +57,15 @@ fun ThemeSelectionToolbar(
 		Row(
 			Modifier
 				.clip(RoundedCornerShape(38.dp))
-				.background(MaterialTheme.colorScheme.surfaceContainerHighest)
+				.background(
+					if (isSystemInDarkTheme())
+						MaterialTheme.colorScheme.surfaceContainerHighest
+					else
+						MaterialTheme.colorScheme.surfaceContainer.blendWith(
+							MaterialTheme.colorScheme.surfaceContainerLow,
+							0.5f
+						)
+				)
 				.padding(12.dp),
 			horizontalArrangement = Arrangement.Center,
 			verticalAlignment = Alignment.CenterVertically
