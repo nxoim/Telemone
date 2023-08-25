@@ -157,9 +157,10 @@ fun OverwriteDefaultsDialog(
 							.height(140.dp)
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
+						colorDisplayTypeOverwrite = "3",
 						uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
-						paletteState,
-						context
+						paletteState = paletteState,
+						context = context
 					)
 
 					Icon(
@@ -176,9 +177,10 @@ fun OverwriteDefaultsDialog(
 							.height(140.dp)
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
+						colorDisplayTypeOverwrite = "3",
 						uuid = overwriteWith,
-						paletteState,
-						context
+						paletteState = paletteState,
+						context = context
 					)
 				}
 			}
