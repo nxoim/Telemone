@@ -1,10 +1,15 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInOutExpo
 import androidx.compose.animation.core.EaseOutQuart
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -24,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -56,7 +60,6 @@ fun SavedThemeItemDisplayTypeChooserDialog(
 		"1"
 	)
 
-
 	if (showSavedThemeTypeDialog) {
 		var displayTheDialog by remember { mutableStateOf(false) }
 		val animatedDialogHeight by animateDpAsState(
@@ -80,6 +83,8 @@ fun SavedThemeItemDisplayTypeChooserDialog(
 		LaunchedEffect(Unit) {
 			displayTheDialog = true
 		}
+		// why does this not work
+		BackHandler(displayTheDialog) { displayTheDialog = false }
 
 		Popup(
 			onDismissRequest = { displayTheDialog = false },
@@ -92,7 +97,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(
 				Box(
 					Modifier
 						.fillMaxSize()
-						.alpha(animatedAlpha)
+//						.graphicsLayer { alpha = animatedAlpha }
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -101,8 +106,11 @@ fun SavedThemeItemDisplayTypeChooserDialog(
 						)
 				)
 
-				if (animatedDialogHeight != 0.dp) Box(
-					Modifier
+				AnimatedVisibility(
+					visible = displayTheDialog,
+					enter = fadeIn(tween(50)),
+					exit = fadeOut(tween(70,20, EaseInOutExpo)),
+					modifier = Modifier
 						.align(Alignment.TopCenter)
 						.height(animatedDialogHeight)
 						.offset(y = (screenHeight / 2) - (154.dp + ((1f - animatedAlpha) * 32).dp))
