@@ -124,7 +124,7 @@ fun SavedThemeItem(
 						?.get(uuid)
 						?.get(colorValueOf)
 						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap)
+							val colorFromToken = getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap.value)
 							val colorAsSaved = Color(it.second)
 
 							// colorFromToken prob should be Color? so it can
@@ -136,7 +136,7 @@ fun SavedThemeItem(
 					vm.themeList.find { it.containsKey(uuid) }
 						?.get(uuid)
 						?.get(colorValueOf)
-						?.let { getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap) } ?: Color.Red
+						?.let { getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap.value) } ?: Color.Red
 				}
 			},
 			label = "i hate these labels"
@@ -156,7 +156,7 @@ fun SavedThemeItem(
 								vm.loadTheme(
 									uuid,
 									withTokens = false,
-									paletteState.entirePaletteAsMap,
+									paletteState.entirePaletteAsMap.value,
 									clearCurrentTheme = true,
 									context
 								)
@@ -270,7 +270,7 @@ fun SavedThemeItem(
 		{ showLoadWithOptionsDialog = false },
 		showLoadWithOptionsDialog,
 		vm,
-		paletteState.entirePaletteAsMap,
+		paletteState.entirePaletteAsMap.value,
 		uuid
 	)
 

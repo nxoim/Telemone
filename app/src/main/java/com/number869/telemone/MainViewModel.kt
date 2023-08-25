@@ -246,7 +246,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 								val colorValue = Color(colorEitherValueOrTokenAsString.toLong())
 								// also seeing if colors match the device's
 								// color scheme
-								val colorToken = getColorTokenFromColorValue(colorValue, paletteState.entirePaletteAsMap)
+								val colorToken = getColorTokenFromColorValue(colorValue, paletteState.entirePaletteAsMap.value)
 
 								loadedMap[uiElementName] = Pair(colorToken, colorValue)
 							} else if (isValueActuallyAColorToken) {
@@ -254,7 +254,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 								val colorToken = colorEitherValueOrTokenAsString
 								// use device's color scheme when loading
 								// telemone format themes
-								val colorValue = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap)
+								val colorValue = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 								loadedMap[uiElementName] = Pair(colorToken, colorValue)
 							} else {
@@ -345,7 +345,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		newDefaultTheme.forEach { (key, value) ->
 			val colorToken = value.first
 			val colorValueLoaded = value.second
-			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap)
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 			// this will check if the color tokens name equals one of the
 			// supported color tokens prom the palette list. if it does
@@ -389,7 +389,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		newDefaultTheme.forEach { (key, value) ->
 			val colorToken = value.first
 			val colorValueAsItWasLoaded = value.second
-			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap)
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
 				defaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
@@ -423,8 +423,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		isDarkMode: Boolean,
 		context: Context
 	) {
-		val darkTheme = stockDarkTheme(paletteState.entirePaletteAsMap, context)
-		val lightTheme = stockLightTheme(paletteState.entirePaletteAsMap, context)
+		val darkTheme = stockDarkTheme(paletteState.entirePaletteAsMap.value, context)
+		val lightTheme = stockLightTheme(paletteState.entirePaletteAsMap.value, context)
 		val defaultThemeKey = if (isDarkMode)
 			"defaultDarkThemeUUID"
 		else
@@ -445,7 +445,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				val uiItemName = it.key
 				val colorToken = it.value.first
 				val colorValueAsItWasSaved = Color(it.value.second)
-				val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap)
+				val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 				// if color token is something that is in the palette
 				// list - load it. if not - load what was saved

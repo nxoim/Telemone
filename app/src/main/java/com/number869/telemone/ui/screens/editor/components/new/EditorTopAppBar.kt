@@ -53,7 +53,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -128,7 +127,7 @@ fun EditorTopAppBar(
 				showSearchbar = { searchbarVisible = true },
 				showClearBeforeLoadDialog = { showingClearBeforeLoadDialog = true },
 				context,
-				paletteState.entirePaletteAsMap,
+				paletteState.entirePaletteAsMap.value,
 				vm,
 				topAppBarState
 			)
@@ -178,7 +177,7 @@ private fun TheAppBar(
 	showSearchbar: () -> Unit,
 	showClearBeforeLoadDialog: () -> Unit,
 	context: Context,
-	palette: SnapshotStateMap<String, Color>,
+	palette: LinkedHashMap<String, Color>,
 	vm: MainViewModel,
 	topAppBarState: TopAppBarScrollBehavior
 ) {

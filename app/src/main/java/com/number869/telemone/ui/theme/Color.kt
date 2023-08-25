@@ -65,13 +65,14 @@ import android.R.color.system_neutral2_600
 import android.R.color.system_neutral2_700
 import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
+import android.annotation.SuppressLint
 import androidx.annotation.FloatRange
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
@@ -94,72 +95,73 @@ data class DataAboutColors(
 	val colorValue: @Composable () -> Color
 )
 
-class PaletteState(val entirePaletteAsMap: SnapshotStateMap<String, Color>) {
-	val allPossibleColorTokensAsList = entirePaletteAsMap.keys
+class PaletteState(val entirePaletteAsMap: MutableState<LinkedHashMap<String, Color>>) {
+	val allPossibleColorTokensAsList = entirePaletteAsMap.value.keys
 }
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun rememberPaletteState(): PaletteState {
-	val entirePaletteAsMap = remember { mutableStateMapOf<String, Color>()  }
+	val entirePaletteAsMap = remember { mutableStateOf(linkedMapOf<String, Color>()) }
 
 	AdditionalColors.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	ColorRolesLight.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	ColorRolesDark.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	PrimaryTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	SecondaryTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	TertiaryTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	NeutralTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	NeutralVariantTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	BlueTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	RedTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	GreenTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	OrangeTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	VioletTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	CyanTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	PinkTones.entries.forEach {
-		entirePaletteAsMap.putIfAbsent(it.dataAboutColors.colorToken, it.dataAboutColors.colorValue())
+		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 

@@ -30,9 +30,9 @@ import com.number869.telemone.ui.theme.SolarSet
 fun DefaultThemesButtons(vm: MainViewModel, paletteState: PaletteState) {
 	val context = LocalContext.current
 	Column(Modifier.fillMaxWidth()) {
-		LightThemeButton { vm.saveLightTheme(context, paletteState.entirePaletteAsMap) }
+		LightThemeButton { vm.saveLightTheme(context, paletteState.entirePaletteAsMap.value) }
 		DarkThemeButton(Modifier.align(Alignment.End).padding(top = 16.dp)) {
-			vm.saveDarkTheme(context, paletteState.entirePaletteAsMap)
+			vm.saveDarkTheme(context, paletteState.entirePaletteAsMap.value)
 		}
 	}
 }
