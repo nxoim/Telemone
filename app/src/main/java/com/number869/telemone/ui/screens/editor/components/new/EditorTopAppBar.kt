@@ -14,12 +14,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -280,6 +283,7 @@ private fun TheSearchbar(
 	hideSearchbar: () -> Unit,
 	vm: MainViewModel
 ) {
+	var fullscreen by remember { mutableStateOf(false) }
 	var searchQuery by remember { mutableStateOf("") }
 	val searchQueryIsEmpty by remember { derivedStateOf { searchQuery == "" } }
 	val searchedThings by remember {
@@ -294,13 +298,16 @@ private fun TheSearchbar(
 
 	SearchBar(
 		query = searchQuery,
-		onQueryChange = { searchQuery = it },
+		onQueryChange = {
+			searchQuery = it
+			fullscreen = true
+		},
 		onSearch = {  }, // it desperately wants me to keep this line
 		placeholder = { Text(text = "Search in current theme") },
 		leadingIcon = { Icon(Icons.Default.Search, "Search")},
 		trailingIcon = {
 			AnimatedVisibility(
-				visible = searchQueryIsEmpty,
+				visible = searchQueryIsEmpty && !fullscreen,
 				enter = fadeIn(),
 				exit = fadeOut()
 			) {
@@ -319,40 +326,64 @@ private fun TheSearchbar(
 				}
 			}
 		},
-		active = !searchQueryIsEmpty,
+		// TODO maybe make it active when its focused
+		active = fullscreen,
 		onActiveChange = {  }
 	) {
 		// clears search when back button is pressed.
 		// its here because it doesnt work if i put it
 		// beside the other back handler at the top
 		// of this composable
-		BackHandler(!searchQueryIsEmpty) {
-			searchQuery = ""
+		BackHandler(fullscreen) {
+			fullscreen = false
 		}
 
-		AnimatedVisibility(
-			visible = !searchQueryIsEmpty,
-			enter = fadeIn(),
-			exit = fadeOut()
-		) {
-			LazyColumn(
-				contentPadding = PaddingValues(
-					top = 8.dp,
-					bottom = 4.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-				),
-				verticalArrangement = spacedBy(4.dp)
+		Box {
+			this@SearchBar.AnimatedVisibility(
+				visible = searchQueryIsEmpty,
+				enter = fadeIn(),
+				exit = fadeOut()
 			) {
-				itemsIndexed(searchedThings) { index, uiElementData ->
-					ElementColorItem(
-						Modifier
-							.padding(horizontal = 16.dp)
-							.animateItemPlacement(),
-						uiElementData = uiElementData,
-						vm = vm,
-						index = index,
-						themeMap = mappedValues(),
-						lastIndexInList = mappedValuesAsList().lastIndex
+				Box(
+					Modifier
+						.clickable(
+							indication = null,
+							interactionSource = remember { MutableInteractionSource() }
+						) { fullscreen = false }
+						.imePadding()
+						.fillMaxSize()
+				) {
+					Text(
+						"Search is empty. Tap this to close",
+						modifier = Modifier.align(Alignment.Center)
 					)
+				}
+			}
+
+			this@SearchBar.AnimatedVisibility(
+				visible = !searchQueryIsEmpty,
+				enter = fadeIn(),
+				exit = fadeOut()
+			) {
+				LazyColumn(
+					contentPadding = PaddingValues(
+						top = 8.dp,
+						bottom = 4.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+					),
+					verticalArrangement = spacedBy(4.dp)
+				) {
+					itemsIndexed(searchedThings) { index, uiElementData ->
+						ElementColorItem(
+							Modifier
+								.padding(horizontal = 16.dp)
+								.animateItemPlacement(),
+							uiElementData = uiElementData,
+							vm = vm,
+							index = index,
+							themeMap = mappedValues(),
+							lastIndexInList = mappedValuesAsList().lastIndex
+						)
+					}
 				}
 			}
 		}
