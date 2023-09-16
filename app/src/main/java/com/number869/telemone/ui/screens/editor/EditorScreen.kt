@@ -301,9 +301,7 @@ fun EditorScreen(
 
 					item {
 						SmallTintedLabel(
-							Modifier
-								.padding(start = 16.dp)
-								.animateItemPlacement(),
+							Modifier.padding(start = 16.dp),
 							labelText = "All Colors"
 						)
 
