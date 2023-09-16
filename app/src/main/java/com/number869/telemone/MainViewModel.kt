@@ -46,11 +46,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	)
 
 	// god bless your eyes and brain that has to process this
-	// color in the list has to be int because Color() returns ulong anyway
+	// color in the list has to be int because Color() returns ulong
 	// anyway and so loading a theme after restarting the app causes a
 	// crash.
 	// don't ask me why i don't keep ulong and use ints instead
-	// i recommend you checking out
 	// i tried savedStateHandle with state flows and i couldnt figure out
 	// how to save the maps
 	private var _themeList: ThemeList = mutableStateListOf()
@@ -293,7 +292,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				}
 
 				loadedFromFileTheme.clear()
-				_mappedValues.putAll(loadedMap)
+				if (clearCurrentTheme) {
+					_mappedValues.putAll(loadedMap)
+				} else {
+					loadedMap.forEach {
+						_mappedValues.putIfAbsent(it.key, it.value)
+					}
+				}
 				loadedFromFileTheme.putAll(loadedMap)
 
 				Toast.makeText(
