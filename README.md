@@ -1,6 +1,6 @@
 # Telemone
 
-Telemone is a theme builder made to bring dynamic themes to Telegram (for Android).
+Telemone is a theme builder made to bring Material You-like dynamic themes to Telegram (for Android).
 
 ### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/Number869/TeleMone/releases "Github Releases")
 
