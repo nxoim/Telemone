@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -17,7 +16,6 @@ import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
 import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 	@OptIn(ExperimentalAnimationApi::class)
@@ -33,12 +31,9 @@ class MainActivity : ComponentActivity() {
 				// its 4am rn here so excuse me if this is dum
 				val paletteState = rememberPaletteState()
 				val vm: MainViewModel = viewModel()
-				val scope = rememberCoroutineScope()
 
 				LaunchedEffect(Unit) {
-					scope.launch {
-						vm.startupConfigProcess(paletteState, isDarkMode, applicationContext)
-					}
+					vm.startupConfigProcess(paletteState, isDarkMode, applicationContext)
 				}
 
 				Surface(
