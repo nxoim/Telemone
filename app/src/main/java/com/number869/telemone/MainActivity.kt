@@ -16,12 +16,16 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
+import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 	@OptIn(ExperimentalAnimationApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		MMKV.initialize(this)
+
 		setContent {
 			TelemoneTheme {
 				val navController = rememberAnimatedNavController()
