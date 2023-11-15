@@ -114,7 +114,6 @@ fun EditorScreen(
 		topBar = {
 			EditorTopAppBar(
 				topAppBarState,
-				paletteState,
 				navController,
 				vm,
 				mappedValues = { mappedValues }
@@ -206,8 +205,6 @@ fun EditorScreen(
 											Modifier.animateItemPlacement(),
 											vm,
 											uuid,
-											paletteState,
-											context,
 											true,
 											changeSelectionMode = { themeSelectionModeIsActive = !themeSelectionModeIsActive },
 											themeSelectionModeIsActive = themeSelectionModeIsActive

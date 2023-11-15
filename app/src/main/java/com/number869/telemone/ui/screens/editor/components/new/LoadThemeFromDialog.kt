@@ -5,8 +5,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import com.number869.telemone.MainViewModel
 
 @Composable
@@ -14,11 +12,8 @@ fun LoadWithOptionsDialog(
 	close: () -> Unit,
 	isShowingApplyDialog: Boolean,
 	vm: MainViewModel,
-	palette: Map<String, Color>,
 	uuid: String
 ) {
-	val context = LocalContext.current
-
 	AnimatedVisibility(visible = isShowingApplyDialog) {
 		AlertDialog(
 			onDismissRequest = { close() },
@@ -30,9 +25,7 @@ fun LoadWithOptionsDialog(
 						vm.loadTheme(
 							uuid,
 							withTokens = false,
-							palette,
-							clearCurrentTheme = true,
-							context
+							clearCurrentTheme = true
 						)
 					}
 				) {
@@ -46,9 +39,7 @@ fun LoadWithOptionsDialog(
 						vm.loadTheme(
 							uuid,
 							withTokens = false,
-							palette,
 							clearCurrentTheme = false,
-							context
 						)
 					}
 				) {
@@ -66,9 +57,7 @@ fun LoadWithOptionsDialog(
 						vm.loadTheme(
 							uuid,
 							withTokens = true,
-							palette,
 							clearCurrentTheme = true,
-							context
 						)
 					}
 				) {
@@ -81,9 +70,7 @@ fun LoadWithOptionsDialog(
 						vm.loadTheme(
 							uuid,
 							withTokens = true,
-							palette,
 							clearCurrentTheme = false,
-							context
 						)
 					}
 				) {

@@ -30,8 +30,8 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.data.LoadedTheme
 import kotlinx.coroutines.delay
 
 @Composable

@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -30,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun OverwriteChoiceDialog(
@@ -38,9 +36,7 @@ fun OverwriteChoiceDialog(
 	isShowingOverwriteChoiceDialog: Boolean,
 	chooseLight: () -> Unit,
 	chooseDark: () -> Unit,
-	vm: MainViewModel,
-	paletteState: PaletteState,
-	context: Context
+	vm: MainViewModel
 ) {
 	AnimatedVisibility(
 		visible = isShowingOverwriteChoiceDialog,
@@ -65,9 +61,7 @@ fun OverwriteChoiceDialog(
 									.clip(RoundedCornerShape(16.dp))
 									.weight(1f, false),
 								vm,
-								"defaultLightThemeUUID",
-								paletteState,
-								context
+								"defaultLightThemeUUID"
 							)
 
 							Spacer(modifier = Modifier.height(16.dp))
@@ -89,9 +83,7 @@ fun OverwriteChoiceDialog(
 									.clip(RoundedCornerShape(16.dp))
 									.weight(1f, false),
 								vm,
-								"defaultDarkThemeUUID",
-								paletteState,
-								context
+								"defaultDarkThemeUUID"
 							)
 
 							Spacer(modifier = Modifier.height(16.dp))
@@ -119,8 +111,6 @@ fun OverwriteDefaultsDialog(
 	vm: MainViewModel,
 	overwriteDark: Boolean,
 	overwriteWith: String,
-	paletteState: PaletteState,
-	context: Context
 ) {
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
 
@@ -159,8 +149,6 @@ fun OverwriteDefaultsDialog(
 						vm,
 						colorDisplayTypeOverwrite = "3",
 						uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
-						paletteState = paletteState,
-						context = context
 					)
 
 					Icon(
@@ -178,9 +166,7 @@ fun OverwriteDefaultsDialog(
 							.clip(RoundedCornerShape(16.dp)),
 						vm,
 						colorDisplayTypeOverwrite = "3",
-						uuid = overwriteWith,
-						paletteState = paletteState,
-						context = context
+						uuid = overwriteWith
 					)
 				}
 			}

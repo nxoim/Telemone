@@ -1,6 +1,5 @@
 package com.number869.telemone
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -9,41 +8,39 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.AndroidViewModel
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.number869.telemone.data.ColorToken
+import com.number869.telemone.data.LoadedTheme
+import com.number869.telemone.data.ThemeRepository
+import com.number869.telemone.data.fallbackKeys
 import com.number869.telemone.ui.theme.PaletteState
 import java.io.File
 import java.util.UUID
 
-// no im not making a data class
-typealias ThemeUUID = String
-typealias UiElementName = String
-typealias ColorToken = String
-typealias ColorValue = Int
-typealias DataAboutColors = Pair<ColorToken, ColorValue>
-typealias UiElementData = Map<UiElementName, DataAboutColors>
-typealias Theme = Map<ThemeUUID, UiElementData>
-typealias ThemeList = SnapshotStateList<Theme>
-typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
-
-// i will refactor all of this. someday. maybe. probably not.
+class MainViewModelFactory(
+	private val context: Context,
+	private val paletteState: PaletteState
+) : ViewModelProvider.NewInstanceFactory() {
+	override fun <T : ViewModel> create(
+		modelClass: Class<T>,
+		extras: CreationExtras
+	): T = MainViewModel(context, paletteState) as T
+}
 
 // funny of you to actually expect some sort of documentation in the
 // comments
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-	private val themeListKey = "AppPreferences.ThemeList"
-	private val preferences = application.getSharedPreferences(
-		"AppPreferences",
-		Context.MODE_PRIVATE
-	)
+class MainViewModel(
+	private val context: Context,
+	private val paletteState: PaletteState
+) : ViewModel() {
+	val themeRepository = ThemeRepository(context)
 
 	// god bless your eyes and brain that has to process this
 	// color in the list has to be int because Color() returns ulong
@@ -52,26 +49,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	// don't ask me why i don't keep ulong and use ints instead
 	// i tried savedStateHandle with state flows and i couldnt figure out
 	// how to save the maps
-	private var _themeList: ThemeList = mutableStateListOf()
-	val themeList: ThemeList get() = _themeList
+	val themeList get() = themeRepository.themeList
+	val palette = paletteState.entirePaletteAsMap.value
+
 	private var _mappedValues: LoadedTheme = mutableStateMapOf()
 	val mappedValues: LoadedTheme get() = _mappedValues
 	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
 	val selectedThemes = mutableStateListOf<String>()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 
-	init {
-		val savedThemeList = preferences.getString(themeListKey, "[]")
-		val type = object : TypeToken<ThemeList>() {}.type
-		val list = Gson().fromJson<ThemeList>(savedThemeList, type)
-		_themeList.addAll(
-			list.map { map ->
-				map.mapValues { entry ->
-					entry.value.mapValues { (_, value) -> Pair(value.first, value.second) }
-				}
-			}
-		)
-	}
+
 
 	fun colorFromCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color {
 		return try {
@@ -96,9 +83,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			if (
 				!selectedThemes.contains(uuid)
 				&&
-				uuid != "defaultLightThemeUUID"
+				uuid != defaultLightThemeUUID
 				&&
-				uuid != "defaultDarkThemeUUID"
+				uuid != defaultDarkThemeUUID
 			) {
 				selectedThemes.add(uuid)
 			}
@@ -109,17 +96,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	}
 
 	fun deleteSelectedThemes() {
-		_themeList.removeIf {
-			selectedThemes.contains(it.keys.first())
+		selectedThemes.forEach {
+			themeRepository.deleteTheme(it)
 		}
-
-		// save changes locally
-		val contents = Gson().toJson(_themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
-	fun saveCurrentTheme(context: Context) {
-		val mapWithUuid = mutableMapOf<String, Map<String, Pair<String, Int>>>()
+	fun saveCurrentTheme() {
 		val uuid = UUID.randomUUID().toString()
 		val map = mutableMapOf<String, Pair<String, Int>>()
 
@@ -127,12 +109,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			val colorMap = Pair(colorPair.first, colorPair.second.toArgb())
 
 			map[themeTokenName] = colorMap
-			mapWithUuid.putIfAbsent(uuid, map)
 		}
-		_themeList.add(mapWithUuid)
 
-		val contents = Gson().toJson(_themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
+		themeRepository.saveTheme(uuid, map)
 
 		Toast.makeText(
 			context,
@@ -141,12 +120,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun deleteTheme(uuid: String, context: Context) {
-		val mapToRemove = _themeList.find { it.containsKey(uuid) }
-		_themeList.remove(mapToRemove)
-
-		val contents = Gson().toJson(_themeList)
-		preferences.edit().clear().putString(themeListKey, contents).apply()
+	fun deleteTheme(uuid: String) {
+		themeRepository.deleteTheme(uuid)
 
 		Toast.makeText(
 			context,
@@ -158,11 +133,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 	fun loadTheme(
 		uuid: String,
 		withTokens: Boolean,
-		palette: Map<String, Color>,
-		clearCurrentTheme: Boolean,
-		context: Context
+		clearCurrentTheme: Boolean
 	) {
-		val loadedMap = _themeList.firstOrNull { it.containsKey(uuid) }?.get(uuid)
+		val loadedMap = themeRepository.getThemeByUUID(uuid)
 
 		if (loadedMap != null) {
 			if (withTokens) {
@@ -208,12 +181,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 	// idk if im dum but i don't think this is able to properly load telegrams
 	// stock themes, like "Day".
-	fun loadThemeFromFile(
-		context: Context,
-		uri: Uri,
-		paletteState: PaletteState,
-		clearCurrentTheme: Boolean
-	) {
+	fun loadThemeFromFile(uri: Uri, clearCurrentTheme: Boolean) {
 		loadedFromFileTheme.clear()
 
 		val loadedMap: LoadedTheme = mutableStateMapOf()
@@ -320,7 +288,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	fun resetCurrentTheme(context: Context) {
+	fun resetCurrentTheme() {
 		_mappedValues.clear()
 		_mappedValues.putAll(defaultCurrentTheme)
 		loadedFromFileTheme.clear()
@@ -332,17 +300,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun overwriteDefaultLightTheme(
-		uuid: String,
-		paletteState: PaletteState,
-		context: Context
-	) {
-		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
+	fun overwriteDefaultLightTheme(uuid: String) {
+		val newDefaultTheme = themeRepository.getThemeByUUID(uuid) ?: return
 
-		val index = _themeList.indexOfFirst { it.containsKey("defaultLightThemeUUID") }
+		val index = themeList.indexOfFirst { it.containsKey(defaultLightThemeUUID) }
 
 		val defaultTheme = if (index != -1) {
-			_themeList[index].getValue("defaultLightThemeUUID").toMutableMap()
+			themeList[index].getValue(defaultLightThemeUUID).toMutableMap()
 		} else {
 			mutableMapOf()
 		}
@@ -364,10 +328,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			}
 		}
 
-		_themeList[index] = mapOf("defaultLightThemeUUID" to defaultTheme)
-
-		val contents = Gson().toJson(_themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
+		themeRepository.replaceThemeByUUID(
+			uuid = defaultLightThemeUUID,
+			newTheme = defaultTheme
+		)
 
 		Toast.makeText(
 			context,
@@ -376,17 +340,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun overwriteDefaultDarkTheme(
-		uuid: String,
-		paletteState: PaletteState,
-		context: Context
-	) {
-		val newDefaultTheme = _themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
+	fun overwriteDefaultDarkTheme(uuid: String, ) {
+		val newDefaultTheme = themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
 
-		val index = _themeList.indexOfFirst { it.containsKey("defaultDarkThemeUUID") }
+		val index = themeList.indexOfFirst { it.containsKey(defaultDarkThemeUUID) }
 
 		val defaultTheme = if (index != -1) {
-			_themeList[index].getValue("defaultDarkThemeUUID").toMutableMap()
+			themeList[index].getValue(defaultDarkThemeUUID).toMutableMap()
 		} else {
 			mutableMapOf()
 		}
@@ -403,10 +363,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 			}
 		}
 
-		_themeList[index] = mapOf("defaultDarkThemeUUID" to defaultTheme)
-
-		val contents = Gson().toJson(_themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
+		themeRepository.replaceThemeByUUID(
+			uuid = defaultLightThemeUUID,
+			newTheme = defaultTheme
+		)
 
 		Toast.makeText(
 			context,
@@ -423,29 +383,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		Log.d(TAG, "color value replaced at $key with $colorValue")
 	}
 
-	fun startupConfigProcess(
-		paletteState: PaletteState,
-		isDarkMode: Boolean,
-		context: Context
-	) {
-		val darkTheme = stockDarkTheme(paletteState.entirePaletteAsMap.value, context)
-		val lightTheme = stockLightTheme(paletteState.entirePaletteAsMap.value, context)
+	fun startupConfigProcess(isDarkMode: Boolean) {
 		val defaultThemeKey = if (isDarkMode)
-			"defaultDarkThemeUUID"
+			defaultDarkThemeUUID
 		else
-			"defaultLightThemeUUID"
+			defaultLightThemeUUID
 
-		// check if default themes are put in the list
-		if (!_themeList.any { it.containsKey("defaultDarkThemeUUID") }) {
-			_themeList.add(mapOf("defaultDarkThemeUUID" to darkTheme))
+		if (themeList.firstOrNull() { it.containsKey(defaultLightThemeUUID) } == null) {
+			val stockLightTheme = themeRepository.getStockLightTheme(paletteState.entirePaletteAsMap.value, context)
+
+			themeRepository.replaceThemeByUUID(defaultLightThemeUUID, stockLightTheme)
 		}
-		// dont do if else or when here because it will only check the first one
-		if (!_themeList.any { it.containsKey("defaultLightThemeUUID") }) {
-			_themeList.add(mapOf("defaultLightThemeUUID" to lightTheme))
+
+		if (themeList.firstOrNull() { it.containsKey(defaultDarkThemeUUID) } == null) {
+			val stockDarkTheme = themeRepository.getStockDarkTheme(paletteState.entirePaletteAsMap.value, context)
+
+			themeRepository.replaceThemeByUUID(defaultDarkThemeUUID, stockDarkTheme)
 		}
 
 		// this will also fill in the missing values
-		_themeList.find { it.containsKey(defaultThemeKey) }
+		themeList.find { it.containsKey(defaultThemeKey) }
 			?.getValue(defaultThemeKey)?.map {
 				val uiItemName = it.key
 				val colorToken = it.value.first
@@ -478,67 +435,61 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		}
 	}
 
-	fun exportThemeWithColorValues(uuid: String, context: Context) {
-		val theme = getThemeAsStringByUUID(
-			_themeList,
-			uuid
-		)
+	fun exportThemeWithColorValues(uuid: String) {
+		val theme = getThemeAsStringByUUID(uuid)
 
-		File(context.cacheDir, "Telemone Export.attheme").writeText(theme)
+		with(context) {
+			File(cacheDir, "Telemone Export.attheme").writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Export.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Export.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Export"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Export"))
+		}
 	}
 
-	fun exportThemeWithColorTokens(uuid: String, context: Context) {
+	fun exportThemeWithColorTokens(uuid: String) {
 		val theme = getThemeAsStringByUUID(
-			_themeList,
 			uuid,
 			ThemeAsStringType.ColorTokens
 		)
 
-		File(
-			context.cacheDir,
-			"Telemone Export (Telemone Format).attheme"
-		).writeText(theme)
+		with(context) {
+			File(
+				cacheDir,
+				"Telemone Export (Telemone Format).attheme"
+			).writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Export (Telemone Format).attheme")
-		)
-
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(
-			Intent.createChooser(
-				intent,
-				"Telemone Export (Telemone Format)"
+			val uri = FileProvider.getUriForFile(
+				this,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Export (Telemone Format).attheme")
 			)
-		)
+
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Export (Telemone Format)"))
+		}
 	}
 
-	fun loadDefaultDarkTheme(palette: Map<String, Color>, context: Context) {
-		_themeList.find { it.containsKey("defaultDarkThemeUUID") }
-			?.getValue("defaultDarkThemeUUID")?.map {
-				val uiItemName = it.key
-				val colorToken = it.value.first
-				val colorValue = getColorValueFromColorToken(colorToken, palette)
+	fun loadDefaultDarkTheme() {
+		themeRepository.getThemeByUUID(defaultDarkThemeUUID)?.map {
+			val uiItemName = it.key
+			val colorToken = it.value.first
+			val colorValue = getColorValueFromColorToken(colorToken, palette)
 
-				_mappedValues[uiItemName] = Pair(it.value.first, colorValue)
-				defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
-			}
+			_mappedValues[uiItemName] = Pair(it.value.first, colorValue)
+			defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
+		}
 
 		loadedFromFileTheme.clear()
 
@@ -549,16 +500,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun loadDefaultLightTheme(palette: Map<String, Color>, context: Context) {
-		_themeList.find { it.containsKey("defaultLightThemeUUID") }
-			?.getValue("defaultLightThemeUUID")?.map {
-				val uiItemName = it.key
-				val colorToken = it.value.first
-				val colorValue = getColorValueFromColorToken(colorToken, palette)
+	fun loadDefaultLightTheme() {
+		themeRepository.getThemeByUUID(defaultLightThemeUUID)?.map {
+			val uiItemName = it.key
+			val colorToken = it.value.first
+			val colorValue = getColorValueFromColorToken(colorToken, palette)
 
-				_mappedValues[uiItemName] = Pair(colorToken, colorValue)
-				defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
-			}
+			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
+			defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
+		}
 
 		loadedFromFileTheme.clear()
 
@@ -569,10 +519,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun loadStockDarkTheme(palette: Map<String, Color>, context: Context) {
+	fun loadStockDarkTheme() {
 		_mappedValues.clear()
 
-		stockDarkTheme(palette, context).map {
+		themeRepository.getStockDarkTheme(palette, context).map {
 			val uiItemName = it.key
 			val colorToken = it.value.first
 			val colorValue = Color(it.value.second)
@@ -590,10 +540,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun loadStockLightTheme(palette: Map<String, Color>, context: Context) {
+	fun loadStockLightTheme() {
 		_mappedValues.clear()
 
-		stockLightTheme(palette, context).map {
+		themeRepository.getStockLightTheme(palette, context).map {
 			val uiItemName = it.key
 			val colorToken = it.value.first
 			val colorValue = Color(it.value.second)
@@ -611,7 +561,77 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 		).show()
 	}
 
-	fun exportCustomTheme(context: Context) {
+
+
+	fun updateDefaultLightThemeFromStock() {
+		val stockLightTheme = themeRepository.getStockLightTheme(palette, context)
+		val currentDefaultLightTheme = themeRepository.getThemeByUUID(defaultLightThemeUUID)!!
+		val newDefaultTheme = currentDefaultLightTheme.toMutableMap()
+
+		// back the theme up before doing anything
+		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultLightTheme)
+
+		stockLightTheme.forEach { (key, value) ->
+			val colorToken = value.first
+			val colorValueLoaded = value.second
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
+
+			// this will check if the color tokens name equals one of the
+			// supported color tokens prom the palette list. if it does
+			// then it will write not the color value thats loaded,
+			// but will write a color value that matches the device's
+			// current color scheme
+			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
+				newDefaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
+			} else {
+				newDefaultTheme[key] = Pair(colorToken, colorValueLoaded)
+			}
+		}
+
+		themeRepository.replaceThemeByUUID(defaultLightThemeUUID, newDefaultTheme)
+
+		Toast.makeText(
+			context,
+			"Default light theme has been overwritten successfully.",
+			Toast.LENGTH_LONG
+		).show()
+	}
+
+	fun updateDefaultDarkThemeFromStock() {
+		val stockDarkTheme = themeRepository.getStockDarkTheme(palette, context)
+		val currentDefaultDarkTheme = themeRepository.getThemeByUUID(defaultDarkThemeUUID)!!
+		val newDefaultTheme = currentDefaultDarkTheme.toMutableMap()
+
+		// back the theme up before doing anything
+		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultDarkTheme)
+
+		stockDarkTheme.forEach { (key, value) ->
+			val colorToken = value.first
+			val colorValueLoaded = value.second
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
+
+			// this will check if the color tokens name equals one of the
+			// supported color tokens prom the palette list. if it does
+			// then it will write not the color value thats loaded,
+			// but will write a color value that matches the device's
+			// current color scheme
+			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
+				newDefaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
+			} else {
+				newDefaultTheme[key] = Pair(colorToken, colorValueLoaded)
+			}
+		}
+
+		themeRepository.replaceThemeByUUID(defaultDarkThemeUUID, newDefaultTheme)
+
+		Toast.makeText(
+			context,
+			"Default dark theme has been overwritten successfully.",
+			Toast.LENGTH_LONG
+		).show()
+	}
+
+	fun exportCustomTheme() {
 		val map = _mappedValues.mapValues {
 			it.value.second.toArgb()
 		}.entries.joinToString("\n")
@@ -621,116 +641,99 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 				.replace(", ", "=")
 		}\n"
 
-		File(context.cacheDir, "Telemone Custom.attheme").writeText(result)
+		with(context) {
+			File(cacheDir, "Telemone Custom.attheme").writeText(result)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Custom.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Custom.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Custom"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Custom"))
+		}
 	}
 
-	fun saveLightTheme(context: Context, palette: Map<String, Color>) {
+	fun saveLightTheme() {
 		val theme = getThemeAsStringByUUID(
-			_themeList,
-			"defaultLightThemeUUID",
+			defaultLightThemeUUID,
 			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
-			palette = palette
 		)
 
-		File(context.cacheDir, "Telemone Light.attheme").writeText(theme)
+		with(context) {
+			File(cacheDir, "Telemone Light.attheme").writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Light.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Light.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Light"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Light"))
+		}
 	}
 
-	fun saveDarkTheme(context: Context, palette: Map<String, Color>) {
+	fun saveDarkTheme() {
 		val theme = getThemeAsStringByUUID(
-			_themeList,
-			"defaultDarkThemeUUID",
+			defaultDarkThemeUUID,
 			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
-			palette = palette
 		)
 
-		File(context.cacheDir, "Telemone Dark.attheme").writeText(theme)
+		with(context) {
+			File(cacheDir, "Telemone Dark.attheme").writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Dark.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Dark.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Dark"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION, )
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Dark"))
+		}
 	}
-}
 
-private fun stockLightTheme(
-	palette: Map<String, Color>,
-	context: Context
-): Map<String, Pair<String, Int>> {
-	val themeMap = mutableMapOf<String, Pair<String, Int>>()
-
-	context.assets.open("defaultLightFile.attheme")
-		.bufferedReader().use { reader ->
-			reader.forEachLine { line ->
-				if (line.isNotEmpty()) {
-					val splitLine = line.replace(" ", "").split("=")
-					val key = splitLine[0]
-					val value = splitLine[1]
-
-					val colorValue = getColorValueFromColorToken(value, palette)
-
-					themeMap[key] = Pair(value, colorValue.toArgb())
+	fun getThemeAsStringByUUID(
+		uuid: String,
+		loadThemeUsing: ThemeAsStringType = ThemeAsStringType.ColorValues,
+	): String {
+		val chosenTheme = themeList.find { it.containsKey(uuid) }
+			?.getValue(uuid)
+			?.mapValues {
+				when (loadThemeUsing) {
+					ThemeAsStringType.ColorValues -> Color(it.value.second).toArgb()
+					ThemeAsStringType.ColorTokens -> it.value.first
+					ThemeAsStringType.ColorValuesFromDevicesColorScheme -> {
+						getColorValueFromColorToken(it.value.first, palette).toArgb()
+					}
 				}
 			}
-		}
+			?.toList()?.sortedBy { it.first }?.joinToString("\n")
 
-	return themeMap.toMap()
+		val themeAsString = "${
+			chosenTheme?.replace(")", "")
+				?.replace("(", "")
+				?.replace(", ", "=")
+		}\n"
+
+		return themeAsString
+	}
 }
 
-// also at least pretend to like these funny little silly haha comments
-private fun stockDarkTheme(
-	palette: Map<String, Color>,
-	context: Context
-): Map<String, Pair<String, Int>> {
-	val themeMap = mutableMapOf<String, Pair<String, Int>>()
-
-	context.assets.open("defaultDarkFile.attheme")
-		.bufferedReader().use { reader ->
-			reader.forEachLine { line ->
-				if (line.isNotEmpty()) {
-					val splitLine = line.replace(" ", "").split("=")
-					val key = splitLine[0]
-					val value = splitLine[1]
-
-					val colorValue = getColorValueFromColorToken(value, palette)
-
-					themeMap[key] = Pair(value, colorValue.toArgb())
-				}
-			}
-		}
-
-	return themeMap.toMap()
-}
+const val defaultLightThemeUUID = "defaultLightThemeUUID"
+const val defaultDarkThemeUUID = "defaultDarkThemeUUID"
 
 fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
 	return if (palette.containsKey(tokenToLookFor))
@@ -748,214 +751,7 @@ fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Colo
 		""
 }
 
-
-val fallbackKeys = mapOf(
-	"chat_inAdminText" to "chat_inTimeText",
-	"chat_inAdminSelectedText" to "chat_inTimeSelectedText",
-	"player_progressCachedBackground" to "player_progressBackground",
-	"chat_inAudioCacheSeekbar" to "chat_inAudioSeekbar",
-	"chat_outAudioCacheSeekbar" to "chat_outAudioSeekbar",
-	"chat_emojiSearchBackground" to "chat_emojiPanelStickerPackSelector",
-	"location_sendLiveLocationIcon" to "location_sendLocationIcon",
-	"changephoneinfo_image2" to "featuredStickers_addButton",
-	"graySectionText" to "windowBackgroundWhiteGrayText2",
-	"chat_inMediaIcon" to "chat_inBubble",
-	"chat_outMediaIcon" to "chat_outBubble",
-	"chat_inMediaIconSelected" to "chat_inBubbleSelected",
-	"chat_outMediaIconSelected" to "chat_outBubbleSelected",
-	"chats_actionUnreadIcon" to "profile_actionIcon",
-	"chats_actionUnreadBackground" to "profile_actionBackground",
-	"chats_actionUnreadPressedBackground" to "profile_actionPressedBackground",
-	"dialog_inlineProgressBackground" to "windowBackgroundGray",
-	"dialog_inlineProgress" to "chats_menuItemIcon",
-	"groupcreate_spanDelete" to "chats_actionIcon",
-	"sharedMedia_photoPlaceholder" to "windowBackgroundGray",
-	"chat_attachPollBackground" to "chat_attachAudioBackground",
-	"chat_attachPollIcon" to "chat_attachAudioIcon",
-	"chats_onlineCircle" to "windowBackgroundWhiteBlueText",
-	"windowBackgroundWhiteBlueButton" to "windowBackgroundWhiteValueText",
-	"windowBackgroundWhiteBlueIcon" to "windowBackgroundWhiteValueText",
-	"undo_background" to "chat_gifSaveHintBackground",
-	"undo_cancelColor" to "chat_gifSaveHintText",
-	"undo_infoColor" to "chat_gifSaveHintText",
-	"windowBackgroundUnchecked" to "windowBackgroundWhite",
-	"windowBackgroundChecked" to "windowBackgroundWhite",
-	"switchTrackBlue" to "switchTrack",
-	"switchTrackBlueChecked" to "switchTrackChecked",
-	"switchTrackBlueThumb" to "windowBackgroundWhite",
-	"switchTrackBlueThumbChecked" to "windowBackgroundWhite",
-	"windowBackgroundCheckText" to "windowBackgroundWhite",
-	"contextProgressInner4" to "contextProgressInner1",
-	"contextProgressOuter4" to "contextProgressOuter1",
-	"switchTrackBlueSelector" to "listSelector",
-	"switchTrackBlueSelectorChecked" to "listSelector",
-	"chat_emojiBottomPanelIcon" to "chat_emojiPanelIcon",
-	"chat_emojiSearchIcon" to "chat_emojiPanelIcon",
-	"chat_emojiPanelStickerSetNameHighlight" to "windowBackgroundWhiteBlueText4",
-	"chat_emojiPanelStickerPackSelectorLine" to "chat_emojiPanelIconSelected",
-	"sharedMedia_actionMode" to "actionBarDefault",
-	"sheet_scrollUp" to "chat_emojiPanelStickerPackSelector",
-	"sheet_other" to "player_actionBarItems",
-	"dialogSearchBackground" to "chat_emojiPanelStickerPackSelector",
-	"dialogSearchHint" to "chat_emojiPanelIcon",
-	"dialogSearchIcon" to "chat_emojiPanelIcon",
-	"dialogSearchText" to "windowBackgroundWhiteBlackText",
-	"dialogFloatingButtonPressed" to "dialogRoundCheckBox",
-	"dialogFloatingIcon" to "dialogRoundCheckBoxCheck",
-	"dialogShadowLine" to "chat_emojiPanelShadowLine",
-	"chat_emojiPanelIconSelector" to "listSelector",
-	"actionBarDefaultArchived" to "actionBarDefault",
-	"actionBarDefaultArchivedSelector" to "actionBarDefaultSelector",
-	"actionBarDefaultArchivedIcon" to "actionBarDefaultIcon",
-	"actionBarDefaultArchivedTitle" to "actionBarDefaultTitle",
-	"actionBarDefaultArchivedSearch" to "actionBarDefaultSearch",
-	"actionBarDefaultArchivedSearchPlaceholder" to "actionBarDefaultSearchPlaceholder",
-	"chats_message_threeLines" to "chats_message",
-	"chats_nameMessage_threeLines" to "chats_nameMessage",
-	"chats_nameArchived" to "chats_name",
-	"chats_nameMessageArchived" to "chats_nameMessage",
-	"chats_nameMessageArchived_threeLines" to "chats_nameMessage",
-	"chats_messageArchived" to "chats_message",
-	"avatar_backgroundArchived" to "chats_unreadCounterMuted",
-	"chats_archiveBackground" to "chats_actionBackground",
-	"chats_archivePinBackground" to "chats_unreadCounterMuted",
-	"chats_archiveIcon" to "chats_actionIcon",
-	"chats_archiveText" to "chats_actionIcon",
-	"actionBarDefaultSubmenuItemIcon" to "dialogIcon",
-	"checkboxDisabled" to "chats_unreadCounterMuted",
-	"chat_status" to "actionBarDefaultSubtitle",
-	"chat_inGreenCall" to "calls_callReceivedGreenIcon",
-	"chat_inRedCall" to "calls_callReceivedRedIcon",
-	"chat_outGreenCall" to "calls_callReceivedGreenIcon",
-	"actionBarTabActiveText" to "actionBarDefaultTitle",
-	"actionBarTabUnactiveText" to "actionBarDefaultSubtitle",
-	"actionBarTabLine" to "actionBarDefaultTitle",
-	"actionBarTabSelector" to "actionBarDefaultSelector",
-	"profile_status" to "avatar_subtitleInProfileBlue",
-	"chats_menuTopBackgroundCats" to "avatar_backgroundActionBarBlue",
-	"chat_outLinkSelectBackground" to "chat_linkSelectBackground",
-	"actionBarDefaultSubmenuSeparator" to "windowBackgroundGray",
-	"chat_attachPermissionImage" to "dialogTextBlack",
-	"chat_attachPermissionMark" to "chat_sentError",
-	"chat_attachPermissionText" to "dialogTextBlack",
-	"chat_attachEmptyImage" to "emptyListPlaceholder",
-	"chat_attachEmptyImage" to "emptyListPlaceholder",
-	"actionBarBrowser" to "actionBarDefault",
-	"chats_sentReadCheck" to "chats_sentCheck",
-	"chat_outSentCheckRead" to "chat_outSentCheck",
-	"chat_outSentCheckReadSelected" to "chat_outSentCheckSelected",
-	"chats_archivePullDownBackground" to "chats_unreadCounterMuted",
-	"chats_archivePullDownBackgroundActive" to "chats_actionBackground",
-	"avatar_backgroundArchivedHidden" to "avatar_backgroundSaved",
-	"featuredStickers_removeButtonText" to "featuredStickers_addButtonPressed",
-	"dialogEmptyImage" to "player_time",
-	"dialogEmptyText" to "player_time",
-	"location_actionIcon" to "dialogTextBlack",
-	"location_actionActiveIcon" to "windowBackgroundWhiteBlueText7",
-	"location_actionBackground" to "dialogBackground",
-	"location_actionPressedBackground" to "dialogBackgroundGray",
-	"location_sendLocationText" to "windowBackgroundWhiteBlueText7",
-	"location_sendLiveLocationText" to "windowBackgroundWhiteGreenText",
-	"chat_outTextSelectionHighlight" to "chat_textSelectBackground",
-	"chat_inTextSelectionHighlight" to "chat_textSelectBackground",
-	"chat_TextSelectionCursor" to "chat_messagePanelCursor",
-	"chat_outTextSelectionCursor" to "chat_TextSelectionCursor",
-	"chat_inPollCorrectAnswer" to "chat_attachLocationBackground",
-	"chat_outPollCorrectAnswer" to "chat_attachLocationBackground",
-	"chat_inPollWrongAnswer" to "chat_attachAudioBackground",
-	"chat_outPollWrongAnswer" to "chat_attachAudioBackground",
-	"windowBackgroundWhiteYellowText" to "avatar_nameInMessageOrange",
-	"profile_tabText" to "windowBackgroundWhiteGrayText",
-	"profile_tabSelectedText" to "windowBackgroundWhiteBlueHeader",
-	"profile_tabSelectedLine" to "windowBackgroundWhiteBlueHeader",
-	"profile_tabSelector" to "listSelector",
-	"statisticChartPopupBackground" to "dialogBackground",
-	"chat_attachGalleryText" to "chat_attachGalleryBackground",
-	"chat_attachAudioText" to "chat_attachAudioBackground",
-	"chat_attachFileText" to "chat_attachFileBackground",
-	"chat_attachContactText" to "chat_attachContactBackground",
-	"chat_attachLocationText" to "chat_attachLocationBackground",
-	"chat_attachPollText" to "chat_attachPollBackground",
-	"chat_inPsaNameText" to "avatar_nameInMessageGreen",
-	"chat_outPsaNameText" to "avatar_nameInMessageGreen",
-	"chat_outAdminText" to "chat_outTimeText",
-	"chat_outAdminSelectedText" to "chat_outTimeSelectedText",
-	"returnToCallMutedBackground" to "windowBackgroundWhite",
-	"dialogSwipeRemove" to "avatar_backgroundRed",
-	"chat_inReactionButtonBackground" to "chat_inLoader",
-	"chat_outReactionButtonBackground" to "chat_outLoader",
-	"chat_inReactionButtonText" to "chat_inPreviewInstantText",
-	"chat_outReactionButtonText" to "chat_outPreviewInstantText",
-	"chat_inReactionButtonTextSelected" to "windowBackgroundWhite",
-	"chat_outReactionButtonTextSelected" to "windowBackgroundWhite",
-	"dialogReactionMentionBackground" to "voipgroup_mutedByAdminGradient2",
-	"topics_unreadCounter" to "chats_unreadCounter",
-	"topics_unreadCounterMuted" to "chats_message",
-	"avatar_background2Saved" to "avatar_backgroundSaved",
-	"avatar_background2Red" to "avatar_backgroundRed",
-	"avatar_background2Orange" to "avatar_backgroundOrange",
-	"avatar_background2Violet" to "avatar_backgroundViolet",
-	"avatar_background2Green" to "avatar_backgroundGreen",
-	"avatar_background2Cyan" to "avatar_backgroundCyan",
-	"avatar_background2Blue" to "avatar_backgroundBlue",
-	"avatar_background2Pink" to "avatar_backgroundPink",
-	"statisticChartLine_orange" to "color_orange",
-	"statisticChartLine_blue" to "color_blue",
-	"statisticChartLine_red" to "color_red",
-	"statisticChartLine_lightblue" to "color_lightblue",
-	"statisticChartLine_golden" to "color_yellow",
-	"statisticChartLine_purple" to "color_purple",
-	"statisticChartLine_indigo" to "color_purple",
-	"statisticChartLine_cyan" to "color_cyan"
-)
-
-val defaultShadowTokens = mapOf(
-	"windowBackgroundGrayShadow" to Pair("transparent", Color.Transparent),
-	"chat_inBubbleShadow" to Pair("transparent", Color.Transparent),
-	"chat_outBubbleShadow" to Pair("transparent", Color.Transparent),
-	"chats_menuTopShadow" to Pair("transparent", Color.Transparent),
-	"chats_menuTopShadowCats" to Pair("transparent", Color.Transparent),
-	"dialogShadowLine" to Pair("transparent", Color.Transparent),
-	"key_chat_messagePanelVoiceLockShadow" to Pair("transparent", Color.Transparent),
-	"chat_emojiPanelShadowLine" to Pair("transparent", Color.Transparent),
-	"chat_messagePanelShadow" to Pair("transparent", Color.Transparent),
-	// TODO choose which shadows you want to be gone
-//	"chat_goDownButtonShadow" to Pair("transparent", Color.Transparent)
-)
-
-private fun getThemeAsStringByUUID(
-	themeList: ThemeList,
-	uuid: String,
-	loadThemeUsing: ThemeAsStringType = ThemeAsStringType.ColorValues,
-	palette: Map<String, Color>? = null
-): String {
-	val chosenTheme = themeList.find { it.containsKey(uuid) }
-		?.getValue(uuid)
-		?.mapValues {
-			when (loadThemeUsing) {
-				ThemeAsStringType.ColorValues -> Color(it.value.second).toArgb()
-				ThemeAsStringType.ColorTokens -> it.value.first
-				ThemeAsStringType.ColorValuesFromDevicesColorScheme -> {
-					if (palette != null) {
-						getColorValueFromColorToken(it.value.first, palette).toArgb()
-					} else {
-						throw Exception("palette is null in getThemeAsStringByUUID(). pass palette to the function where getThemeAsStringByUUID() was called.")
-					}
-				}
-			}
-		}
-		?.toList()?.sortedBy { it.first }?.joinToString("\n")
-
-	val themeAsString = "${
-		chosenTheme?.replace(")", "")
-			?.replace("(", "")
-			?.replace(", ", "=")
-	}\n"
-
-	return themeAsString
-}
-
-private enum class ThemeAsStringType {
+enum class ThemeAsStringType {
 	ColorValues,
 	ColorTokens,
 	ColorValuesFromDevicesColorScheme

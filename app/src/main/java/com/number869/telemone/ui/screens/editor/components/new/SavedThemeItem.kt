@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.getColorValueFromColorToken
-import com.number869.telemone.ui.theme.PaletteState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -66,13 +65,12 @@ fun SavedThemeItem(
 	modifier: Modifier,
 	vm: MainViewModel,
 	uuid: String,
-	paletteState: PaletteState,
-	context: Context,
 	isInSavedThemesRow: Boolean = false,
 	colorDisplayTypeOverwrite: String? = null,
 	changeSelectionMode: () -> Unit = { },
 	themeSelectionModeIsActive: Boolean = false
 ) {
+	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }
 	var showDeleteDialog by remember { mutableStateOf(false) }
 	var showLoadWithOptionsDialog by remember { mutableStateOf(false) }
@@ -124,7 +122,7 @@ fun SavedThemeItem(
 						?.get(uuid)
 						?.get(colorValueOf)
 						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap.value)
+							val colorFromToken = getColorValueFromColorToken(it.first, vm.palette)
 							val colorAsSaved = Color(it.second)
 
 							// colorFromToken prob should be Color? so it can
@@ -136,7 +134,7 @@ fun SavedThemeItem(
 					vm.themeList.find { it.containsKey(uuid) }
 						?.get(uuid)
 						?.get(colorValueOf)
-						?.let { getColorValueFromColorToken(it.first, paletteState.entirePaletteAsMap.value) } ?: Color.Red
+						?.let { getColorValueFromColorToken(it.first, vm.palette) } ?: Color.Red
 				}
 			},
 			label = "i hate these labels"
@@ -156,9 +154,7 @@ fun SavedThemeItem(
 								vm.loadTheme(
 									uuid,
 									withTokens = false,
-									paletteState.entirePaletteAsMap.value,
 									clearCurrentTheme = true,
-									context
 								)
 
 								Toast
@@ -229,14 +225,14 @@ fun SavedThemeItem(
 				text = { Text("Export this theme")},
 				onClick = {
 					showMenu = false
-					vm.exportThemeWithColorValues(uuid, context)
+					vm.exportThemeWithColorValues(uuid)
 				}
 			)
 			DropdownMenuItem(
 				text = { Text("Export this theme in Telemone format")},
 				onClick = {
 					showMenu = false
-					vm.exportThemeWithColorTokens(uuid, context)
+					vm.exportThemeWithColorTokens(uuid)
 				}
 			)
 			DropdownMenuItem(
@@ -270,7 +266,6 @@ fun SavedThemeItem(
 		{ showLoadWithOptionsDialog = false },
 		showLoadWithOptionsDialog,
 		vm,
-		paletteState.entirePaletteAsMap.value,
 		uuid
 	)
 
@@ -279,8 +274,6 @@ fun SavedThemeItem(
 		showDeleteDialog,
 		vm,
 		uuid,
-		paletteState,
-		context
 	)
 
 	OverwriteChoiceDialog(
@@ -289,8 +282,6 @@ fun SavedThemeItem(
 		{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
 		{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
 		vm,
-		paletteState,
-		context
 	)
 
 	OverwriteDefaultsDialog(
@@ -298,13 +289,11 @@ fun SavedThemeItem(
 		showOverwriteDarkThemeDialog,
 		overwrite = {
 			showOverwriteDarkThemeDialog = false
-			vm.overwriteDefaultDarkTheme(uuid, paletteState, context)
+			vm.overwriteDefaultDarkTheme(uuid)
 		},
 		vm = vm,
 		overwriteDark = true,
 		uuid,
-		paletteState,
-		context
 	)
 
 	OverwriteDefaultsDialog(
@@ -312,13 +301,11 @@ fun SavedThemeItem(
 		showOverwriteLightThemeDialog,
 		overwrite = {
 			showOverwriteLightThemeDialog = false
-			vm.overwriteDefaultLightTheme(uuid, paletteState, context)
+			vm.overwriteDefaultLightTheme(uuid)
 		},
 		vm = vm,
 		overwriteDark = false,
 		uuid,
-		paletteState,
-		context
 	)
 }
 

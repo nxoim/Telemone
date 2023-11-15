@@ -64,7 +64,7 @@ fun Navigator(
 				}
 			}
 		) {
-			MainScreen(navController, vm, paletteState)
+			MainScreen(navController, vm)
 		}
 
 		composable(

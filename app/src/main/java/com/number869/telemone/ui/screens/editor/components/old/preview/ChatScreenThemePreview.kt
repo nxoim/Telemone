@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.old.preview
 
-import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,8 +42,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
@@ -653,14 +650,4 @@ fun BottomBar(
             tint = iconColor,
         )
     }
-}
-
-@Preview(
-    device = "id:pixel_6_pro",
-    wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
-    showBackground = true, apiLevel = 33
-)
-@Composable
-fun ChatScreenPreviewPreview() {
-    ChatScreenPreview(MainViewModel(Application()))
 }
