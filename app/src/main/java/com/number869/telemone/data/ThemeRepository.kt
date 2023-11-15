@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.number869.telemone.defaultLightThemeUUID
 import com.number869.telemone.getColorValueFromColorToken
 
 // no im not making a data class
@@ -61,11 +60,16 @@ class ThemeRepository(context: Context) {
 
 	fun replaceThemeByUUID(
 		uuid: String,
-		newTheme: MutableMap<UiElementName, DataAboutColors>
+		newTheme: UiElementData
 	) {
-		val index = themeList.indexOfFirst { it.containsKey(uuid) }
+		runCatching {
+			val index = themeList.indexOfFirst { it.containsKey(uuid) }
 
-		themeList[index] = mapOf(defaultLightThemeUUID to newTheme)
+			themeList[index] = mapOf(uuid to newTheme)
+		}.onFailure {
+			// this runs if a theme is absent
+			themeList.add(mapOf(uuid to newTheme))
+		}
 
 		val contents = Gson().toJson(themeList)
 		preferences.edit().putString(themeListKey, contents).apply()
