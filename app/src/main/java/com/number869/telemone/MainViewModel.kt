@@ -1,6 +1,5 @@
 package com.number869.telemone
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -37,8 +36,8 @@ typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
 
 class MainViewModelFactory(
-	private val context: Application,
-	private  val paletteState: PaletteState
+	private val context: Context,
+	private val paletteState: PaletteState
 ) : ViewModelProvider.NewInstanceFactory() {
 	override fun <T : ViewModel> create(
 		modelClass: Class<T>,
@@ -50,7 +49,10 @@ class MainViewModelFactory(
 
 // funny of you to actually expect some sort of documentation in the
 // comments
-class MainViewModel(val context: Application, val paletteState: PaletteState) : ViewModel() {
+class MainViewModel(
+	private val context: Context,
+	private val paletteState: PaletteState
+) : ViewModel() {
 	private val themeListKey = "AppPreferences.ThemeList"
 	private val preferences = context.getSharedPreferences(
 		"AppPreferences",
@@ -478,19 +480,21 @@ class MainViewModel(val context: Application, val paletteState: PaletteState) : 
 			uuid
 		)
 
-		File(context.cacheDir, "Telemone Export.attheme").writeText(theme)
+		with(context) {
+			File(cacheDir, "Telemone Export.attheme").writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Export.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Export.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Export"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Export"))
+		}
 	}
 
 	fun exportThemeWithColorTokens(uuid: String) {
@@ -500,27 +504,24 @@ class MainViewModel(val context: Application, val paletteState: PaletteState) : 
 			ThemeAsStringType.ColorTokens
 		)
 
-		File(
-			context.cacheDir,
-			"Telemone Export (Telemone Format).attheme"
-		).writeText(theme)
+		with(context) {
+			File(
+				cacheDir,
+				"Telemone Export (Telemone Format).attheme"
+			).writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Export (Telemone Format).attheme")
-		)
-
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(
-			Intent.createChooser(
-				intent,
-				"Telemone Export (Telemone Format)"
+			val uri = FileProvider.getUriForFile(
+				this,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Export (Telemone Format).attheme")
 			)
-		)
+
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Export (Telemone Format)"))
+		}
 	}
 
 	fun loadDefaultDarkTheme() {
@@ -614,19 +615,21 @@ class MainViewModel(val context: Application, val paletteState: PaletteState) : 
 				.replace(", ", "=")
 		}\n"
 
-		File(context.cacheDir, "Telemone Custom.attheme").writeText(result)
+		with(context) {
+			File(cacheDir, "Telemone Custom.attheme").writeText(result)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Custom.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Custom.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Custom"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Custom"))
+		}
 	}
 
 	fun saveLightTheme() {
@@ -637,19 +640,21 @@ class MainViewModel(val context: Application, val paletteState: PaletteState) : 
 			palette = palette
 		)
 
-		File(context.cacheDir, "Telemone Light.attheme").writeText(theme)
+		with(context) {
+			File(cacheDir, "Telemone Light.attheme").writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Light.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Light.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Light"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Light"))
+		}
 	}
 
 	fun saveDarkTheme() {
@@ -660,19 +665,22 @@ class MainViewModel(val context: Application, val paletteState: PaletteState) : 
 			palette = palette
 		)
 
-		File(context.cacheDir, "Telemone Dark.attheme").writeText(theme)
+		with(context) {
+			File(cacheDir, "Telemone Dark.attheme").writeText(theme)
 
-		val uri = FileProvider.getUriForFile(
-			context,
-			"${context.packageName}.provider",
-			File(context.cacheDir, "Telemone Dark.attheme")
-		)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "Telemone Dark.attheme")
+			)
 
-		val intent = Intent(Intent.ACTION_SEND)
-		intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-		intent.type = "*/attheme"
-		intent.putExtra(Intent.EXTRA_STREAM, uri)
-		context.startActivity(Intent.createChooser(intent, "Telemone Dark"))
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION, )
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, "Telemone Dark"))
+		}
 	}
 }
 

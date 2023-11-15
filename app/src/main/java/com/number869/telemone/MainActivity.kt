@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
 				val isDarkMode = isSystemInDarkTheme()
 				val paletteState = rememberPaletteState()
 				val vm = viewModel<MainViewModel>(
-					factory = MainViewModelFactory(application, paletteState)
+					factory = MainViewModelFactory(this, paletteState)
 				)
 
 				LaunchedEffect(Unit) {
