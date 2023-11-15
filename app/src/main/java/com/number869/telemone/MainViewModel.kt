@@ -561,6 +561,76 @@ class MainViewModel(
 		).show()
 	}
 
+
+
+	fun updateDefaultLightThemeFromStock() {
+		val stockLightTheme = themeRepository.getStockLightTheme(palette, context)
+		val currentDefaultLightTheme = themeRepository.getThemeByUUID(defaultLightThemeUUID)!!
+		val newDefaultTheme = currentDefaultLightTheme.toMutableMap()
+
+		// back the theme up before doing anything
+		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultLightTheme)
+
+		stockLightTheme.forEach { (key, value) ->
+			val colorToken = value.first
+			val colorValueLoaded = value.second
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
+
+			// this will check if the color tokens name equals one of the
+			// supported color tokens prom the palette list. if it does
+			// then it will write not the color value thats loaded,
+			// but will write a color value that matches the device's
+			// current color scheme
+			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
+				newDefaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
+			} else {
+				newDefaultTheme[key] = Pair(colorToken, colorValueLoaded)
+			}
+		}
+
+		themeRepository.replaceThemeByUUID(defaultLightThemeUUID, newDefaultTheme)
+
+		Toast.makeText(
+			context,
+			"Default light theme has been overwritten successfully.",
+			Toast.LENGTH_LONG
+		).show()
+	}
+
+	fun updateDefaultDarkThemeFromStock() {
+		val stockDarkTheme = themeRepository.getStockDarkTheme(palette, context)
+		val currentDefaultDarkTheme = themeRepository.getThemeByUUID(defaultDarkThemeUUID)!!
+		val newDefaultTheme = currentDefaultDarkTheme.toMutableMap()
+
+		// back the theme up before doing anything
+		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultDarkTheme)
+
+		stockDarkTheme.forEach { (key, value) ->
+			val colorToken = value.first
+			val colorValueLoaded = value.second
+			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
+
+			// this will check if the color tokens name equals one of the
+			// supported color tokens prom the palette list. if it does
+			// then it will write not the color value thats loaded,
+			// but will write a color value that matches the device's
+			// current color scheme
+			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
+				newDefaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
+			} else {
+				newDefaultTheme[key] = Pair(colorToken, colorValueLoaded)
+			}
+		}
+
+		themeRepository.replaceThemeByUUID(defaultDarkThemeUUID, newDefaultTheme)
+
+		Toast.makeText(
+			context,
+			"Default dark theme has been overwritten successfully.",
+			Toast.LENGTH_LONG
+		).show()
+	}
+
 	fun exportCustomTheme() {
 		val map = _mappedValues.mapValues {
 			it.value.second.toArgb()
