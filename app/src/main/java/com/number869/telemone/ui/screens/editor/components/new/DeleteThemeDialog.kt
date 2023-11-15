@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun DeleteThemeDialog(
@@ -24,8 +22,6 @@ fun DeleteThemeDialog(
 	isShowingDeleteDialog: Boolean,
 	vm: MainViewModel,
 	uuid: String,
-	paletteState: PaletteState,
-	context: Context
 ) {
 	AnimatedVisibility(
 		visible = isShowingDeleteDialog
@@ -40,9 +36,7 @@ fun DeleteThemeDialog(
 						.height(180.dp)
 						.clip(RoundedCornerShape(16.dp)),
 					vm,
-					uuid,
-					paletteState,
-					context
+					uuid
 				)
 			},
 			text = {
@@ -50,7 +44,7 @@ fun DeleteThemeDialog(
 			},
 			confirmButton = {
 				FilledTonalButton(
-					onClick = { vm.deleteTheme(uuid, context) },
+					onClick = { vm.deleteTheme(uuid) },
 					colors = ButtonDefaults.filledTonalButtonColors(
 						containerColor = MaterialTheme.colorScheme.errorContainer,
 						contentColor = MaterialTheme.colorScheme.onErrorContainer

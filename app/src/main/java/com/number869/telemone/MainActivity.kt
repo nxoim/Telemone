@@ -28,12 +28,13 @@ class MainActivity : ComponentActivity() {
 			TelemoneTheme {
 				val navController = rememberAnimatedNavController()
 				val isDarkMode = isSystemInDarkTheme()
-				// its 4am rn here so excuse me if this is dum
 				val paletteState = rememberPaletteState()
-				val vm: MainViewModel = viewModel()
+				val vm = viewModel<MainViewModel>(
+					factory = MainViewModelFactory(application, paletteState)
+				)
 
 				LaunchedEffect(Unit) {
-					vm.startupConfigProcess(paletteState, isDarkMode, applicationContext)
+					vm.startupConfigProcess(isDarkMode)
 				}
 
 				Surface(

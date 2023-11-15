@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -59,26 +58,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.Screens
-import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditorTopAppBar(
 	topAppBarState: TopAppBarScrollBehavior,
-	paletteState: PaletteState,
 	navController: NavController,
 	vm: MainViewModel,
 	mappedValues: () -> LoadedTheme,
 	mappedValuesAsList: () -> List<Pair<String, Pair<String, Color>>>
 ) {
-	val context = LocalContext.current
 	var showingClearBeforeLoadDialog by remember { mutableStateOf(false) }
 	val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
 
@@ -92,12 +87,7 @@ fun EditorTopAppBar(
 		pickedFileUriState.value = result
 
 		result?.let { uri ->
-			vm.loadThemeFromFile(
-				context,
-				uri,
-				paletteState,
-				true
-			)
+			vm.loadThemeFromFile(uri,true)
 		}
 	}
 	// this one is used when pressing the "leave as is" button
@@ -107,12 +97,7 @@ fun EditorTopAppBar(
 		pickedFileUriState.value = result
 
 		result?.let { uri ->
-			vm.loadThemeFromFile(
-				context,
-				uri,
-				paletteState,
-				false
-			)
+			vm.loadThemeFromFile(uri, false)
 		}
 	}
 
@@ -129,8 +114,6 @@ fun EditorTopAppBar(
 				navController,
 				showSearchbar = { searchbarVisible = true },
 				showClearBeforeLoadDialog = { showingClearBeforeLoadDialog = true },
-				context,
-				paletteState.entirePaletteAsMap.value,
 				vm,
 				topAppBarState
 			)
@@ -161,12 +144,12 @@ fun EditorTopAppBar(
 			{ showingClearBeforeLoadDialog = false },
 			{
 				showingClearBeforeLoadDialog = false
-				vm.saveCurrentTheme(context)
+				vm.saveCurrentTheme()
 				launcherThatClears.launch(arrayOf("*/*"))
 			},
 			{
 				showingClearBeforeLoadDialog = false
-				vm.saveCurrentTheme(context)
+				vm.saveCurrentTheme()
 				launcherThatDoesnt.launch(arrayOf("*/*"))
 			}
 		)
@@ -179,8 +162,6 @@ private fun TheAppBar(
 	navController: NavController,
 	showSearchbar: () -> Unit,
 	showClearBeforeLoadDialog: () -> Unit,
-	context: Context,
-	palette: LinkedHashMap<String, Color>,
 	vm: MainViewModel,
 	topAppBarState: TopAppBarScrollBehavior
 ) {
@@ -218,10 +199,10 @@ private fun TheAppBar(
 			}
 		},
 		actions = {
-			IconButton(onClick = { vm.exportCustomTheme(context) }) {
+			IconButton(onClick = { vm.exportCustomTheme() }) {
 				Icon(Icons.Default.Upload, contentDescription = "Export current theme")
 			}
-			IconButton(onClick = { vm.saveCurrentTheme(context) }) {
+			IconButton(onClick = { vm.saveCurrentTheme() }) {
 				Icon(Icons.Default.Save, contentDescription = "Save current theme")
 			}
 			Box {
@@ -232,17 +213,17 @@ private fun TheAppBar(
 				DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
 					DropdownMenuItem(
 						text = { Text(text = "Reset current theme") },
-						onClick = { vm.resetCurrentTheme(context) },
+						onClick = { vm.resetCurrentTheme() },
 						leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reset current theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock light theme") },
-						onClick = { vm.loadStockLightTheme(palette, context) },
+						onClick = { vm.loadStockLightTheme() },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load stock light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock dark theme") },
-						onClick = { vm.loadStockDarkTheme(palette, context) },
+						onClick = { vm.loadStockDarkTheme() },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load stock dark theme") }
 					)
 					DropdownMenuItem(
@@ -255,12 +236,12 @@ private fun TheAppBar(
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default light theme") },
-						onClick = { vm.loadDefaultLightTheme(palette, context) },
+						onClick = { vm.loadDefaultLightTheme() },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load default light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default dark theme") },
-						onClick = { vm.loadDefaultDarkTheme(palette, context) },
+						onClick = { vm.loadDefaultDarkTheme() },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load default dark theme") }
 					)
 					DropdownMenuItem(
