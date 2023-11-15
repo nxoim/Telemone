@@ -34,8 +34,6 @@ class MainViewModelFactory(
 	): T = MainViewModel(context, paletteState) as T
 }
 
-// i will refactor all of this. someday. maybe. probably not.
-
 // funny of you to actually expect some sort of documentation in the
 // comments
 class MainViewModel(
@@ -386,20 +384,21 @@ class MainViewModel(
 	}
 
 	fun startupConfigProcess(isDarkMode: Boolean) {
-		val darkTheme = themeRepository.getStockDarkTheme(paletteState.entirePaletteAsMap.value, context)
-		val lightTheme = themeRepository.getStockLightTheme(paletteState.entirePaletteAsMap.value, context)
 		val defaultThemeKey = if (isDarkMode)
 			defaultDarkThemeUUID
 		else
 			defaultLightThemeUUID
 
-		// check if default themes are put in the list
-		if (!themeList.any { it.containsKey(defaultDarkThemeUUID) }) {
-			themeList.add(mapOf(defaultDarkThemeUUID to darkTheme))
+		if (themeList.firstOrNull() { it.containsKey(defaultLightThemeUUID) } == null) {
+			val stockLightTheme = themeRepository.getStockLightTheme(paletteState.entirePaletteAsMap.value, context)
+
+			themeRepository.replaceThemeByUUID(defaultLightThemeUUID, stockLightTheme)
 		}
-		// dont do if else or when here because it will only check the first one
-		if (!themeList.any { it.containsKey(defaultLightThemeUUID) }) {
-			themeList.add(mapOf(defaultLightThemeUUID to lightTheme))
+
+		if (themeList.firstOrNull() { it.containsKey(defaultDarkThemeUUID) } == null) {
+			val stockDarkTheme = themeRepository.getStockDarkTheme(paletteState.entirePaletteAsMap.value, context)
+
+			themeRepository.replaceThemeByUUID(defaultDarkThemeUUID, stockDarkTheme)
 		}
 
 		// this will also fill in the missing values
