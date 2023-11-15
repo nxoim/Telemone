@@ -60,8 +60,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.number869.telemone.LoadedTheme
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.data.LoadedTheme
 import com.number869.telemone.ui.Screens
 import kotlinx.coroutines.delay
 
