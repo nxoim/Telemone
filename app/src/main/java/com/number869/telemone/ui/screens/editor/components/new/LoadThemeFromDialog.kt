@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ThemeStorageType
 
 @Composable
 fun LoadWithOptionsDialog(
@@ -22,10 +23,12 @@ fun LoadWithOptionsDialog(
 					onClick = {
 						close()
 
-						vm.loadTheme(
-							uuid,
-							withTokens = false,
-							clearCurrentTheme = true
+						vm.loadSavedTheme(
+							ThemeStorageType.ByUuid(
+								uuid,
+								withTokens = false,
+								clearCurrentTheme = true
+							)
 						)
 					}
 				) {
@@ -36,10 +39,12 @@ fun LoadWithOptionsDialog(
 					onClick = {
 						close()
 
-						vm.loadTheme(
-							uuid,
-							withTokens = false,
-							clearCurrentTheme = false,
+						vm.loadSavedTheme(
+							ThemeStorageType.ByUuid(
+								uuid,
+								withTokens = false,
+								clearCurrentTheme = false,
+							)
 						)
 					}
 				) {
@@ -54,10 +59,12 @@ fun LoadWithOptionsDialog(
 					onClick = {
 						close()
 
-						vm.loadTheme(
-							uuid,
-							withTokens = true,
-							clearCurrentTheme = true,
+						vm.loadSavedTheme(
+							ThemeStorageType.ByUuid(
+								uuid,
+								withTokens = true,
+								clearCurrentTheme = true
+							)
 						)
 					}
 				) {
@@ -67,10 +74,12 @@ fun LoadWithOptionsDialog(
 					onClick = {
 						close()
 
-						vm.loadTheme(
-							uuid,
-							withTokens = true,
-							clearCurrentTheme = false,
+						vm.loadSavedTheme(
+							ThemeStorageType.ByUuid(
+								uuid,
+								withTokens = true,
+								clearCurrentTheme = false
+							)
 						)
 					}
 				) {

@@ -47,33 +47,25 @@ class MainViewModel(
 	// anyway and so loading a theme after restarting the app causes a
 	// crash.
 	// don't ask me why i don't keep ulong and use ints instead
-	// i tried savedStateHandle with state flows and i couldnt figure out
-	// how to save the maps
 	val themeList get() = themeRepository.themeList
 	val palette = paletteState.entirePaletteAsMap.value
 
 	private var _mappedValues: LoadedTheme = mutableStateMapOf()
-	val mappedValues: LoadedTheme get() = _mappedValues
+	val mappedValues get() = _mappedValues
 	var defaultCurrentTheme: LoadedTheme = mutableStateMapOf()
 	val selectedThemes = mutableStateListOf<String>()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 
-
-
-	fun colorFromCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color {
-		return try {
-			mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
+	fun colorFromCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color = try {
+		mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
+	} catch (e: NoSuchElementException) {
+		Color.Red
 	}
 
-	fun selectOrUnselectSavedTheme(uuid: String) {
-		if (selectedThemes.contains(uuid))
-			selectedThemes.remove(uuid)
-		else
-			selectedThemes.add(uuid)
-	}
+	fun selectOrUnselectSavedTheme(uuid: String) = if (selectedThemes.contains(uuid))
+		selectedThemes.remove(uuid)
+	else
+		selectedThemes.add(uuid)
 
 	fun selectAllThemes() {
 		selectedThemes.clear()
@@ -91,14 +83,11 @@ class MainViewModel(
 			}
 		}
 	}
-	fun unselectAllThemes() {
-		selectedThemes.clear()
-	}
 
-	fun deleteSelectedThemes() {
-		selectedThemes.forEach {
-			themeRepository.deleteTheme(it)
-		}
+	fun unselectAllThemes() = selectedThemes.clear()
+
+	fun deleteSelectedThemes() = selectedThemes.forEach {
+		themeRepository.deleteTheme(it)
 	}
 
 	fun saveCurrentTheme() {
@@ -126,55 +115,6 @@ class MainViewModel(
 		Toast.makeText(
 			context,
 			"Theme has been deleted successfully.",
-			Toast.LENGTH_LONG
-		).show()
-	}
-
-	fun loadTheme(
-		uuid: String,
-		withTokens: Boolean,
-		clearCurrentTheme: Boolean
-	) {
-		val loadedMap = themeRepository.getThemeByUUID(uuid)
-
-		if (loadedMap != null) {
-			if (withTokens) {
-				if (clearCurrentTheme) {
-					_mappedValues.clear()
-					loadedFromFileTheme.clear()
-				}
-				loadedMap.let {
-					it.forEach { colorPair ->
-						val colorToken = colorPair.value.first
-						val colorValue = getColorValueFromColorToken(colorToken, palette)
-
-						_mappedValues.putIfAbsent(
-							colorPair.key,
-							Pair(colorToken, colorValue)
-						)
-					}
-				}
-			} else {
-				if (clearCurrentTheme) {
-					_mappedValues.clear()
-					loadedFromFileTheme.clear()
-				}
-				loadedMap.let {
-					it.forEach { colorPair ->
-						_mappedValues.putIfAbsent(
-							colorPair.key,
-							Pair(colorPair.value.first, Color(colorPair.value.second))
-						)
-					}
-				}
-			}
-		}
-
-		loadedFromFileTheme.clear()
-
-		Toast.makeText(
-			context,
-			"Theme loaded successfully.",
 			Toast.LENGTH_LONG
 		).show()
 	}
@@ -300,13 +240,13 @@ class MainViewModel(
 		).show()
 	}
 
-	fun overwriteDefaultLightTheme(uuid: String) {
+	fun overwriteTheme(uuid: String, isLightTheme: Boolean) {
+		val targetThemeId = if (isLightTheme) defaultLightThemeUUID else defaultDarkThemeUUID
 		val newDefaultTheme = themeRepository.getThemeByUUID(uuid) ?: return
 
-		val index = themeList.indexOfFirst { it.containsKey(defaultLightThemeUUID) }
-
+		val index = themeList.indexOfFirst { it.containsKey(targetThemeId) }
 		val defaultTheme = if (index != -1) {
-			themeList[index].getValue(defaultLightThemeUUID).toMutableMap()
+			themeList[index].getValue(targetThemeId).toMutableMap()
 		} else {
 			mutableMapOf()
 		}
@@ -329,48 +269,14 @@ class MainViewModel(
 		}
 
 		themeRepository.replaceThemeByUUID(
-			uuid = defaultLightThemeUUID,
+			uuid = targetThemeId,
 			newTheme = defaultTheme
 		)
 
+		val themeType = if (isLightTheme) "light" else "dark"
 		Toast.makeText(
 			context,
-			"Default light theme has been overwritten successfully.",
-			Toast.LENGTH_LONG
-		).show()
-	}
-
-	fun overwriteDefaultDarkTheme(uuid: String, ) {
-		val newDefaultTheme = themeList.find { it.containsKey(uuid) }?.getValue(uuid) ?: return
-
-		val index = themeList.indexOfFirst { it.containsKey(defaultDarkThemeUUID) }
-
-		val defaultTheme = if (index != -1) {
-			themeList[index].getValue(defaultDarkThemeUUID).toMutableMap()
-		} else {
-			mutableMapOf()
-		}
-
-		newDefaultTheme.forEach { (key, value) ->
-			val colorToken = value.first
-			val colorValueAsItWasLoaded = value.second
-			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
-
-			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
-				defaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
-			} else {
-				defaultTheme[key] = Pair(colorToken, colorValueAsItWasLoaded)
-			}
-		}
-
-		themeRepository.replaceThemeByUUID(
-			uuid = defaultLightThemeUUID,
-			newTheme = defaultTheme
-		)
-
-		Toast.makeText(
-			context,
-			"Default dark theme has been overwritten successfully.",
+			"Default $themeType theme has been overwritten successfully.",
 			Toast.LENGTH_LONG
 		).show()
 	}
@@ -390,13 +296,21 @@ class MainViewModel(
 			defaultLightThemeUUID
 
 		if (themeList.firstOrNull() { it.containsKey(defaultLightThemeUUID) } == null) {
-			val stockLightTheme = themeRepository.getStockLightTheme(paletteState.entirePaletteAsMap.value, context)
+			val stockLightTheme = themeRepository.getStockTheme(
+				palette = paletteState.entirePaletteAsMap.value,
+				context = context,
+				light = true
+			)
 
 			themeRepository.replaceThemeByUUID(defaultLightThemeUUID, stockLightTheme)
 		}
 
 		if (themeList.firstOrNull() { it.containsKey(defaultDarkThemeUUID) } == null) {
-			val stockDarkTheme = themeRepository.getStockDarkTheme(paletteState.entirePaletteAsMap.value, context)
+			val stockDarkTheme = themeRepository.getStockTheme(
+				palette = paletteState.entirePaletteAsMap.value,
+				context = context,
+				light = false
+			)
 
 			themeRepository.replaceThemeByUUID(defaultDarkThemeUUID, stockDarkTheme)
 		}
@@ -435,152 +349,168 @@ class MainViewModel(
 		}
 	}
 
-	fun exportThemeWithColorValues(uuid: String) {
-		val theme = getThemeAsStringByUUID(uuid)
+	fun exportTheme(uuid: String, exportDataType: ThemeColorDataType) {
+		val theme = getThemeAsStringByUUID(uuid, exportDataType)
+		val fileName = if (exportDataType == ThemeColorDataType.ColorTokens)
+			"Telemone Export (Telemone Format).attheme"
+		else
+			"Telemone Export.attheme"
 
 		with(context) {
-			File(cacheDir, "Telemone Export.attheme").writeText(theme)
-
-			val uri = FileProvider.getUriForFile(
-				applicationContext,
-				"${packageName}.provider",
-				File(cacheDir, "Telemone Export.attheme")
-			)
-
-			val intent = Intent(Intent.ACTION_SEND)
-			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-			intent.type = "*/attheme"
-			intent.putExtra(Intent.EXTRA_STREAM, uri)
-			startActivity(Intent.createChooser(intent, "Telemone Export"))
-		}
-	}
-
-	fun exportThemeWithColorTokens(uuid: String) {
-		val theme = getThemeAsStringByUUID(
-			uuid,
-			ThemeAsStringType.ColorTokens
-		)
-
-		with(context) {
-			File(
-				cacheDir,
-				"Telemone Export (Telemone Format).attheme"
-			).writeText(theme)
+			File(cacheDir, fileName).writeText(theme)
 
 			val uri = FileProvider.getUriForFile(
 				this,
 				"${packageName}.provider",
-				File(cacheDir, "Telemone Export (Telemone Format).attheme")
+				File(cacheDir, fileName)
 			)
 
 			val intent = Intent(Intent.ACTION_SEND)
 			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 			intent.type = "*/attheme"
 			intent.putExtra(Intent.EXTRA_STREAM, uri)
-			startActivity(Intent.createChooser(intent, "Telemone Export (Telemone Format)"))
+			startActivity(Intent.createChooser(intent, fileName))
 		}
 	}
 
-	fun loadDefaultDarkTheme() {
-		themeRepository.getThemeByUUID(defaultDarkThemeUUID)?.map {
-			val uiItemName = it.key
-			val colorToken = it.value.first
-			val colorValue = getColorValueFromColorToken(colorToken, palette)
+	private fun loadSavedThemeByUuid(
+		uuid: String,
+		withTokens: Boolean,
+		clearCurrentTheme: Boolean
+	) {
+		val loadedMap = themeRepository.getThemeByUUID(uuid)
 
-			_mappedValues[uiItemName] = Pair(it.value.first, colorValue)
-			defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
+		if (loadedMap != null) {
+			if (withTokens) {
+				if (clearCurrentTheme) {
+					_mappedValues.clear()
+					loadedFromFileTheme.clear()
+				}
+				loadedMap.let {
+					it.forEach { colorPair ->
+						val colorToken = colorPair.value.first
+						val colorValue = getColorValueFromColorToken(colorToken, palette)
+
+						_mappedValues.putIfAbsent(
+							colorPair.key,
+							Pair(colorToken, colorValue)
+						)
+					}
+				}
+			} else {
+				if (clearCurrentTheme) {
+					_mappedValues.clear()
+					loadedFromFileTheme.clear()
+				}
+				loadedMap.let {
+					it.forEach { colorPair ->
+						_mappedValues.putIfAbsent(
+							colorPair.key,
+							Pair(colorPair.value.first, Color(colorPair.value.second))
+						)
+					}
+				}
+			}
 		}
 
 		loadedFromFileTheme.clear()
 
 		Toast.makeText(
 			context,
-			"Default dark theme has been loaded successfully.",
+			"Theme loaded successfully.",
 			Toast.LENGTH_LONG
 		).show()
 	}
 
-	fun loadDefaultLightTheme() {
-		themeRepository.getThemeByUUID(defaultLightThemeUUID)?.map {
-			val uiItemName = it.key
-			val colorToken = it.value.first
-			val colorValue = getColorValueFromColorToken(colorToken, palette)
-
-			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
-			defaultCurrentTheme.put(uiItemName, Pair(colorToken, colorValue))
-		}
-
-		loadedFromFileTheme.clear()
-
-		Toast.makeText(
-			context,
-			"Default light theme has been loaded successfully.",
-			Toast.LENGTH_LONG
-		).show()
-	}
-
-	fun loadStockDarkTheme() {
+	fun loadSavedTheme(storedTheme: ThemeStorageType) {
 		_mappedValues.clear()
 
-		themeRepository.getStockDarkTheme(palette, context).map {
-			val uiItemName = it.key
-			val colorToken = it.value.first
-			val colorValue = Color(it.value.second)
+		fun loadTheme(themeMap: Map<String, Pair<String, Int>>) {
+			themeMap.map {
+				val uiItemName = it.key
+				val colorToken = it.value.first
+				val colorValue = if (storedTheme is ThemeStorageType.Stock)
+					Color(it.value.second)
+				else
+					getColorValueFromColorToken(colorToken, palette)
 
-			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
-			defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
+				_mappedValues[uiItemName] = Pair(colorToken, colorValue)
+				defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
+			}
+
+			loadedFromFileTheme.clear()
+
+			val storageTypeText = when (storedTheme) {
+				is ThemeStorageType.Default -> "Default"
+				is ThemeStorageType.Stock -> "Stock"
+				is ThemeStorageType.ByUuid -> "Saved"
+				is ThemeStorageType.ExternalFile -> "External"
+			}
+
+			val appearanceTypeText = when (storedTheme) {
+				ThemeStorageType.Default(isLight = true),
+				ThemeStorageType.Stock(isLight = true) -> "light "
+				ThemeStorageType.Default(isLight = false),
+				ThemeStorageType.Stock(isLight = false) -> "dark "
+				else -> "" // empty
+			}
+
+			Toast.makeText(
+				context,
+				"$storageTypeText ${appearanceTypeText}theme has been loaded successfully.",
+				Toast.LENGTH_LONG
+			).show()
 		}
 
-		loadedFromFileTheme.clear()
+		when (storedTheme) {
+			is ThemeStorageType.Default -> {
+				val defaultThemeUuid = if (storedTheme.isLight)
+					defaultLightThemeUUID
+				else
+					defaultDarkThemeUUID
 
-		Toast.makeText(
-			context,
-			"Stock dark theme has been loaded successfully.",
-			Toast.LENGTH_LONG
-		).show()
-	}
+				loadTheme(themeRepository.getThemeByUUID(defaultThemeUuid)!!)
+			}
 
-	fun loadStockLightTheme() {
-		_mappedValues.clear()
+			is ThemeStorageType.Stock -> loadTheme(
+				themeRepository.getStockTheme(palette, context, storedTheme.isLight)
+			)
 
-		themeRepository.getStockLightTheme(palette, context).map {
-			val uiItemName = it.key
-			val colorToken = it.value.first
-			val colorValue = Color(it.value.second)
+			is ThemeStorageType.ByUuid -> loadSavedThemeByUuid(
+				storedTheme.uuid,
+				storedTheme.withTokens,
+				storedTheme.clearCurrentTheme
+			)
 
-			_mappedValues[uiItemName] = Pair(colorToken, colorValue)
-			defaultCurrentTheme[uiItemName] = Pair(colorToken, colorValue)
+			is ThemeStorageType.ExternalFile -> loadThemeFromFile(
+				storedTheme.uri,
+				storedTheme.clearCurrentTheme
+			)
 		}
-
-		loadedFromFileTheme.clear()
-
-		Toast.makeText(
-			context,
-			"Stock light theme has been loaded successfully.",
-			Toast.LENGTH_LONG
-		).show()
 	}
 
+	fun updateDefaultThemeFromStock(light: Boolean) {
+		val targetThemeId = if (light)
+			defaultLightThemeUUID
+		else
+			defaultDarkThemeUUID
 
-
-	fun updateDefaultLightThemeFromStock() {
-		val stockLightTheme = themeRepository.getStockLightTheme(palette, context)
-		val currentDefaultLightTheme = themeRepository.getThemeByUUID(defaultLightThemeUUID)!!
-		val newDefaultTheme = currentDefaultLightTheme.toMutableMap()
+		val stockTheme = themeRepository.getStockTheme(palette, context, light)
+		val currentDefaultTheme = themeRepository.getThemeByUUID(targetThemeId)!!
+		val newDefaultTheme = currentDefaultTheme.toMutableMap()
 
 		// back the theme up before doing anything
-		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultLightTheme)
+		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultTheme)
 
-		stockLightTheme.forEach { (key, value) ->
+		stockTheme.forEach { (key, value) ->
 			val colorToken = value.first
 			val colorValueLoaded = value.second
 			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
 
 			// this will check if the color tokens name equals one of the
-			// supported color tokens prom the palette list. if it does
+			// supported color tokens from the palette list. if it does
 			// then it will write not the color value thats loaded,
-			// but will write a color value that matches the device's
-			// current color scheme
+			// but a color value that matches the devices current color scheme
 			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
 				newDefaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
 			} else {
@@ -588,47 +518,40 @@ class MainViewModel(
 			}
 		}
 
-		themeRepository.replaceThemeByUUID(defaultLightThemeUUID, newDefaultTheme)
+		themeRepository.replaceThemeByUUID(targetThemeId, newDefaultTheme)
 
+		val themeType = if (light) "light" else "dark"
 		Toast.makeText(
 			context,
-			"Default light theme has been overwritten successfully.",
+			"Default $themeType theme has been overwritten successfully.",
 			Toast.LENGTH_LONG
 		).show()
 	}
 
-	fun updateDefaultDarkThemeFromStock() {
-		val stockDarkTheme = themeRepository.getStockDarkTheme(palette, context)
-		val currentDefaultDarkTheme = themeRepository.getThemeByUUID(defaultDarkThemeUUID)!!
-		val newDefaultTheme = currentDefaultDarkTheme.toMutableMap()
+	fun exportTheme(light: Boolean) {
+		val targetThemeId = if (light) defaultLightThemeUUID else defaultDarkThemeUUID
+		val themeName = if (light) "Telemone Light" else "Telemone Dark"
+		val theme = getThemeAsStringByUUID(
+			targetThemeId,
+			ThemeColorDataType.ColorValuesFromDevicesColorScheme,
+		)
 
-		// back the theme up before doing anything
-		themeRepository.saveTheme(UUID.randomUUID().toString(), currentDefaultDarkTheme)
+		with(context) {
+			File(cacheDir, "$themeName.attheme").writeText(theme)
 
-		stockDarkTheme.forEach { (key, value) ->
-			val colorToken = value.first
-			val colorValueLoaded = value.second
-			val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
+			val uri = FileProvider.getUriForFile(
+				applicationContext,
+				"${packageName}.provider",
+				File(cacheDir, "$themeName.attheme")
+			)
 
-			// this will check if the color tokens name equals one of the
-			// supported color tokens prom the palette list. if it does
-			// then it will write not the color value thats loaded,
-			// but will write a color value that matches the device's
-			// current color scheme
-			if (paletteState.allPossibleColorTokensAsList.contains(colorToken)) {
-				newDefaultTheme[key] = Pair(colorToken, colorValueFromToken.toArgb())
-			} else {
-				newDefaultTheme[key] = Pair(colorToken, colorValueLoaded)
-			}
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+			intent.type = "*/attheme"
+			intent.putExtra(Intent.EXTRA_STREAM, uri)
+			startActivity(Intent.createChooser(intent, themeName))
 		}
-
-		themeRepository.replaceThemeByUUID(defaultDarkThemeUUID, newDefaultTheme)
-
-		Toast.makeText(
-			context,
-			"Default dark theme has been overwritten successfully.",
-			Toast.LENGTH_LONG
-		).show()
 	}
 
 	fun exportCustomTheme() {
@@ -658,64 +581,17 @@ class MainViewModel(
 		}
 	}
 
-	fun saveLightTheme() {
-		val theme = getThemeAsStringByUUID(
-			defaultLightThemeUUID,
-			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
-		)
-
-		with(context) {
-			File(cacheDir, "Telemone Light.attheme").writeText(theme)
-
-			val uri = FileProvider.getUriForFile(
-				applicationContext,
-				"${packageName}.provider",
-				File(cacheDir, "Telemone Light.attheme")
-			)
-
-			val intent = Intent(Intent.ACTION_SEND)
-			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-			intent.type = "*/attheme"
-			intent.putExtra(Intent.EXTRA_STREAM, uri)
-			startActivity(Intent.createChooser(intent, "Telemone Light"))
-		}
-	}
-
-	fun saveDarkTheme() {
-		val theme = getThemeAsStringByUUID(
-			defaultDarkThemeUUID,
-			ThemeAsStringType.ColorValuesFromDevicesColorScheme,
-		)
-
-		with(context) {
-			File(cacheDir, "Telemone Dark.attheme").writeText(theme)
-
-			val uri = FileProvider.getUriForFile(
-				applicationContext,
-				"${packageName}.provider",
-				File(cacheDir, "Telemone Dark.attheme")
-			)
-
-			val intent = Intent(Intent.ACTION_SEND)
-			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION, )
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-			intent.type = "*/attheme"
-			intent.putExtra(Intent.EXTRA_STREAM, uri)
-			startActivity(Intent.createChooser(intent, "Telemone Dark"))
-		}
-	}
-
-	fun getThemeAsStringByUUID(
+	private fun getThemeAsStringByUUID(
 		uuid: String,
-		loadThemeUsing: ThemeAsStringType = ThemeAsStringType.ColorValues,
+		loadThemeUsing: ThemeColorDataType = ThemeColorDataType.ColorValues,
 	): String {
 		val chosenTheme = themeList.find { it.containsKey(uuid) }
 			?.getValue(uuid)
 			?.mapValues {
 				when (loadThemeUsing) {
-					ThemeAsStringType.ColorValues -> Color(it.value.second).toArgb()
-					ThemeAsStringType.ColorTokens -> it.value.first
-					ThemeAsStringType.ColorValuesFromDevicesColorScheme -> {
+					ThemeColorDataType.ColorValues -> Color(it.value.second).toArgb()
+					ThemeColorDataType.ColorTokens -> it.value.first
+					ThemeColorDataType.ColorValuesFromDevicesColorScheme -> {
 						getColorValueFromColorToken(it.value.first, palette).toArgb()
 					}
 				}
@@ -730,6 +606,17 @@ class MainViewModel(
 
 		return themeAsString
 	}
+}
+
+sealed interface ThemeStorageType {
+	data class Default(val isLight: Boolean) : ThemeStorageType
+	data class Stock(val isLight: Boolean) : ThemeStorageType
+	data class ByUuid(
+		val uuid: String,
+		val withTokens: Boolean,
+		val clearCurrentTheme: Boolean
+	) : ThemeStorageType
+	data class ExternalFile(val uri: Uri, val clearCurrentTheme: Boolean) : ThemeStorageType
 }
 
 const val defaultLightThemeUUID = "defaultLightThemeUUID"
@@ -751,7 +638,7 @@ fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Colo
 		""
 }
 
-enum class ThemeAsStringType {
+enum class ThemeColorDataType {
 	ColorValues,
 	ColorTokens,
 	ColorValuesFromDevicesColorScheme

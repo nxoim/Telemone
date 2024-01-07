@@ -56,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ThemeColorDataType
+import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.getColorValueFromColorToken
 
@@ -151,10 +153,12 @@ fun SavedThemeItem(
 					return@let if (isInSavedThemesRow && !themeSelectionModeIsActive)
 						it.combinedClickable(
 							onClick = {
-								vm.loadTheme(
-									uuid,
-									withTokens = false,
-									clearCurrentTheme = true,
+								vm.loadSavedTheme(
+									ThemeStorageType.ByUuid(
+										uuid,
+										withTokens = false,
+										clearCurrentTheme = true
+									)
 								)
 
 								Toast
@@ -225,14 +229,14 @@ fun SavedThemeItem(
 				text = { Text("Export this theme")},
 				onClick = {
 					showMenu = false
-					vm.exportThemeWithColorValues(uuid)
+					vm.exportTheme(uuid, exportDataType = ThemeColorDataType.ColorValues)
 				}
 			)
 			DropdownMenuItem(
 				text = { Text("Export this theme in Telemone format")},
 				onClick = {
 					showMenu = false
-					vm.exportThemeWithColorTokens(uuid)
+					vm.exportTheme(uuid, exportDataType = ThemeColorDataType.ColorTokens)
 				}
 			)
 			DropdownMenuItem(
@@ -289,7 +293,7 @@ fun SavedThemeItem(
 		showOverwriteDarkThemeDialog,
 		overwrite = {
 			showOverwriteDarkThemeDialog = false
-			vm.overwriteDefaultDarkTheme(uuid)
+			vm.overwriteTheme(uuid, isLightTheme = false)
 		},
 		vm = vm,
 		overwriteDark = true,
@@ -301,7 +305,7 @@ fun SavedThemeItem(
 		showOverwriteLightThemeDialog,
 		overwrite = {
 			showOverwriteLightThemeDialog = false
-			vm.overwriteDefaultLightTheme(uuid)
+			vm.overwriteTheme(uuid, isLightTheme = true)
 		},
 		vm = vm,
 		overwriteDark = false,

@@ -27,9 +27,9 @@ import com.number869.telemone.ui.theme.SolarSet
 @Composable
 fun DefaultThemesButtons(vm: MainViewModel) {
 	Column(Modifier.fillMaxWidth()) {
-		LightThemeButton { vm.saveLightTheme() }
+		LightThemeButton { vm.exportTheme(light = true) }
 		DarkThemeButton(Modifier.align(Alignment.End).padding(top = 16.dp)) {
-			vm.saveDarkTheme()
+			vm.exportTheme(light = false)
 		}
 	}
 }

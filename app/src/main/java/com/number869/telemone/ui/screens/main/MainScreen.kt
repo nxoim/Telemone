@@ -140,13 +140,12 @@ If you decline - you can always change your mind and update by pressing the menu
 					}
 
 					// remember the new hash
-					storageForStockThemeComparison
-						.encode(
-							"lastRememberedStockLightThemeHash",
-							currentStockLightThemeHash
-						)
-					// update default light theme
-					vm.updateDefaultLightThemeFromStock()
+					storageForStockThemeComparison.encode(
+						"lastRememberedStockLightThemeHash",
+						currentStockLightThemeHash
+					)
+
+					vm.updateDefaultThemeFromStock(light = true)
 					displayLightThemeUpdateChoiceDialog = false
 					lightThemeCanBeUpdated = false
 				}
@@ -196,13 +195,13 @@ If you decline - you can always change your mind and update by pressing the menu
 					}
 
 					// remember the hash
-					storageForStockThemeComparison
-						.encode(
-							"lastRememberedStockDarkThemeHash",
-							currentStockDarkThemeHash
-						)
+					storageForStockThemeComparison.encode(
+						"lastRememberedStockDarkThemeHash",
+						currentStockDarkThemeHash
+					)
+
 					// save the current dark theme and update
-					vm.updateDefaultDarkThemeFromStock()
+					vm.updateDefaultThemeFromStock(light = false)
 					displayDarkThemeUpdateChoiceDialog = false
 					darkThemeCanBeUpdated = false
 				}

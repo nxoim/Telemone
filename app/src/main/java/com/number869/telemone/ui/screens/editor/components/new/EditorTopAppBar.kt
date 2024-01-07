@@ -61,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.LoadedTheme
 import com.number869.telemone.ui.Screens
 import kotlinx.coroutines.delay
@@ -218,12 +219,12 @@ private fun TheAppBar(
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock light theme") },
-						onClick = { vm.loadStockLightTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load stock light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock dark theme") },
-						onClick = { vm.loadStockDarkTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load stock dark theme") }
 					)
 					DropdownMenuItem(
@@ -236,12 +237,12 @@ private fun TheAppBar(
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default light theme") },
-						onClick = { vm.loadDefaultLightTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load default light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default dark theme") },
-						onClick = { vm.loadDefaultDarkTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load default dark theme") }
 					)
 					DropdownMenuItem(
