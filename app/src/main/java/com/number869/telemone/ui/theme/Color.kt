@@ -742,9 +742,9 @@ val neutralVariantTones
 		)
 	}
 
-val blueTones @Composable get() = Color.Blue.getCustomTones(name = "blue")
-val redTones @Composable get() = Color.Red.getCustomTones(name = "red")
-val greenTones @Composable get() = Color.Green.getCustomTones(name = "green")
+val blueTones @Composable get() = blue.getCustomTones(name = "blue")
+val redTones @Composable get() = red.getCustomTones(name = "red")
+val greenTones @Composable get() = green.getCustomTones(name = "green")
 val orangeTones @Composable get() = orange.getCustomTones(name = "orange")
 val violetTones @Composable get() = violet.getCustomTones(name = "violet")
 val pinkTones @Composable get() = pink.getCustomTones(name = "pink")
@@ -803,4 +803,4 @@ val green = Color.Green
 val orange = Color(0xFFFFAA00)
 val violet = Color(0xFFEB00FF)
 val pink = Color(0xFFFF32AC)
-val cyan = Color.Cyan
+val cyan = Color(0xFF14AAAC)
