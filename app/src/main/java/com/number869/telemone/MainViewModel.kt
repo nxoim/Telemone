@@ -6,6 +6,7 @@ import android.net.Uri
 import android.service.controls.ControlsProviderService.TAG
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.Color
@@ -34,6 +35,7 @@ class MainViewModelFactory(
 	): T = MainViewModel(context, paletteState) as T
 }
 
+@Stable
 // funny of you to actually expect some sort of documentation in the
 // comments
 class MainViewModel(

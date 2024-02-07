@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
@@ -65,25 +66,26 @@ import androidx.compose.ui.zIndex
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.shared.ui.animateMovableContent
 import com.number869.telemone.ui.theme.AdditionalColors
-import com.number869.telemone.ui.theme.BlueTones
 import com.number869.telemone.ui.theme.ColorRolesDark
 import com.number869.telemone.ui.theme.ColorRolesLight
-import com.number869.telemone.ui.theme.CyanTones
 import com.number869.telemone.ui.theme.DataAboutColors
-import com.number869.telemone.ui.theme.GreenTones
-import com.number869.telemone.ui.theme.NeutralTones
-import com.number869.telemone.ui.theme.NeutralVariantTones
-import com.number869.telemone.ui.theme.OrangeTones
-import com.number869.telemone.ui.theme.PinkTones
-import com.number869.telemone.ui.theme.PrimaryTones
-import com.number869.telemone.ui.theme.RedTones
-import com.number869.telemone.ui.theme.SecondaryTones
 import com.number869.telemone.ui.theme.SolarSet
-import com.number869.telemone.ui.theme.TertiaryTones
-import com.number869.telemone.ui.theme.VioletTones
+import com.number869.telemone.ui.theme.ToneInfo
+import com.number869.telemone.ui.theme.blueTones
+import com.number869.telemone.ui.theme.cyanTones
+import com.number869.telemone.ui.theme.greenTones
+import com.number869.telemone.ui.theme.neutralTones
+import com.number869.telemone.ui.theme.neutralVariantTones
+import com.number869.telemone.ui.theme.orangeTones
+import com.number869.telemone.ui.theme.pinkTones
+import com.number869.telemone.ui.theme.primaryTones
+import com.number869.telemone.ui.theme.redTones
+import com.number869.telemone.ui.theme.secondaryTones
+import com.number869.telemone.ui.theme.tertiaryTones
+import com.number869.telemone.ui.theme.violetTones
 import kotlinx.coroutines.delay
 
-// ⚠️if anyone knows how to make this pipipopo decently shorter - hmu
+// ⚠ if anyone knows how to make this pipipopo decently shorter - hmu
 @Composable
 fun PalettePopup(
 	currentUiElement: String,
@@ -131,19 +133,32 @@ fun PalettePopup(
 			)
 		)
 
+		val primaryTones = primaryTones
+		val secondaryTones = secondaryTones
+		val tertiaryTones = tertiaryTones
+		val neutralTones = neutralTones
+		val neutralVariantTones = neutralVariantTones
+		val blueTones = blueTones
+		val redTones = redTones
+		val greenTones = greenTones
+		val orangeTones = orangeTones
+		val violetTones = violetTones
+		val pinkTones = pinkTones
+		val cyanTones = cyanTones
+
 		val primaryTonesAsListOfMovableContent = remember {
-			PrimaryTones.entries.map {
+			primaryTones.map {
 				movableContentOf {
-					val inPreview = it == PrimaryTones.T40 || it == PrimaryTones.T50 || it == PrimaryTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Primary }
+						currentPopupContentType == PaletteMenuCategories.Primary
 					)
 				}
 			}
@@ -167,18 +182,18 @@ fun PalettePopup(
 		}
 
 		val secondaryTonesAsListOfMovableContent = remember {
-			SecondaryTones.entries.map {
+			secondaryTones.map {
 				movableContentOf {
-					val inPreview = it == SecondaryTones.T40 || it == SecondaryTones.T50 || it == SecondaryTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Secondary }
+						currentPopupContentType == PaletteMenuCategories.Secondary
 					)
 				}
 			}
@@ -203,18 +218,18 @@ fun PalettePopup(
 		}
 
 		val tertiaryTonesAsListOfMovableContent = remember {
-			TertiaryTones.entries.map {
+			tertiaryTones.map {
 				movableContentOf {
-					val inPreview = it == TertiaryTones.T40 || it == TertiaryTones.T50 || it == TertiaryTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Tertiary }
+						currentPopupContentType == PaletteMenuCategories.Tertiary
 					)
 				}
 			}
@@ -239,18 +254,18 @@ fun PalettePopup(
 		}
 
 		val neutralTonesAsListOfMovableContent = remember {
-			NeutralTones.entries.map {
+			neutralTones.map {
 				movableContentOf {
-					val inPreview = it == NeutralTones.T40 || it == NeutralTones.T50 || it == NeutralTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Neutral }
+						currentPopupContentType == PaletteMenuCategories.Neutral
 					)
 				}
 			}
@@ -275,18 +290,18 @@ fun PalettePopup(
 		}
 
 		val neutralVariantTonesAsListOfMovableContent = remember {
-			NeutralVariantTones.entries.map {
+			neutralVariantTones.map {
 				movableContentOf {
-					val inPreview = it == NeutralVariantTones.T40 || it == NeutralVariantTones.T50 || it == NeutralVariantTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.NeutralVariant }
+						currentPopupContentType == PaletteMenuCategories.NeutralVariant
 					)
 				}
 			}
@@ -312,18 +327,18 @@ fun PalettePopup(
 		}
 
 		val blueTonesAsListOfMovableContent = remember {
-			BlueTones.entries.map {
+			blueTones.map {
 				movableContentOf {
-					val inPreview = it == BlueTones.T40 || it == BlueTones.T50 || it == BlueTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Blue }
+						currentPopupContentType == PaletteMenuCategories.Blue
 					)
 				}
 			}
@@ -348,18 +363,18 @@ fun PalettePopup(
 		}
 
 		val redTonesAsListOfMovableContent = remember {
-			RedTones.entries.map {
+			redTones.map {
 				movableContentOf {
-					val inPreview = it == RedTones.T40 || it == RedTones.T50 || it == RedTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Red }
+						currentPopupContentType == PaletteMenuCategories.Red
 					)
 				}
 			}
@@ -384,18 +399,18 @@ fun PalettePopup(
 		}
 
 		val greenTonesAsListOfMovableContent = remember {
-			GreenTones.entries.map {
+			greenTones.map {
 				movableContentOf {
-					val inPreview = it == GreenTones.T40 || it == GreenTones.T50 || it == GreenTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Green }
+						currentPopupContentType == PaletteMenuCategories.Green
 					)
 				}
 			}
@@ -420,18 +435,18 @@ fun PalettePopup(
 		}
 
 		val orangeTonesAsListOfMovableContent = remember {
-			OrangeTones.entries.map {
+			orangeTones.map {
 				movableContentOf {
-					val inPreview = it == OrangeTones.T40 || it == OrangeTones.T50 || it == OrangeTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Orange }
+						currentPopupContentType == PaletteMenuCategories.Orange
 					)
 				}
 			}
@@ -456,18 +471,18 @@ fun PalettePopup(
 		}
 
 		val violetTonesAsListOfMovableContent = remember {
-			VioletTones.entries.map {
+			violetTones.map {
 				movableContentOf {
-					val inPreview = it == VioletTones.T40 || it == VioletTones.T50 || it == VioletTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Violet }
+						currentPopupContentType == PaletteMenuCategories.Violet
 					)
 				}
 			}
@@ -492,18 +507,18 @@ fun PalettePopup(
 		}
 
 		val pinkTonesAsListOfMovableContent = remember {
-			PinkTones.entries.map {
+			pinkTones.map {
 				movableContentOf {
-					val inPreview = it == PinkTones.T40 || it == PinkTones.T50 || it == PinkTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Pink }
+						currentPopupContentType == PaletteMenuCategories.Pink
 					)
 				}
 			}
@@ -528,18 +543,18 @@ fun PalettePopup(
 		}
 
 		val cyanTonesAsListOfMovableContent = remember {
-			CyanTones.entries.map {
+			cyanTones.map {
 				movableContentOf {
-					val inPreview = it == CyanTones.T40 || it == CyanTones.T50 || it == CyanTones.T60
+					val inPreview = it.tone == 40 || it.tone == 50 || it.tone == 60
 
 					TonalPaletteItem(
 						Modifier
-							.zIndex(if (inPreview) 999f else 0f)
+							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
-						dataAboutColors = it.dataAboutColors,
+						toneInfo = it,
 						key = currentUiElement,
 						vm = vm,
-						{ currentPopupContentType == PaletteMenuCategories.Cyan }
+						currentPopupContentType == PaletteMenuCategories.Cyan
 					)
 				}
 			}
@@ -1092,7 +1107,7 @@ fun PalettePopup(
 				seventhColorRolesRowLight
 			)
 		}
-		
+
 		val listOfColorRolesRowsDark = remember {
 			listOf(
 				firstColorRolesRowDark,
@@ -1104,7 +1119,7 @@ fun PalettePopup(
 				seventhColorRolesRowDark
 			)
 		}
-		
+
 		val colorRolesAsMovableContent = remember {
 			movableContentOf {
 				ColorRolesAnimatedCategoryContainer(
@@ -1227,7 +1242,7 @@ fun PalettePopup(
 									modifier = Modifier.graphicsLayer { alpha = if(currentPopupContentTypeAnimated == PaletteMenuCategories.Primary) visibilityAlpha else animatedPlaceholderAlpha },
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Primary },
 									enabled =  { isOnHomePage },
-									listOfColors = PrimaryTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = primaryTones,
 									label = "Primary",
 								)
 
@@ -1248,7 +1263,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Secondary },
 									enabled = { isOnHomePage },
 									label = "Secondary",
-									listOfColors = SecondaryTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = secondaryTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Secondary) secondaryAsMovableContent()
@@ -1268,7 +1283,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Tertiary },
 									enabled = { isOnHomePage },
 									label = "Tertiary",
-									listOfColors = TertiaryTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = tertiaryTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Tertiary) tertiaryAsMovableContent()
@@ -1304,7 +1319,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Neutral },
 									enabled = { isOnHomePage },
 									label = "Neutral",
-									listOfColors = NeutralTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = neutralTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Neutral) neutralAsMovableContent()
@@ -1324,7 +1339,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.NeutralVariant },
 									enabled = { isOnHomePage },
 									label = "Neutral Variant",
-									listOfColors = NeutralVariantTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = neutralVariantTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.NeutralVariant) neutralVariantAsMovableContent()
@@ -1362,7 +1377,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Blue },
 									enabled = { isOnHomePage },
 									label = "Blue",
-									listOfColors = BlueTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = blueTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Blue) blueAsMovableContent()
@@ -1382,7 +1397,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Red },
 									enabled = { isOnHomePage },
 									label = "Red",
-									listOfColors = RedTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = redTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Red) redAsMovableContent()
@@ -1402,7 +1417,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Green },
 									enabled = { isOnHomePage },
 									label = "Green",
-									listOfColors = GreenTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = greenTones
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Green) greenAsMovableContent()
@@ -1427,7 +1442,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Orange },
 									enabled = { isOnHomePage },
 									label = "Orange",
-									listOfColors = OrangeTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = orangeTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Orange) orangeAsMovableContent()
@@ -1447,7 +1462,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Violet },
 									enabled = { isOnHomePage },
 									label = "Violet",
-									listOfColors = VioletTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = violetTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Violet) violetAsMovableContent()
@@ -1467,7 +1482,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Pink },
 									enabled = { isOnHomePage },
 									label = "Pink",
-									listOfColors = PinkTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = pinkTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Pink) pinkAsMovableContent()
@@ -1487,7 +1502,7 @@ fun PalettePopup(
 									expand = { currentPopupContentTypeAnimated = PaletteMenuCategories.Cyan },
 									enabled = { isOnHomePage },
 									label = "Cyan",
-									listOfColors = CyanTones.entries.map { it.name to it.dataAboutColors },
+									listOfColors = cyanTones,
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.Cyan) cyanAsMovableContent()
@@ -1556,15 +1571,12 @@ fun PalettePopup(
 @Composable
 private fun TonalPaletteItem(
 	modifier: Modifier = Modifier,
-	dataAboutColors: DataAboutColors,
+	toneInfo: ToneInfo,
 	key: String,
 	vm: MainViewModel,
-	enabled: () -> Boolean
+	enabled: Boolean
 ) {
-	val colorToken = dataAboutColors.colorToken
-	val colorValue = dataAboutColors.colorValue()
-	
-	val size = if (!enabled())
+	val size = if (!enabled)
 		Size(32f, 24f)
 	else
 		Size(9999f, 80f)
@@ -1574,21 +1586,22 @@ private fun TonalPaletteItem(
 			.width(size.width.dp)
 			.height(size.height.dp)
 			.clip(CircleShape)
-			.background(colorValue)
+			.background(toneInfo.colorValue)
 			.let {
 				// no, the enabled parameter in the clickable modifier
 				// doesn't cut it
-				return@let if (enabled()) it.clickable {
+				return@let if (enabled) it.clickable {
 					vm.changeValue(
 						key,
-						colorToken,
-						colorValue
+						toneInfo.colorToken,
+						toneInfo.colorValue
 					)
 				} else it
 			}
 	)
 }
 
+@Stable
 @Composable
 private fun ColorRolesAnimatedCategoryContainer(
 	modifier: Modifier,
@@ -1644,7 +1657,10 @@ private fun ColorRolesAnimatedCategoryContainer(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.Center
 		) {
-			Box(Modifier.width(72.dp).height(32.dp)) {
+			Box(
+				Modifier
+					.width(72.dp)
+					.height(32.dp)) {
 				if (!expanded()) {
 					listOfColorRolesRowsLight.forEachIndexed { listIndex, rowItems ->
 						rowItems.forEachIndexed { itemIndex, item ->
@@ -1663,7 +1679,10 @@ private fun ColorRolesAnimatedCategoryContainer(
 								else -> 0.dp
 							}
 
-							Box(Modifier.zIndex(zIndex).padding(start = padding)) {
+							Box(
+								Modifier
+									.zIndex(zIndex)
+									.padding(start = padding)) {
 								item()
 							}
 						}
@@ -1709,7 +1728,7 @@ private fun ColorRolesAnimatedCategoryContainer(
 					Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 						Icon(
 							SolarSet.Sun,
-							contentDescription = "Light theme color roles",
+							contentDescription = "Light theme colorValue roles",
 							Modifier
 								.size(32.dp)
 								.graphicsLayer { alpha = 1f - backgroundAndContentAlpha }
@@ -1731,7 +1750,7 @@ private fun ColorRolesAnimatedCategoryContainer(
 					Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 						Icon(
 							SolarSet.Moon,
-							contentDescription = "Dark theme color roles",
+							contentDescription = "Dark theme colorValue roles",
 							Modifier
 								.size(32.dp)
 								.graphicsLayer { alpha = 1f - backgroundAndContentAlpha }
@@ -1757,6 +1776,7 @@ private fun ColorRolesAnimatedCategoryContainer(
 	}
 }
 
+@Stable
 @Composable
 private fun ColorRolesStaticCategoryContainer(
 	modifier: Modifier,
@@ -1776,7 +1796,10 @@ private fun ColorRolesStaticCategoryContainer(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.Center
 	) {
-		Box(Modifier.width(72.dp).height(32.dp)) {
+		Box(
+			Modifier
+				.width(72.dp)
+				.height(32.dp)) {
 			listOfColors.forEachIndexed { index, it ->
 				ColorRoleItem(
 					Modifier.padding(start = (index * 12).dp),
@@ -1799,6 +1822,7 @@ private fun ColorRolesStaticCategoryContainer(
 	}
 }
 
+@Stable
 @Composable
 private fun SmallAnimatedExpandableCategoryContainer(
 	modifier: Modifier = Modifier,
@@ -1877,13 +1901,14 @@ private fun SmallAnimatedExpandableCategoryContainer(
 	}
 }
 
+@Stable
 @Composable
 private fun SmallStaticExpandableCategoryContainer(
 	modifier: Modifier = Modifier,
 	expand: () -> Unit,
 	enabled: () -> Boolean,
 	label: String,
-	listOfColors: List<Pair<String, DataAboutColors>>
+	listOfColors: List<ToneInfo>
 ) {
 	Box(
 		modifier
@@ -1908,7 +1933,7 @@ private fun SmallStaticExpandableCategoryContainer(
 							.width(32.dp)
 							.height(24.dp)
 							.clip(CircleShape)
-							.background(it.second.colorValue())
+							.background(it.colorValue)
 					)
 				}
 			}
@@ -2126,9 +2151,10 @@ enum class PaletteMenuCategories() {
 	}
 }
 
+@Stable
 @Composable
 fun CategoryButtonColorsFromList(listWithMovableContent: List<@Composable () -> Unit>) {
-	listWithMovableContent.subList(1, 12).forEachIndexed { index, content ->
+	listWithMovableContent.subList(1, listWithMovableContent.lastIndex).forEachIndexed { index, content ->
 		val padding = if (listWithMovableContent.lastIndex <= 2) when (index) {
 			0 -> 0.dp
 			1 -> 8.dp
@@ -2153,6 +2179,7 @@ fun CategoryButtonColorsFromList(listWithMovableContent: List<@Composable () -> 
 	}
 }
 
+@Stable
 @Composable
 fun TonalPaletteFromType(listWithMovableContent: List<@Composable () -> Unit>) {
 	Column {
@@ -2160,7 +2187,10 @@ fun TonalPaletteFromType(listWithMovableContent: List<@Composable () -> Unit>) {
 			listWithMovableContent.subList(1, 6).forEachIndexed { index, content ->
 				val zIndex = if (index == 6 || index == 5 || index == 4) 1f else 0f
 
-				Box(Modifier.weight(1f).zIndex(zIndex)) { content() }
+				Box(
+					Modifier
+						.weight(1f)
+						.zIndex(zIndex)) { content() }
 			}
 		}
 
@@ -2173,7 +2203,7 @@ fun TonalPaletteFromType(listWithMovableContent: List<@Composable () -> Unit>) {
 		// beginning of the expansion animation, and so it doesnt match
 		// the preview
 		Row(horizontalArrangement = spacedBy(8.dp), modifier = Modifier.zIndex(-1f)) {
-			listWithMovableContent.subList(6, 12).forEachIndexed { index, content ->
+			listWithMovableContent.subList(6, listWithMovableContent.lastIndex).forEachIndexed { index, content ->
 				val zIndex = if (index == 0 ) 1f else 0f
 
 				Box(Modifier.weight(1f).zIndex(zIndex)) { content() }
@@ -2182,6 +2212,7 @@ fun TonalPaletteFromType(listWithMovableContent: List<@Composable () -> Unit>) {
 	}
 }
 
+@Stable
 @Composable
 fun ColorRolesPaletteRow(modifier: Modifier = Modifier, listWithMovableContent: List<@Composable () -> Unit>) {
 	Row(modifier, horizontalArrangement = spacedBy(8.dp)) {
@@ -2194,7 +2225,10 @@ fun ColorRolesPaletteRow(modifier: Modifier = Modifier, listWithMovableContent: 
 				else -> 0f
 			}
 
-			Box(Modifier.weight(1f).zIndex(zIndex)) { item() }
+			Box(
+				Modifier
+					.weight(1f)
+					.zIndex(zIndex)) { item() }
 		}
 	}
 }
