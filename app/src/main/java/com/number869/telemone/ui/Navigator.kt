@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -37,7 +36,6 @@ import com.number869.telemone.ui.screens.main.MainScreen
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.number869.telemone.ui.screens.welcome.WelcomeScreen
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Navigator() {
 	val vm = viewModel<MainViewModel>()
@@ -54,8 +52,6 @@ fun Navigator() {
 		startingDestination = startDestination,
 		containedContentAnimation = {
 			scaleFadePredictiveBackAnimation(
-				backHandler = this::backHandler.get(),
-				onBack = { navigateBack() },
 				fallbackAnimation = stackAnimation { _ ->
 					cleanFadeAndSlide(
 						tween(

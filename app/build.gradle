@@ -83,6 +83,6 @@ dependencies {
 
     implementation 'com.arkivanov.decompose:decompose:3.0.0-alpha04'
     implementation 'com.arkivanov.decompose:extensions-compose:3.0.0-alpha04'
-    implementation 'com.github.Number869.Decomposite:decomposite-core:3af90cc1b5'
-    implementation 'com.github.Number869.Decomposite:decomposite-optionalExtensions:8eb163bf9e'
+    implementation 'com.github.Number869.Decomposite:decomposite-core:0.0.2.0'
+    implementation 'com.github.Number869.Decomposite:decomposite-optionalExtensions:0.0.2.0'
 }
