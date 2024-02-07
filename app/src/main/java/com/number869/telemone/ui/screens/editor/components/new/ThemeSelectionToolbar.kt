@@ -1,7 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -25,24 +23,26 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.decomposite.core.common.ultils.ContentType
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.theme.blendWith
 
 @Composable
 fun ThemeSelectionToolbar(
 	modifier: Modifier = Modifier,
-	vm: MainViewModel,
-	hideToolbarAction: () -> Unit,
-	context: Context
+	hideToolbarAction: () -> Unit
 ) {
-	var showDeleteSelectedThemesDialog by remember { mutableStateOf(false) }
+	val navController = navController<Destinations>()
+	val vm = viewModel<MainViewModel>()
+
 	val selectedThemeCount by remember {
 		derivedStateOf {
 			vm.selectedThemes.count()
@@ -100,7 +100,12 @@ fun ThemeSelectionToolbar(
 			Spacer(modifier = Modifier.width(16.dp))
 
 			FilledTonalIconButton(
-				onClick = { showDeleteSelectedThemesDialog = true },
+				onClick = {
+					navController.navigate(
+						Destinations.EditorScreen.Dialogs.DeleteSelectedThemes,
+						ContentType.Overlay
+					)
+				},
 				enabled = deleteButtonEnabled,
 				colors = IconButtonDefaults.filledTonalIconButtonColors(
 					containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -110,15 +115,5 @@ fun ThemeSelectionToolbar(
 				Icon(Icons.Outlined.DeleteForever, contentDescription = "Delete button")
 			}
 		}
-	}
-
-	AnimatedVisibility(visible = showDeleteSelectedThemesDialog) {
-		DeleteSelectedThemesDialog(
-			vm,
-			hideToolbarAction,
-			hideDialog = { showDeleteSelectedThemesDialog = false},
-			selectedThemeCount,
-			context
-		)
 	}
 }

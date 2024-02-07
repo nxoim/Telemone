@@ -30,7 +30,6 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.LoadedTheme
 import kotlinx.coroutines.delay
 
@@ -38,7 +37,6 @@ import kotlinx.coroutines.delay
 fun ElementColorItem(
 	modifier: Modifier = Modifier,
 	uiElementData: Pair<String, Pair<String, Color>>,
-	vm: MainViewModel,
 	index: Int,
 	themeMap: LoadedTheme,
 	lastIndexInList: Int
@@ -119,7 +117,6 @@ fun ElementColorItem(
 
 					PalettePopup(
 						uiElementData.first,
-						vm,
 						backgroundColor,
 						uiElementData.second.first,
 						startPopupAnimation

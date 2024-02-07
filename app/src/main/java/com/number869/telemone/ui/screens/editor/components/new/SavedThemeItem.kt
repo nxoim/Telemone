@@ -55,30 +55,31 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.decomposite.core.common.ultils.ContentType
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ThemeColorDataType
 import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.getColorValueFromColorToken
+import com.number869.telemone.ui.Destinations
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SavedThemeItem(
 	modifier: Modifier,
-	vm: MainViewModel,
 	uuid: String,
 	isInSavedThemesRow: Boolean = false,
 	colorDisplayTypeOverwrite: String? = null,
 	changeSelectionMode: () -> Unit = { },
 	themeSelectionModeIsActive: Boolean = false
 ) {
+	val navController = navController<Destinations>()
+	val vm = viewModel<MainViewModel>()
+
 	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }
-	var showDeleteDialog by remember { mutableStateOf(false) }
-	var showLoadWithOptionsDialog by remember { mutableStateOf(false) }
-	var showOverwriteChoiceDialog by remember { mutableStateOf(false) }
-	var showOverwriteLightThemeDialog by remember { mutableStateOf(false) }
-	var showOverwriteDarkThemeDialog by remember { mutableStateOf(false) }
 
 	val selected by remember { derivedStateOf { vm.selectedThemes.contains(uuid) } }
 	val selectedOverlayColor by animateColorAsState(
@@ -107,12 +108,7 @@ fun SavedThemeItem(
 	@Composable
 	fun colorOf(colorValueOf: String): Color {
 		return animateColorAsState(
-			when (
-				if (colorDisplayTypeOverwrite == null)
-					colorDisplayType
-				else
-					colorDisplayTypeOverwrite
-			) {
+			when (colorDisplayTypeOverwrite ?: colorDisplayType) {
 				"1" -> {
 					vm.themeList.find { it.containsKey(uuid) }
 						?.get(uuid)
@@ -223,7 +219,12 @@ fun SavedThemeItem(
 		) {
 			DropdownMenuItem(
 				text = { Text("Load theme with options") },
-				onClick = { showLoadWithOptionsDialog = true }
+				onClick = {
+					navController.navigate(
+						Destinations.EditorScreen.Dialogs.LoadThemeWithOptions(uuid),
+						ContentType.Overlay
+					)
+				}
 			)
 			DropdownMenuItem(
 				text = { Text("Export this theme")},
@@ -243,14 +244,20 @@ fun SavedThemeItem(
 				text = { Text("Overwrite a default theme")},
 				onClick = {
 					showMenu = false
-					showOverwriteChoiceDialog = true
+					navController.navigate(
+						Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice(uuid),
+						ContentType.Overlay
+					)
 				}
 			)
 			DropdownMenuItem(
 				text = { Text("Delete theme") },
 				onClick = {
 					showMenu = false
-					showDeleteDialog = true
+					navController.navigate(
+						Destinations.EditorScreen.Dialogs.DeleteOneTheme(uuid),
+						ContentType.Overlay
+					)
 				}
 			)
 			DropdownMenuItem(
@@ -263,54 +270,6 @@ fun SavedThemeItem(
 			)
 		}
 	}
-
-	// i dont know what to do with all these dialogs
-
-	LoadWithOptionsDialog(
-		{ showLoadWithOptionsDialog = false },
-		showLoadWithOptionsDialog,
-		vm,
-		uuid
-	)
-
-	DeleteThemeDialog(
-		close = { showDeleteDialog = false },
-		showDeleteDialog,
-		vm,
-		uuid,
-	)
-
-	OverwriteChoiceDialog(
-		{ showOverwriteChoiceDialog = false },
-		showOverwriteChoiceDialog,
-		{ showOverwriteChoiceDialog = false; showOverwriteLightThemeDialog = true },
-		{ showOverwriteChoiceDialog = false; showOverwriteDarkThemeDialog = true },
-		vm,
-	)
-
-	OverwriteDefaultsDialog(
-		close = { showOverwriteDarkThemeDialog = false },
-		showOverwriteDarkThemeDialog,
-		overwrite = {
-			showOverwriteDarkThemeDialog = false
-			vm.overwriteTheme(uuid, isLightTheme = false)
-		},
-		vm = vm,
-		overwriteDark = true,
-		uuid,
-	)
-
-	OverwriteDefaultsDialog(
-		close = { showOverwriteLightThemeDialog = false },
-		showOverwriteLightThemeDialog,
-		overwrite = {
-			showOverwriteLightThemeDialog = false
-			vm.overwriteTheme(uuid, isLightTheme = true)
-		},
-		vm = vm,
-		overwriteDark = false,
-		uuid,
-	)
 }
 
 @Composable

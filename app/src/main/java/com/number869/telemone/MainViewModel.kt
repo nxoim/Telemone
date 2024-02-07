@@ -7,15 +7,16 @@ import android.service.controls.ControlsProviderService.TAG
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
+import com.number869.decomposite.core.common.viewModel.ViewModel
 import com.number869.telemone.data.ColorToken
 import com.number869.telemone.data.LoadedTheme
 import com.number869.telemone.data.ThemeRepository
@@ -24,23 +25,13 @@ import com.number869.telemone.ui.theme.PaletteState
 import java.io.File
 import java.util.UUID
 
-
-class MainViewModelFactory(
-	private val context: Context,
-	private val paletteState: PaletteState
-) : ViewModelProvider.NewInstanceFactory() {
-	override fun <T : ViewModel> create(
-		modelClass: Class<T>,
-		extras: CreationExtras
-	): T = MainViewModel(context, paletteState) as T
-}
-
 @Stable
 // funny of you to actually expect some sort of documentation in the
 // comments
 class MainViewModel(
 	private val context: Context,
-	private val paletteState: PaletteState
+	private val paletteState: PaletteState,
+	isDarkMode: Boolean
 ) : ViewModel() {
 	val themeRepository = ThemeRepository(context)
 
@@ -58,10 +49,20 @@ class MainViewModel(
 	val selectedThemes = mutableStateListOf<String>()
 	private var loadedFromFileTheme: LoadedTheme = mutableStateMapOf()
 
+	var themeSelectionToolbarIsVisible by mutableStateOf(false)
+
 	fun colorFromCurrentTheme(colorValueOf: ColorToken /*its a String*/): Color = try {
 		mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
 	} catch (e: NoSuchElementException) {
 		Color.Red
+	}
+
+	init {
+		startupConfigProcess(isDarkMode)
+	}
+
+	override fun onDestroy(removeFromViewModelStore: () -> Unit) {
+		// do not destroy anything
 	}
 
 	fun selectOrUnselectSavedTheme(uuid: String) = if (selectedThemes.contains(uuid))
@@ -323,7 +324,10 @@ class MainViewModel(
 				val uiItemName = it.key
 				val colorToken = it.value.first
 				val colorValueAsItWasSaved = Color(it.value.second)
-				val colorValueFromToken = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap.value)
+				val colorValueFromToken = getColorValueFromColorToken(
+					colorToken,
+					paletteState.entirePaletteAsMap.value
+				)
 
 				// if color token is something that is in the palette
 				// list - load it. if not - load what was saved
@@ -349,6 +353,7 @@ class MainViewModel(
 				}
 			}
 		}
+
 	}
 
 	fun exportTheme(uuid: String, exportDataType: ThemeColorDataType) {
@@ -607,6 +612,14 @@ class MainViewModel(
 		}\n"
 
 		return themeAsString
+	}
+
+	fun hideThemeSelectionModeToolbar() {
+		themeSelectionToolbarIsVisible = false
+	}
+
+	fun toggleThemeSelectionModeToolbar() {
+		themeSelectionToolbarIsVisible = !themeSelectionToolbarIsVisible
 	}
 }
 

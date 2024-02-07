@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,50 +13,46 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 
 @Composable
-fun DeleteThemeDialog(
-	close: () -> Unit,
-	isShowingDeleteDialog: Boolean,
-	vm: MainViewModel,
-	uuid: String,
-) {
-	AnimatedVisibility(
-		visible = isShowingDeleteDialog
-	) {
-		AlertDialog(
-			onDismissRequest = { close() },
-			title = { Text("Delete this theme?") },
-			icon = {
-				SavedThemeItem(
-					Modifier
-						.width(150.dp)
-						.height(180.dp)
-						.clip(RoundedCornerShape(16.dp)),
-					vm,
-					uuid
+fun DeleteThemeDialog(close: () -> Unit, uuid: String, ) {
+	val vm = viewModel<MainViewModel>()
+
+	AlertDialog(
+		onDismissRequest = { close() },
+		title = { Text("Delete this theme?") },
+		icon = {
+			SavedThemeItem(
+				Modifier
+					.width(150.dp)
+					.height(180.dp)
+					.clip(RoundedCornerShape(16.dp)),
+				uuid
+			)
+		},
+		text = {
+			Text(text = "This theme will be unrecoverable after deletion.")
+		},
+		confirmButton = {
+			FilledTonalButton(
+				onClick = {
+					close()
+					vm.deleteTheme(uuid)
+				},
+				colors = ButtonDefaults.filledTonalButtonColors(
+					containerColor = MaterialTheme.colorScheme.errorContainer,
+					contentColor = MaterialTheme.colorScheme.onErrorContainer
 				)
-			},
-			text = {
-				Text(text = "This theme will be unrecoverable after deletion.")
-			},
-			confirmButton = {
-				FilledTonalButton(
-					onClick = { vm.deleteTheme(uuid) },
-					colors = ButtonDefaults.filledTonalButtonColors(
-						containerColor = MaterialTheme.colorScheme.errorContainer,
-						contentColor = MaterialTheme.colorScheme.onErrorContainer
-					)
-				) {
-					Text("Delete")
-				}
-			},
-			dismissButton = {
-				TextButton(onClick = { close() },) {
-					Text("Cancel")
-				}
+			) {
+				Text("Delete")
 			}
-		)
-	}
+		},
+		dismissButton = {
+			TextButton(onClick = { close() },) {
+				Text("Cancel")
+			}
+		}
+	)
 }

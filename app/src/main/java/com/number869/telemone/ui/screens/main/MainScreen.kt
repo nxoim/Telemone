@@ -28,19 +28,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.Screens
+import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
 import com.tencent.mmkv.MMKV
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-	navController: NavHostController,
-	vm: MainViewModel
-) {
+fun MainScreen() {
+	val vm = viewModel<MainViewModel>()
+	val navController = navController<Destinations>()
 	val context = LocalContext.current
 	val storageForStockThemeComparison = MMKV.mmkvWithID("storageForStockThemeComparison")
 
@@ -261,7 +261,7 @@ If you decline - you can always change your mind and update by pressing the menu
 					DropdownMenuItem(
 						text = { Text("About") },
 						onClick = {
-							navController.navigate(Screens.AboutScreen.route)
+							navController.navigate(Destinations.AboutScreen.About)
 							showMenu = false
 						}
 					)
@@ -276,9 +276,9 @@ If you decline - you can always change your mind and update by pressing the menu
 			verticalArrangement = Arrangement.SpaceAround,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			DefaultThemesButtons(vm)
+			DefaultThemesButtons()
 
-			OutlinedButton(onClick = { navController.navigate("EditorScreen") }) {
+			OutlinedButton(onClick = { navController.navigate(Destinations.EditorScreen.Editor) }) {
 				Text(text = "Go to theme editor")
 			}
 		}

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -24,14 +23,15 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.number869.decomposite.core.common.navigation.navController
 import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.LargeTonalButton
-import com.number869.telemone.ui.Screens
+import com.number869.telemone.ui.Destinations
 
 @Composable
-fun WelcomeScreen(navController: NavHostController) {
+fun WelcomeScreen() {
+	val navController = navController<Destinations>()
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
@@ -97,9 +97,7 @@ fun WelcomeScreen(navController: NavHostController) {
 		LargeTonalButton(
 			onClick = {
 				preferences.edit().putBoolean(AppSettings.AgreedToPpAndTos.id, true).apply()
-				navController.navigate(Screens.MainScreen.route) {
-					popUpTo(0)
-				}
+				navController.replaceAll(Destinations.MainScreen)
 			},
 			label = "I Agree",
 			modifier = Modifier.weight(1f, false)

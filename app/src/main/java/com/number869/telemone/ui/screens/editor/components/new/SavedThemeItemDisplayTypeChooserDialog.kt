@@ -39,10 +39,7 @@ import com.number869.telemone.shared.ui.SelectionDialog
 import com.number869.telemone.shared.ui.SelectionDialogItem
 
 @Composable
-fun SavedThemeItemDisplayTypeChooserDialog(
-	showSavedThemeTypeDialog: Boolean,
-	hideDialog: () -> Unit
-) {
+fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
 	val screenHeight = LocalConfiguration.current.screenHeightDp.dp +
 			WindowInsets.statusBars.asPaddingValues().calculateTopPadding() +
 			WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -60,107 +57,105 @@ fun SavedThemeItemDisplayTypeChooserDialog(
 		"1"
 	)
 
-	if (showSavedThemeTypeDialog) {
-		var displayTheDialog by remember { mutableStateOf(false) }
-		val animatedDialogHeight by animateDpAsState(
-			if (displayTheDialog) 308.dp else 0.dp,
-			animationSpec = if (displayTheDialog)
-				tween(400, easing = EaseOutQuart)
-			else
-				tween(150, easing = EaseOutQuart),
-			label = ""
+	var displayTheDialog by remember { mutableStateOf(false) }
+	val animatedDialogHeight by animateDpAsState(
+		if (displayTheDialog) 308.dp else 0.dp,
+		animationSpec = if (displayTheDialog)
+			tween(400, easing = EaseOutQuart)
+		else
+			tween(150, easing = EaseOutQuart),
+		label = ""
+	)
+
+	val animatedAlpha by animateFloatAsState(
+		if (displayTheDialog) 1f else 0f,
+		animationSpec = if (displayTheDialog)
+			tween(400, easing = EaseOutQuart)
+		else
+			tween(150, easing = EaseOutQuart),
+		label = ""
+	)
+
+	LaunchedEffect(Unit) {
+		displayTheDialog = true
+	}
+	// why does this not work
+	BackHandler(displayTheDialog) { displayTheDialog = false }
+
+	Popup(
+		onDismissRequest = { displayTheDialog = false },
+		properties = PopupProperties(
+			focusable = displayTheDialog,
+			dismissOnBackPress = true
 		)
-
-		val animatedAlpha by animateFloatAsState(
-			if (displayTheDialog) 1f else 0f,
-			animationSpec = if (displayTheDialog)
-				tween(400, easing = EaseOutQuart)
-			else
-				tween(150, easing = EaseOutQuart),
-			label = ""
-		)
-
-		LaunchedEffect(Unit) {
-			displayTheDialog = true
-		}
-		// why does this not work
-		BackHandler(displayTheDialog) { displayTheDialog = false }
-
-		Popup(
-			onDismissRequest = { displayTheDialog = false },
-			properties = PopupProperties(
-				focusable = displayTheDialog,
-				dismissOnBackPress = true
-			)
-		) {
-			Box {
-				Box(
-					Modifier
-						.fillMaxSize()
+	) {
+		Box {
+			Box(
+				Modifier
+					.fillMaxSize()
 //						.graphicsLayer { alpha = animatedAlpha }
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-							enabled = displayTheDialog,
-							onClick = { displayTheDialog = false }
-						)
-				)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+						enabled = displayTheDialog,
+						onClick = { displayTheDialog = false }
+					)
+			)
 
-				AnimatedVisibility(
-					visible = displayTheDialog,
-					enter = fadeIn(tween(50)),
-					exit = fadeOut(tween(70,20, EaseInOutExpo)),
-					modifier = Modifier
-						.align(Alignment.TopCenter)
-						.height(animatedDialogHeight)
-						.offset(y = (screenHeight / 2) - (154.dp + ((1f - animatedAlpha) * 32).dp))
+			AnimatedVisibility(
+				visible = displayTheDialog,
+				enter = fadeIn(tween(50)),
+				exit = fadeOut(tween(70,20, EaseInOutExpo)),
+				modifier = Modifier
+					.align(Alignment.TopCenter)
+					.height(animatedDialogHeight)
+					.offset(y = (screenHeight / 2) - (154.dp + ((1f - animatedAlpha) * 32).dp))
+			) {
+				DisposableEffect(Unit) {
+					onDispose {
+						hideDialog()
+					}
+				}
+
+				SelectionDialog(
+					title = "Choose display type",
+					contentAlpha = { animatedAlpha }
 				) {
-					DisposableEffect(Unit) {
-						onDispose {
-							hideDialog()
-						}
-					}
+					SelectionDialogItem(
+						text = "Saved color values",
+						selectThisItem = {
+							preferences.edit().putString(
+								AppSettings.SavedThemeItemDisplayType.id,
+								"1"
+							).apply()
+							displayTheDialog = false
+						},
+						selected = savedThemeItemDisplayType == "1"
+					)
 
-					SelectionDialog(
-						title = "Choose display type",
-						contentAlpha = { animatedAlpha }
-					) {
-						SelectionDialogItem(
-							text = "Saved color values",
-							selectThisItem = {
-								preferences.edit().putString(
-									AppSettings.SavedThemeItemDisplayType.id,
-									"1"
-								).apply()
-								displayTheDialog = false
-							},
-							selected = savedThemeItemDisplayType == "1"
-						)
+					SelectionDialogItem(
+						text = "Current color scheme (fallback to saved colors)",
+						selectThisItem = {
+							preferences.edit().putString(
+								AppSettings.SavedThemeItemDisplayType.id,
+								"2"
+							).apply()
+							displayTheDialog = false
+						},
+						selected = savedThemeItemDisplayType == "2"
+					)
 
-						SelectionDialogItem(
-							text = "Current color scheme (fallback to saved colors)",
-							selectThisItem = {
-								preferences.edit().putString(
-									AppSettings.SavedThemeItemDisplayType.id,
-									"2"
-								).apply()
-								displayTheDialog = false
-							},
-							selected = savedThemeItemDisplayType == "2"
-						)
-
-						SelectionDialogItem(
-							text = "Current color scheme",
-							selectThisItem = {
-								preferences.edit().putString(
-									AppSettings.SavedThemeItemDisplayType.id,
-									"3"
-								).apply()
-								displayTheDialog = false
-							},
-							selected = savedThemeItemDisplayType == "3"
-						)
-					}
+					SelectionDialogItem(
+						text = "Current color scheme",
+						selectThisItem = {
+							preferences.edit().putString(
+								AppSettings.SavedThemeItemDisplayType.id,
+								"3"
+							).apply()
+							displayTheDialog = false
+						},
+						selected = savedThemeItemDisplayType == "3"
+					)
 				}
 			}
 		}
