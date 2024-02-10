@@ -49,6 +49,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +73,7 @@ fun EditorTopAppBar(
 ) {
 	val navController = navController<Destinations>()
 
-	var searchbarVisible by remember { mutableStateOf(false) }
+	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
 	Box(
 		Modifier.fillMaxWidth(),
@@ -118,7 +119,7 @@ private fun TheAppBar(
 ) {
 	val vm = viewModel<MainViewModel>()
 	val navController = navController<Destinations>()
-	var showMenu by remember { mutableStateOf(false) }
+	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
 
 	// switch texts every 3 seconds
@@ -216,8 +217,8 @@ private fun TheSearchbar(
 	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>,
 	hideSearchbar: () -> Unit,
 ) {
-	var fullscreen by remember { mutableStateOf(false) }
-	var searchQuery by remember { mutableStateOf("") }
+	var fullscreen by rememberSaveable { mutableStateOf(false) }
+	var searchQuery by rememberSaveable { mutableStateOf("") }
 	val searchQueryIsEmpty by remember { derivedStateOf { searchQuery == "" } }
 	val searchedThings = mappedValuesAsList.filter {
 		it.first.contains(searchQuery, true)
