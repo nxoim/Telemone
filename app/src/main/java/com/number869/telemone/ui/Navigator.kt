@@ -33,6 +33,7 @@ import com.number869.telemone.ui.screens.editor.components.new.OverwriteChoiceDi
 import com.number869.telemone.ui.screens.editor.components.new.OverwriteDefaultsDialog
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
 import com.number869.telemone.ui.screens.main.MainScreen
+import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.number869.telemone.ui.screens.welcome.WelcomeScreen
 
@@ -188,6 +189,10 @@ fun Navigator() {
 				val navController = navController<Destinations>()
 
 				SavedThemeItemDisplayTypeChooserDialog { navController.navigateBack() }
+			}
+
+			is Destinations.GlobalDialogs.ThemeUpdateAvailable -> {
+				ThemeUpdateAvailableDialog(ofLight = it.ofLight)
 			}
 		}
 	}

@@ -60,4 +60,9 @@ sealed interface Destinations {
 			data object TosDialog : Dialogs
 		}
 	}
+
+	@Serializable
+	sealed interface GlobalDialogs : Destinations {
+		data class ThemeUpdateAvailable(val ofLight: Boolean) : GlobalDialogs
+	}
 }
