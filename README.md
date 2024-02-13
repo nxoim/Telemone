@@ -41,7 +41,7 @@ Contributions to Telemone are welcome! If you have any bug fixes, improvements, 
 2. Create a new branch for your feature/fix.
 3. Make the necessary changes and commit them.
 4. Push your branch to your forked repository.
-5. Open a pull request to the **dev** branch of the main repository.
+5. Create an issue describing and referencing your contribution
 
 ## Credits
 - [Telegram Monet project](https://github.com/c3r5b8/Telegram-Monet "Telegram Monet project"). Their themes are the base of the default themes in Telemone and because of them i have started this project.
