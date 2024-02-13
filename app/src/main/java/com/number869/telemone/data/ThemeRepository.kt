@@ -75,38 +75,15 @@ class ThemeRepository(context: Context) {
 		preferences.edit().putString(themeListKey, contents).apply()
 	}
 
-	fun getStockLightTheme(
+	fun getStockTheme(
 		palette: Map<String, Color>,
-		context: Context
+		context: Context,
+		light: Boolean
 	): Map<String, Pair<String, Int>> {
 		val themeMap = mutableMapOf<String, Pair<String, Int>>()
+		val fileName = if (light) "defaultLightFile.attheme" else "defaultDarkFile.attheme"
 
-		context.assets.open("defaultLightFile.attheme")
-			.bufferedReader().use { reader ->
-				reader.forEachLine { line ->
-					if (line.isNotEmpty()) {
-						val splitLine = line.replace(" ", "").split("=")
-						val key = splitLine[0]
-						val value = splitLine[1]
-
-						val colorValue = getColorValueFromColorToken(value, palette)
-
-						themeMap[key] = Pair(value, colorValue.toArgb())
-					}
-				}
-			}
-
-		return themeMap.toMap()
-	}
-
-	// also at least pretend to like these funny little silly haha comments
-	fun getStockDarkTheme(
-		palette: Map<String, Color>,
-		context: Context
-	): Map<String, Pair<String, Int>> {
-		val themeMap = mutableMapOf<String, Pair<String, Int>>()
-
-		context.assets.open("defaultDarkFile.attheme")
+		context.assets.open(fileName)
 			.bufferedReader().use { reader ->
 				reader.forEachLine { line ->
 					if (line.isNotEmpty()) {

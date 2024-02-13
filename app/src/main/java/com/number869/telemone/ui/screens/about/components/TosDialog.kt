@@ -18,11 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.number869.decomposite.core.common.navigation.navController
 import com.number869.telemone.R
+import com.number869.telemone.ui.Destinations
 
 @Composable
-fun TosDialog(navController: NavHostController) {
+fun TosDialog() {
+	val navController = navController<Destinations>()
+
 	Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		Card(
 			colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
@@ -37,7 +40,7 @@ fun TosDialog(navController: NavHostController) {
 				}
 
 				TextButton(
-					onClick = { navController.popBackStack() },
+					onClick = { navController.navigateBack() },
 					modifier = Modifier
 						.align(Alignment.End)
 						.padding(top = 20.dp, bottom = 20.dp, end = 24.dp)

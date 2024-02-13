@@ -47,23 +47,26 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 
 @Composable
-fun CurrentThemePreview(vm: MainViewModel) {
+fun CurrentThemePreview() {
 	Row(
 		Modifier
 			.padding(16.dp)
 			.fillMaxWidth(),
 		horizontalArrangement = Arrangement.SpaceEvenly
 	) {
-		PreviewHomeScreen(vm)
-		PreviewChat(vm)
+		PreviewHomeScreen()
+		PreviewChat()
 	}
 }
 
 @Composable
-private fun PreviewHomeScreen(vm: MainViewModel) {
+private fun PreviewHomeScreen() {
+	val vm = viewModel<MainViewModel>()
+
 	fun colorOf(colorValueOf: String): Color {
 		return try {
 			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
@@ -95,17 +98,19 @@ private fun PreviewHomeScreen(vm: MainViewModel) {
 
 			Spacer(modifier = Modifier.height(2.dp))
 
-			ChatItem(pinned = true, vm = vm)
-			ChatItem(unread = true, vm = vm)
-			ChatItem(secret = true, sent = true, vm = vm)
-			ChatItem(muted = true, unread = true, vm = vm)
-			ChatItem(verified = true, vm = vm)
+			ChatItem(pinned = true)
+			ChatItem(unread = true)
+			ChatItem(secret = true, sent = true)
+			ChatItem(muted = true, unread = true)
+			ChatItem(verified = true)
 		}
 	}
 }
 
 @Composable
-private fun PreviewChat(vm: MainViewModel) {
+private fun PreviewChat() {
+	val vm = viewModel<MainViewModel>()
+
 	fun colorOf(colorValueOf: String): Color {
 		return try {
 			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
@@ -348,9 +353,10 @@ fun ChatItem(
 	sent: Boolean = false,
 	secret: Boolean = false,
 	muted: Boolean = false,
-	verified: Boolean = false,
-	vm: MainViewModel
+	verified: Boolean = false
 ) {
+	val vm = viewModel<MainViewModel>()
+
 	fun colorOf(colorValueOf: String): Color {
 		return try {
 			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second

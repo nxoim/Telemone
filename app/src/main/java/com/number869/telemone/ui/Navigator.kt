@@ -1,40 +1,45 @@
 package com.number869.telemone.ui
 
 import android.content.Context
-import androidx.compose.animation.ExperimentalAnimationApi
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.dialog
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.number869.decomposite.common.cleanFadeAndSlide
+import com.number869.decomposite.common.scaleFadePredictiveBackAnimation
+import com.number869.decomposite.core.common.navigation.NavHost
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.decomposite.core.common.ultils.ContentType
+import com.number869.decomposite.core.common.ultils.animation.OverlayStackNavigationAnimation
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.ui.screens.about.AboutScreen
 import com.number869.telemone.ui.screens.about.components.PrivacyPolicyDialog
 import com.number869.telemone.ui.screens.about.components.TosDialog
 import com.number869.telemone.ui.screens.editor.EditorScreen
+import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
+import com.number869.telemone.ui.screens.editor.components.new.DeleteSelectedThemesDialog
+import com.number869.telemone.ui.screens.editor.components.new.DeleteThemeDialog
+import com.number869.telemone.ui.screens.editor.components.new.LoadWithOptionsDialog
+import com.number869.telemone.ui.screens.editor.components.new.OverwriteChoiceDialog
+import com.number869.telemone.ui.screens.editor.components.new.OverwriteDefaultsDialog
+import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
 import com.number869.telemone.ui.screens.main.MainScreen
+import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.number869.telemone.ui.screens.welcome.WelcomeScreen
-import com.number869.telemone.ui.theme.PaletteState
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Navigator(
-	navController: NavHostController,
-	vm: MainViewModel,
-	paletteState: PaletteState
-) {
+fun Navigator() {
+	val vm = viewModel<MainViewModel>()
 	val screenWidth = LocalConfiguration.current.screenWidthDp
 	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
 	val preferences = LocalContext.current.getSharedPreferences(
@@ -42,106 +47,153 @@ fun Navigator(
 		Context.MODE_PRIVATE
 	)
 	val skipWelcomeScreen = preferences.getBoolean(AppSettings.AgreedToPpAndTos.id, false)
-	val startDestination = if (skipWelcomeScreen) Screens.MainScreen.route else Screens.WelcomeScreen.route
+	val startDestination = if (skipWelcomeScreen) Destinations.MainScreen else Destinations.WelcomeScreen
 
-	AnimatedNavHost(navController, startDestination) {
-		composable(Screens.WelcomeScreen.route) {
-			WelcomeScreen(navController)
+	NavHost(
+		startingDestination = startDestination,
+		containedContentAnimation = {
+			scaleFadePredictiveBackAnimation(
+				fallbackAnimation = stackAnimation { _ ->
+					cleanFadeAndSlide(
+						tween(
+							600,
+							easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs
+						),
+						targetOffsetDp = (screenWidth * 0.2).toInt()
+					)
+				}
+			)
+		},
+		overlayingContentAnimation = {
+			// no animations for overlays because that is handled inside
+			// the overlays themselves
+			OverlayStackNavigationAnimation { null }
 		}
+	) {
+		when (it) {
+			Destinations.EditorScreen.ThemeValuesScreen -> ThemeValuesScreen()
+			Destinations.MainScreen -> MainScreen()
+			Destinations.WelcomeScreen -> WelcomeScreen()
+			Destinations.EditorScreen.Editor -> EditorScreen()
+			Destinations.AboutScreen.About -> AboutScreen()
 
-		composable(
-			Screens.MainScreen.route,
-			enterTransition = {
-				when (initialState.destination.route) {
-					Screens.EditorScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { -screenWidth }) + fadeIn(tween(300, 100))
-					else -> null
+			Destinations.AboutScreen.Dialogs.PrivacyPolicyDialog -> PrivacyPolicyDialog()
+			Destinations.AboutScreen.Dialogs.TosDialog -> TosDialog()
+			Destinations.EditorScreen.Dialogs.ClearThemeBeforeLoadingFromFile -> {
+				val navController = navController<Destinations>()
+				val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
+
+				// stuff for loading files.
+				// this one is used when pressing the "clear" button
+				val launcherThatClears = rememberLauncherForActivityResult(
+					contract = ActivityResultContracts.OpenDocument()
+				) { result ->
+					pickedFileUriState.value = result
+
+					result?.let { uri ->
+						vm.loadThemeFromFile(uri,true)
+						navController.navigateBack()
+					}
 				}
-			},
-			exitTransition = {
-				when (targetState.destination.route) {
-					Screens.EditorScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { -screenWidth }) + fadeOut(tween(300, 100))
-					else -> null
+				// this one is used when pressing the "leave as is" button
+				val launcherThatDoesnt = rememberLauncherForActivityResult(
+					contract = ActivityResultContracts.OpenDocument()
+				) { result ->
+					pickedFileUriState.value = result
+
+					result?.let { uri ->
+						vm.loadThemeFromFile(uri, false)
+						navController.navigateBack()
+					}
 				}
+
+				ClearBeforeLoadDialog(
+					close = { navController.navigateBack() },
+					clear = {
+						vm.saveCurrentTheme()
+						launcherThatClears.launch(arrayOf("*/*"))
+					},
+					leaveAsIs = {
+						vm.saveCurrentTheme()
+						launcherThatDoesnt.launch(arrayOf("*/*"))
+					}
+				)
 			}
-		) {
-			MainScreen(navController, vm)
-		}
+			is Destinations.EditorScreen.Dialogs.DeleteOneTheme -> {
+				val navController = navController<Destinations>()
 
-		composable(
-			Screens.AboutScreen.route,
-			enterTransition = {
-				when (initialState.destination.route) {
-					Screens.MainScreen.route -> slideInVertically(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetY = { -screenWidth }) + fadeIn(tween(300, 100))
-					else -> null
-				}
-			},
-			exitTransition = {
-				when (targetState.destination.route) {
-					Screens.MainScreen.route -> slideOutVertically(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetY = { -screenWidth }) + fadeOut(tween(300, 100))
-					else -> null
-				}
+				DeleteThemeDialog(
+					close = { navController.navigateBack() },
+					uuid = it.uuid
+				)
 			}
-		) {
-			AboutScreen(navController)
-		}
+			Destinations.EditorScreen.Dialogs.DeleteSelectedThemes -> {
+				val navController = navController<Destinations>()
 
-		composable(
-			Screens.EditorScreen.route,
-			enterTransition = {
-				when (initialState.destination.route) {
-					Screens.MainScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { screenWidth }) + fadeIn(tween(300, 100))
-					Screens.ThemeValuesScreen.route -> slideInHorizontally(initialOffsetX = { -screenWidth }) + fadeIn(tween(300, 100, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs))
-					else -> null
-				}
-			},
-			exitTransition = {
-				when (targetState.destination.route) {
-					Screens.ThemeValuesScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { -screenWidth }) + fadeOut(tween(300, 100))
-					Screens.MainScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { screenWidth }) + fadeOut(tween(300, 100))
-					else -> null
-				}
+				DeleteSelectedThemesDialog(
+					hideToolbar = { vm.hideThemeSelectionModeToolbar() },
+					hideDialog = { navController.navigateBack() },
+					selectedThemeCount = vm.selectedThemes.size,
+					context = LocalContext.current
+				)
 			}
-		) {
-			EditorScreen(navController, vm, paletteState)
-		}
+			is Destinations.EditorScreen.Dialogs.LoadThemeWithOptions -> {
+				val navController = navController<Destinations>()
 
-		composable(
-			Screens.ThemeValuesScreen.route,
-			enterTransition = {
-				when (initialState.destination.route) {
-					Screens.EditorScreen.route -> slideInHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), initialOffsetX = { screenWidth }) + fadeIn(tween(300, 100))
-					else -> null
-				}
-			},
-			exitTransition = {
-				when (targetState.destination.route) {
-					Screens.EditorScreen.route -> slideOutHorizontally(tween(600, easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs), targetOffsetX = { screenWidth }) + fadeOut(tween(300, 100))
-					else -> null
-				}
+				LoadWithOptionsDialog(
+					close = { navController.navigateBack() },
+					uuid = it.uuid
+				)
 			}
-		) {
-			ThemeValuesScreen(vm)
-		}
+			is Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation -> {
+				val navController = navController<Destinations>()
 
-		dialog(Dialogs.PrivacyPolicyDialog.route) {
-			PrivacyPolicyDialog(navController)
-		}
+				OverwriteDefaultsDialog(
+					close = { navController.navigateBack() },
+					overwrite = {
+						vm.overwriteTheme(it.withThemeUuid, isLightTheme = !it.overwriteDark)
+						navController.navigateBack()
+					},
+					overwriteDark = it.overwriteDark,
+					overwriteWith = it.withThemeUuid
+				)
+			}
+			is Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice -> {
+				val navController = navController<Destinations>()
 
-		dialog(Dialogs.TosDialog.route) {
-			TosDialog(navController)
+				OverwriteChoiceDialog(
+					close = { navController.navigateBack() },
+					chooseLight = {
+						navController.navigateBack() // close this
+						navController.navigate(
+							Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
+								overwriteDark = false,
+								withThemeUuid = it.withThemeUuid
+							),
+							ContentType.Overlay
+						)
+					},
+					chooseDark = {
+						navController.navigateBack()
+						navController.navigate(
+							Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
+								overwriteDark = true,
+								withThemeUuid = it.withThemeUuid
+							),
+							ContentType.Overlay
+						)
+					}
+				)
+			}
+			Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection -> {
+				val navController = navController<Destinations>()
+
+				SavedThemeItemDisplayTypeChooserDialog { navController.navigateBack() }
+			}
+
+			is Destinations.GlobalDialogs.ThemeUpdateAvailable -> {
+				ThemeUpdateAvailableDialog(ofLight = it.ofLight)
+			}
 		}
 	}
-}
-
-enum class Screens(val route: String) {
-	WelcomeScreen("WelcomeScreen"),
-	MainScreen("MainScreen"),
-	EditorScreen("EditorScreen"),
-	ThemeValuesScreen("ThemeValuesScreen"),
-	AboutScreen("AboutScreen")
-}
-
-enum class Dialogs(val route: String) {
-	PrivacyPolicyDialog("PrivacyPolicyDialog"),
-	TosDialog("TosDialog")
 }

@@ -19,7 +19,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.ui.theme.PrimaryTones
+import com.number869.telemone.ui.theme.primaryTones
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -35,7 +35,7 @@ fun LargeTonalButton(onClick: () -> Unit, label: String, modifier: Modifier = Mo
 			.fillMaxWidth()
 			.height(64.dp)
 			.clip(RoundedCornerShape(12.dp))
-			.background(PrimaryTones.T90.dataAboutColors.colorValue())
+			.background(primaryTones.find { it.tone == 90 }!!.colorValue)
 	) {
 		Text(
 			label,

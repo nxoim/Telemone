@@ -1,14 +1,9 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -54,52 +49,31 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.decomposite.core.common.ultils.ContentType
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.LoadedTheme
-import com.number869.telemone.ui.Screens
+import com.number869.telemone.ui.Destinations
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditorTopAppBar(
 	topAppBarState: TopAppBarScrollBehavior,
-	navController: NavController,
-	vm: MainViewModel,
-	mappedValues: () -> LoadedTheme,
-	mappedValuesAsList: () -> List<Pair<String, Pair<String, Color>>>
+	mappedValues: LoadedTheme,
+	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>
 ) {
-	var showingClearBeforeLoadDialog by remember { mutableStateOf(false) }
-	val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
+	val navController = navController<Destinations>()
 
-	var searchbarVisible by remember { mutableStateOf(false) }
-
-	// stuff for loading files.
-	// this one is used when pressing the "clear" button
-	val launcherThatClears = rememberLauncherForActivityResult(
-		contract = ActivityResultContracts.OpenDocument()
-	) { result ->
-		pickedFileUriState.value = result
-
-		result?.let { uri ->
-			vm.loadThemeFromFile(uri,true)
-		}
-	}
-	// this one is used when pressing the "leave as is" button
-	val launcherThatDoesnt = rememberLauncherForActivityResult(
-		contract = ActivityResultContracts.OpenDocument()
-	) { result ->
-		pickedFileUriState.value = result
-
-		result?.let { uri ->
-			vm.loadThemeFromFile(uri, false)
-		}
-	}
+	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
 	Box(
 		Modifier.fillMaxWidth(),
@@ -111,10 +85,13 @@ fun EditorTopAppBar(
 			exit = fadeOut() + slideOutVertically()
 		) {
 			TheAppBar(
-				navController,
 				showSearchbar = { searchbarVisible = true },
-				showClearBeforeLoadDialog = { showingClearBeforeLoadDialog = true },
-				vm,
+				showClearBeforeLoadDialog = {
+					navController.navigate(
+						Destinations.EditorScreen.Dialogs.ClearThemeBeforeLoadingFromFile,
+						ContentType.Overlay
+					)
+				},
 				topAppBarState
 			)
 		}
@@ -128,44 +105,21 @@ fun EditorTopAppBar(
 				mappedValues = mappedValues ,
 				mappedValuesAsList = mappedValuesAsList,
 				hideSearchbar = { searchbarVisible = false },
-				vm
 			)
 		}
-	}
-
-	// Dialog that asks if the user wants to clear current theme
-	// before loading one from file
-	AnimatedVisibility(
-		visible = showingClearBeforeLoadDialog,
-		enter = expandVertically(),
-		exit = shrinkVertically()
-	) {
-		ClearBeforeLoadDialog(
-			{ showingClearBeforeLoadDialog = false },
-			{
-				showingClearBeforeLoadDialog = false
-				vm.saveCurrentTheme()
-				launcherThatClears.launch(arrayOf("*/*"))
-			},
-			{
-				showingClearBeforeLoadDialog = false
-				vm.saveCurrentTheme()
-				launcherThatDoesnt.launch(arrayOf("*/*"))
-			}
-		)
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TheAppBar(
-	navController: NavController,
 	showSearchbar: () -> Unit,
 	showClearBeforeLoadDialog: () -> Unit,
-	vm: MainViewModel,
 	topAppBarState: TopAppBarScrollBehavior
 ) {
-	var showMenu by remember { mutableStateOf(false) }
+	val vm = viewModel<MainViewModel>()
+	val navController = navController<Destinations>()
+	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
 
 	// switch texts every 3 seconds
@@ -176,7 +130,7 @@ private fun TheAppBar(
 
 	TopAppBar(
 		navigationIcon = {
-			IconButton(onClick = { navController.popBackStack() }) {
+			IconButton(onClick = { navController.navigateBack() }) {
 				Icon(Icons.Default.ArrowBack, contentDescription = "Back")
 			}
 		},
@@ -218,30 +172,30 @@ private fun TheAppBar(
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock light theme") },
-						onClick = { vm.loadStockLightTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load stock light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock dark theme") },
-						onClick = { vm.loadStockDarkTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load stock dark theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Show values") },
 						onClick = {
-							navController.navigate(Screens.ThemeValuesScreen.route)
+							navController.navigate(Destinations.EditorScreen.ThemeValuesScreen)
 							showMenu = false
 						},
 						leadingIcon = { Icon(Icons.Default.ShortText, contentDescription = "Show values") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default light theme") },
-						onClick = { vm.loadDefaultLightTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load default light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default dark theme") },
-						onClick = { vm.loadDefaultDarkTheme() },
+						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load default dark theme") }
 					)
 					DropdownMenuItem(
@@ -259,22 +213,17 @@ private fun TheAppBar(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TheSearchbar(
-	mappedValues: () -> LoadedTheme,
-	mappedValuesAsList: () -> List<Pair<String, Pair<String, Color>>>,
+	mappedValues: LoadedTheme,
+	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>,
 	hideSearchbar: () -> Unit,
-	vm: MainViewModel
 ) {
-	var fullscreen by remember { mutableStateOf(false) }
-	var searchQuery by remember { mutableStateOf("") }
+	var fullscreen by rememberSaveable { mutableStateOf(false) }
+	var searchQuery by rememberSaveable { mutableStateOf("") }
 	val searchQueryIsEmpty by remember { derivedStateOf { searchQuery == "" } }
-	val searchedThings by remember {
-		derivedStateOf {
-			mappedValuesAsList().filter {
-				it.first.contains(searchQuery, true)
-						||
-						it.second.first.contains(searchQuery, true)
-			}
-		}
+	val searchedThings = mappedValuesAsList.filter {
+		it.first.contains(searchQuery, true)
+				||
+				it.second.first.contains(searchQuery, true)
 	}
 
 	SearchBar(
@@ -359,10 +308,9 @@ private fun TheSearchbar(
 								.padding(horizontal = 16.dp)
 								.animateItemPlacement(),
 							uiElementData = uiElementData,
-							vm = vm,
 							index = index,
-							themeMap = mappedValues(),
-							lastIndexInList = mappedValuesAsList().lastIndex
+							themeMap = mappedValues,
+							lastIndexInList = mappedValuesAsList.lastIndex
 						)
 					}
 				}

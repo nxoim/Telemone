@@ -12,15 +12,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.number869.telemone.ui.Dialogs
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.decomposite.core.common.ultils.ContentType
+import com.number869.telemone.ui.Destinations
 
 @Composable
-fun LegalItem(navController: NavController) {
+fun LegalItem() {
+	val navController = navController<Destinations>()
+
 	AboutCard(label = "Legal") {
 		Column(
 			Modifier
-				.clickable { navController.navigate(Dialogs.PrivacyPolicyDialog.route) }
+				.clickable {
+					navController.navigate(
+						Destinations.AboutScreen.Dialogs.PrivacyPolicyDialog,
+						ContentType.Overlay
+					)
+				}
 				.fillMaxWidth()
 		) {
 			Text(
@@ -37,7 +45,12 @@ fun LegalItem(navController: NavController) {
 
 		Column(
 			Modifier
-				.clickable { navController.navigate(Dialogs.TosDialog.route) }
+				.clickable {
+					navController.navigate(
+						Destinations.AboutScreen.Dialogs.TosDialog,
+						ContentType.Overlay
+					)
+				}
 				.fillMaxWidth()
 		) {
 			Text(

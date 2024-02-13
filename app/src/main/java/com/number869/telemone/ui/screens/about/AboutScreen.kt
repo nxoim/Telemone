@@ -22,7 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.number869.decomposite.core.common.navigation.navController
+import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.screens.about.components.DescriptionItem
 import com.number869.telemone.ui.screens.about.components.DevelopersItem
 import com.number869.telemone.ui.screens.about.components.LegalItem
@@ -32,7 +33,8 @@ import com.number869.telemone.ui.screens.about.components.VersionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(navController: NavHostController) {
+fun AboutScreen() {
+    val navController = navController<Destinations>()
     val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 
     val listOfItems = listOf<@Composable () -> Unit>(
@@ -41,7 +43,7 @@ fun AboutScreen(navController: NavHostController) {
         { DevelopersItem() },
         { SourceAndLinksItem() },
         { SpecialMentionsItem() },
-        { LegalItem(navController) }
+        { LegalItem() }
     )
 
     Scaffold(
@@ -49,7 +51,7 @@ fun AboutScreen(navController: NavHostController) {
             CenterAlignedTopAppBar(
                 title = { Text(text = "About Telemone") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navController.navigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back",

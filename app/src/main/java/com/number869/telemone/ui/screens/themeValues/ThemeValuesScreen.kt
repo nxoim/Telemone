@@ -24,10 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
+import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 
 @Composable
-fun ThemeValuesScreen(vm: MainViewModel) {
+fun ThemeValuesScreen() {
+	val vm = viewModel<MainViewModel>()
+
 	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
 	val text = mutableListOf<String>()
 	var showValues by remember { mutableStateOf(false) }
