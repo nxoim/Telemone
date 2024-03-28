@@ -2,31 +2,18 @@ package com.number869.telemone.ui.screens.about.components
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +33,7 @@ fun DevelopersItem() {
 					.clickable {
 						val intent = Intent(
 							Intent.ACTION_VIEW,
-							Uri.parse("https://github.com/Number869")
+							Uri.parse("https://github.com/nxoim")
 						)
 						context.startActivity(intent)
 					},
@@ -61,7 +48,7 @@ fun DevelopersItem() {
 				Spacer(modifier = Modifier.width(8.dp))
 
 				Text(
-					text = "Number869",
+					text = "nxoim",
 					style = MaterialTheme.typography.bodyLarge
 				)
 			}

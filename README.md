@@ -2,9 +2,9 @@
 
 Telemone is a theme builder made to bring dynamic themes to Telegram (for Android).
 
-### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/Number869/TeleMone/releases "Github Releases")
+### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/nxoim/Telemone/releases "Github Releases")
 
-![SCREENSHOTS](https://github.com/Number869/Telemone/assets/52751853/17412115-639f-4ae3-b1fd-3cca0fb97201)
+![SCREENSHOTS](https://github.com/nxoim/Telemone/assets/52751853/17412115-639f-4ae3-b1fd-3cca0fb97201)
 
 ## Features
 - **Default Themes.**
@@ -49,4 +49,4 @@ Contributions to Telemone are welcome! If you have any bug fixes, improvements, 
 
 ## Feedback and Support
 
-If you have any feedback or require support - feel free to join us on [Telegram](https://t.me/Number869Community "Telegram"). You are also welcome to open issues and use discussions in this repository.
+If you have any feedback or require support - feel free to join us on [Telegram](https://t.me/nxoimCommunity "Telegram"). You are also welcome to open issues and use discussions in this repository.
