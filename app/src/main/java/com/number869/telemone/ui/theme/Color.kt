@@ -79,7 +79,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.materialkolor.hct.Hct
-import com.materialkolor.ktx.fromColor
+import com.materialkolor.ktx.from
 import com.materialkolor.ktx.harmonize
 import com.materialkolor.ktx.toHct
 import com.materialkolor.palettes.TonalPalette
@@ -786,7 +786,7 @@ fun Color.matchSaturation(toThatOf: Color, saturationMultiplier: Double = 0.9): 
 
 val possibleTones = listOf(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100)
 
-fun Color.getTone(tone: Int) = Color(TonalPalette.fromColor(this).tone(tone))
+fun Color.getTone(tone: Int) = Color(TonalPalette.from(this).tone(tone))
 
 fun Color.blendWith(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float): Color {
 	val inv = 1f - ratio
