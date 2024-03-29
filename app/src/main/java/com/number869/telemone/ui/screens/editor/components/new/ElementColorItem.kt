@@ -39,6 +39,7 @@ fun ElementColorItem(
 	uiElementData: Pair<String, Pair<String, Color>>,
 	index: Int,
 	themeMap: LoadedTheme,
+	changeValue: (String, String, Color) -> Unit,
 	lastIndexInList: Int
 ) {
 	val backgroundColor by animateColorAsState(
@@ -119,7 +120,8 @@ fun ElementColorItem(
 						uiElementData.first,
 						backgroundColor,
 						uiElementData.second.first,
-						startPopupAnimation
+						startPopupAnimation,
+						changeValue = changeValue,
 					) { startPopupAnimation = false }
 				}
 			}

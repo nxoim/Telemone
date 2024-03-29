@@ -47,34 +47,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 
 @Composable
-fun CurrentThemePreview() {
+fun CurrentThemePreview(colorOf: (String) -> Color) {
 	Row(
 		Modifier
 			.padding(16.dp)
 			.fillMaxWidth(),
 		horizontalArrangement = Arrangement.SpaceEvenly
 	) {
-		PreviewHomeScreen()
-		PreviewChat()
+		PreviewHomeScreen(colorOf)
+		PreviewChat(colorOf)
 	}
 }
 
 @Composable
-private fun PreviewHomeScreen() {
-	val vm = viewModel<MainViewModel>()
-
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
+private fun PreviewHomeScreen(colorOf: (String) -> Color) {
 	OutlinedCard(
 		Modifier
 			.width(150.dp)
@@ -98,27 +86,17 @@ private fun PreviewHomeScreen() {
 
 			Spacer(modifier = Modifier.height(2.dp))
 
-			ChatItem(pinned = true)
-			ChatItem(unread = true)
-			ChatItem(secret = true, sent = true)
-			ChatItem(muted = true, unread = true)
-			ChatItem(verified = true)
+			ChatItem(pinned = true, colorOf = colorOf)
+			ChatItem(unread = true, colorOf = colorOf)
+			ChatItem(secret = true, sent = true, colorOf = colorOf)
+			ChatItem(muted = true, unread = true, colorOf = colorOf)
+			ChatItem(verified = true, colorOf = colorOf)
 		}
 	}
 }
 
 @Composable
-private fun PreviewChat() {
-	val vm = viewModel<MainViewModel>()
-
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
+private fun PreviewChat(colorOf: (String) -> Color) {
 	OutlinedCard(
 		Modifier
 			.width(150.dp)
@@ -353,18 +331,9 @@ fun ChatItem(
 	sent: Boolean = false,
 	secret: Boolean = false,
 	muted: Boolean = false,
-	verified: Boolean = false
+	verified: Boolean = false,
+	colorOf: (String) -> Color
 ) {
-	val vm = viewModel<MainViewModel>()
-
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
 	val avatarBackgroundNumber by remember {
 		derivedStateOf {
 			(1..7).random()

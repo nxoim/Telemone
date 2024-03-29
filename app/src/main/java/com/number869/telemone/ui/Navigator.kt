@@ -124,7 +124,8 @@ fun Navigator() {
 
 				DeleteThemeDialog(
 					close = { navController.navigateBack() },
-					uuid = it.uuid
+					uuid = it.uuid,
+					deleteTheme = { vm.deleteTheme(it.uuid) }
 				)
 			}
 			Destinations.EditorScreen.Dialogs.DeleteSelectedThemes -> {
@@ -133,6 +134,8 @@ fun Navigator() {
 				DeleteSelectedThemesDialog(
 					hideToolbar = { vm.hideThemeSelectionModeToolbar() },
 					hideDialog = { navController.navigateBack() },
+					deleteSelectedThemes = vm::deleteSelectedThemes,
+					unselectAllThemes = vm::unselectAllThemes,
 					selectedThemeCount = vm.selectedThemes.size,
 					context = LocalContext.current
 				)
@@ -142,6 +145,7 @@ fun Navigator() {
 
 				LoadWithOptionsDialog(
 					close = { navController.navigateBack() },
+					loadSavedTheme = vm::loadSavedTheme,
 					uuid = it.uuid
 				)
 			}
@@ -192,7 +196,12 @@ fun Navigator() {
 			}
 
 			is Destinations.GlobalDialogs.ThemeUpdateAvailable -> {
-				ThemeUpdateAvailableDialog(ofLight = it.ofLight)
+				ThemeUpdateAvailableDialog(
+					ofLight = it.ofLight,
+					decline = { vm.declineDefaultThemeUpdate(it.ofLight) }
+				) {
+					vm.acceptTheStockThemeUpdate(it.ofLight)
+				}
 			}
 		}
 	}

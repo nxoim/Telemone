@@ -57,8 +57,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.decomposite.core.common.navigation.navController
 import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.LoadedTheme
 import com.number869.telemone.ui.Destinations
@@ -69,6 +67,11 @@ import kotlinx.coroutines.delay
 fun EditorTopAppBar(
 	topAppBarState: TopAppBarScrollBehavior,
 	mappedValues: LoadedTheme,
+	exportCustomTheme: () -> Unit,
+	saveCurrentTheme: () -> Unit,
+	resetCurrentTheme: () -> Unit,
+	loadSavedTheme: (ThemeStorageType) -> Unit,
+	changeValue: (String, String, Color) -> Unit,
 	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>
 ) {
 	val navController = navController<Destinations>()
@@ -92,6 +95,10 @@ fun EditorTopAppBar(
 						ContentType.Overlay
 					)
 				},
+				exportCustomTheme,
+				saveCurrentTheme,
+				resetCurrentTheme,
+				loadSavedTheme,
 				topAppBarState
 			)
 		}
@@ -104,6 +111,7 @@ fun EditorTopAppBar(
 			TheSearchbar(
 				mappedValues = mappedValues ,
 				mappedValuesAsList = mappedValuesAsList,
+				changeValue = changeValue,
 				hideSearchbar = { searchbarVisible = false },
 			)
 		}
@@ -115,9 +123,12 @@ fun EditorTopAppBar(
 private fun TheAppBar(
 	showSearchbar: () -> Unit,
 	showClearBeforeLoadDialog: () -> Unit,
+	exportCustomTheme: () -> Unit,
+	saveCurrentTheme: () -> Unit,
+	resetCurrentTheme: () -> Unit,
+	loadSavedTheme: (ThemeStorageType) -> Unit,
 	topAppBarState: TopAppBarScrollBehavior
 ) {
-	val vm = viewModel<MainViewModel>()
 	val navController = navController<Destinations>()
 	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
@@ -153,10 +164,10 @@ private fun TheAppBar(
 			}
 		},
 		actions = {
-			IconButton(onClick = { vm.exportCustomTheme() }) {
+			IconButton(onClick = { exportCustomTheme() }) {
 				Icon(Icons.Default.Upload, contentDescription = "Export current theme")
 			}
-			IconButton(onClick = { vm.saveCurrentTheme() }) {
+			IconButton(onClick = { saveCurrentTheme() }) {
 				Icon(Icons.Default.Save, contentDescription = "Save current theme")
 			}
 			Box {
@@ -167,17 +178,17 @@ private fun TheAppBar(
 				DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
 					DropdownMenuItem(
 						text = { Text(text = "Reset current theme") },
-						onClick = { vm.resetCurrentTheme() },
+						onClick = { resetCurrentTheme() },
 						leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reset current theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock light theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load stock light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock dark theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load stock dark theme") }
 					)
 					DropdownMenuItem(
@@ -190,12 +201,12 @@ private fun TheAppBar(
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default light theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load default light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default dark theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load default dark theme") }
 					)
 					DropdownMenuItem(
@@ -215,6 +226,7 @@ private fun TheAppBar(
 private fun TheSearchbar(
 	mappedValues: LoadedTheme,
 	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>,
+	changeValue: (String, String, Color) -> Unit,
 	hideSearchbar: () -> Unit,
 ) {
 	var fullscreen by rememberSaveable { mutableStateOf(false) }
@@ -310,6 +322,7 @@ private fun TheSearchbar(
 							uiElementData = uiElementData,
 							index = index,
 							themeMap = mappedValues,
+							changeValue = changeValue,
 							lastIndexInList = mappedValuesAsList.lastIndex
 						)
 					}

@@ -107,6 +107,11 @@ fun EditorScreen() {
 			EditorTopAppBar(
 				topAppBarState,
 				mappedValues,
+				exportCustomTheme = vm::exportCustomTheme,
+				saveCurrentTheme = vm::saveCurrentTheme,
+				resetCurrentTheme = vm::resetCurrentTheme,
+				loadSavedTheme = vm::loadSavedTheme,
+				changeValue = vm::changeValue,
 				mappedValuesAsList
 			)
 		},
@@ -124,7 +129,9 @@ fun EditorScreen() {
 					Spacer(modifier = Modifier.padding(top = scaffoldPadding.calculateTopPadding()))
 
 					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
-					CurrentThemePreview()
+					CurrentThemePreview() { targetUiElement ->
+						vm.colorFromCurrentTheme(targetUiElement)
+					}
 
 					Spacer(modifier = Modifier.height(8.dp))
 
@@ -208,6 +215,10 @@ fun EditorScreen() {
 								) {
 									ThemeSelectionToolbar(
 										Modifier.padding(top = 16.dp),
+										selectedThemeCount = vm.selectedThemes.count(),
+										allThemesAreSelected = vm.selectedThemes.count() == vm.themeList.count(),
+										unselectAllThemes = vm::unselectAllThemes,
+										selectAllThemes = vm::selectAllThemes,
 										hideToolbarAction = { vm.hideThemeSelectionModeToolbar() }
 									)
 								}
@@ -243,6 +254,7 @@ fun EditorScreen() {
 							uiElementData = uiElementData,
 							index = index,
 							themeMap = mappedValues,
+							changeValue = vm::changeValue,
 							lastIndexInList = newUiElementsColors.lastIndex
 						)
 					}
@@ -272,6 +284,7 @@ fun EditorScreen() {
 							uiElementData = uiElementData,
 							index = index,
 							themeMap = mappedValues,
+							changeValue = vm::changeValue,
 							lastIndexInList = mappedValuesAsList.lastIndex
 						)
 					}
@@ -294,6 +307,7 @@ fun EditorScreen() {
 						uiElementData = uiElementData,
 						index = index,
 						themeMap = mappedValues,
+						changeValue = vm::changeValue,
 						lastIndexInList = mappedValuesAsList.lastIndex
 					)
 				}

@@ -107,7 +107,7 @@ fun MainScreen() {
 			verticalArrangement = Arrangement.SpaceAround,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			DefaultThemesButtons()
+			DefaultThemesButtons(vm::exportTheme)
 
 			OutlinedButton(onClick = { navController.navigate(Destinations.EditorScreen.Editor) }) {
 				Text(text = "Go to theme editor")

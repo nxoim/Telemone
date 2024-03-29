@@ -4,13 +4,14 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 import com.number869.telemone.ThemeStorageType
 
 @Composable
-fun LoadWithOptionsDialog(close: () -> Unit, uuid: String) {
-	val vm = viewModel<MainViewModel>()
+fun LoadWithOptionsDialog(
+	close: () -> Unit,
+	loadSavedTheme: (ThemeStorageType) -> Unit,
+	uuid: String
+) {
 
 	AlertDialog(
 		onDismissRequest = { close() },
@@ -19,7 +20,7 @@ fun LoadWithOptionsDialog(close: () -> Unit, uuid: String) {
 				onClick = {
 					close()
 
-					vm.loadSavedTheme(
+					loadSavedTheme(
 						ThemeStorageType.ByUuid(
 							uuid,
 							withTokens = false,
@@ -35,7 +36,7 @@ fun LoadWithOptionsDialog(close: () -> Unit, uuid: String) {
 				onClick = {
 					close()
 
-					vm.loadSavedTheme(
+					loadSavedTheme(
 						ThemeStorageType.ByUuid(
 							uuid,
 							withTokens = false,
@@ -55,7 +56,7 @@ fun LoadWithOptionsDialog(close: () -> Unit, uuid: String) {
 				onClick = {
 					close()
 
-					vm.loadSavedTheme(
+					loadSavedTheme(
 						ThemeStorageType.ByUuid(
 							uuid,
 							withTokens = true,
@@ -70,7 +71,7 @@ fun LoadWithOptionsDialog(close: () -> Unit, uuid: String) {
 				onClick = {
 					close()
 
-					vm.loadSavedTheme(
+					loadSavedTheme(
 						ThemeStorageType.ByUuid(
 							uuid,
 							withTokens = true,

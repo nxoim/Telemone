@@ -26,20 +26,16 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 import com.number869.telemone.shared.ui.TextWithFixedSize
 import com.number869.telemone.ui.theme.SolarSet
 
 @Composable
-fun DefaultThemesButtons() {
-	val vm = viewModel<MainViewModel>()
-
+fun DefaultThemesButtons(exportTheme: (light: Boolean) -> Unit) {
 	val buttons = remember {
 		movableContentOf<Pair<Modifier, Modifier>> {
-			LightThemeButton(it.first) { vm.exportTheme(light = true) }
+			LightThemeButton(it.first) { exportTheme(true) }
 
-			DarkThemeButton(it.second) { vm.exportTheme(light = false) }
+			DarkThemeButton(it.second) { exportTheme(false) }
 		}
 	}
 

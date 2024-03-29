@@ -104,7 +104,6 @@ fun SavedThemeItem(
 	)
 
 	// cry about it being here
-	// tho this whole file could be prettier, yes
 	@Composable
 	fun colorOf(colorValueOf: String): Color {
 		return animateColorAsState(

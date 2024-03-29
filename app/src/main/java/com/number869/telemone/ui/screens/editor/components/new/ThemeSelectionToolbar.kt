@@ -30,28 +30,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.number869.decomposite.core.common.navigation.navController
 import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.theme.blendWith
 
 @Composable
 fun ThemeSelectionToolbar(
 	modifier: Modifier = Modifier,
+	selectedThemeCount: Int,
+	allThemesAreSelected: Boolean,
+	unselectAllThemes: () -> Unit,
+	selectAllThemes: () -> Unit,
 	hideToolbarAction: () -> Unit
 ) {
 	val navController = navController<Destinations>()
-	val vm = viewModel<MainViewModel>()
-
-	val selectedThemeCount by remember {
-		derivedStateOf {
-			vm.selectedThemes.count()
-		}
-	}
 
 	val noThemesAreSelected by remember { derivedStateOf { selectedThemeCount == 0 } }
-	val allThemesAreSelected by remember { derivedStateOf { selectedThemeCount == vm.themeList.count() } }
-	val deleteButtonEnabled by remember { derivedStateOf { vm.selectedThemes.isNotEmpty() } }
+	val deleteButtonEnabled = selectedThemeCount > 1
 
 	Box(modifier, contentAlignment = Alignment.Center) {
 		Row(
@@ -72,7 +66,7 @@ fun ThemeSelectionToolbar(
 		) {
 			TextButton(
 				onClick = {
-					vm.unselectAllThemes()
+					unselectAllThemes()
 					hideToolbarAction()
 				}
 			) {
@@ -82,7 +76,7 @@ fun ThemeSelectionToolbar(
 			Spacer(modifier = Modifier.width(8.dp))
 
 			FilledTonalIconButton(
-				onClick = { vm.unselectAllThemes() },
+				onClick = { unselectAllThemes() },
 				enabled = !noThemesAreSelected
 			) {
 				Icon(Icons.Outlined.Deselect, contentDescription = "Deselect All Button")
@@ -91,7 +85,7 @@ fun ThemeSelectionToolbar(
 			Spacer(modifier = Modifier.height(8.dp))
 
 			FilledTonalIconButton(
-				onClick = { vm.selectAllThemes() },
+				onClick = { selectAllThemes() },
 				enabled = !allThemesAreSelected
 			) {
 				Icon(Icons.Outlined.SelectAll, contentDescription = "Select All Button")

@@ -12,18 +12,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 
 @Composable
 fun DeleteSelectedThemesDialog(
 	hideToolbar: () -> Unit,
 	hideDialog: () -> Unit,
+	deleteSelectedThemes: () -> Unit,
+	unselectAllThemes: () -> Unit,
 	selectedThemeCount: Int,
 	context: Context
 ) {
-	val vm = viewModel<MainViewModel>()
-
 	AlertDialog(
 		icon = { Icon(Icons.Default.DeleteForever, contentDescription = "Delete icon") },
 		title = { Text("Permanently delete these themes?") },
@@ -31,8 +29,8 @@ fun DeleteSelectedThemesDialog(
 		confirmButton = {
 			FilledTonalButton(
 				onClick = {
-					vm.deleteSelectedThemes()
-					vm.unselectAllThemes()
+					deleteSelectedThemes()
+					unselectAllThemes()
 					hideDialog()
 					hideToolbar()
 

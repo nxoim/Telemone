@@ -13,13 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 
 @Composable
-fun DeleteThemeDialog(close: () -> Unit, uuid: String, ) {
-	val vm = viewModel<MainViewModel>()
-
+fun DeleteThemeDialog(close: () -> Unit, deleteTheme: () -> Unit, uuid: String, ) {
 	AlertDialog(
 		onDismissRequest = { close() },
 		title = { Text("Delete this theme?") },
@@ -39,7 +35,7 @@ fun DeleteThemeDialog(close: () -> Unit, uuid: String, ) {
 			FilledTonalButton(
 				onClick = {
 					close()
-					vm.deleteTheme(uuid)
+					deleteTheme()
 				},
 				colors = ButtonDefaults.filledTonalButtonColors(
 					containerColor = MaterialTheme.colorScheme.errorContainer,
