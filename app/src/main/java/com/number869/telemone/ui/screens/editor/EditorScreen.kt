@@ -60,6 +60,7 @@ import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.defaultDarkThemeUUID
 import com.number869.telemone.defaultLightThemeUUID
+import com.number869.telemone.getColorValueFromColorToken
 import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
@@ -81,17 +82,29 @@ fun EditorScreen() {
 
 	val themeList by remember {
 		derivedStateOf {
-			vm.themeList.flatMap { map ->
-				map.keys.filterNot {
-					it == defaultLightThemeUUID || it == defaultDarkThemeUUID
+			vm.themeList
+				.filterNot {
+					it.uuid == defaultLightThemeUUID || it.uuid == defaultDarkThemeUUID
 				}
-			}.reversed()
+				.reversed()
 		}
 	}
 	val mappedValues = vm.mappedValues
-	val mappedValuesAsList by remember { derivedStateOf { mappedValues.toList().sortedBy { it.first } } }
-	val newUiElementsColors by remember { derivedStateOf { mappedValues.filter { !vm.defaultCurrentTheme.keys.contains(it.key) }.toList() } }
-	val incompatibleValues by remember { derivedStateOf { mappedValues.filter { it.value.first == "INCOMPATIBLE VALUE" }.toList() } }
+	val mappedValuesAsList by remember {
+		derivedStateOf { mappedValues.sortedBy { it.name } }
+	}
+	val newUiElementsColors by remember {
+		derivedStateOf {
+			mappedValues.filter {
+				it.name !in vm.defaultCurrentTheme.map { it.name }
+			}
+		}
+	}
+	val incompatibleValues by remember {
+		derivedStateOf {
+			mappedValues.filter { it.colorToken == "INCOMPATIBLE VALUE" }
+		}
+	}
 	val savedThemesRowState = rememberLazyListState()
 	val wholeThingListState = rememberLazyListState()
 
@@ -112,7 +125,6 @@ fun EditorScreen() {
 				resetCurrentTheme = vm::resetCurrentTheme,
 				loadSavedTheme = vm::loadSavedTheme,
 				changeValue = vm::changeValue,
-				mappedValuesAsList
 			)
 		},
 		bottomBar = { Box {} }, // edge to edge hello
@@ -139,7 +151,10 @@ fun EditorScreen() {
 						Modifier
 							.clip(CircleShape)
 							.clickable {
-								navController.navigate(Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection, ContentType.Overlay)
+								navController.navigate(
+									Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection,
+									ContentType.Overlay
+								)
 							},
 						verticalAlignment = Alignment.Bottom,
 						horizontalArrangement = spacedBy(8.dp)
@@ -193,12 +208,17 @@ fun EditorScreen() {
 								horizontalArrangement = spacedBy(16.dp),
 								modifier = Modifier.animateContentSize()
 							) {
-								itemsIndexed(themeList, key = { _, item -> item }) { index, uuid ->
+								itemsIndexed(themeList, key = { _, item -> item.uuid }) { index, theme ->
 									SavedThemeItem(
 										Modifier.animateItemPlacement(),
-										uuid,
+										theme,
+										selected = vm.selectedThemes.contains(theme.uuid),
 										true,
+										loadSavedTheme = { vm.loadSavedTheme(it) },
+										selectOrUnselectSavedTheme = { vm.selectOrUnselectSavedTheme(theme.uuid) },
+										exportTheme = { vm.exportTheme(theme.uuid, it) },
 										changeSelectionMode = { vm.toggleThemeSelectionModeToolbar() },
+										getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) },
 										themeSelectionModeIsActive = themeSelectionModeIsVisible
 									)
 								}
@@ -253,7 +273,6 @@ fun EditorScreen() {
 								.animateItemPlacement(),
 							uiElementData = uiElementData,
 							index = index,
-							themeMap = mappedValues,
 							changeValue = vm::changeValue,
 							lastIndexInList = newUiElementsColors.lastIndex
 						)
@@ -283,7 +302,6 @@ fun EditorScreen() {
 								.animateItemPlacement(),
 							uiElementData = uiElementData,
 							index = index,
-							themeMap = mappedValues,
 							changeValue = vm::changeValue,
 							lastIndexInList = mappedValuesAsList.lastIndex
 						)
@@ -299,14 +317,13 @@ fun EditorScreen() {
 					Spacer(modifier = Modifier.height(16.dp))
 				}
 
-				itemsIndexed(mappedValuesAsList) {index, uiElementData ->
+				itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementData ->
 					ElementColorItem(
 						Modifier
 							.padding(horizontal = 16.dp)
 							.animateItemPlacement(),
 						uiElementData = uiElementData,
 						index = index,
-						themeMap = mappedValues,
 						changeValue = vm::changeValue,
 						lastIndexInList = mappedValuesAsList.lastIndex
 					)

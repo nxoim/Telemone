@@ -1,6 +1,7 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseOutCirc
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -63,8 +64,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
+import com.number869.telemone.data.UiElementColorData
+import com.number869.telemone.data.color
 import com.number869.telemone.shared.ui.animateMovableContent
 import com.number869.telemone.ui.theme.AdditionalColors
 import com.number869.telemone.ui.theme.ColorRolesDark
@@ -89,9 +90,7 @@ import kotlinx.coroutines.delay
 // ⚠ if anyone knows how to make this pipipopo decently shorter - hmu
 @Composable
 fun PalettePopup(
-	currentUiElement: String,
-	currentColor: Color,
-	currentColorName: String,
+	uiElementColorData: UiElementColorData,
 	isPopupVisible: Boolean,
 	changeValue: (String, String, Color) -> Unit,
 	hidePopup: () -> Unit
@@ -157,7 +156,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Primary
 					)
@@ -192,7 +191,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Secondary
 					)
@@ -228,7 +227,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Tertiary
 					)
@@ -264,7 +263,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Neutral
 					)
@@ -300,7 +299,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.NeutralVariant
 					)
@@ -337,7 +336,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Blue
 					)
@@ -373,7 +372,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Red
 					)
@@ -409,7 +408,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Green
 					)
@@ -445,7 +444,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Orange
 					)
@@ -481,7 +480,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Violet
 					)
@@ -517,7 +516,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Pink
 					)
@@ -553,7 +552,7 @@ fun PalettePopup(
 							.zIndex(if (inPreview) 1f else 0f)
 							.animateTonalItem(this),
 						toneInfo = it,
-						key = currentUiElement,
+						key = uiElementColorData.name,
 						changeValue = changeValue,
 						currentPopupContentType == PaletteMenuCategories.Pink
 					)
@@ -585,7 +584,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.PrimaryLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -593,7 +592,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SecondaryLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -601,7 +600,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.TertiaryLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -609,7 +608,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.ErrorLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -622,7 +621,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnPrimaryLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -630,7 +629,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnSecondaryLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -638,7 +637,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnTertiaryLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -646,7 +645,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnErrorLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -659,7 +658,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.PrimaryContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -667,7 +666,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SecondaryContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -675,7 +674,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.TertiaryContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -683,7 +682,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.ErrorContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -696,7 +695,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnPrimaryContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -704,7 +703,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnSecondaryContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -712,7 +711,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnTertiaryContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -720,7 +719,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnErrorContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -733,7 +732,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceDimLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -741,7 +740,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -749,7 +748,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceBrightLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -762,7 +761,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceContainerLowestLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -770,7 +769,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceContainerLowLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -778,7 +777,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceContainerLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -786,7 +785,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceContainerHighLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -794,7 +793,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.SurfaceContainerHighestLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -807,7 +806,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnSurfaceLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -815,7 +814,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OnSurfaceVariantLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -823,7 +822,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OutlineLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -831,7 +830,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesLight.OutlineVariantLight.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -844,7 +843,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.PrimaryDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -852,7 +851,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SecondaryDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -860,7 +859,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.TertiaryDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -868,7 +867,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.ErrorDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -881,7 +880,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnPrimaryDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -889,7 +888,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnSecondaryDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -897,7 +896,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnTertiaryDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -905,7 +904,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnErrorDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -918,7 +917,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.PrimaryContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -926,7 +925,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SecondaryContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -934,7 +933,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.TertiaryContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -942,7 +941,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.ErrorContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -955,7 +954,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnPrimaryContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -963,7 +962,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnSecondaryContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -971,7 +970,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnTertiaryContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -979,7 +978,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnErrorContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -992,7 +991,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceDimDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1000,7 +999,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1008,7 +1007,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceBrightDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -1021,7 +1020,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceContainerLowestDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1029,7 +1028,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceContainerLowDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1037,7 +1036,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceContainerDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1045,7 +1044,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceContainerHighDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1053,7 +1052,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.SurfaceContainerHighestDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -1066,7 +1065,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnSurfaceDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1074,7 +1073,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OnSurfaceVariantDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1082,7 +1081,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OutlineDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				},
@@ -1090,7 +1089,7 @@ fun PalettePopup(
 					ColorRoleItem(
 						Modifier.animateTonalItem(this),
 						ColorRolesDark.OutlineVariantDark.dataAboutColors,
-						currentUiElement,
+						uiElementColorData.name,
 						changeValue,
 					) { currentPopupContentType == PaletteMenuCategories.ColorRoles }
 				}
@@ -1140,7 +1139,7 @@ fun PalettePopup(
 			movableContentOf {
 				AdditionalColorsAnimatedCategoryContainer(
 					Modifier.animateCategoryButton(this),
-					currentUiElement,
+					uiElementColorData.name,
 					expand = { if (isOnHomePage) currentPopupContentType = PaletteMenuCategories.AdditionalColors },
 					isOnHomePage = { isOnHomePage },
 					expanded = { currentPopupContentType == PaletteMenuCategories.AdditionalColors },
@@ -1176,9 +1175,9 @@ fun PalettePopup(
 				PalettePopupAppBar(
 					isOnHomePage,
 					isPopupVisible,
-					currentUiElement,
-					currentColor,
-					currentColorName,
+					uiElementColorData.name,
+					animateColorAsState(uiElementColorData.color).value,
+					uiElementColorData.colorToken,
 					hidePopup = hidePopup,
 					openHome = { currentPopupContentType = PaletteMenuCategories.Home }
 				)
@@ -1536,7 +1535,7 @@ fun PalettePopup(
 										Pair(ColorRolesDark.TertiaryDark.name, ColorRolesDark.TertiaryDark.dataAboutColors)
 									),
 									changeValue = changeValue,
-									key = currentUiElement
+									key = uiElementColorData.name
 								)
 
 								if (isOnHomePage && currentPopupContentTypeAnimated == PaletteMenuCategories.ColorRoles) colorRolesAsMovableContent()

@@ -12,10 +12,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.data.ThemeData
 
 @Composable
-fun DeleteThemeDialog(close: () -> Unit, deleteTheme: () -> Unit, uuid: String, ) {
+fun DeleteThemeDialog(
+	close: () -> Unit,
+	deleteTheme: () -> Unit,
+	theme: ThemeData,
+	getColorValueFromColorToken: (String) -> Color
+) {
 	AlertDialog(
 		onDismissRequest = { close() },
 		title = { Text("Delete this theme?") },
@@ -25,7 +32,12 @@ fun DeleteThemeDialog(close: () -> Unit, deleteTheme: () -> Unit, uuid: String, 
 					.width(150.dp)
 					.height(180.dp)
 					.clip(RoundedCornerShape(16.dp)),
-				uuid
+				theme,
+				loadSavedTheme = {  },
+				selectOrUnselectSavedTheme = {  },
+				exportTheme = { },
+				changeSelectionMode = {  },
+				getColorValueFromColorToken = getColorValueFromColorToken
 			)
 		},
 		text = {

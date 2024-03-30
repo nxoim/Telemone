@@ -1,5 +1,6 @@
 package com.number869.telemone.ui
 
+import com.number869.telemone.data.ThemeData
 import kotlinx.serialization.Serializable
 import javax.annotation.concurrent.Immutable
 
@@ -28,16 +29,16 @@ sealed interface Destinations {
 			data class LoadThemeWithOptions(val uuid: String) : Dialogs
 
 			@Serializable
-			data class OverwriteDefaultThemeChoice(val withThemeUuid: String) : Dialogs
+			data class OverwriteDefaultThemeChoice(val withTheme: ThemeData) : Dialogs
 
 			@Serializable
 			data class OverwriteDefaultThemeConfirmation(
 				val overwriteDark: Boolean,
-				val withThemeUuid: String
+				val withTheme: ThemeData
 			) : Dialogs
 
 			@Serializable
-			data class DeleteOneTheme(val uuid: String) : Dialogs
+			data class DeleteOneTheme(val theme: ThemeData) : Dialogs
 
 			@Serializable
 			data object DeleteSelectedThemes : Dialogs

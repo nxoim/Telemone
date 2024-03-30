@@ -22,24 +22,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.text.TextStyle
 import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
+import com.number869.telemone.ThemeColorDataType
 
 @Composable
 fun ThemeValuesScreen() {
 	val vm = viewModel<MainViewModel>()
 
-	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
-	val text = mutableListOf<String>()
 	var showValues by remember { mutableStateOf(false) }
-
-	mappedValues.toSortedMap().forEach {
-		val name = it.key
-		val token = if (showValues) it.value.second.toArgb() else it.value.first
-		text.add("$name = $token")
-	}
+	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
+	val text = vm.stringify(
+		mappedValues.toList(),
+		if (showValues)
+			ThemeColorDataType.ColorValues
+		else
+			ThemeColorDataType.ColorTokens
+	)
 
 	LazyColumn(
 		Modifier
@@ -59,7 +58,7 @@ fun ThemeValuesScreen() {
 		}
 		item {
 			SelectionContainer() {
-				Text(text = text.joinToString("\n"), style = TextStyle())
+				Text(text = text)
 			}
 		}
 	}

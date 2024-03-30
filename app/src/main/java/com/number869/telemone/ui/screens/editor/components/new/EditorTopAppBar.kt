@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.dp
 import com.number869.decomposite.core.common.navigation.navController
 import com.number869.decomposite.core.common.ultils.ContentType
 import com.number869.telemone.ThemeStorageType
-import com.number869.telemone.data.LoadedTheme
+import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.ui.Destinations
 import kotlinx.coroutines.delay
 
@@ -66,13 +66,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun EditorTopAppBar(
 	topAppBarState: TopAppBarScrollBehavior,
-	mappedValues: LoadedTheme,
+	mappedValues: List<UiElementColorData>,
 	exportCustomTheme: () -> Unit,
 	saveCurrentTheme: () -> Unit,
 	resetCurrentTheme: () -> Unit,
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	changeValue: (String, String, Color) -> Unit,
-	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>
 ) {
 	val navController = navController<Destinations>()
 
@@ -110,7 +109,6 @@ fun EditorTopAppBar(
 		) {
 			TheSearchbar(
 				mappedValues = mappedValues ,
-				mappedValuesAsList = mappedValuesAsList,
 				changeValue = changeValue,
 				hideSearchbar = { searchbarVisible = false },
 			)
@@ -224,18 +222,17 @@ private fun TheAppBar(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TheSearchbar(
-	mappedValues: LoadedTheme,
-	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>,
+	mappedValues: List<UiElementColorData>,
 	changeValue: (String, String, Color) -> Unit,
 	hideSearchbar: () -> Unit,
 ) {
 	var fullscreen by rememberSaveable { mutableStateOf(false) }
 	var searchQuery by rememberSaveable { mutableStateOf("") }
 	val searchQueryIsEmpty by remember { derivedStateOf { searchQuery == "" } }
-	val searchedThings = mappedValuesAsList.filter {
-		it.first.contains(searchQuery, true)
+	val searchedThings = mappedValues.filter {
+		it.name.contains(searchQuery, true)
 				||
-				it.second.first.contains(searchQuery, true)
+				it.colorToken.contains(searchQuery, true)
 	}
 
 	SearchBar(
@@ -321,9 +318,8 @@ private fun TheSearchbar(
 								.animateItemPlacement(),
 							uiElementData = uiElementData,
 							index = index,
-							themeMap = mappedValues,
 							changeValue = changeValue,
-							lastIndexInList = mappedValuesAsList.lastIndex
+							lastIndexInList = mappedValues.lastIndex
 						)
 					}
 				}

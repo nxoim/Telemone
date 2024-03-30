@@ -21,6 +21,9 @@ import com.number869.decomposite.core.common.ultils.animation.OverlayStackNaviga
 import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
+import com.number869.telemone.defaultDarkThemeUUID
+import com.number869.telemone.defaultLightThemeUUID
+import com.number869.telemone.getColorValueFromColorToken
 import com.number869.telemone.ui.screens.about.AboutScreen
 import com.number869.telemone.ui.screens.about.components.PrivacyPolicyDialog
 import com.number869.telemone.ui.screens.about.components.TosDialog
@@ -124,8 +127,9 @@ fun Navigator() {
 
 				DeleteThemeDialog(
 					close = { navController.navigateBack() },
-					uuid = it.uuid,
-					deleteTheme = { vm.deleteTheme(it.uuid) }
+					theme = it.theme,
+					deleteTheme = { vm.deleteTheme(it.theme.uuid) },
+					getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) }
 				)
 			}
 			Destinations.EditorScreen.Dialogs.DeleteSelectedThemes -> {
@@ -155,11 +159,14 @@ fun Navigator() {
 				OverwriteDefaultsDialog(
 					close = { navController.navigateBack() },
 					overwrite = {
-						vm.overwriteTheme(it.withThemeUuid, isLightTheme = !it.overwriteDark)
+						vm.overwriteTheme(it.withTheme.uuid, isLightTheme = !it.overwriteDark)
 						navController.navigateBack()
 					},
 					overwriteDark = it.overwriteDark,
-					overwriteWith = it.withThemeUuid
+					lightTheme = vm.themeList.find { it.uuid == defaultLightThemeUUID }!!,
+					darkTheme = vm.themeList.find { it.uuid == defaultDarkThemeUUID }!!,
+					overwriteWith = it.withTheme,
+					getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) }
 				)
 			}
 			is Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice -> {
@@ -172,7 +179,7 @@ fun Navigator() {
 						navController.navigate(
 							Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
 								overwriteDark = false,
-								withThemeUuid = it.withThemeUuid
+								withTheme = it.withTheme
 							),
 							ContentType.Overlay
 						)
@@ -182,11 +189,14 @@ fun Navigator() {
 						navController.navigate(
 							Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
 								overwriteDark = true,
-								withThemeUuid = it.withThemeUuid
+								withTheme = it.withTheme
 							),
 							ContentType.Overlay
 						)
-					}
+					},
+					lightTheme = vm.themeList.find { it.uuid == defaultLightThemeUUID }!!,
+					darkTheme = vm.themeList.find { it.uuid == defaultDarkThemeUUID }!!,
+					getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) }
 				)
 			}
 			Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection -> {

@@ -39,7 +39,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,31 +56,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.decomposite.core.common.navigation.navController
 import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 import com.number869.telemone.ThemeColorDataType
 import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.AppSettings
-import com.number869.telemone.getColorValueFromColorToken
+import com.number869.telemone.data.ThemeData
+import com.number869.telemone.data.color
 import com.number869.telemone.ui.Destinations
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SavedThemeItem(
 	modifier: Modifier,
-	uuid: String,
+	themeData: ThemeData,
+	selected: Boolean = false,
 	isInSavedThemesRow: Boolean = false,
 	colorDisplayTypeOverwrite: String? = null,
 	changeSelectionMode: () -> Unit = { },
+	loadSavedTheme: (ThemeStorageType) -> Unit,
+	selectOrUnselectSavedTheme: () -> Unit,
+	exportTheme: (ThemeColorDataType) -> Unit,
+	getColorValueFromColorToken: (String) -> Color,
 	themeSelectionModeIsActive: Boolean = false
 ) {
 	val navController = navController<Destinations>()
-	val vm = viewModel<MainViewModel>()
 
 	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }
 
-	val selected by remember { derivedStateOf { vm.selectedThemes.contains(uuid) } }
 	val selectedOverlayColor by animateColorAsState(
 		if (themeSelectionModeIsActive && selected)
 			MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
@@ -105,33 +106,33 @@ fun SavedThemeItem(
 
 	// cry about it being here
 	@Composable
-	fun colorOf(colorValueOf: String): Color {
+	fun colorOf(uiElementName: String): Color {
 		return animateColorAsState(
 			when (colorDisplayTypeOverwrite ?: colorDisplayType) {
 				"1" -> {
-					vm.themeList.find { it.containsKey(uuid) }
-						?.get(uuid)
-						?.get(colorValueOf)
-						?.let { Color(it.second) } ?: Color.Red
+					themeData.values
+						.find { it.name == uiElementName }
+						?.color
+						?: Color.Red
 				}
 				"2" -> { // in case theres a need to show monet colors only when available
-					vm.themeList.find { it.containsKey(uuid) }
-						?.get(uuid)
-						?.get(colorValueOf)
+					themeData.values
+						.find { it.name == uiElementName }
 						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.first, vm.palette)
-							val colorAsSaved = Color(it.second)
+							val colorFromToken = getColorValueFromColorToken(it.colorToken)
+							val colorAsSaved = it.color
 
 							// colorFromToken prob should be Color? so it can
 							// be null
 							if (colorFromToken == Color.Red) colorAsSaved else colorFromToken
-						} ?: Color.Red
+						}
+						?: Color.Red
 				}
 				else -> {
-					vm.themeList.find { it.containsKey(uuid) }
-						?.get(uuid)
-						?.get(colorValueOf)
-						?.let { getColorValueFromColorToken(it.first, vm.palette) } ?: Color.Red
+					themeData.values
+						.find { it.name == uiElementName }
+						?.let { getColorValueFromColorToken(it.colorToken) }
+						?: Color.Red
 				}
 			},
 			label = "i hate these labels"
@@ -148,9 +149,9 @@ fun SavedThemeItem(
 					return@let if (isInSavedThemesRow && !themeSelectionModeIsActive)
 						it.combinedClickable(
 							onClick = {
-								vm.loadSavedTheme(
+								loadSavedTheme(
 									ThemeStorageType.ByUuid(
-										uuid,
+										themeData.uuid,
 										withTokens = false,
 										clearCurrentTheme = true
 									)
@@ -167,7 +168,7 @@ fun SavedThemeItem(
 							onLongClick = { showMenu = true }
 						)
 					else if (themeSelectionModeIsActive)
-						it.clickable { vm.selectOrUnselectSavedTheme(uuid) }
+						it.clickable { selectOrUnselectSavedTheme() }
 					else
 						it
 				}
@@ -200,7 +201,7 @@ fun SavedThemeItem(
 		) {
 			Checkbox(
 				checked = selected,
-				onCheckedChange = { vm.selectOrUnselectSavedTheme(uuid) },
+				onCheckedChange = { selectOrUnselectSavedTheme() },
 				colors = CheckboxDefaults.colors(
 					uncheckedColor = Color.Transparent
 				),
@@ -220,7 +221,7 @@ fun SavedThemeItem(
 				text = { Text("Load theme with options") },
 				onClick = {
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.LoadThemeWithOptions(uuid),
+						Destinations.EditorScreen.Dialogs.LoadThemeWithOptions(themeData.uuid),
 						ContentType.Overlay
 					)
 				}
@@ -229,14 +230,14 @@ fun SavedThemeItem(
 				text = { Text("Export this theme")},
 				onClick = {
 					showMenu = false
-					vm.exportTheme(uuid, exportDataType = ThemeColorDataType.ColorValues)
+					exportTheme(ThemeColorDataType.ColorValues)
 				}
 			)
 			DropdownMenuItem(
 				text = { Text("Export this theme in Telemone format")},
 				onClick = {
 					showMenu = false
-					vm.exportTheme(uuid, exportDataType = ThemeColorDataType.ColorTokens)
+					exportTheme(ThemeColorDataType.ColorTokens)
 				}
 			)
 			DropdownMenuItem(
@@ -244,7 +245,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice(uuid),
+						Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice(themeData),
 						ContentType.Overlay
 					)
 				}
@@ -254,7 +255,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.DeleteOneTheme(uuid),
+						Destinations.EditorScreen.Dialogs.DeleteOneTheme(themeData),
 						ContentType.Overlay
 					)
 				}
@@ -264,7 +265,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					changeSelectionMode()
-					vm.selectOrUnselectSavedTheme(uuid)
+					selectOrUnselectSavedTheme()
 				}
 			)
 		}

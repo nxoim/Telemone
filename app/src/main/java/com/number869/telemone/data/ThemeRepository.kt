@@ -1,86 +1,115 @@
 package com.number869.telemone.data
 
 import android.content.Context
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.number869.telemone.defaultDarkThemeUUID
+import com.number869.telemone.defaultLightThemeUUID
 import com.number869.telemone.getColorValueFromColorToken
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.Serializable
 
 // no im not making a data class
-typealias ThemeUUID = String
-typealias UiElementName = String
-typealias ColorToken = String
-typealias ColorValue = Int
-typealias DataAboutColors = Pair<ColorToken, ColorValue>
-typealias UiElementData = Map<UiElementName, DataAboutColors>
-typealias Theme = Map<ThemeUUID, UiElementData>
-typealias ThemeList = SnapshotStateList<Theme>
-typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
+private typealias ThemeUUID = String
+private typealias UiElementName = String
+private typealias ColorToken = String
+private typealias ColorValue = Int
+private typealias DataAboutColors = Pair<ColorToken, ColorValue>
+private typealias UiElementData = Map<UiElementName, DataAboutColors>
+private typealias Theme = Map<ThemeUUID, UiElementData>
+private typealias ThemeList = SnapshotStateList<Theme>
+private typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
+
+@Serializable
+data class UiElementColorData(
+	val name: String,
+	val colorToken: String,
+	val colorValue: Int
+)
+val UiElementColorData.color get() = Color(colorValue)
+
+@Serializable
+data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
 
 
 class ThemeRepository(context: Context) {
-	private val themeListKey = "AppPreferences.ThemeList"
+	private val oldThemeListKey = "AppPreferences.ThemeList"
 	private val preferences = context.getSharedPreferences(
 		"AppPreferences",
 		Context.MODE_PRIVATE
 	)
-	var themeList: ThemeList = mutableStateListOf()
+	private var _themeList = MutableStateFlow(getAllThemesFromStorage())
 
-	init {
-		val savedThemeList = preferences.getString(themeListKey, "[]")
-		val type = object : TypeToken<ThemeList>() {}.type
-		val list = Gson().fromJson<ThemeList>(savedThemeList, type)
-		themeList.addAll(
-			list.map { map ->
+	fun getAllThemes() = _themeList.asStateFlow()
+
+	private fun getAllThemesFromStorage(): List<ThemeData> {
+		var endResult = listOf<ThemeData>()
+		val oldSavedThemeList = preferences.getString(oldThemeListKey, "[]")
+		val oldType = object : TypeToken<ThemeList>() {}.type
+		val oldList = Gson().fromJson<ThemeList>(oldSavedThemeList, oldType)
+
+		if (oldList.isNotEmpty()) {
+			val oldThemeList = oldList.map { map ->
 				map.mapValues { entry ->
 					entry.value.mapValues { (_, value) -> Pair(value.first, value.second) }
 				}
 			}
-		)
-	}
-
-	fun getThemeByUUID(uuid: ThemeUUID): UiElementData? = themeList.find { it.containsKey(uuid) }?.get(uuid)
-	fun saveTheme(uuid: String, theme: Map<String, Pair<String, Int>>) {
-		themeList.add(mapOf(uuid to theme))
-		val contents = Gson().toJson(themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
-	}
-
-	fun deleteTheme(uuid: ThemeUUID) {
-		themeList.removeIf { it.containsKey(uuid) }
-
-		// save changes locally
-		val contents = Gson().toJson(themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
-	}
-
-	fun replaceThemeByUUID(
-		uuid: String,
-		newTheme: UiElementData
-	) {
-		runCatching {
-			val index = themeList.indexOfFirst { it.containsKey(uuid) }
-
-			themeList[index] = mapOf(uuid to newTheme)
-		}.onFailure {
-			// this runs if a theme is absent
-			themeList.add(mapOf(uuid to newTheme))
+			val convertedToNew = oldThemeList.map { it.toNew() }
+			endResult = convertedToNew
 		}
 
-		val contents = Gson().toJson(themeList)
-		preferences.edit().putString(themeListKey, contents).apply()
+		return endResult
+	}
+
+	fun getThemeByUUID(uuid: String): ThemeData? = _themeList.value.find { it.uuid == uuid }
+
+	fun saveTheme(theme: ThemeData) {
+		_themeList.value += theme
+		saveThemeListToStorage()
+	}
+
+	fun deleteTheme(uuid: String) {
+		_themeList.value.find { it.uuid == uuid }?.let {
+			_themeList.value -= it
+		}
+		saveThemeListToStorage()
+	}
+
+	fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
+		val newList = _themeList.value.toMutableList()
+
+		newList.replaceAll {
+			if (it.uuid == targetThemesUUID)
+				ThemeData(targetThemesUUID, newData)
+			else
+				it
+		}
+
+		_themeList.value = newList
+
+		if (targetThemesUUID !in _themeList.value.map { it.uuid }) {
+			_themeList.value += ThemeData(targetThemesUUID, newData)
+		}
+		saveThemeListToStorage()
+	}
+
+	private fun saveThemeListToStorage() {
+		val oldThemeList = _themeList.value.map { it.toOld() }
+		val contents = Gson().toJson(oldThemeList)
+		preferences.edit().putString(oldThemeListKey, contents).apply()
 	}
 
 	fun getStockTheme(
 		palette: Map<String, Color>,
 		context: Context,
 		light: Boolean
-	): Map<String, Pair<String, Int>> {
-		val themeMap = mutableMapOf<String, Pair<String, Int>>()
+	): ThemeData {
+		val themeData = mutableListOf<UiElementColorData>()
 		val fileName = if (light) "defaultLightFile.attheme" else "defaultDarkFile.attheme"
 
 		context.assets.open(fileName)
@@ -88,18 +117,45 @@ class ThemeRepository(context: Context) {
 				reader.forEachLine { line ->
 					if (line.isNotEmpty()) {
 						val splitLine = line.replace(" ", "").split("=")
-						val key = splitLine[0]
-						val value = splitLine[1]
+						val name = splitLine[0]
+						val colorToken = splitLine[1]
 
-						val colorValue = getColorValueFromColorToken(value, palette)
+						val colorValue = getColorValueFromColorToken(colorToken, palette)
 
-						themeMap[key] = Pair(value, colorValue.toArgb())
+						themeData.add(
+							UiElementColorData(
+								name = name,
+								colorToken = colorToken,
+								colorValue = colorValue.toArgb()
+							)
+						)
 					}
 				}
 			}
 
-		return themeMap.toMap()
+		return ThemeData(
+			if (light) defaultLightThemeUUID else defaultDarkThemeUUID,
+			themeData
+		)
 	}
+
+	private fun Theme.toNew(): ThemeData {
+		val themeData = this.values.first().map { (elementName, pair) ->
+			UiElementColorData(
+				name = elementName,
+				colorToken = pair.first,
+				colorValue = pair.second
+			)
+		}
+
+		return ThemeData(this.keys.first(), themeData)
+	}
+
+	private fun ThemeData.toOld() = mapOf(
+		uuid to values.associate { data ->
+			data.name to (data.colorToken to data.colorValue)
+		}
+	)
 }
 
 val fallbackKeys = mapOf(
