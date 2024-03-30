@@ -12,13 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
 import com.number869.telemone.ui.Destinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
 
 @Composable
 fun LegalItem() {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<Destinations>()
 
 	AboutCard(label = "Legal") {
 		Column(

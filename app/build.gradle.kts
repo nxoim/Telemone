@@ -81,6 +81,5 @@ dependencies {
 
     implementation(libs.decompose)
     implementation(libs.decompose.extensions.compose)
-    implementation(libs.decomposite.core)
-    implementation(libs.decomposite.optionalExtensions)
+    implementation(libs.decomposite)
 }

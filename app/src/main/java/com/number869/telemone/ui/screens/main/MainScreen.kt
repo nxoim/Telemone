@@ -23,19 +23,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
+import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-	val vm = viewModel<MainViewModel>()
-	val navController = navController<Destinations>()
+	val vm = getExistingViewModel<MainViewModel>()
+	val navController = getExistingNavController<Destinations>()
 
 	LaunchedEffect(Unit) {
 		if (vm.displayLightThemeUpdateChoiceDialog) navController.navigate(

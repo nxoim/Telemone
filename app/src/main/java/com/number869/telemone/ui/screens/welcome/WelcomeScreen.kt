@@ -23,15 +23,15 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
 import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.LargeTonalButton
 import com.number869.telemone.ui.Destinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
 fun WelcomeScreen() {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<Destinations>()
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
 		Context.MODE_PRIVATE

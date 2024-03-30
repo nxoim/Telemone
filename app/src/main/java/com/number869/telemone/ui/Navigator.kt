@@ -4,21 +4,10 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.number869.decomposite.common.cleanFadeAndSlide
-import com.number869.decomposite.common.scaleFadePredictiveBackAnimation
-import com.number869.decomposite.core.common.navigation.NavHost
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.ultils.animation.OverlayStackNavigationAnimation
-import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.defaultDarkThemeUUID
@@ -39,51 +28,35 @@ import com.number869.telemone.ui.screens.main.MainScreen
 import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.number869.telemone.ui.screens.welcome.WelcomeScreen
+import com.nxoim.decomposite.core.common.navigation.NavHost
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.navigation.navController
+import com.nxoim.decomposite.core.common.ultils.ContentType
+import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 
 @Composable
 fun Navigator() {
-	val vm = viewModel<MainViewModel>()
-	val screenWidth = LocalConfiguration.current.screenWidthDp
-	val easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs = CubicBezierEasing(0.48f,0.19f,0.05f,1.03f)
+	val vm = getExistingViewModel<MainViewModel>()
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
 	)
 	val skipWelcomeScreen = preferences.getBoolean(AppSettings.AgreedToPpAndTos.id, false)
-	val startDestination = if (skipWelcomeScreen) Destinations.MainScreen else Destinations.WelcomeScreen
+	val startDestination = if (skipWelcomeScreen) MainDestinations.MainScreen else MainDestinations.WelcomeScreen
 
-	NavHost(
-		startingDestination = startDestination,
-		containedContentAnimation = {
-			scaleFadePredictiveBackAnimation(
-				fallbackAnimation = stackAnimation { _ ->
-					cleanFadeAndSlide(
-						tween(
-							600,
-							easing = easingMaybeLikeTheOneThatGoogleUsesInMockupsButDoesntGiveTheSpecs
-						),
-						targetOffsetDp = (screenWidth * 0.2).toInt()
-					)
-				}
-			)
-		},
-		overlayingContentAnimation = {
-			// no animations for overlays because that is handled inside
-			// the overlays themselves
-			OverlayStackNavigationAnimation { null }
-		}
-	) {
+	val mainNavController = navController(startingDestination = startDestination)
+	NavHost(mainNavController) {
 		when (it) {
-			Destinations.EditorScreen.ThemeValuesScreen -> ThemeValuesScreen()
-			Destinations.MainScreen -> MainScreen()
-			Destinations.WelcomeScreen -> WelcomeScreen()
-			Destinations.EditorScreen.Editor -> EditorScreen()
-			Destinations.AboutScreen.About -> AboutScreen()
+			MainDestinations.EditorScreen.ThemeValuesScreen -> ThemeValuesScreen()
+			MainDestinations.MainScreen -> MainScreen()
+			MainDestinations.WelcomeScreen -> WelcomeScreen()
+			MainDestinations.EditorScreen.Editor -> EditorScreen()
+			MainDestinations.AboutScreen.About -> AboutScreen()
 
-			Destinations.AboutScreen.Dialogs.PrivacyPolicyDialog -> PrivacyPolicyDialog()
-			Destinations.AboutScreen.Dialogs.TosDialog -> TosDialog()
-			Destinations.EditorScreen.Dialogs.ClearThemeBeforeLoadingFromFile -> {
-				val navController = navController<Destinations>()
+			MainDestinations.AboutScreen.Dialogs.PrivacyPolicyDialog -> PrivacyPolicyDialog()
+			MainDestinations.AboutScreen.Dialogs.TosDialog -> TosDialog()
+			MainDestinations.EditorScreen.Dialogs.ClearThemeBeforeLoadingFromFile -> {
+				val navController = getExistingNavController<MainDestinations>()
 				val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
 
 				// stuff for loading files.
@@ -122,8 +95,8 @@ fun Navigator() {
 					}
 				)
 			}
-			is Destinations.EditorScreen.Dialogs.DeleteOneTheme -> {
-				val navController = navController<Destinations>()
+			is MainDestinations.EditorScreen.Dialogs.DeleteOneTheme -> {
+				val navController = getExistingNavController<MainDestinations>()
 
 				DeleteThemeDialog(
 					close = { navController.navigateBack() },
@@ -132,8 +105,8 @@ fun Navigator() {
 					getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) }
 				)
 			}
-			Destinations.EditorScreen.Dialogs.DeleteSelectedThemes -> {
-				val navController = navController<Destinations>()
+			MainDestinations.EditorScreen.Dialogs.DeleteSelectedThemes -> {
+				val navController = getExistingNavController<MainDestinations>()
 
 				DeleteSelectedThemesDialog(
 					hideToolbar = { vm.hideThemeSelectionModeToolbar() },
@@ -144,8 +117,8 @@ fun Navigator() {
 					context = LocalContext.current
 				)
 			}
-			is Destinations.EditorScreen.Dialogs.LoadThemeWithOptions -> {
-				val navController = navController<Destinations>()
+			is MainDestinations.EditorScreen.Dialogs.LoadThemeWithOptions -> {
+				val navController = getExistingNavController<MainDestinations>()
 
 				LoadWithOptionsDialog(
 					close = { navController.navigateBack() },
@@ -153,8 +126,8 @@ fun Navigator() {
 					uuid = it.uuid
 				)
 			}
-			is Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation -> {
-				val navController = navController<Destinations>()
+			is MainDestinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation -> {
+				val navController = getExistingNavController<MainDestinations>()
 
 				OverwriteDefaultsDialog(
 					close = { navController.navigateBack() },
@@ -169,15 +142,15 @@ fun Navigator() {
 					getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) }
 				)
 			}
-			is Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice -> {
-				val navController = navController<Destinations>()
+			is MainDestinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice -> {
+				val navController = getExistingNavController<MainDestinations>()
 
 				OverwriteChoiceDialog(
 					close = { navController.navigateBack() },
 					chooseLight = {
 						navController.navigateBack() // close this
 						navController.navigate(
-							Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
+							MainDestinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
 								overwriteDark = false,
 								withTheme = it.withTheme
 							),
@@ -187,7 +160,7 @@ fun Navigator() {
 					chooseDark = {
 						navController.navigateBack()
 						navController.navigate(
-							Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
+							MainDestinations.EditorScreen.Dialogs.OverwriteDefaultThemeConfirmation(
 								overwriteDark = true,
 								withTheme = it.withTheme
 							),
@@ -199,13 +172,13 @@ fun Navigator() {
 					getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) }
 				)
 			}
-			Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection -> {
-				val navController = navController<Destinations>()
+			MainDestinations.EditorScreen.Dialogs.SavedThemeTypeSelection -> {
+				val navController = getExistingNavController<MainDestinations>()
 
 				SavedThemeItemDisplayTypeChooserDialog { navController.navigateBack() }
 			}
 
-			is Destinations.GlobalDialogs.ThemeUpdateAvailable -> {
+			is MainDestinations.GlobalDialogs.ThemeUpdateAvailable -> {
 				ThemeUpdateAvailableDialog(
 					ofLight = it.ofLight,
 					decline = { vm.declineDefaultThemeUpdate(it.ofLight) }

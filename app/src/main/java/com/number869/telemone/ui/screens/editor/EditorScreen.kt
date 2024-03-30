@@ -54,9 +54,6 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.MainViewModel
 import com.number869.telemone.defaultDarkThemeUUID
 import com.number869.telemone.defaultLightThemeUUID
@@ -68,6 +65,9 @@ import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
+import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
@@ -76,8 +76,8 @@ import my.nanihadesuka.compose.ScrollbarSelectionActionable
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen() {
-	val navController = navController<Destinations>()
-	val vm = viewModel<MainViewModel>()
+	val navController = getExistingNavController<Destinations>()
+	val vm = getExistingViewModel<MainViewModel>()
 	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 
 	val themeList by remember {

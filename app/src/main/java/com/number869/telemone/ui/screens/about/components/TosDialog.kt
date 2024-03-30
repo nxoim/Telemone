@@ -18,13 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
 import com.number869.telemone.R
 import com.number869.telemone.ui.Destinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
 fun TosDialog() {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<Destinations>()
 
 	Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		Card(
@@ -32,7 +32,10 @@ fun TosDialog() {
 			shape = RoundedCornerShape(32.dp)
 		) {
 			Column {
-				Column(Modifier.verticalScroll(rememberScrollState()).weight(1f, false)) {
+				Column(
+					Modifier
+						.verticalScroll(rememberScrollState())
+						.weight(1f, false)) {
 					Text(
 						stringResource(id = R.string.tos_text),
 						modifier = Modifier.padding(24.dp)

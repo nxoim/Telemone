@@ -55,11 +55,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
 import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.ui.Destinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -73,7 +73,7 @@ fun EditorTopAppBar(
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	changeValue: (String, String, Color) -> Unit,
 ) {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<Destinations>()
 
 	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -127,7 +127,7 @@ private fun TheAppBar(
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	topAppBarState: TopAppBarScrollBehavior
 ) {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<Destinations>()
 	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
 

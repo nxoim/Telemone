@@ -54,14 +54,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
 import com.number869.telemone.ThemeColorDataType
 import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.data.color
 import com.number869.telemone.ui.Destinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -78,7 +78,7 @@ fun SavedThemeItem(
 	getColorValueFromColorToken: (String) -> Color,
 	themeSelectionModeIsActive: Boolean = false
 ) {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<Destinations>()
 
 	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }

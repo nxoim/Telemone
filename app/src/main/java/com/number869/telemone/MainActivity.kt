@@ -10,14 +10,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
-import com.number869.decomposite.core.common.navigation.NavigationRoot
-import com.number869.decomposite.core.common.navigation.navigationRootDataProvider
-import com.number869.decomposite.core.common.viewModel.viewModel
 import com.number869.telemone.data.InstanceLocator
 import com.number869.telemone.data.ThemeRepository
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
+import com.nxoim.decomposite.core.common.navigation.NavigationRoot
+import com.nxoim.decomposite.core.common.navigation.navigationRootDataProvider
+import com.nxoim.decomposite.core.common.viewModel.viewModel
 import com.tencent.mmkv.MMKV
 
 class MainActivity : ComponentActivity() {

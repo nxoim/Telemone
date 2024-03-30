@@ -18,7 +18,7 @@ gson = "2.10.1"
 lazyColumnScrollbar = "1.7.2"
 mmkv = "1.3.2"
 decompose = "3.0.0-alpha06"
-decomposite = "65e7a49954"
+decomposite = "0.1.0.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -46,8 +46,7 @@ lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", 
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-decomposite-core = { module = "com.github.Number869.Decomposite:decomposite-core", version.ref = "decomposite" }
-decomposite-optionalExtensions = { module = "com.github.Number869.Decomposite:decomposite-optionalExtensions", version.ref = "decomposite" }
+decomposite = { module = "com.github.nxoim.decomposite:decomposite", version.ref = "decomposite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
