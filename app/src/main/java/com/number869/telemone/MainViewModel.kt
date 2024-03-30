@@ -30,12 +30,10 @@ import java.util.UUID
 @Stable
 // funny of you to actually expect some sort of documentation in the
 // comments
-class MainViewModel(
-	private val context: Context,
-	private val paletteState: PaletteState,
-	isDarkMode: Boolean
-) : ViewModel() {
-	private val themeRepository = ThemeRepository(context)
+class MainViewModel() : ViewModel() {
+	private val context = App.instanceLocator.get<Context>()
+	private val paletteState = App.instanceLocator.get<PaletteState>()
+	private val themeRepository = App.instanceLocator.get<ThemeRepository>()
 
 	// god bless your eyes and brain that has to process this
 	// color in the list has to be int because Color() returns ulong
@@ -72,14 +70,14 @@ class MainViewModel(
 	var displayDarkThemeUpdateChoiceDialog by mutableStateOf(false)
 
 	init {
-		startupConfigProcess(isDarkMode)
+		startupConfigProcess(paletteState.isDarkMode)
 		checkForThemeHashUpdates()
 
 		viewModelScope.launch {
 			themeRepository.getAllThemes().collectLatest {
 				_themeList = it
 
-				val defaultThemeKey = if (isDarkMode)
+				val defaultThemeKey = if (paletteState.isDarkMode)
 					defaultDarkThemeUUID
 				else
 					defaultLightThemeUUID

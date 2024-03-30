@@ -65,8 +65,8 @@ import android.R.color.system_neutral2_600
 import android.R.color.system_neutral2_700
 import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
-import android.annotation.SuppressLint
 import androidx.annotation.FloatRange
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -92,13 +92,16 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-class PaletteState(val entirePaletteAsMap: MutableState<LinkedHashMap<String, Color>>) {
+class PaletteState(
+	val entirePaletteAsMap: MutableState<LinkedHashMap<String, Color>>,
+	val isDarkMode: Boolean
+) {
 	val allPossibleColorTokensAsList = entirePaletteAsMap.value.keys
 }
 
-@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun rememberPaletteState(): PaletteState {
+	val isDarkMode = isSystemInDarkTheme()
 	val entirePaletteAsMap = remember { mutableStateOf(linkedMapOf<String, Color>()) }
 
 	AdditionalColors.entries.forEach {
@@ -130,7 +133,7 @@ fun rememberPaletteState(): PaletteState {
 		toneList.forEach { entirePaletteAsMap.value[it.colorToken] = it.colorValue }
 	}
 
-	return remember { PaletteState(entirePaletteAsMap) }
+	return remember { PaletteState(entirePaletteAsMap, isDarkMode) }
 }
 
 enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
