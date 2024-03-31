@@ -16,13 +16,10 @@ import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.mongodb.kbson.ObjectId
 
@@ -157,7 +154,6 @@ class RealmThemeRepositoryImpl(
 	),
 	private val context: Context
 ) : ThemeRepository {
-	private val scope = CoroutineScope(Dispatchers.Default)
 	override fun getAllThemes() = flow {
 		realm.query(ThemeDataRealm::class).asFlow().collect() { result ->
 			emit(result.list.map { it.toThemeData() })
@@ -165,37 +161,33 @@ class RealmThemeRepositoryImpl(
 	}
 
 	override fun getThemeByUUID(uuid: String): ThemeData? {
-		return realm.query(ThemeDataRealm::class, args = arrayOf(uuid)).first().find()?.toThemeData()
+		return realm.query(ThemeDataRealm::class, "uuid == $0", uuid)
+			.first()
+			.find()
+			?.toThemeData()
 	}
 
 	override fun saveTheme(theme: ThemeData) {
-		scope.launch {
-			realm.write {
-				this.copyToRealm(theme.toThemeDataRealm())
-			}
-
+		realm.writeBlocking {
+			this.copyToRealm(theme.toThemeDataRealm(), UpdatePolicy.ALL)
 		}
 	}
 
 	override fun deleteTheme(uuid: String) {
-		scope.launch {
-			realm.write {
-				this.delete(this.query(ThemeDataRealm::class, uuid).first())
-			}
+		realm.writeBlocking {
+			this.delete(this.query(ThemeDataRealm::class, uuid).first())
 		}
 	}
 
 	override fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
-		scope.launch {
-			realm.writeBlocking {
-				this.copyToRealm(
-					ThemeData(
-						targetThemesUUID,
-						newData
-					).toThemeDataRealm(),
-					updatePolicy = UpdatePolicy.ALL
-				)
-			}
+		realm.writeBlocking {
+			this.copyToRealm(
+				ThemeData(
+					targetThemesUUID,
+					newData
+				).toThemeDataRealm(),
+				updatePolicy = UpdatePolicy.ALL
+			)
 		}
 	}
 
@@ -270,6 +262,33 @@ private fun getStockTheme(
 		themeData
 	)
 }
+fun initializeThemeRepository(context: Context): ThemeRepository {
+	val oldThemeListKey = "AppPreferences.ThemeList"
+	val preferences = context.getSharedPreferences(
+		"AppPreferences",
+		Context.MODE_PRIVATE
+	)
+
+	println("initializing repo")
+
+	return if (preferences.contains(oldThemeListKey)) {
+		println("preparing repo migration")
+		val oldRepo = SharedPreferencesThemeRepositoryImpl(context)
+
+		val themes = oldRepo.getAllThemes().value
+		val newRepo = RealmThemeRepositoryImpl(context = context)
+		themes.forEach { theme -> newRepo.saveTheme(theme) }
+
+		// delete the data in old repo after migration
+		preferences.edit().remove(oldThemeListKey).apply()
+
+		newRepo
+	} else {
+		println("no migration needed")
+		RealmThemeRepositoryImpl(context = context)
+	}
+}
+
 
 class ThemeDataRealm : RealmObject {
 	@PrimaryKey

@@ -461,11 +461,11 @@ class ThemeManager(
         }
 
         if (themeList.find { it.uuid == defaultLightThemeUUID } == null) {
-            themeRepository.replaceTheme(defaultLightThemeUUID, stockLightTheme.values)
+            themeRepository.saveTheme(ThemeData(defaultLightThemeUUID, stockLightTheme.values))
         }
 
         if (themeList.find { it.uuid == defaultDarkThemeUUID } == null) {
-            themeRepository.replaceTheme(defaultDarkThemeUUID, stockDarkTheme.values)
+            themeRepository.saveTheme(ThemeData(defaultDarkThemeUUID, stockDarkTheme.values))
         }
 
         if (paletteState.isDarkMode)

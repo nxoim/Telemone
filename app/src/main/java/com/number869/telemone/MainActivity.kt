@@ -11,9 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
 import com.number869.telemone.data.InstanceLocator
-import com.number869.telemone.data.RealmThemeRepositoryImpl
 import com.number869.telemone.data.ThemeManager
-import com.number869.telemone.data.ThemeRepository
+import com.number869.telemone.data.initializeThemeRepository
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
@@ -37,10 +36,8 @@ class MainActivity : ComponentActivity() {
 					// not in a launched effect because this needs to be
 					// executed synchronously, before other ui
 					single<Context>(cacheInstance = false) { this@MainActivity }
-					single<ThemeRepository> {
-						RealmThemeRepositoryImpl(context = inject())
-//						SharedPreferencesThemeRepositoryImpl(context = inject())
-					}
+//					single<ThemeRepository> { SharedPreferencesThemeRepositoryImpl(inject()) }
+					single { initializeThemeRepository(context = inject()) }
 					// update palette state on config changes
 					single(cacheInstance = false) { paletteState }
 					single {
