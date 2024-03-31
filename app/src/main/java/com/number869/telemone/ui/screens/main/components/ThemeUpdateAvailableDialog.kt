@@ -8,7 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
@@ -17,7 +17,7 @@ fun ThemeUpdateAvailableDialog(
 	decline: () -> Unit,
 	acceptStockThemeUpdate: () -> Unit
 ) {
-	val navController = getExistingNavController<Destinations>()
+	val navController = getExistingNavController<RootDestinations>()
 	val typeText = if (ofLight) "light" else "dark"
 
 	AlertDialog(

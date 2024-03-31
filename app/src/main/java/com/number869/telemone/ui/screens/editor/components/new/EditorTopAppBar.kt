@@ -55,9 +55,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.ThemeStorageType
+import com.number869.telemone.data.ThemeStorageType
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
+import com.number869.telemone.ui.screens.editor.EditorDestinations
+import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
 import kotlinx.coroutines.delay
@@ -72,9 +74,8 @@ fun EditorTopAppBar(
 	resetCurrentTheme: () -> Unit,
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	changeValue: (String, String, Color) -> Unit,
+	navController: NavController<EditorDestinations> = getExistingNavController()
 ) {
-	val navController = getExistingNavController<Destinations>()
-
 	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
 	Box(
@@ -90,7 +91,7 @@ fun EditorTopAppBar(
 				showSearchbar = { searchbarVisible = true },
 				showClearBeforeLoadDialog = {
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.ClearThemeBeforeLoadingFromFile,
+						EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile,
 						ContentType.Overlay
 					)
 				},
@@ -125,9 +126,10 @@ private fun TheAppBar(
 	saveCurrentTheme: () -> Unit,
 	resetCurrentTheme: () -> Unit,
 	loadSavedTheme: (ThemeStorageType) -> Unit,
-	topAppBarState: TopAppBarScrollBehavior
+	topAppBarState: TopAppBarScrollBehavior,
+	navController: NavController<EditorDestinations> = getExistingNavController(),
+	rootNavController: NavController<RootDestinations> = getExistingNavController()
 ) {
-	val navController = getExistingNavController<Destinations>()
 	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
 
@@ -139,7 +141,7 @@ private fun TheAppBar(
 
 	TopAppBar(
 		navigationIcon = {
-			IconButton(onClick = { navController.navigateBack() }) {
+			IconButton(onClick = { rootNavController.navigateBack() }) {
 				Icon(Icons.Default.ArrowBack, contentDescription = "Back")
 			}
 		},
@@ -192,7 +194,7 @@ private fun TheAppBar(
 					DropdownMenuItem(
 						text = { Text(text = "Show values") },
 						onClick = {
-							navController.navigate(Destinations.EditorScreen.ThemeValuesScreen)
+							navController.navigate(EditorDestinations.ThemeValues)
 							showMenu = false
 						},
 						leadingIcon = { Icon(Icons.Default.ShortText, contentDescription = "Show values") }

@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.number869.telemone.ui.theme.blendWith
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
@@ -42,7 +42,7 @@ fun ThemeSelectionToolbar(
 	selectAllThemes: () -> Unit,
 	hideToolbarAction: () -> Unit
 ) {
-	val navController = getExistingNavController<Destinations>()
+	val navController = getExistingNavController<EditorDestinations>()
 
 	val noThemesAreSelected by remember { derivedStateOf { selectedThemeCount == 0 } }
 	val deleteButtonEnabled = selectedThemeCount > 1
@@ -96,7 +96,7 @@ fun ThemeSelectionToolbar(
 			FilledTonalIconButton(
 				onClick = {
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.DeleteSelectedThemes,
+						EditorDestinations.Dialogs.DeleteSelectedThemes,
 						ContentType.Overlay
 					)
 				},

@@ -554,7 +554,7 @@ fun PalettePopup(
 						toneInfo = it,
 						key = uiElementColorData.name,
 						changeValue = changeValue,
-						currentPopupContentType == PaletteMenuCategories.Pink
+						currentPopupContentType == PaletteMenuCategories.Cyan
 					)
 				}
 			}

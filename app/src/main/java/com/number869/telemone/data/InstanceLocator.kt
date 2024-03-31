@@ -3,40 +3,43 @@ package com.number869.telemone.data
 import kotlin.reflect.KClass
 
 class InstanceLocator {
-    val instances = hashMapOf<KClass<*>, Any>()
-    val lazyInstances = hashMapOf<KClass<*>, () -> Any>()
+    val instanceReferences = hashMapOf<KClass<*>, () -> Any>()
+    val instanceCache = hashMapOf<KClass<*>, Any>()
+    val instancesToCache = hashSetOf<KClass<*>>()
 
     init {
         println("InstanceLocator initialized")
     }
 
-    inline fun <reified T : Any> putOrOverwrite(instance: T) = instances.put(T::class, instance)
+    inline fun <reified T : Any> put(
+        cacheInstance: Boolean = true,
+        noinline instanceProvider: () -> T
+    ) {
+        if (cacheInstance)
+            instancesToCache.add(T::class)
+        else
+            instancesToCache.remove(T::class)
 
-    inline fun <reified T : Any> putLazy(noinline initializer: () -> T) {
-        lazyInstances[T::class] = initializer
+        instanceReferences[T::class] = instanceProvider
     }
 
-    inline fun <reified T : Any> get(): T = getAndCheck(T::class)
+    inline fun <reified T : Any> get(): T {
+        val cachedInstance = instanceCache[T::class]
 
-    inline fun <reified T : Any> getLazy() = lazy { getAndCheck(T::class) }
+        val instanceProvider = instanceReferences[T::class]
+            ?: error("${T::class.simpleName} not present in InstanceLocator")
 
-    inline fun <reified T : Any> getOrPut(instance: T) = instances
-        .getOrPut(T::class) { instance } as T
-
-    inline fun <reified T : Any> getAndCheck(target: KClass<T>): T {
-        val instance = instances[target]
-            ?: lazyInstances[target]?.let { initializer ->
-                val lazyInstance = initializer()
-                instances[target] = lazyInstance
-                lazyInstance
-            }
-            ?: error("${target.simpleName} not present in InstanceLocator")
+        val instance = cachedInstance ?: instanceProvider()
+        if (instancesToCache.contains(T::class)) instanceCache[T::class] = instance
 
         return runCatching { instance as T }.onFailure {
-            // shouldnt happen
-            error("Wrong data type while retrieving ${target.simpleName}. It's actually ${T::class.simpleName}'")
+            // shouldn't happen
+            error("Wrong data type while retrieving ${T::class.simpleName}. It's actually ${instance::class.simpleName}")
         }.getOrThrow()
     }
 
-    inline fun <reified T : Any> remove() = instances.remove(T::class)
+    inline fun <reified T : Any> remove() {
+        instanceReferences.remove(T::class)
+        instanceCache.remove(T::class)
+    }
 }

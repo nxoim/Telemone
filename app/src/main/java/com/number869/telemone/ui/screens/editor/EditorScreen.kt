@@ -54,17 +54,18 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.MainViewModel
-import com.number869.telemone.defaultDarkThemeUUID
-import com.number869.telemone.defaultLightThemeUUID
-import com.number869.telemone.getColorValueFromColorToken
+import com.number869.telemone.data.defaultDarkThemeUUID
+import com.number869.telemone.data.defaultLightThemeUUID
+import com.number869.telemone.data.getColorValueFromColorToken
+import com.number869.telemone.inject
 import com.number869.telemone.shared.ui.SmallTintedLabel
-import com.number869.telemone.ui.Destinations
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
+import com.number869.telemone.ui.theme.PaletteState
+import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
 import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
@@ -75,10 +76,14 @@ import my.nanihadesuka.compose.ScrollbarSelectionActionable
 // this is prob gonna get redesigned
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun EditorScreen() {
-	val navController = getExistingNavController<Destinations>()
-	val vm = getExistingViewModel<MainViewModel>()
+fun EditorScreen(
+	navController: NavController<EditorDestinations> = getExistingNavController(),
+	vm: EditorViewModel = getExistingViewModel<EditorViewModel>()
+) {
 	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
+	val palette = remember {
+		inject<PaletteState>().entirePaletteAsMap.value
+	}
 
 	val themeList by remember {
 		derivedStateOf {
@@ -152,7 +157,7 @@ fun EditorScreen() {
 							.clip(CircleShape)
 							.clickable {
 								navController.navigate(
-									Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection,
+									EditorDestinations.Dialogs.SavedThemeTypeSelection,
 									ContentType.Overlay
 								)
 							},
@@ -163,7 +168,10 @@ fun EditorScreen() {
 
 						FilledTonalIconButton(
 							onClick = {
-								navController.navigate(Destinations.EditorScreen.Dialogs.SavedThemeTypeSelection, ContentType.Overlay)
+								navController.navigate(
+									EditorDestinations.Dialogs.SavedThemeTypeSelection,
+									ContentType.Overlay
+								)
 							},
 							modifier = Modifier.size(18.dp)
 						) {
@@ -218,7 +226,7 @@ fun EditorScreen() {
 										selectOrUnselectSavedTheme = { vm.selectOrUnselectSavedTheme(theme.uuid) },
 										exportTheme = { vm.exportTheme(theme.uuid, it) },
 										changeSelectionMode = { vm.toggleThemeSelectionModeToolbar() },
-										getColorValueFromColorToken = { getColorValueFromColorToken(it, vm.palette) },
+										getColorValueFromColorToken = { getColorValueFromColorToken(it, palette) },
 										themeSelectionModeIsActive = themeSelectionModeIsVisible
 									)
 								}

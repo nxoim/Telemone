@@ -26,12 +26,14 @@ import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.LargeTonalButton
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
+import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
-fun WelcomeScreen() {
-	val navController = getExistingNavController<Destinations>()
+fun WelcomeScreen(
+	navController: NavController<RootDestinations> = getExistingNavController()
+) {
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
@@ -97,7 +99,7 @@ fun WelcomeScreen() {
 		LargeTonalButton(
 			onClick = {
 				preferences.edit().putBoolean(AppSettings.AgreedToPpAndTos.id, true).apply()
-				navController.replaceAll(Destinations.MainScreen)
+				navController.replaceAll(RootDestinations.Main)
 			},
 			label = "I Agree",
 			modifier = Modifier.weight(1f, false)

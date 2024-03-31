@@ -1,15 +1,13 @@
 package com.number869.telemone.data
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.number869.telemone.defaultDarkThemeUUID
-import com.number869.telemone.defaultLightThemeUUID
-import com.number869.telemone.getColorValueFromColorToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
@@ -37,7 +35,7 @@ val UiElementColorData.color get() = Color(colorValue)
 data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
 
 
-class ThemeRepository(context: Context) {
+class ThemeRepository(private val context: Context) {
 	private val oldThemeListKey = "AppPreferences.ThemeList"
 	private val preferences = context.getSharedPreferences(
 		"AppPreferences",
@@ -106,7 +104,6 @@ class ThemeRepository(context: Context) {
 
 	fun getStockTheme(
 		palette: Map<String, Color>,
-		context: Context,
 		light: Boolean
 	): ThemeData {
 		val themeData = mutableListOf<UiElementColorData>()
@@ -156,6 +153,42 @@ class ThemeRepository(context: Context) {
 			data.name to (data.colorToken to data.colorValue)
 		}
 	)
+}
+
+sealed interface ThemeStorageType {
+	data class Default(val isLight: Boolean) : ThemeStorageType
+	data class Stock(val isLight: Boolean) : ThemeStorageType
+	data class ByUuid(
+		val uuid: String,
+		val withTokens: Boolean,
+		val clearCurrentTheme: Boolean
+	) : ThemeStorageType
+	data class ExternalFile(val uri: Uri, val clearCurrentTheme: Boolean) : ThemeStorageType
+}
+
+const val defaultLightThemeUUID = "defaultLightThemeUUID"
+const val defaultDarkThemeUUID = "defaultDarkThemeUUID"
+
+fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
+	return if (palette.containsKey(tokenToLookFor))
+		palette.getValue(tokenToLookFor)
+	else
+		Color.Red
+}
+
+fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Color>): String {
+	val tokenIndex = palette.values.indexOf(valueToLookFor)
+
+	return if (palette.containsValue(valueToLookFor))
+		palette.keys.elementAt(tokenIndex)
+	else
+		""
+}
+
+enum class ThemeColorDataType {
+	ColorValues,
+	ColorTokens,
+	ColorValuesFromDevicesColorScheme
 }
 
 val fallbackKeys = mapOf(

@@ -54,12 +54,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.ThemeColorDataType
-import com.number869.telemone.ThemeStorageType
 import com.number869.telemone.data.AppSettings
+import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeData
+import com.number869.telemone.data.ThemeStorageType
 import com.number869.telemone.data.color
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.screens.editor.EditorDestinations
+import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
 
@@ -76,10 +77,9 @@ fun SavedThemeItem(
 	selectOrUnselectSavedTheme: () -> Unit,
 	exportTheme: (ThemeColorDataType) -> Unit,
 	getColorValueFromColorToken: (String) -> Color,
-	themeSelectionModeIsActive: Boolean = false
+	themeSelectionModeIsActive: Boolean = false,
+	navController: NavController<EditorDestinations> = getExistingNavController()
 ) {
-	val navController = getExistingNavController<Destinations>()
-
 	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }
 
@@ -91,6 +91,7 @@ fun SavedThemeItem(
 		label = ""
 	)
 
+	// TODO: MOVE THIS ALL OUTTTTTTTTTTTTTTTTTTTT
 	val preferences = LocalContext.current.getSharedPreferences(
 		"AppPreferences.Settings",
 		Context.MODE_PRIVATE
@@ -221,7 +222,7 @@ fun SavedThemeItem(
 				text = { Text("Load theme with options") },
 				onClick = {
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.LoadThemeWithOptions(themeData.uuid),
+						EditorDestinations.Dialogs.LoadThemeWithOptions(themeData.uuid),
 						ContentType.Overlay
 					)
 				}
@@ -245,7 +246,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice(themeData),
+						EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(themeData),
 						ContentType.Overlay
 					)
 				}
@@ -255,7 +256,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.DeleteOneTheme(themeData),
+						EditorDestinations.Dialogs.DeleteOneTheme(themeData),
 						ContentType.Overlay
 					)
 				}

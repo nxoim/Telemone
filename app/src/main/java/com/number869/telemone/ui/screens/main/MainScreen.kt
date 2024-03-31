@@ -23,9 +23,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
+import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
 import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
@@ -33,18 +33,18 @@ import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-	val vm = getExistingViewModel<MainViewModel>()
-	val navController = getExistingNavController<Destinations>()
-
+fun MainScreen(
+	navController: NavController<RootDestinations> = getExistingNavController(),
+	vm: MainViewModel = getExistingViewModel()
+) {
 	LaunchedEffect(Unit) {
 		if (vm.displayLightThemeUpdateChoiceDialog) navController.navigate(
-			Destinations.GlobalDialogs.ThemeUpdateAvailable(true),
+			RootDestinations.GlobalDialogs.ThemeUpdateAvailable(true),
 			ContentType.Overlay
 		)
 
 		if (vm.displayDarkThemeUpdateChoiceDialog) navController.navigate(
-			Destinations.GlobalDialogs.ThemeUpdateAvailable(false),
+			RootDestinations.GlobalDialogs.ThemeUpdateAvailable(false),
 			ContentType.Overlay
 		)
 	}
@@ -68,7 +68,7 @@ fun MainScreen() {
 							text = { Text("Update default light theme") },
 							onClick = {
 								navController.navigate(
-									Destinations.GlobalDialogs.ThemeUpdateAvailable(true),
+									RootDestinations.GlobalDialogs.ThemeUpdateAvailable(true),
 									ContentType.Overlay
 								)
 								showMenu = false
@@ -81,7 +81,7 @@ fun MainScreen() {
 							text = { Text("Update default dark theme") },
 							onClick = {
 								navController.navigate(
-									Destinations.GlobalDialogs.ThemeUpdateAvailable(false),
+									RootDestinations.GlobalDialogs.ThemeUpdateAvailable(false),
 									ContentType.Overlay
 								)
 								showMenu = false
@@ -92,7 +92,7 @@ fun MainScreen() {
 					DropdownMenuItem(
 						text = { Text("About") },
 						onClick = {
-							navController.navigate(Destinations.AboutScreen.About)
+							navController.navigate(RootDestinations.About)
 							showMenu = false
 						}
 					)
@@ -107,9 +107,9 @@ fun MainScreen() {
 			verticalArrangement = Arrangement.SpaceAround,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			DefaultThemesButtons(vm::exportTheme)
+			DefaultThemesButtons(vm::exportDefaultTheme)
 
-			OutlinedButton(onClick = { navController.navigate(Destinations.EditorScreen.Editor) }) {
+			OutlinedButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
 				Text(text = "Go to theme editor")
 			}
 		}

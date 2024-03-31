@@ -22,19 +22,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.about.components.DescriptionItem
 import com.number869.telemone.ui.screens.about.components.DevelopersItem
 import com.number869.telemone.ui.screens.about.components.LegalItem
 import com.number869.telemone.ui.screens.about.components.SourceAndLinksItem
 import com.number869.telemone.ui.screens.about.components.SpecialMentionsItem
 import com.number869.telemone.ui.screens.about.components.VersionItem
+import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen() {
-    val navController = getExistingNavController<Destinations>()
+fun AboutScreen(
+    navController: NavController<RootDestinations> = getExistingNavController()
+) {
     val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 
     val listOfItems = listOf<@Composable () -> Unit>(

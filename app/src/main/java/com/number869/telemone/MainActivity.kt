@@ -11,13 +11,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
 import com.number869.telemone.data.InstanceLocator
+import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.ThemeRepository
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
 import com.nxoim.decomposite.core.common.navigation.NavigationRoot
 import com.nxoim.decomposite.core.common.navigation.navigationRootDataProvider
-import com.nxoim.decomposite.core.common.viewModel.viewModel
 import com.tencent.mmkv.MMKV
 
 class MainActivity : ComponentActivity() {
@@ -34,21 +34,24 @@ class MainActivity : ComponentActivity() {
 
 				remember {
 					// not in a launched effect because this needs to be
-					// executed synchronously
-					App.instanceLocator.putOrOverwrite<Context>(this@MainActivity)
-					App.instanceLocator.getOrPut(
-						ThemeRepository(context = App.instanceLocator.get())
-					)
+					// executed synchronously, before other ui
+					single<Context>(cacheInstance = false) { this@MainActivity }
+					single {
+						ThemeRepository(context = inject())
+					}
 					// update palette state on config changes
-					App.instanceLocator.putOrOverwrite(paletteState)
+					single(cacheInstance = false) { paletteState }
+					single {
+						ThemeManager(
+							themeRepository = inject(),
+							paletteState = inject(),
+							context = inject()
+						)
+					}
 				}
 
 				Surface(modifier = Modifier.fillMaxSize()) {
-					NavigationRoot(navigationRootDataProvider) {
-						val vm = viewModel { MainViewModel() }
-
-						Navigator()
-					}
+					NavigationRoot(navigationRootDataProvider) { Navigator() }
 				}
 			}
 		}
@@ -64,3 +67,11 @@ class App() : Application() {
 		println("APP CREATED")
 	}
 }
+
+// Utils. Theres not many of them so they are here
+inline fun <reified T : Any> single(
+	cacheInstance: Boolean = true,
+	noinline instanceProvider: () -> T
+) = App.instanceLocator.put(cacheInstance, instanceProvider)
+
+inline fun <reified T : Any> inject() = App.instanceLocator.get<T>()
