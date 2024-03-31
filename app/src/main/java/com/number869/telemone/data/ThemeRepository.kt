@@ -8,9 +8,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import org.mongodb.kbson.ObjectId
 
 // no im not making a data class
 private typealias ThemeUUID = String
@@ -35,7 +49,16 @@ val UiElementColorData.color get() = Color(colorValue)
 data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
 
 
-class ThemeRepository(private val context: Context) {
+interface ThemeRepository {
+	fun getAllThemes(): Flow<List<ThemeData>>
+	fun getThemeByUUID(uuid: String): ThemeData?
+	fun saveTheme(theme: ThemeData)
+	fun deleteTheme(uuid: String)
+	fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>)
+	fun getStockTheme(palette: Map<String, Color>, light: Boolean): ThemeData
+}
+
+class SharedPreferencesThemeRepositoryImpl(private val context: Context) : ThemeRepository {
 	private val oldThemeListKey = "AppPreferences.ThemeList"
 	private val preferences = context.getSharedPreferences(
 		"AppPreferences",
@@ -43,7 +66,7 @@ class ThemeRepository(private val context: Context) {
 	)
 	private var _themeList = MutableStateFlow(getAllThemesFromStorage())
 
-	fun getAllThemes() = _themeList.asStateFlow()
+	override fun getAllThemes() = _themeList.asStateFlow()
 
 	private fun getAllThemesFromStorage(): List<ThemeData> {
 		var endResult = listOf<ThemeData>()
@@ -64,21 +87,21 @@ class ThemeRepository(private val context: Context) {
 		return endResult
 	}
 
-	fun getThemeByUUID(uuid: String): ThemeData? = _themeList.value.find { it.uuid == uuid }
+	override fun getThemeByUUID(uuid: String): ThemeData? = _themeList.value.find { it.uuid == uuid }
 
-	fun saveTheme(theme: ThemeData) {
+	override fun saveTheme(theme: ThemeData) {
 		_themeList.value += theme
 		saveThemeListToStorage()
 	}
 
-	fun deleteTheme(uuid: String) {
+	override fun deleteTheme(uuid: String) {
 		_themeList.value.find { it.uuid == uuid }?.let {
 			_themeList.value -= it
 		}
 		saveThemeListToStorage()
 	}
 
-	fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
+	override fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
 		val newList = _themeList.value.toMutableList()
 
 		newList.replaceAll {
@@ -102,39 +125,10 @@ class ThemeRepository(private val context: Context) {
 		preferences.edit().putString(oldThemeListKey, contents).apply()
 	}
 
-	fun getStockTheme(
+	override fun getStockTheme(
 		palette: Map<String, Color>,
 		light: Boolean
-	): ThemeData {
-		val themeData = mutableListOf<UiElementColorData>()
-		val fileName = if (light) "defaultLightFile.attheme" else "defaultDarkFile.attheme"
-
-		context.assets.open(fileName)
-			.bufferedReader().use { reader ->
-				reader.forEachLine { line ->
-					if (line.isNotEmpty()) {
-						val splitLine = line.replace(" ", "").split("=")
-						val name = splitLine[0]
-						val colorToken = splitLine[1]
-
-						val colorValue = getColorValueFromColorToken(colorToken, palette)
-
-						themeData.add(
-							UiElementColorData(
-								name = name,
-								colorToken = colorToken,
-								colorValue = colorValue.toArgb()
-							)
-						)
-					}
-				}
-			}
-
-		return ThemeData(
-			if (light) defaultLightThemeUUID else defaultDarkThemeUUID,
-			themeData
-		)
-	}
+	) = getStockTheme(palette, context, light)
 
 	private fun Theme.toNew(): ThemeData {
 		val themeData = this.values.first().map { (elementName, pair) ->
@@ -153,6 +147,141 @@ class ThemeRepository(private val context: Context) {
 			data.name to (data.colorToken to data.colorValue)
 		}
 	)
+}
+
+class RealmThemeRepositoryImpl(
+	private val realm: Realm = Realm.open(
+		RealmConfiguration.create(
+			setOf(ThemeDataRealm::class, UiElementColorDataRealm::class)
+		)
+	),
+	private val context: Context
+) : ThemeRepository {
+	private val scope = CoroutineScope(Dispatchers.Default)
+	override fun getAllThemes() = flow {
+		realm.query(ThemeDataRealm::class).asFlow().collect() { result ->
+			emit(result.list.map { it.toThemeData() })
+		}
+	}
+
+	override fun getThemeByUUID(uuid: String): ThemeData? {
+		return realm.query(ThemeDataRealm::class, args = arrayOf(uuid)).first().find()?.toThemeData()
+	}
+
+	override fun saveTheme(theme: ThemeData) {
+		scope.launch {
+			realm.write {
+				this.copyToRealm(theme.toThemeDataRealm())
+			}
+
+		}
+	}
+
+	override fun deleteTheme(uuid: String) {
+		scope.launch {
+			realm.write {
+				this.delete(this.query(ThemeDataRealm::class, uuid).first())
+			}
+		}
+	}
+
+	override fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
+		scope.launch {
+			realm.writeBlocking {
+				this.copyToRealm(
+					ThemeData(
+						targetThemesUUID,
+						newData
+					).toThemeDataRealm(),
+					updatePolicy = UpdatePolicy.ALL
+				)
+			}
+		}
+	}
+
+	override fun getStockTheme(
+		palette: Map<String, Color>,
+		light: Boolean
+	) = getStockTheme(palette, context, light)
+
+	private fun ThemeData.toThemeDataRealm(): ThemeDataRealm {
+		return ThemeDataRealm().apply {
+			uuid = this@toThemeDataRealm.uuid
+			values.addAll(this@toThemeDataRealm.values.map { it.toUiElementColorDataRealm() })
+		}
+	}
+
+	private fun ThemeDataRealm.toThemeData(): ThemeData {
+		return ThemeData(
+			uuid = uuid,
+			values = values.map { it.toUiElementColorData() }
+		)
+	}
+
+	private fun UiElementColorData.toUiElementColorDataRealm(): UiElementColorDataRealm {
+		return UiElementColorDataRealm().apply {
+			name = this@toUiElementColorDataRealm.name
+			colorToken = this@toUiElementColorDataRealm.colorToken
+			colorValue = this@toUiElementColorDataRealm.colorValue
+		}
+	}
+
+	private fun UiElementColorDataRealm.toUiElementColorData(): UiElementColorData {
+		return UiElementColorData(
+			name = name,
+			colorToken = colorToken,
+			colorValue = colorValue
+		)
+	}
+}
+
+
+private fun getStockTheme(
+	palette: Map<String, Color>,
+	context: Context,
+	light: Boolean
+): ThemeData {
+	val themeData = mutableListOf<UiElementColorData>()
+	val fileName = if (light) "defaultLightFile.attheme" else "defaultDarkFile.attheme"
+
+	context.assets.open(fileName)
+		.bufferedReader().use { reader ->
+			reader.forEachLine { line ->
+				if (line.isNotEmpty()) {
+					val splitLine = line.replace(" ", "").split("=")
+					val name = splitLine[0]
+					val colorToken = splitLine[1]
+
+					val colorValue = getColorValueFromColorToken(colorToken, palette)
+
+					themeData.add(
+						UiElementColorData(
+							name = name,
+							colorToken = colorToken,
+							colorValue = colorValue.toArgb()
+						)
+					)
+				}
+			}
+		}
+
+	return ThemeData(
+		if (light) defaultLightThemeUUID else defaultDarkThemeUUID,
+		themeData
+	)
+}
+
+class ThemeDataRealm : RealmObject {
+	@PrimaryKey
+	var _id: ObjectId = ObjectId()
+	var uuid: String = ""
+	var values: RealmList<UiElementColorDataRealm> = realmListOf()
+}
+
+class UiElementColorDataRealm : EmbeddedRealmObject {
+	var name: String = ""
+	var colorToken: String = ""
+	var colorValue: Int = 0
 }
 
 sealed interface ThemeStorageType {

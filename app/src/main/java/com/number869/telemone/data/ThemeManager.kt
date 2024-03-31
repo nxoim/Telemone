@@ -17,7 +17,6 @@ import androidx.core.text.isDigitsOnly
 import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
@@ -34,7 +33,7 @@ class ThemeManager(
     // anyway and so loading a theme after restarting the app causes a
     // crash.
     // don't ask me why i don't keep ulong and use ints instead
-    private var _themeList by mutableStateOf(themeRepository.getAllThemes().value)
+    private var _themeList by mutableStateOf(listOf<ThemeData>())
     val themeList get() = _themeList
     private val palette = paletteState.entirePaletteAsMap.value
 
@@ -47,7 +46,7 @@ class ThemeManager(
         println("ThemeManager initialized")
         startupConfigProcess()
         scope.launch {
-            themeRepository.getAllThemes().collectLatest {
+            themeRepository.getAllThemes().collect {
                 _themeList = it
 
                 val defaultThemeKey = if (paletteState.isDarkMode)
