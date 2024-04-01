@@ -44,9 +44,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,16 +55,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.colorOf
-import com.number869.telemone.data.defaultDarkThemeUUID
-import com.number869.telemone.data.defaultLightThemeUUID
-import com.number869.telemone.inject
 import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
-import com.number869.telemone.ui.theme.PaletteState
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
@@ -84,41 +77,24 @@ fun EditorScreen(
 	vm: EditorViewModel = getExistingViewModel<EditorViewModel>()
 ) {
 	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
-	val palette = remember {
-		inject<PaletteState>().entirePaletteAsMap.value
-	}
-
-	val themeList by remember {
-		derivedStateOf {
-			vm.themeList
-				.filterNot {
-					it.uuid == defaultLightThemeUUID || it.uuid == defaultDarkThemeUUID
-				}
-				.reversed()
-		}
-	}
-	val mappedValues = vm.mappedValues
-	val mappedValuesAsList by remember {
-		derivedStateOf { mappedValues.sortedBy { it.name } }
-	}
-	val newUiElementsColors by remember {
-		derivedStateOf {
-			mappedValues.filter {
-				it.name !in vm.defaultCurrentTheme.map { it.name }
-			}
-		}
-	}
-	val incompatibleValues by remember {
-		derivedStateOf {
-			mappedValues.filter { it.colorToken == "INCOMPATIBLE VALUE" }
-		}
-	}
 	val savedThemesRowState = rememberLazyListState()
 	val wholeThingListState = rememberLazyListState()
 
-	val themeSelectionModeIsVisible = vm.themeSelectionToolbarIsVisible
+	val preferences = LocalContext.current.getSharedPreferences(
+		"AppPreferences.Settings",
+		Context.MODE_PRIVATE
+	)
+	val colorDisplayTypePref = preferences.getString(
+		AppSettings.SavedThemeItemDisplayType.id,
+		"1"
+	)
+	val colorDisplayType = when (colorDisplayTypePref) {
+		"1" -> ThemeColorPreviewDisplayType.SavedColorValues
+		"2" -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
+		else -> ThemeColorPreviewDisplayType.CurrentColorScheme
+	}
 
-	LaunchedEffect(themeList) {
+	LaunchedEffect(vm.themeList) {
 		savedThemesRowState.animateScrollToItem(0)
 	}
 
@@ -127,7 +103,7 @@ fun EditorScreen(
 		topBar = {
 			EditorTopAppBar(
 				topAppBarState,
-				mappedValues,
+				vm.mappedValues,
 				exportCustomTheme = vm::exportCustomTheme,
 				saveCurrentTheme = vm::saveCurrentTheme,
 				resetCurrentTheme = vm::resetCurrentTheme,
@@ -149,9 +125,11 @@ fun EditorScreen(
 					Spacer(modifier = Modifier.padding(top = scaffoldPadding.calculateTopPadding()))
 
 					SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
-					CurrentThemePreview() { targetUiElement ->
-						vm.colorFromCurrentTheme(targetUiElement)
-					}
+					CurrentThemePreview(
+						colorOf = { targetUiElement ->
+							vm.colorFromCurrentTheme(targetUiElement)
+						}
+					)
 
 					Spacer(modifier = Modifier.height(8.dp))
 
@@ -182,7 +160,7 @@ fun EditorScreen(
 						}
 					}
 
-					AnimatedVisibility(visible = themeList.isEmpty()) {
+					AnimatedVisibility(visible = vm.themeList.isEmpty()) {
 						Box(
 							Modifier
 								.fillMaxWidth(1f)
@@ -211,23 +189,7 @@ fun EditorScreen(
 						}
 					}
 
-					val preferences = LocalContext.current.getSharedPreferences(
-						"AppPreferences.Settings",
-						Context.MODE_PRIVATE
-					)
-
-					val colorDisplayTypePref = preferences.getString(
-						AppSettings.SavedThemeItemDisplayType.id,
-						"1"
-					)
-
-					val colorDisplayType = when (colorDisplayTypePref) {
-						"1" -> ThemeColorPreviewDisplayType.SavedColorValues
-						"2" -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
-						else -> ThemeColorPreviewDisplayType.CurrentColorScheme
-					}
-
-					AnimatedVisibility(visible = themeList.isNotEmpty()) {
+					AnimatedVisibility(visible = vm.themeList.isNotEmpty()) {
 						Column {
 							LazyRow(
 								state = savedThemesRowState,
@@ -235,7 +197,7 @@ fun EditorScreen(
 								horizontalArrangement = spacedBy(16.dp),
 								modifier = Modifier.animateContentSize()
 							) {
-								itemsIndexed(themeList, key = { _, item -> item.uuid }) { index, theme ->
+								itemsIndexed(vm.themeList, key = { _, item -> item.uuid }) { index, theme ->
 									SavedThemeItem(
 										Modifier.animateItemPlacement(),
 										theme,
@@ -244,14 +206,16 @@ fun EditorScreen(
 										loadSavedTheme = { vm.loadSavedTheme(it) },
 										selectOrUnselectSavedTheme = { vm.selectOrUnselectSavedTheme(theme.uuid) },
 										exportTheme = { vm.exportTheme(theme.uuid, it) },
-										changeSelectionMode = { vm.toggleThemeSelectionModeToolbar() },
+										changeSelectionMode = {
+											vm.toggleThemeSelectionModeToolbar()
+										},
 										colorOf = { targetUiElement ->
 											colorOf(
 												theme.values.find { it.name == targetUiElement }!!,
 												colorDisplayType
 											)
 										},
-										themeSelectionModeIsActive = themeSelectionModeIsVisible
+										themeSelectionModeIsActive = vm.themeSelectionToolbarIsVisible
 									)
 								}
 							}
@@ -261,7 +225,7 @@ fun EditorScreen(
 								horizontalArrangement = Arrangement.Center
 							) {
 								AnimatedVisibility(
-									themeSelectionModeIsVisible,
+									vm.themeSelectionToolbarIsVisible,
 									enter = expandVertically(expandFrom = Alignment.CenterVertically) + fadeIn(),
 									exit = shrinkVertically(shrinkTowards = Alignment.CenterVertically) + fadeOut(),
 								) {
@@ -279,13 +243,13 @@ fun EditorScreen(
 							Spacer(
 								Modifier
 									.animateContentSize()
-									.height(if (themeSelectionModeIsVisible) 12.dp else 24.dp)
+									.height(if (vm.themeSelectionToolbarIsVisible) 12.dp else 24.dp)
 							)
 						}
 					}
 				}
 
-				if (newUiElementsColors.isNotEmpty()) {
+				if (vm.newUiElements.isNotEmpty()) {
 					item {
 						SmallTintedLabel(
 							Modifier
@@ -298,7 +262,7 @@ fun EditorScreen(
 							.animateItemPlacement())
 					}
 
-					itemsIndexed(newUiElementsColors) { index, uiElementData ->
+					itemsIndexed(vm.newUiElements) { index, uiElementData ->
 						ElementColorItem(
 							Modifier
 								.padding(horizontal = 16.dp)
@@ -306,14 +270,14 @@ fun EditorScreen(
 							uiElementData = uiElementData,
 							index = index,
 							changeValue = vm::changeValue,
-							lastIndexInList = newUiElementsColors.lastIndex
+							lastIndexInList = vm.newUiElements.lastIndex
 						)
 					}
 
 					item { Spacer(modifier = Modifier.height(24.dp)) }
 				}
 
-				if (incompatibleValues.isNotEmpty()) {
+				if (vm.incompatibleValues.isNotEmpty()) {
 					item {
 						SmallTintedLabel(
 							Modifier
@@ -327,7 +291,7 @@ fun EditorScreen(
 							.animateItemPlacement())
 					}
 
-					itemsIndexed(incompatibleValues) { index, uiElementData ->
+					itemsIndexed(vm.incompatibleValues) { index, uiElementData ->
 						ElementColorItem(
 							Modifier
 								.padding(horizontal = 16.dp)
@@ -335,7 +299,7 @@ fun EditorScreen(
 							uiElementData = uiElementData,
 							index = index,
 							changeValue = vm::changeValue,
-							lastIndexInList = mappedValuesAsList.lastIndex
+							lastIndexInList = vm.mappedValues.lastIndex
 						)
 					}
 				}
@@ -349,7 +313,7 @@ fun EditorScreen(
 					Spacer(modifier = Modifier.height(16.dp))
 				}
 
-				itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementData ->
+				itemsIndexed(vm.mappedValues, key = { _, it -> it.name }) {index, uiElementData ->
 					ElementColorItem(
 						Modifier
 							.padding(horizontal = 16.dp)
@@ -357,7 +321,7 @@ fun EditorScreen(
 						uiElementData = uiElementData,
 						index = index,
 						changeValue = vm::changeValue,
-						lastIndexInList = mappedValuesAsList.lastIndex
+						lastIndexInList = vm.mappedValues.lastIndex
 					)
 				}
 			}

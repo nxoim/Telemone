@@ -23,8 +23,17 @@ class EditorViewModel(
 	private val themeManager: ThemeManager = inject()
 ) : ViewModel() {
 	val themeList get() = themeManager.themeList
-	val mappedValues get() = themeManager.mappedValues
-	val defaultCurrentTheme get() = themeManager.defaultCurrentTheme
+		.filterNot { it.uuid == defaultLightThemeUUID || it.uuid == defaultDarkThemeUUID }
+		.reversed()
+	val mappedValues get() = themeManager.mappedValues.sortedBy { it.name }
+	private val defaultCurrentTheme get() = themeManager.defaultCurrentTheme
+	val newUiElements get() = mappedValues.filter {
+		it.name !in defaultCurrentTheme.map { it.name }
+	}
+	val incompatibleValues get() = mappedValues.filter {
+		it.colorToken == "INCOMPATIBLE VALUE"
+	}
+
 	val selectedThemes = mutableStateListOf<String>()
 	var themeSelectionToolbarIsVisible by mutableStateOf(false)
 
