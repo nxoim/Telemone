@@ -3,7 +3,6 @@ package com.number869.telemone.data
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.Serializable
 import org.mongodb.kbson.ObjectId
 
-// no im not making a data class
 private typealias ThemeUUID = String
 private typealias UiElementName = String
 private typealias ColorToken = String
@@ -32,7 +30,6 @@ private typealias DataAboutColors = Pair<ColorToken, ColorValue>
 private typealias UiElementData = Map<UiElementName, DataAboutColors>
 private typealias Theme = Map<ThemeUUID, UiElementData>
 private typealias ThemeList = SnapshotStateList<Theme>
-private typealias LoadedTheme = SnapshotStateMap<String, Pair<String, Color>>
 
 @Serializable
 data class UiElementColorData(
@@ -44,7 +41,6 @@ val UiElementColorData.color get() = Color(colorValue)
 
 @Serializable
 data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
-
 
 interface ThemeRepository {
 	fun getAllThemes(): Flow<List<ThemeData>>
@@ -169,7 +165,7 @@ class RealmThemeRepositoryImpl(
 
 	override fun saveTheme(theme: ThemeData) {
 		realm.writeBlocking {
-			this.copyToRealm(theme.toThemeDataRealm(), UpdatePolicy.ALL)
+			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
 		}
 	}
 
@@ -182,10 +178,7 @@ class RealmThemeRepositoryImpl(
 	override fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
 		realm.writeBlocking {
 			this.copyToRealm(
-				ThemeData(
-					targetThemesUUID,
-					newData
-				).toThemeDataRealm(),
+				ThemeData(targetThemesUUID, newData).toRealmRepresentation(),
 				updatePolicy = UpdatePolicy.ALL
 			)
 		}
@@ -196,10 +189,10 @@ class RealmThemeRepositoryImpl(
 		light: Boolean
 	) = getStockTheme(palette, context, light)
 
-	private fun ThemeData.toThemeDataRealm(): ThemeDataRealm {
+	private fun ThemeData.toRealmRepresentation(): ThemeDataRealm {
 		return ThemeDataRealm().apply {
-			uuid = this@toThemeDataRealm.uuid
-			values.addAll(this@toThemeDataRealm.values.map { it.toUiElementColorDataRealm() })
+			uuid = this@toRealmRepresentation.uuid
+			values.addAll(this@toRealmRepresentation.values.map { it.toRealmRepresentation() })
 		}
 	}
 
@@ -210,11 +203,11 @@ class RealmThemeRepositoryImpl(
 		)
 	}
 
-	private fun UiElementColorData.toUiElementColorDataRealm(): UiElementColorDataRealm {
+	private fun UiElementColorData.toRealmRepresentation(): UiElementColorDataRealm {
 		return UiElementColorDataRealm().apply {
-			name = this@toUiElementColorDataRealm.name
-			colorToken = this@toUiElementColorDataRealm.colorToken
-			colorValue = this@toUiElementColorDataRealm.colorValue
+			name = this@toRealmRepresentation.name
+			colorToken = this@toRealmRepresentation.colorToken
+			colorValue = this@toRealmRepresentation.colorValue
 		}
 	}
 
@@ -290,14 +283,14 @@ fun initializeThemeRepository(context: Context): ThemeRepository {
 }
 
 
-class ThemeDataRealm : RealmObject {
+private class ThemeDataRealm : RealmObject {
 	@PrimaryKey
 	var _id: ObjectId = ObjectId()
 	var uuid: String = ""
 	var values: RealmList<UiElementColorDataRealm> = realmListOf()
 }
 
-class UiElementColorDataRealm : EmbeddedRealmObject {
+private class UiElementColorDataRealm : EmbeddedRealmObject {
 	var name: String = ""
 	var colorToken: String = ""
 	var colorValue: Int = 0
