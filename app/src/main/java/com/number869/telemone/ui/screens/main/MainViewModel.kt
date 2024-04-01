@@ -38,7 +38,6 @@ class MainViewModel(
     // move into theme manager
     init { checkForThemeHashUpdates() }
 
-
     fun exportDefaultTheme(light: Boolean) {
         val targetThemeId = if (light) defaultLightThemeUUID else defaultDarkThemeUUID
         val themeName = if (light) "Telemone Light" else "Telemone Dark"
@@ -118,10 +117,10 @@ class MainViewModel(
         )
         if (ofLight) {
             displayLightThemeUpdateChoiceDialog = false
-            lightThemeCanBeUpdated = true
+            lightThemeCanBeUpdated = false
         } else {
             displayDarkThemeUpdateChoiceDialog = false
-            darkThemeCanBeUpdated = true
+            darkThemeCanBeUpdated = false
         }
     }
 

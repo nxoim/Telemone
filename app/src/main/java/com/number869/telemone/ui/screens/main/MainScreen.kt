@@ -15,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,30 +24,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
+import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
-import com.nxoim.decomposite.core.common.ultils.ContentType
-import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
+import com.nxoim.decomposite.core.common.viewModel.viewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
 	navController: NavController<RootDestinations> = getExistingNavController(),
-	vm: MainViewModel = getExistingViewModel()
+	vm: MainViewModel = viewModel { MainViewModel() }
 ) {
-	LaunchedEffect(Unit) {
-		if (vm.displayLightThemeUpdateChoiceDialog) navController.navigate(
-			RootDestinations.GlobalDialogs.ThemeUpdateAvailable(true),
-			ContentType.Overlay
-		)
-
-		if (vm.displayDarkThemeUpdateChoiceDialog) navController.navigate(
-			RootDestinations.GlobalDialogs.ThemeUpdateAvailable(false),
-			ContentType.Overlay
-		)
-	}
-
 	Column(Modifier.fillMaxSize()) {
 		var showMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -67,10 +54,7 @@ fun MainScreen(
 						DropdownMenuItem(
 							text = { Text("Update default light theme") },
 							onClick = {
-								navController.navigate(
-									RootDestinations.GlobalDialogs.ThemeUpdateAvailable(true),
-									ContentType.Overlay
-								)
+								vm.displayLightThemeUpdateChoiceDialog = true
 								showMenu = false
 							}
 						)
@@ -80,10 +64,7 @@ fun MainScreen(
 						DropdownMenuItem(
 							text = { Text("Update default dark theme") },
 							onClick = {
-								navController.navigate(
-									RootDestinations.GlobalDialogs.ThemeUpdateAvailable(false),
-									ContentType.Overlay
-								)
+								vm.displayDarkThemeUpdateChoiceDialog = true
 								showMenu = false
 							}
 						)
@@ -114,4 +95,16 @@ fun MainScreen(
 			}
 		}
 	}
+
+	if (vm.displayLightThemeUpdateChoiceDialog) ThemeUpdateAvailableDialog(
+		ofLight = true,
+		decline = { vm.declineDefaultThemeUpdate(true) },
+		acceptStockThemeUpdate = { vm.acceptTheStockThemeUpdate(true) }
+	)
+
+	if (vm.displayDarkThemeUpdateChoiceDialog) ThemeUpdateAvailableDialog(
+		ofLight = false,
+		decline = { vm.declineDefaultThemeUpdate(false) },
+		acceptStockThemeUpdate = { vm.acceptTheStockThemeUpdate(false) }
+	)
 }
