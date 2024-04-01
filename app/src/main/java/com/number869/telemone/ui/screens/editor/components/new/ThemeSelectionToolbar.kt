@@ -96,7 +96,7 @@ fun ThemeSelectionToolbar(
 			FilledTonalIconButton(
 				onClick = {
 					navController.navigate(
-						EditorDestinations.Dialogs.DeleteSelectedThemes,
+						EditorDestinations.Dialogs.DeleteSelectedThemes(selectedThemeCount),
 						ContentType.Overlay
 					)
 				},

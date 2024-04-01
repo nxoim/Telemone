@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.service.controls.ControlsProviderService
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
 import com.number869.telemone.inject
+import com.number869.telemone.ui.screens.editor.showToast
 import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,26 +75,20 @@ class ThemeManager(
             )
         )
 
-        Toast.makeText(
-            context,
-            "Theme has been saved successfully.",
-            Toast.LENGTH_LONG
-        ).show()
+
     }
 
-    fun deleteTheme(uuid: String) {
-        themeRepository.deleteTheme(uuid)
-
-        Toast.makeText(
-            context,
-            "Theme has been deleted successfully.",
-            Toast.LENGTH_LONG
-        ).show()
-    }
+    fun deleteTheme(uuid: String) = themeRepository.deleteTheme(uuid)
 
     // idk if im dum but i don't think this is able to properly load telegrams
     // stock themes, like "Day".
-    fun loadThemeFromFile(uri: Uri, clearCurrentTheme: Boolean) {
+    fun loadThemeFromFile(
+        uri: Uri,
+        clearCurrentTheme: Boolean,
+        onSuccess: () -> Unit,
+        onIncompatibleValuesFound: () -> Unit,
+        onIncompatibleFileType: () -> Unit
+    ) {
         loadedFromFileTheme.clear()
 
         val loadedList = mutableStateListOf<UiElementColorData>()
@@ -168,11 +162,7 @@ class ThemeManager(
             Log.d(ControlsProviderService.TAG, "Loaded Theme: processed")
 
             if (containsIncompatibleValues) {
-                Toast.makeText(
-                    context,
-                    "Some colors are incompatible and were marked as such.",
-                    Toast.LENGTH_LONG
-                ).show()
+                onIncompatibleValuesFound()
             }
 
             if (isCorrectFormat) {
@@ -204,17 +194,9 @@ class ThemeManager(
                 }
                 loadedFromFileTheme.addAll(loadedList)
 
-                Toast.makeText(
-                    context,
-                    "File loaded successfully",
-                    Toast.LENGTH_LONG
-                ).show()
+                onSuccess()
             } else {
-                Toast.makeText(
-                    context,
-                    "Chosen file isn't a Telegram (not Telegram X) theme.",
-                    Toast.LENGTH_LONG
-                ).show()
+                onIncompatibleFileType()
             }
 
             // reset
@@ -227,12 +209,6 @@ class ThemeManager(
         _mappedValues.clear()
         _mappedValues.addAll(defaultCurrentTheme)
         loadedFromFileTheme.clear()
-
-        Toast.makeText(
-            context,
-            "Reset completed.",
-            Toast.LENGTH_LONG
-        ).show()
     }
 
     fun overwriteTheme(uuid: String, isLightTheme: Boolean) {
@@ -245,13 +221,6 @@ class ThemeManager(
             targetThemeId,
             newDefaultTheme.values
         )
-
-        val themeType = if (isLightTheme) "light" else "dark"
-        Toast.makeText(
-            context,
-            "Default $themeType theme has been overwritten successfully.",
-            Toast.LENGTH_LONG
-        ).show()
     }
 
     fun changeValue(key: String, colorToken: String, colorValue: Color) {
@@ -317,16 +286,30 @@ class ThemeManager(
         _mappedValues.addAll(uiElementDataToAdd)
 
         loadedFromFileTheme.clear()
-
-        Toast.makeText(
-            context,
-            "Theme loaded successfully.",
-            Toast.LENGTH_LONG
-        ).show()
     }
 
-    fun loadSavedTheme(storedTheme: ThemeStorageType) {
+    fun loadSavedTheme(
+        storedTheme: ThemeStorageType,
+        onSuccess: (storageTypeText: String, appearanceTypeText: String) -> Unit,
+        onIncompatibleValuesFound: () -> Unit,
+        onIncompatibleFileType: () -> Unit
+    ) {
         _mappedValues.clear()
+
+        val storageTypeText = when (storedTheme) {
+            is ThemeStorageType.Default -> "Default"
+            is ThemeStorageType.Stock -> "Stock"
+            is ThemeStorageType.ByUuid -> "Saved"
+            is ThemeStorageType.ExternalFile -> "External"
+        }
+
+        val appearanceTypeText = when (storedTheme) {
+            ThemeStorageType.Default(isLight = true),
+            ThemeStorageType.Stock(isLight = true) -> "light "
+            ThemeStorageType.Default(isLight = false),
+            ThemeStorageType.Stock(isLight = false) -> "dark "
+            else -> "" // empty
+        }
 
         fun loadDefaultOrStockTheme() {
             _mappedValues.clear()
@@ -354,41 +337,31 @@ class ThemeManager(
 
             loadedFromFileTheme.clear()
 
-            val storageTypeText = when (storedTheme) {
-                is ThemeStorageType.Default -> "Default"
-                is ThemeStorageType.Stock -> "Stock"
-                is ThemeStorageType.ByUuid -> "Saved"
-                is ThemeStorageType.ExternalFile -> "External"
-            }
-
-            val appearanceTypeText = when (storedTheme) {
-                ThemeStorageType.Default(isLight = true),
-                ThemeStorageType.Stock(isLight = true) -> "light "
-                ThemeStorageType.Default(isLight = false),
-                ThemeStorageType.Stock(isLight = false) -> "dark "
-                else -> "" // empty
-            }
-
-            Toast.makeText(
-                context,
-                "$storageTypeText ${appearanceTypeText}theme has been loaded successfully.",
-                Toast.LENGTH_LONG
-            ).show()
+            onSuccess(storageTypeText, appearanceTypeText)
         }
 
         when (storedTheme) {
             is ThemeStorageType.Default,
             is ThemeStorageType.Stock -> loadDefaultOrStockTheme()
 
-            is ThemeStorageType.ByUuid -> loadSavedThemeByUuid(
-                storedTheme.uuid,
-                storedTheme.withTokens,
-                storedTheme.clearCurrentTheme
-            )
+            is ThemeStorageType.ByUuid -> {
+                loadSavedThemeByUuid(
+                    storedTheme.uuid,
+                    storedTheme.withTokens,
+                    storedTheme.clearCurrentTheme
+                )
+
+                showToast("Theme loaded successfully.")
+            }
 
             is ThemeStorageType.ExternalFile -> loadThemeFromFile(
                 storedTheme.uri,
-                storedTheme.clearCurrentTheme
+                storedTheme.clearCurrentTheme,
+                onSuccess = {
+                    onSuccess(storageTypeText, appearanceTypeText)
+                },
+                onIncompatibleFileType = onIncompatibleFileType,
+                onIncompatibleValuesFound = onIncompatibleValuesFound
             )
         }
     }
@@ -457,13 +430,6 @@ class ThemeManager(
         )
 
         themeRepository.replaceTheme(targetThemeId, stockTheme.values)
-
-        val themeType = if (light) "light" else "dark"
-        Toast.makeText(
-            context,
-            "Default $themeType theme has been overwritten successfully.",
-            Toast.LENGTH_LONG
-        ).show()
     }
 
     fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUID(uuid)

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.number869.telemone.data.ThemeData
+import com.number869.telemone.data.ThemeStorageType
 import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
@@ -57,7 +58,7 @@ private fun Dialogs(
             pickedFileUriState.value = result
 
             result?.let { uri ->
-                vm.loadThemeFromFile(uri,true)
+                vm.loadSavedTheme(ThemeStorageType.ExternalFile(uri, true))
                 editorNavController.navigateBack()
             }
         }
@@ -68,7 +69,7 @@ private fun Dialogs(
             pickedFileUriState.value = result
 
             result?.let { uri ->
-                vm.loadThemeFromFile(uri, false)
+                vm.loadSavedTheme(ThemeStorageType.ExternalFile(uri, false))
                 editorNavController.navigateBack()
             }
         }
@@ -92,13 +93,13 @@ private fun Dialogs(
             deleteTheme = { vm.deleteTheme(destination.theme.uuid) },
         )
     }
-    EditorDestinations.Dialogs.DeleteSelectedThemes -> {
+    is EditorDestinations.Dialogs.DeleteSelectedThemes -> {
         DeleteSelectedThemesDialog(
             hideToolbar = { vm.hideThemeSelectionModeToolbar() },
             hideDialog = { editorNavController.navigateBack() },
             deleteSelectedThemes = vm::deleteSelectedThemes,
             unselectAllThemes = vm::unselectAllThemes,
-            selectedThemeCount = vm.selectedThemes.size,
+            selectedThemeCount = destination.selectedThemeCount,
         )
     }
     is EditorDestinations.Dialogs.LoadThemeWithOptions -> {
@@ -183,7 +184,7 @@ sealed interface EditorDestinations {
         data class DeleteOneTheme(val theme: ThemeData) : Dialogs
 
         @Serializable
-        data object DeleteSelectedThemes : Dialogs
+        data class DeleteSelectedThemes(val selectedThemeCount: Int) : Dialogs
 
         @Serializable
         data object ClearThemeBeforeLoadingFromFile : Dialogs

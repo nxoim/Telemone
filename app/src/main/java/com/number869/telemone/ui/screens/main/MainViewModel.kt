@@ -13,6 +13,7 @@ import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.data.stringify
 import com.number869.telemone.inject
+import com.number869.telemone.ui.screens.editor.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.tencent.mmkv.MMKV
 import java.io.File
@@ -112,10 +113,14 @@ class MainViewModel(
         storageForStockThemeComparison.encode(lastRememberedStockThemeKey(ofLight), nullString)
 
         themeManager.updateDefaultThemeFromStock(ofLight)
+        val themeType = if (ofLight) "light" else "dark"
+        showToast("Default $themeType theme has been overwritten successfully.")
+
         storageForStockThemeComparison.encode(
             dialogVisibilitySettingKey(ofLight),
             false
         )
+
         if (ofLight) {
             displayLightThemeUpdateChoiceDialog = false
             lightThemeCanBeUpdated = false

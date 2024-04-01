@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.scaleIn
@@ -57,6 +56,7 @@ import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.data.ThemeStorageType
 import com.number869.telemone.ui.screens.editor.EditorDestinations
+import com.number869.telemone.ui.screens.editor.showToast
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
@@ -105,13 +105,7 @@ fun SavedThemeItem(
 									)
 								)
 
-								Toast
-									.makeText(
-										context,
-										"Theme loaded",
-										Toast.LENGTH_SHORT
-									)
-									.show()
+								showToast("Theme loaded")
 							},
 							onLongClick = { showMenu = true }
 						)

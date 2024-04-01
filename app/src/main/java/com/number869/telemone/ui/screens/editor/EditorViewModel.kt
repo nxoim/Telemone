@@ -1,6 +1,7 @@
 package com.number869.telemone.ui.screens.editor
 
-import android.net.Uri
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -42,12 +43,31 @@ class EditorViewModel(
 
 	fun exportCustomTheme() = themeManager.exportCustomTheme()
 
-	fun saveCurrentTheme() = themeManager.saveCurrentTheme()
+	fun saveCurrentTheme() {
+		themeManager.saveCurrentTheme()
+		showToast("Theme has been saved successfully.",)
+	}
 
-	fun resetCurrentTheme() = themeManager.resetCurrentTheme()
+	fun resetCurrentTheme() {
+		themeManager.resetCurrentTheme()
+		showToast("Reset completed.")
+	}
 
 	fun loadSavedTheme(themeStorageType: ThemeStorageType) =
-		themeManager.loadSavedTheme(themeStorageType)
+		themeManager.loadSavedTheme(
+			themeStorageType,
+			onSuccess = { storageTypeText, appearanceTypeText ->
+				showToast(
+					"$storageTypeText ${appearanceTypeText}theme has been loaded successfully."
+				)
+			},
+			onIncompatibleValuesFound = {
+				showToast("Some colors are incompatible and were marked as such.")
+			},
+			onIncompatibleFileType = {
+				showToast("Chosen file isn't a Telegram (not Telegram X) theme.")
+			}
+		)
 
 	fun changeValue(uiElementName: String, colorToken: String, colorValue: Color) =
 		themeManager.changeValue(uiElementName, colorToken, colorValue)
@@ -83,8 +103,10 @@ class EditorViewModel(
 
 	fun unselectAllThemes() = selectedThemes.clear()
 
-	fun deleteSelectedThemes() = selectedThemes.forEach {
-		themeManager.deleteTheme(it)
+	fun deleteSelectedThemes(selectedThemeCount: Int) {
+		selectedThemes.forEach { themeManager.deleteTheme(it) }
+
+		showToast("Themes ($selectedThemeCount) have been successfully deleted.")
 	}
 
 	fun hideThemeSelectionModeToolbar() {
@@ -97,18 +119,27 @@ class EditorViewModel(
 
 	fun getThemeByUUID(uuid: String) = themeManager.getThemeByUUID(uuid)
 
-	fun loadThemeFromFile(uri: Uri, clearCurrentTheme: Boolean) =
-		themeManager.loadThemeFromFile(uri, clearCurrentTheme)
+	fun deleteTheme(uuid: String) {
+		themeManager.deleteTheme(uuid)
 
-	fun deleteTheme(uuid: String) = themeManager.deleteTheme(uuid)
+		showToast("Theme has been deleted successfully.",)
+	}
 
-	fun overwriteTheme(uuid: String, isLightTheme: Boolean) =
+	fun overwriteTheme(uuid: String, isLightTheme: Boolean) {
 		themeManager.overwriteTheme(uuid, isLightTheme)
+
+		val themeType = if (isLightTheme) "light" else "dark"
+		showToast("Default $themeType theme has been overwritten successfully.")
+	}
 }
 
 enum class ThemeColorPreviewDisplayType(val id: String) {
 	SavedColorValues("1"),
 	CurrentColorSchemeWithFallback("2"),
 	CurrentColorScheme("3")
+}
+
+fun showToast(text: String, context: Context = inject()) {
+	Toast.makeText(context, text, Toast.LENGTH_LONG).show()
 }
 
