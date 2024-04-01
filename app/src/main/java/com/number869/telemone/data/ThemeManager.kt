@@ -17,6 +17,8 @@ import androidx.core.text.isDigitsOnly
 import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
@@ -499,4 +501,11 @@ class ThemeManager(
     }
 
     fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUID(uuid)
+    fun getThemeByUUIDAsFlow(uuid: String) = themeRepository
+        .getThemeByUUIDAsFlow(uuid)
+        .stateIn(
+            scope,
+            SharingStarted.WhileSubscribed(),
+            themeList.find { it.uuid == uuid }
+        )
 }

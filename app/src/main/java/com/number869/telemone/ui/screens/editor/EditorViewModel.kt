@@ -87,6 +87,7 @@ class EditorViewModel(
 		themeSelectionToolbarIsVisible = !themeSelectionToolbarIsVisible
 	}
 
+	fun getThemeByUUID(uuid: String) = themeManager.getThemeByUUID(uuid)
 
 	fun loadThemeFromFile(uri: Uri, clearCurrentTheme: Boolean) =
 		themeManager.loadThemeFromFile(uri, clearCurrentTheme)

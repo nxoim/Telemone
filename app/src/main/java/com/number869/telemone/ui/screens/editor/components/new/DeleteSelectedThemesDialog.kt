@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
@@ -12,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun DeleteSelectedThemesDialog(
@@ -20,8 +20,9 @@ fun DeleteSelectedThemesDialog(
 	deleteSelectedThemes: () -> Unit,
 	unselectAllThemes: () -> Unit,
 	selectedThemeCount: Int,
-	context: Context
 ) {
+	val context = LocalContext.current
+
 	AlertDialog(
 		icon = { Icon(Icons.Default.DeleteForever, contentDescription = "Delete icon") },
 		title = { Text("Permanently delete these themes?") },
