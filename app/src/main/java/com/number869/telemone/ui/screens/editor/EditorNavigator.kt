@@ -10,8 +10,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
-import com.number869.telemone.data.getColorValueFromColorToken
-import com.number869.telemone.inject
 import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteSelectedThemesDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteThemeDialog
@@ -20,7 +18,6 @@ import com.number869.telemone.ui.screens.editor.components.new.OverwriteChoiceDi
 import com.number869.telemone.ui.screens.editor.components.new.OverwriteDefaultsDialog
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDisplayTypeChooserDialog
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
-import com.number869.telemone.ui.theme.PaletteState
 import com.nxoim.decomposite.core.common.navigation.NavHost
 import com.nxoim.decomposite.core.common.navigation.navController
 import com.nxoim.decomposite.core.common.ultils.ContentType
@@ -30,9 +27,6 @@ import kotlinx.serialization.Serializable
 @Composable
 fun EditorNavigator() {
     val vm = viewModel { EditorViewModel() }
-    val palette = remember {
-        inject<PaletteState>().entirePaletteAsMap.value
-    }
     val editorNavController = navController<EditorDestinations>(EditorDestinations.Editor)
 
     NavHost(editorNavController) {
@@ -85,9 +79,6 @@ fun EditorNavigator() {
                     close = { editorNavController.navigateBack() },
                     theme = it.theme,
                     deleteTheme = { vm.deleteTheme(it.theme.uuid) },
-                    getColorValueFromColorToken = {
-                        getColorValueFromColorToken(it, palette)
-                    }
                 )
             }
             EditorDestinations.Dialogs.DeleteSelectedThemes -> {
@@ -118,9 +109,6 @@ fun EditorNavigator() {
                     lightTheme = vm.themeList.find { it.uuid == defaultLightThemeUUID }!!,
                     darkTheme = vm.themeList.find { it.uuid == defaultDarkThemeUUID }!!,
                     overwriteWith = it.withTheme,
-                    getColorValueFromColorToken = {
-                        getColorValueFromColorToken(it, palette)
-                    }
                 )
             }
             is EditorDestinations.Dialogs.OverwriteDefaultThemeChoice -> {
@@ -148,9 +136,6 @@ fun EditorNavigator() {
                     },
                     lightTheme = vm.themeList.find { it.uuid == defaultLightThemeUUID }!!,
                     darkTheme = vm.themeList.find { it.uuid == defaultDarkThemeUUID }!!,
-                    getColorValueFromColorToken = {
-                        getColorValueFromColorToken(it, palette)
-                    }
                 )
             }
             EditorDestinations.Dialogs.SavedThemeTypeSelection -> {

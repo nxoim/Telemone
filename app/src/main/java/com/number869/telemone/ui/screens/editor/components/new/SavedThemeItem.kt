@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -54,11 +53,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.data.ThemeStorageType
-import com.number869.telemone.data.color
 import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
@@ -71,12 +68,11 @@ fun SavedThemeItem(
 	themeData: ThemeData,
 	selected: Boolean = false,
 	isInSavedThemesRow: Boolean = false,
-	colorDisplayTypeOverwrite: String? = null,
 	changeSelectionMode: () -> Unit = { },
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	selectOrUnselectSavedTheme: () -> Unit,
 	exportTheme: (ThemeColorDataType) -> Unit,
-	getColorValueFromColorToken: (String) -> Color,
+	colorOf: @Composable (String) -> Color,
 	themeSelectionModeIsActive: Boolean = false,
 	navController: NavController<EditorDestinations> = getExistingNavController()
 ) {
@@ -90,55 +86,6 @@ fun SavedThemeItem(
 			Color.Transparent,
 		label = ""
 	)
-
-	// TODO: MOVE THIS ALL OUTTTTTTTTTTTTTTTTTTTT
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-
-	// 1 - Saved color values
-	// 2 - Current color scheme (fallback to saved colors)
-	// 3 - Current color scheme
-	val colorDisplayType = preferences.getString(
-		AppSettings.SavedThemeItemDisplayType.id,
-		"1"
-	)
-
-	// cry about it being here
-	@Composable
-	fun colorOf(uiElementName: String): Color {
-		return animateColorAsState(
-			when (colorDisplayTypeOverwrite ?: colorDisplayType) {
-				"1" -> {
-					themeData.values
-						.find { it.name == uiElementName }
-						?.color
-						?: Color.Red
-				}
-				"2" -> { // in case theres a need to show monet colors only when available
-					themeData.values
-						.find { it.name == uiElementName }
-						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.colorToken)
-							val colorAsSaved = it.color
-
-							// colorFromToken prob should be Color? so it can
-							// be null
-							if (colorFromToken == Color.Red) colorAsSaved else colorFromToken
-						}
-						?: Color.Red
-				}
-				else -> {
-					themeData.values
-						.find { it.name == uiElementName }
-						?.let { getColorValueFromColorToken(it.colorToken) }
-						?: Color.Red
-				}
-			},
-			label = "i hate these labels"
-		).value
-	}
 
 	Box {
 		OutlinedCard(

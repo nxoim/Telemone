@@ -2,6 +2,7 @@
 
 package com.number869.telemone.ui.screens.editor
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
@@ -50,13 +51,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.data.AppSettings
+import com.number869.telemone.data.colorOf
 import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
-import com.number869.telemone.data.getColorValueFromColorToken
 import com.number869.telemone.inject
 import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
@@ -208,6 +211,22 @@ fun EditorScreen(
 						}
 					}
 
+					val preferences = LocalContext.current.getSharedPreferences(
+						"AppPreferences.Settings",
+						Context.MODE_PRIVATE
+					)
+
+					val colorDisplayTypePref = preferences.getString(
+						AppSettings.SavedThemeItemDisplayType.id,
+						"1"
+					)
+
+					val colorDisplayType = when (colorDisplayTypePref) {
+						"1" -> ThemeColorPreviewDisplayType.SavedColorValues
+						"2" -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
+						else -> ThemeColorPreviewDisplayType.CurrentColorScheme
+					}
+
 					AnimatedVisibility(visible = themeList.isNotEmpty()) {
 						Column {
 							LazyRow(
@@ -226,7 +245,12 @@ fun EditorScreen(
 										selectOrUnselectSavedTheme = { vm.selectOrUnselectSavedTheme(theme.uuid) },
 										exportTheme = { vm.exportTheme(theme.uuid, it) },
 										changeSelectionMode = { vm.toggleThemeSelectionModeToolbar() },
-										getColorValueFromColorToken = { getColorValueFromColorToken(it, palette) },
+										colorOf = { targetUiElement ->
+											colorOf(
+												theme.values.find { it.name == targetUiElement }!!,
+												colorDisplayType
+											)
+										},
 										themeSelectionModeIsActive = themeSelectionModeIsVisible
 									)
 								}

@@ -102,3 +102,9 @@ class EditorViewModel(
 	) = themeManager.stringify(source, using)
 }
 
+enum class ThemeColorPreviewDisplayType(val id: String) {
+	SavedColorValues("1"),
+	CurrentColorSchemeWithFallback("2"),
+	CurrentColorScheme("3")
+}
+
