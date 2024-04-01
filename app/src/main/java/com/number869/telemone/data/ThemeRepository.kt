@@ -334,26 +334,24 @@ fun colorOf(
 	palette: Map<String, Color> = remember {
 		inject<PaletteState>().entirePaletteAsMap
 	}
-): Color {
-	return animateColorAsState(
-		when (colorDisplayType) {
-			ThemeColorPreviewDisplayType.SavedColorValues -> {
-				data.color
-			}
-			// in case theres a need to show monet colors only when available
-			ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback -> {
-				val colorFromToken = getColorValueFromColorTokenOrNull(data.colorToken, palette)
-				val colorAsSaved = data.color
-				colorFromToken ?: colorAsSaved
-			}
+) = animateColorAsState(
+	when (colorDisplayType) {
+		ThemeColorPreviewDisplayType.SavedColorValues -> {
+			data.color
+		}
+		// in case theres a need to show monet colors only when available
+		ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback -> {
+			val colorFromToken = getColorValueFromColorTokenOrNull(data.colorToken, palette)
+			val colorAsSaved = data.color
+			colorFromToken ?: colorAsSaved
+		}
 
-			ThemeColorPreviewDisplayType.CurrentColorScheme -> {
-				getColorValueFromColorToken(data.colorToken, palette)
-			}
-		},
-		label = "i hate these labels"
-	).value
-}
+		ThemeColorPreviewDisplayType.CurrentColorScheme -> {
+			getColorValueFromColorToken(data.colorToken, palette)
+		}
+	},
+	label = "i hate these labels"
+).value
 
 fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
 	return if (palette.containsKey(tokenToLookFor))
