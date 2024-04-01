@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
+import com.number869.telemone.inject
 import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -412,41 +413,6 @@ class ThemeManager(
         }
     }
 
-
-    @JvmName("stringify2") // cuz compile issue "declaration clash"
-    fun stringify(
-        source: List<UiElementColorData>,
-        using: ThemeColorDataType
-    ) = source.stringify(using)
-
-    private fun List<UiElementColorData>.stringify(using: ThemeColorDataType): String {
-        val theme = when(using) {
-            ThemeColorDataType.ColorValues -> {
-                this.sortedBy { it.name }.associate { it.name to it.colorValue.toString() }
-            }
-            ThemeColorDataType.ColorTokens -> {
-                this.sortedBy { it.name }.associate { it.name to it.colorToken }
-            }
-            ThemeColorDataType.ColorValuesFromDevicesColorScheme -> {
-                this
-                    .sortedBy { it.name }
-                    .associate {
-                        it.name to getColorValueFromColorToken(it.colorToken, palette).toArgb().toString()
-                    }
-            }
-        }
-
-
-        val themeAsString = theme.entries.joinToString("\n")
-            .replace(")", "")
-            .replace("(", "")
-            .replace(", ", "=")
-
-        return "${
-            themeAsString
-        }\n"
-    }
-
     private fun startupConfigProcess() {
         val stockLightTheme by lazy {
             themeRepository.getStockTheme(
@@ -508,4 +474,42 @@ class ThemeManager(
             SharingStarted.WhileSubscribed(),
             themeList.find { it.uuid == uuid }
         )
+}
+
+@JvmName("stringify2") // cuz compile issue "declaration clash"
+fun stringify(
+    source: List<UiElementColorData>,
+    using: ThemeColorDataType,
+    palette: Map<String, Color> = inject<PaletteState>().entirePaletteAsMap.value
+) = source.stringify(using, palette)
+
+private fun List<UiElementColorData>.stringify(
+    using: ThemeColorDataType,
+    palette: Map<String, Color> = inject<PaletteState>().entirePaletteAsMap.value
+): String {
+    val theme = when(using) {
+        ThemeColorDataType.ColorValues -> {
+            this.sortedBy { it.name }.associate { it.name to it.colorValue.toString() }
+        }
+        ThemeColorDataType.ColorTokens -> {
+            this.sortedBy { it.name }.associate { it.name to it.colorToken }
+        }
+        ThemeColorDataType.ColorValuesFromDevicesColorScheme -> {
+            this
+                .sortedBy { it.name }
+                .associate {
+                    it.name to getColorValueFromColorToken(it.colorToken, palette).toArgb().toString()
+                }
+        }
+    }
+
+
+    val themeAsString = theme.entries.joinToString("\n")
+        .replace(")", "")
+        .replace("(", "")
+        .replace(", ", "=")
+
+    return "${
+        themeAsString
+    }\n"
 }

@@ -11,6 +11,7 @@ import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
+import com.number869.telemone.data.stringify
 import com.number869.telemone.inject
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.tencent.mmkv.MMKV
@@ -41,7 +42,7 @@ class MainViewModel(
     fun exportDefaultTheme(light: Boolean) {
         val targetThemeId = if (light) defaultLightThemeUUID else defaultDarkThemeUUID
         val themeName = if (light) "Telemone Light" else "Telemone Dark"
-        val theme = themeManager.stringify(
+        val theme = stringify(
             themeManager.getThemeByUUID(targetThemeId)!!.values,
             ThemeColorDataType.ColorValuesFromDevicesColorScheme
         )

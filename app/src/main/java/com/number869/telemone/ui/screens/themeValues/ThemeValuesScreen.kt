@@ -23,16 +23,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.number869.telemone.data.ThemeColorDataType
+import com.number869.telemone.data.stringify
 import com.number869.telemone.ui.screens.editor.EditorViewModel
 import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 
 @Composable
-fun ThemeValuesScreen() {
-	val vm = getExistingViewModel<EditorViewModel>()
-
+fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
 	var showValues by remember { mutableStateOf(false) }
 	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
-	val text = vm.stringify(
+	val text = stringify(
 		mappedValues.toList(),
 		if (showValues)
 			ThemeColorDataType.ColorValues

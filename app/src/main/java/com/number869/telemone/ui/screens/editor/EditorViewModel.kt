@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.ThemeStorageType
-import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.inject
@@ -105,11 +104,6 @@ class EditorViewModel(
 
 	fun overwriteTheme(uuid: String, isLightTheme: Boolean) =
 		themeManager.overwriteTheme(uuid, isLightTheme)
-
-	fun stringify(
-		source: List<UiElementColorData>,
-		using: ThemeColorDataType
-	) = themeManager.stringify(source, using)
 }
 
 enum class ThemeColorPreviewDisplayType(val id: String) {
