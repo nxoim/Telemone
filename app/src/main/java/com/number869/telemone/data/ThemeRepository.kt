@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import org.mongodb.kbson.ObjectId
 
@@ -51,6 +52,7 @@ data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
 interface ThemeRepository {
 	fun getAllThemes(): Flow<List<ThemeData>>
 	fun getThemeByUUID(uuid: String): ThemeData?
+	fun getThemeByUUIDAsFlow(uuid: String): Flow<ThemeData?>
 	fun saveTheme(theme: ThemeData)
 	fun deleteTheme(uuid: String)
 	fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>)
@@ -87,6 +89,9 @@ class SharedPreferencesThemeRepositoryImpl(private val context: Context) : Theme
 	}
 
 	override fun getThemeByUUID(uuid: String): ThemeData? = _themeList.value.find { it.uuid == uuid }
+	override fun getThemeByUUIDAsFlow(uuid: String)= flow {
+		_themeList.value.find { it.uuid == uuid }.let { emit(it) }
+	}
 
 	override fun saveTheme(theme: ThemeData) {
 		_themeList.value += theme
@@ -168,6 +173,12 @@ class RealmThemeRepositoryImpl(
 			.find()
 			?.toThemeData()
 	}
+
+	override fun getThemeByUUIDAsFlow(uuid: String) = realm
+		.query(ThemeDataRealm::class, "uuid = $0", uuid)
+		.first()
+		.asFlow()
+		.map { it.obj?.toThemeData() }
 
 	override fun saveTheme(theme: ThemeData) {
 		realm.writeBlocking {
