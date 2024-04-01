@@ -1,5 +1,6 @@
 package com.number869.telemone
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
@@ -21,6 +22,7 @@ import com.nxoim.decomposite.core.common.navigation.navigationRootDataProvider
 import com.tencent.mmkv.MMKV
 
 class MainActivity : ComponentActivity() {
+	@SuppressLint("RememberReturnType")
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -36,7 +38,6 @@ class MainActivity : ComponentActivity() {
 					// not in a launched effect because this needs to be
 					// executed synchronously, before other ui
 					single<Context>(cacheInstance = false) { this@MainActivity }
-//					single<ThemeRepository> { SharedPreferencesThemeRepositoryImpl(inject()) }
 					single { initializeThemeRepository(context = inject()) }
 					// update palette state on config changes
 					single(cacheInstance = false) { paletteState }
