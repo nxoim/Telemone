@@ -33,7 +33,6 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			TelemoneTheme {
 				val paletteState = rememberPaletteState()
-
 				remember {
 					// not in a launched effect because this needs to be
 					// executed synchronously, before other ui

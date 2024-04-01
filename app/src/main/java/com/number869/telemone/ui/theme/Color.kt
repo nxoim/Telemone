@@ -71,9 +71,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -93,27 +91,28 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 class PaletteState(
-	val entirePaletteAsMap: MutableState<LinkedHashMap<String, Color>>,
+	val entirePaletteAsMap: LinkedHashMap<String, Color>,
 	val isDarkMode: Boolean
 ) {
-	val allPossibleColorTokensAsList = entirePaletteAsMap.value.keys
+	val allPossibleColorTokensAsList = entirePaletteAsMap.keys
 }
 
 @Composable
 fun rememberPaletteState(): PaletteState {
 	val isDarkMode = isSystemInDarkTheme()
-	val entirePaletteAsMap = remember { mutableStateOf(linkedMapOf<String, Color>()) }
+	val entirePaletteAsMap = remember { linkedMapOf<String, Color>() }
+
 
 	AdditionalColors.entries.forEach {
-		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	ColorRolesLight.entries.forEach {
-		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	ColorRolesDark.entries.forEach {
-		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	listOf(
@@ -130,7 +129,7 @@ fun rememberPaletteState(): PaletteState {
 		cyanTones,
 		pinkTones
 	).forEach { toneList ->
-		toneList.forEach { entirePaletteAsMap.value[it.colorToken] = it.colorValue }
+		toneList.forEach { entirePaletteAsMap[it.colorToken] = it.colorValue }
 	}
 
 	return remember { PaletteState(entirePaletteAsMap, isDarkMode) }

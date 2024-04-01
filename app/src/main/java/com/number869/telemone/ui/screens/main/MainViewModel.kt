@@ -16,6 +16,7 @@ import com.number869.telemone.inject
 import com.number869.telemone.ui.screens.editor.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Stable
@@ -25,7 +26,9 @@ class MainViewModel(
     private val context: Context = inject(),
     private val themeManager: ThemeManager = inject()
 ) : ViewModel() {
-    private val storageForStockThemeComparison = MMKV.mmkvWithID("storageForStockThemeComparison")
+    private val storageForStockThemeComparison by lazy {
+        MMKV.mmkvWithID("storageForStockThemeComparison")
+    }
 
     var lightThemeCanBeUpdated by mutableStateOf(
         assetFoldersThemeHash(true)	!= lastThemeUpdatesHash(true)
@@ -38,7 +41,7 @@ class MainViewModel(
     var displayDarkThemeUpdateChoiceDialog by mutableStateOf(false)
 
     // move into theme manager
-    init { checkForThemeHashUpdates() }
+    init { viewModelScope.launch { checkForThemeHashUpdates() } }
 
     fun exportDefaultTheme(light: Boolean) {
         val targetThemeId = if (light) defaultLightThemeUUID else defaultDarkThemeUUID

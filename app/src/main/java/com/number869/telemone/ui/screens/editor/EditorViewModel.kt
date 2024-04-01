@@ -25,7 +25,7 @@ class EditorViewModel(
 	val themeList get() = themeManager.themeList
 		.filterNot { it.uuid == defaultLightThemeUUID || it.uuid == defaultDarkThemeUUID }
 		.reversed()
-	val mappedValues get() = themeManager.mappedValues.sortedBy { it.name }
+	val mappedValues get() = themeManager.mappedValues.values.toList().sortedBy { it.name }
 	private val defaultCurrentTheme get() = themeManager.defaultCurrentTheme
 	val newUiElements get() = mappedValues.filter {
 		it.name !in defaultCurrentTheme.map { it.name }

@@ -332,7 +332,7 @@ fun colorOf(
 	data: UiElementColorData,
 	colorDisplayType: ThemeColorPreviewDisplayType,
 	palette: Map<String, Color> = remember {
-		inject<PaletteState>().entirePaletteAsMap.value
+		inject<PaletteState>().entirePaletteAsMap
 	}
 ): Color {
 	return animateColorAsState(
