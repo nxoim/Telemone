@@ -365,21 +365,18 @@ class ThemeManager(
             )
         }
 
-        val defaultLightTheme = themeRepository.getThemeByUUID(defaultLightThemeUUID)
-        val defaultDarkTheme = themeRepository.getThemeByUUID(defaultDarkThemeUUID)
-
-        if (defaultLightTheme == null) {
+        if (getThemeByUUID(defaultLightThemeUUID) == null) {
             themeRepository.saveTheme(ThemeData(defaultLightThemeUUID, stockLightTheme.values))
         }
 
-        if (defaultDarkTheme == null) {
+        if (getThemeByUUID(defaultDarkThemeUUID) == null) {
             themeRepository.saveTheme(ThemeData(defaultDarkThemeUUID, stockDarkTheme.values))
         }
 
         if (paletteState.isDarkMode)
-            _mappedValues.putAll(defaultDarkTheme!!.values.associateBy { it.name })
+            _mappedValues.putAll(getThemeByUUID(defaultDarkThemeUUID)!!.values.associateBy { it.name })
         else
-            _mappedValues.putAll(defaultLightTheme!!.values.associateBy { it.name })
+            _mappedValues.putAll(getThemeByUUID(defaultLightThemeUUID)!!.values.associateBy { it.name })
     }
 
     fun updateDefaultThemeFromStock(light: Boolean) {

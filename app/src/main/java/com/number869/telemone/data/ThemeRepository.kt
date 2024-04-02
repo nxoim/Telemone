@@ -90,10 +90,8 @@ class RealmThemeRepositoryImpl(
 		.map { it.obj?.toThemeData() }
 
 	override fun saveTheme(theme: ThemeData) {
-		scope.launch {
-			realm.write {
-				this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
-			}
+		realm.writeBlocking {
+			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
 		}
 	}
 
