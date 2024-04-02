@@ -5,11 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.service.controls.ControlsProviderService
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
@@ -19,9 +16,6 @@ import com.number869.telemone.ui.screens.editor.showToast
 import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
 
@@ -37,8 +31,8 @@ class ThemeManager(
     // anyway and so loading a theme after restarting the app causes a
     // crash.
     // don't ask me why i don't keep ulong and use ints instead
-    private var _themeList by mutableStateOf(listOf<ThemeData>())
-    val themeList get() = _themeList
+    val themeList get() = themeRepository.getAllThemes()
+
     private val palette = paletteState.entirePaletteAsMap
 
     private var _mappedValues = mutableStateMapOf<String, UiElementColorData>()
@@ -49,23 +43,12 @@ class ThemeManager(
     init {
         println("ThemeManager initialized")
         startupConfigProcess()
-        scope.launch {
-            themeRepository.getAllThemes().collect {
-                _themeList = it
+        val defaultThemeKey = if (paletteState.isDarkMode)
+            defaultDarkThemeUUID
+        else
+            defaultLightThemeUUID
 
-                val defaultThemeKey = if (paletteState.isDarkMode)
-                    defaultDarkThemeUUID
-                else
-                    defaultLightThemeUUID
-
-                it.find { it.uuid == defaultThemeKey }?.let {
-                    if (defaultCurrentTheme.toList() != it.values) {
-                        defaultCurrentTheme.clear()
-                        defaultCurrentTheme.addAll(it.values)
-                    }
-                }
-            }
-        }
+        defaultCurrentTheme.addAll(getThemeByUUID(defaultThemeKey)!!.values)
     }
 
     fun saveCurrentTheme() {
@@ -206,7 +189,7 @@ class ThemeManager(
             "Upon overwriteTheme() theme did not exist in themeList"
         )
 
-        themeRepository.replaceTheme(targetThemeId, newDefaultTheme.values)
+        themeRepository.saveTheme(ThemeData(targetThemeId, newDefaultTheme.values))
     }
 
     fun changeValue(key: String, colorToken: String, colorValue: Color) {
@@ -382,24 +365,21 @@ class ThemeManager(
             )
         }
 
-        if (themeList.find { it.uuid == defaultLightThemeUUID } == null) {
+        val defaultLightTheme = themeRepository.getThemeByUUID(defaultLightThemeUUID)
+        val defaultDarkTheme = themeRepository.getThemeByUUID(defaultDarkThemeUUID)
+
+        if (defaultLightTheme == null) {
             themeRepository.saveTheme(ThemeData(defaultLightThemeUUID, stockLightTheme.values))
         }
 
-        if (themeList.find { it.uuid == defaultDarkThemeUUID } == null) {
+        if (defaultDarkTheme == null) {
             themeRepository.saveTheme(ThemeData(defaultDarkThemeUUID, stockDarkTheme.values))
         }
 
         if (paletteState.isDarkMode)
-            _mappedValues.putAll(
-                themeRepository.getThemeByUUID(defaultDarkThemeUUID)!!.values
-                    .associateBy { it.name }
-            )
+            _mappedValues.putAll(defaultDarkTheme!!.values.associateBy { it.name })
         else
-            _mappedValues.putAll(
-                themeRepository.getThemeByUUID(defaultLightThemeUUID)!!.values
-                    .associateBy { it.name }
-            )
+            _mappedValues.putAll(defaultLightTheme!!.values.associateBy { it.name })
     }
 
     fun updateDefaultThemeFromStock(light: Boolean) {
@@ -416,17 +396,10 @@ class ThemeManager(
             ThemeData(UUID.randomUUID().toString(), currentDefaultTheme.values)
         )
 
-        themeRepository.replaceTheme(targetThemeId, stockTheme.values)
+        themeRepository.saveTheme(ThemeData(targetThemeId, stockTheme.values))
     }
 
     fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUID(uuid)
-    fun getThemeByUUIDAsFlow(uuid: String) = themeRepository
-        .getThemeByUUIDAsFlow(uuid)
-        .stateIn(
-            scope,
-            SharingStarted.WhileSubscribed(),
-            themeList.find { it.uuid == uuid }
-        )
 }
 
 @JvmName("stringify2") // cuz compile issue "declaration clash"

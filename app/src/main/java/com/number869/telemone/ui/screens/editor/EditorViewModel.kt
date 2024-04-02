@@ -11,10 +11,10 @@ import androidx.compose.ui.graphics.Color
 import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.ThemeStorageType
-import com.number869.telemone.data.defaultDarkThemeUUID
-import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.inject
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Stable
 // funny of you to actually expect some sort of documentation in the
@@ -23,8 +23,7 @@ class EditorViewModel(
 	private val themeManager: ThemeManager = inject()
 ) : ViewModel() {
 	val themeList get() = themeManager.themeList
-		.filterNot { it.uuid == defaultLightThemeUUID || it.uuid == defaultDarkThemeUUID }
-		.reversed()
+
 	val mappedValues get() = themeManager.mappedValues.values.toList().sortedBy { it.name }
 	private val defaultCurrentTheme get() = themeManager.defaultCurrentTheme
 	val newUiElements get() = mappedValues.filter {
@@ -88,15 +87,11 @@ class EditorViewModel(
 
 	fun selectAllThemes() {
 		selectedThemes.clear()
-		themeList.forEach {
-			if (
-				!selectedThemes.contains(it.uuid)
-				&&
-				it.uuid != defaultLightThemeUUID
-				&&
-				it.uuid != defaultDarkThemeUUID
-			) {
-				selectedThemes.add(it.uuid)
+		viewModelScope.launch {
+			themeList.first()?.forEach {
+				if (!selectedThemes.contains(it.uuid)) {
+					selectedThemes.add(it.uuid)
+				}
 			}
 		}
 	}

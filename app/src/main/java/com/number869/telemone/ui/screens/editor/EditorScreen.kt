@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -44,6 +45,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -94,7 +99,12 @@ fun EditorScreen(
 		else -> ThemeColorPreviewDisplayType.CurrentColorScheme
 	}
 
-	LaunchedEffect(vm.themeList) {
+	val themeList by vm.themeList.collectAsState(listOf())
+	val displayingSavedThemes by remember {
+		derivedStateOf { themeList.isNotEmpty() }
+	}
+
+	LaunchedEffect(themeList) {
 		savedThemesRowState.animateScrollToItem(0)
 	}
 
@@ -160,7 +170,11 @@ fun EditorScreen(
 						}
 					}
 
-					AnimatedVisibility(visible = vm.themeList.isEmpty()) {
+					AnimatedVisibility(
+						visible = !displayingSavedThemes,
+						enter = fadeIn() + expandVertically(),
+						exit = fadeOut() + shrinkVertically()
+					) {
 						Box(
 							Modifier
 								.fillMaxWidth(1f)
@@ -189,7 +203,11 @@ fun EditorScreen(
 						}
 					}
 
-					AnimatedVisibility(visible = vm.themeList.isNotEmpty()) {
+					AnimatedVisibility(
+						visible = displayingSavedThemes,
+						enter = fadeIn() + expandVertically(),
+						exit = fadeOut() + shrinkVertically()
+					) {
 						Column {
 							LazyRow(
 								state = savedThemesRowState,
@@ -197,7 +215,7 @@ fun EditorScreen(
 								horizontalArrangement = spacedBy(16.dp),
 								modifier = Modifier.animateContentSize()
 							) {
-								itemsIndexed(vm.themeList, key = { _, item -> item.uuid }) { index, theme ->
+								items(themeList, key = { item -> item.uuid }) { theme ->
 									SavedThemeItem(
 										Modifier.animateItemPlacement(),
 										theme,
@@ -232,7 +250,7 @@ fun EditorScreen(
 									ThemeSelectionToolbar(
 										Modifier.padding(top = 16.dp),
 										selectedThemeCount = vm.selectedThemes.count(),
-										allThemesAreSelected = vm.selectedThemes.count() == vm.themeList.count(),
+										allThemesAreSelected = vm.selectedThemes.count() == themeList.count(),
 										unselectAllThemes = vm::unselectAllThemes,
 										selectAllThemes = vm::selectAllThemes,
 										hideToolbarAction = { vm.hideThemeSelectionModeToolbar() }
@@ -257,6 +275,7 @@ fun EditorScreen(
 								.animateItemPlacement(),
 							labelText = "New Values"
 						)
+
 						Spacer(modifier = Modifier
 							.height(16.dp)
 							.animateItemPlacement())
