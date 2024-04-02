@@ -1,18 +1,12 @@
 package com.number869.telemone.data
 
 import android.content.Context
-import android.net.Uri
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.number869.telemone.inject
-import com.number869.telemone.ui.screens.editor.ThemeColorPreviewDisplayType
-import com.number869.telemone.ui.theme.PaletteState
+import com.number869.telemone.shared.utils.getColorValueFromColorToken
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
@@ -132,16 +126,6 @@ class RealmThemeRepositoryImpl(
 	)
 }
 
-@Serializable
-data class UiElementColorData(
-	val name: String,
-	val colorToken: String,
-	val colorValue: Int
-)
-val UiElementColorData.color get() = Color(colorValue)
-
-@Serializable
-data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
 class SharedPreferencesThemeRepositoryImpl(private val context: Context) : ThemeRepository {
 	private val oldThemeListKey = "AppPreferences.ThemeList"
 	private val preferences = context.getSharedPreferences(
@@ -297,7 +281,15 @@ fun initializeThemeRepository(context: Context): ThemeRepository {
 	}
 }
 
+@Serializable
+data class UiElementColorData(
+	val name: String,
+	val colorToken: String,
+	val colorValue: Int
+)
 
+@Serializable
+data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
 private class ThemeDataRealm : RealmObject {
 	@PrimaryKey
 	var _id: ObjectId = ObjectId()
@@ -311,74 +303,8 @@ private class UiElementColorDataRealm : EmbeddedRealmObject {
 	var colorValue: Int = 0
 }
 
-sealed interface ThemeStorageType {
-	data class Default(val isLight: Boolean) : ThemeStorageType
-	data class Stock(val isLight: Boolean) : ThemeStorageType
-	data class ByUuid(
-		val uuid: String,
-		val withTokens: Boolean,
-		val clearCurrentTheme: Boolean
-	) : ThemeStorageType
-	data class ExternalFile(val uri: Uri, val clearCurrentTheme: Boolean) : ThemeStorageType
-}
-
 const val defaultLightThemeUUID = "defaultLightThemeUUID"
 const val defaultDarkThemeUUID = "defaultDarkThemeUUID"
-
-@Composable
-fun colorOf(
-	data: UiElementColorData,
-	colorDisplayType: ThemeColorPreviewDisplayType,
-	palette: Map<String, Color> = remember {
-		inject<PaletteState>().entirePaletteAsMap
-	}
-) = animateColorAsState(
-	when (colorDisplayType) {
-		ThemeColorPreviewDisplayType.SavedColorValues -> {
-			data.color
-		}
-		// in case theres a need to show monet colors only when available
-		ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback -> {
-			val colorFromToken = getColorValueFromColorTokenOrNull(data.colorToken, palette)
-			val colorAsSaved = data.color
-			colorFromToken ?: colorAsSaved
-		}
-
-		ThemeColorPreviewDisplayType.CurrentColorScheme -> {
-			getColorValueFromColorToken(data.colorToken, palette)
-		}
-	},
-	label = "i hate these labels"
-).value
-
-fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
-	return if (palette.containsKey(tokenToLookFor))
-		palette.getValue(tokenToLookFor)
-	else
-		Color.Red
-}
-
-fun getColorValueFromColorTokenOrNull(tokenToLookFor: String, palette: Map<String, Color>): Color? {
-	return if (palette.containsKey(tokenToLookFor))
-		palette.getValue(tokenToLookFor)
-	else
-		null
-}
-
-fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Color>): String {
-	val tokenIndex = palette.values.indexOf(valueToLookFor)
-
-	return if (palette.containsValue(valueToLookFor))
-		palette.keys.elementAt(tokenIndex)
-	else
-		""
-}
-
-enum class ThemeColorDataType {
-	ColorValues,
-	ColorTokens,
-	ColorValuesFromDevicesColorScheme
-}
 
 val fallbackKeys = mapOf(
 	"chat_inAdminText" to "chat_inTimeText",

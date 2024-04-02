@@ -46,15 +46,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeData
-import com.number869.telemone.data.ThemeStorageType
+import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.number869.telemone.ui.screens.editor.showToast
 import com.nxoim.decomposite.core.common.navigation.NavController
@@ -76,7 +75,6 @@ fun SavedThemeItem(
 	themeSelectionModeIsActive: Boolean = false,
 	navController: NavController<EditorDestinations> = getExistingNavController()
 ) {
-	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }
 
 	val selectedOverlayColor by animateColorAsState(

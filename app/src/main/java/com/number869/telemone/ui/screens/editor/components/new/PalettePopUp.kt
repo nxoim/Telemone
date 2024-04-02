@@ -65,8 +65,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.data.color
 import com.number869.telemone.shared.ui.animateMovableContent
+import com.number869.telemone.shared.utils.color
 import com.number869.telemone.ui.theme.AdditionalColors
 import com.number869.telemone.ui.theme.ColorRolesDark
 import com.number869.telemone.ui.theme.ColorRolesLight

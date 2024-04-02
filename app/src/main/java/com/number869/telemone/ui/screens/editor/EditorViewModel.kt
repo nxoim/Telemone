@@ -8,10 +8,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import com.number869.telemone.data.ThemeColorDataType
 import com.number869.telemone.data.ThemeManager
-import com.number869.telemone.data.ThemeStorageType
-import com.number869.telemone.inject
+import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.inject
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

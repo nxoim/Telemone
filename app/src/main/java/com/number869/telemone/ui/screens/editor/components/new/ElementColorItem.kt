@@ -31,7 +31,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.data.color
+import com.number869.telemone.shared.utils.color
 import kotlinx.coroutines.delay
 
 @Composable

@@ -14,6 +14,8 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.number869.telemone.data.InstanceLocator
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.initializeThemeRepository
+import com.number869.telemone.shared.utils.inject
+import com.number869.telemone.shared.utils.single
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
@@ -58,19 +60,5 @@ class MainActivity : ComponentActivity() {
 }
 
 class App() : Application() {
-	companion object {
-		val instanceLocator = InstanceLocator()
-	}
-
-	init {
-		println("APP CREATED")
-	}
+	companion object { val instanceLocator = InstanceLocator() }
 }
-
-// Utils. Theres not many of them so they are here
-inline fun <reified T : Any> single(
-	cacheInstance: Boolean = true,
-	noinline instanceProvider: () -> T
-) = App.instanceLocator.put(cacheInstance, instanceProvider)
-
-inline fun <reified T : Any> inject() = App.instanceLocator.get<T>()

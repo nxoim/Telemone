@@ -59,8 +59,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.AppSettings
-import com.number869.telemone.data.colorOf
 import com.number869.telemone.shared.ui.SmallTintedLabel
+import com.number869.telemone.shared.utils.colorOf
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem

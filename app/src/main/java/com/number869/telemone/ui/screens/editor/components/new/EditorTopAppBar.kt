@@ -55,8 +55,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.data.ThemeStorageType
 import com.number869.telemone.data.UiElementColorData
+import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController

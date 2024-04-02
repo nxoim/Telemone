@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.number869.telemone.data.ThemeData
-import com.number869.telemone.data.ThemeStorageType
 import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
+import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteSelectedThemesDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteThemeDialog

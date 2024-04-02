@@ -22,8 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.number869.telemone.data.ThemeColorDataType
-import com.number869.telemone.data.stringify
+import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.shared.utils.stringify
 import com.number869.telemone.ui.screens.editor.EditorViewModel
 import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 
