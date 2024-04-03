@@ -1,11 +1,13 @@
 package com.number869.telemone.shared.utils
 
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.ui.screens.editor.ThemeColorPreviewDisplayType
 import com.number869.telemone.ui.theme.PaletteState
@@ -65,6 +67,17 @@ enum class ThemeColorDataType {
     ColorValues,
     ColorTokens,
     ColorValuesFromDevicesColorScheme
+}
+fun getColorDisplayType(preferences: SharedPreferences): ThemeColorPreviewDisplayType {
+    val colorDisplayTypePref = preferences.getString(
+        AppSettings.SavedThemeItemDisplayType.id,
+        "1"
+    )
+    return when (colorDisplayTypePref) {
+        "1" -> ThemeColorPreviewDisplayType.SavedColorValues
+        "2" -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
+        else -> ThemeColorPreviewDisplayType.CurrentColorScheme
+    }
 }
 
 sealed interface ThemeStorageType {
