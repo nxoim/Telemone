@@ -235,7 +235,7 @@ private fun SavedThemesSection(
 			) {
 				items(themeList, key = { item -> item.uuid }) { theme ->
 					SavedThemeItem(
-						Modifier.animateItemPlacement(),
+						Modifier.animateItem(),
 						theme,
 						selected = vm.selectedThemes.contains(theme.uuid),
 						true,
@@ -337,20 +337,20 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel) {
 			SmallTintedLabel(
 				Modifier
 					.padding(start = 16.dp)
-					.animateItemPlacement(),
+					.animateItem(),
 				labelText = "New Values"
 			)
 
 			Spacer(modifier = Modifier
 				.height(16.dp)
-				.animateItemPlacement())
+				.animateItem())
 		}
 
 		itemsIndexed(vm.newUiElements) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
 					.padding(horizontal = 16.dp)
-					.animateItemPlacement(),
+					.animateItem(),
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -369,20 +369,20 @@ private fun LazyListScope.IncompatibleValuesSection(vm: EditorViewModel) {
 			SmallTintedLabel(
 				Modifier
 					.padding(start = 16.dp)
-					.animateItemPlacement(),
+					.animateItem(),
 				labelText = "Incompatible Values"
 			)
 
 			Spacer(modifier = Modifier
 				.height(16.dp)
-				.animateItemPlacement())
+				.animateItem())
 		}
 
 		itemsIndexed(vm.incompatibleValues) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
 					.padding(horizontal = 16.dp)
-					.animateItemPlacement(),
+					.animateItem(),
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -397,7 +397,7 @@ private fun LazyListScope.AllColorsSection(vm: EditorViewModel) {
 		ElementColorItem(
 			Modifier
 				.padding(horizontal = 16.dp)
-				.animateItemPlacement(),
+				.animateItem(),
 			uiElementData = uiElementColorData,
 			index = index,
 			changeValue = vm::changeValue,
