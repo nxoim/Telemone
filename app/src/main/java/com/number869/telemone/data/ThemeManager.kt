@@ -237,7 +237,7 @@ class ThemeManager(
             loadedFromFileTheme.clear()
         }
 
-        val uiElementDataToAdd = loadedTheme.values.filter { it.name !in _mappedValues }
+        val uiElementDataToAdd = themeData.filter { it.name !in _mappedValues }
         _mappedValues.putAll(uiElementDataToAdd.associateBy { it.name })
 
         loadedFromFileTheme.clear()
