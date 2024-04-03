@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.color
 import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
@@ -81,9 +82,7 @@ class EditorViewModel(
 	fun changeValue(uiElementName: String, colorToken: String, colorValue: Color) =
 		themeManager.changeValue(uiElementName, colorToken, colorValue)
 
-	fun colorFromCurrentTheme(uiElementName: String): Color = mappedValues[uiElementName]
-		?.let { Color(it.colorValue) }
-		?: Color.Red
+	fun colorFromCurrentTheme(uiElementName: String): Color = mappedValues[uiElementName]?.color ?: Color.Red
 
 	fun selectOrUnselectSavedTheme(uuid: String) = if (selectedThemes.contains(uuid))
 		selectedThemes.remove(uuid)

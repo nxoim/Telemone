@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CurrentThemePreview(colorOf: (String) -> Color) {
+fun CurrentThemePreview(colorOf: @Composable (String) -> Color) {
 	Row(
 		Modifier
 			.padding(16.dp)
@@ -62,7 +62,7 @@ fun CurrentThemePreview(colorOf: (String) -> Color) {
 }
 
 @Composable
-private fun PreviewHomeScreen(colorOf: (String) -> Color) {
+private fun PreviewHomeScreen(colorOf: @Composable (String) -> Color) {
 	OutlinedCard(
 		Modifier
 			.width(150.dp)
@@ -96,7 +96,7 @@ private fun PreviewHomeScreen(colorOf: (String) -> Color) {
 }
 
 @Composable
-private fun PreviewChat(colorOf: (String) -> Color) {
+private fun PreviewChat(colorOf: @Composable (String) -> Color) {
 	OutlinedCard(
 		Modifier
 			.width(150.dp)
@@ -332,7 +332,7 @@ fun ChatItem(
 	secret: Boolean = false,
 	muted: Boolean = false,
 	verified: Boolean = false,
-	colorOf: (String) -> Color
+	colorOf: @Composable (String) -> Color
 ) {
 	val avatarBackgroundNumber by remember {
 		derivedStateOf {
@@ -361,35 +361,30 @@ fun ChatItem(
 	val verifiedIconColor = colorOf("chats_verifiedCheck")
 	val avatarTextColor = colorOf("avatar_text")
 
-	val avatarColor1 by remember {
-		derivedStateOf {
-			when (avatarBackgroundNumber) {
-				1 -> colorOf("avatar_backgroundBlue")
-				2 -> colorOf("avatar_backgroundGreen")
-				3 -> colorOf("avatar_backgroundOrange")
-				4 -> colorOf("avatar_backgroundPink")
-				5 -> colorOf("avatar_backgroundRed")
-				6 -> colorOf("avatar_backgroundViolet")
-				7 -> colorOf("avatar_backgroundCyan")
-				else -> colorOf("avatar_backgroundBlue")
-			}
-		}
+	val avatarColor1 = when (avatarBackgroundNumber) {
+		1 -> colorOf("avatar_backgroundBlue")
+		2 -> colorOf("avatar_backgroundGreen")
+		3 -> colorOf("avatar_backgroundOrange")
+		4 -> colorOf("avatar_backgroundPink")
+		5 -> colorOf("avatar_backgroundRed")
+		6 -> colorOf("avatar_backgroundViolet")
+		7 -> colorOf("avatar_backgroundCyan")
+		else -> colorOf("avatar_backgroundBlue")
 	}
 
-	val avatarColor2 by remember {
-		derivedStateOf {
-			when (avatarBackgroundNumber) {
-				1 -> colorOf("avatar_background2Blue")
-				2 -> colorOf("avatar_background2Green")
-				3 -> colorOf("avatar_background2Orange")
-				4 -> colorOf("avatar_background2Pink")
-				5 -> colorOf("avatar_background2Red")
-				6 -> colorOf("avatar_background2Violet")
-				7 -> colorOf("avatar_background2Cyan")
-				else -> colorOf("avatar_background2Blue")
-			}
-		}
+
+
+	val avatarColor2 = when (avatarBackgroundNumber) {
+		1 -> colorOf("avatar_background2Blue")
+		2 -> colorOf("avatar_background2Green")
+		3 -> colorOf("avatar_background2Orange")
+		4 -> colorOf("avatar_background2Pink")
+		5 -> colorOf("avatar_background2Red")
+		6 -> colorOf("avatar_background2Violet")
+		7 -> colorOf("avatar_background2Cyan")
+		else -> colorOf("avatar_background2Blue")
 	}
+
 
 	Column {
 		Row(

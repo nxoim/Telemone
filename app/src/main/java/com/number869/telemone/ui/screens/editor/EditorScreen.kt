@@ -4,6 +4,7 @@ package com.number869.telemone.ui.screens.editor
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -122,7 +123,9 @@ fun EditorScreen(
 				item {
 					CurrentThemeSection(
 						Modifier.padding(top = scaffoldPadding.calculateTopPadding()),
-						colorOf = vm::colorFromCurrentTheme
+						colorOf = {
+							animateColorAsState(vm.colorFromCurrentTheme(it)).value
+						}
 					)
 					SavedThemesSection(
 						navController,
@@ -162,7 +165,7 @@ fun EditorScreen(
 @Composable
 private fun CurrentThemeSection(
 	modifier: Modifier = Modifier,
-	colorOf: (String) -> Color
+	colorOf: @Composable (String) -> Color
 ) = Column(modifier) {
 	SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
 	CurrentThemePreview(colorOf)
@@ -183,7 +186,7 @@ private fun SavedThemesSection(
 	}
 
 	LaunchedEffect(themeList) {
-		savedThemesRowState.animateScrollToItem(0)
+		if (themeList.isNotEmpty()) savedThemesRowState.animateScrollToItem(0)
 	}
 
 	Row(

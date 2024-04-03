@@ -185,7 +185,7 @@ class ThemeManager(
         themeRepository.saveTheme(ThemeData(targetThemeId, newDefaultTheme.values))
     }
 
-    fun changeValue(key: String, colorToken: String, colorValue: Color) {
+    fun changeValue(key: String, colorToken: String, colorValue: Color) = scope.launch(Dispatchers.Default) {
         // lets not use getColorTokenFromColorValue() to not run a loop
         // each time
         _mappedValues[key] = UiElementColorData(key, colorToken, colorValue.toArgb())
@@ -224,13 +224,15 @@ class ThemeManager(
             "Theme was not available upon loading using loadSavedThemeByUuid()"
         )
         var themeData = loadedTheme.values
-        val uiElementDataToAdd = themeData.asSequence().filter { it.name !in _mappedValues }
 
         if (loadSystemsColorsUsingTokens) themeData = themeData.map {
             it.copy(
                 colorValue = getColorValueFromColorToken(it.colorToken, palette).toArgb()
             )
         }
+        
+        val uiElementDataToAdd = themeData.asSequence().filter { it.name !in _mappedValues }
+
         if (clearCurrentTheme) {
             _mappedValues.clear()
             loadedFromFileTheme.clear()
