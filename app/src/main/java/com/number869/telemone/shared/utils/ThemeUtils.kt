@@ -12,7 +12,7 @@ import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.ui.theme.PaletteState
 
 val UiElementColorData.color get() = Color(colorValue)
-fun incorrectUiElementColorData(ofUiElement: String) = UiElementColorData(
+fun incompatibleUiElementColorData(ofUiElement: String) = UiElementColorData(
     ofUiElement,
     "INCOMPATIBLE VALUE",
     Color.Red.toArgb()
@@ -115,13 +115,20 @@ fun List<UiElementColorData>.stringify(
 ): String {
     val theme = when(using) {
         ThemeColorDataType.ColorValues -> {
-            this.sortedBy { it.name }.associate { it.name to it.colorValue.toString() }
+            this
+                .asSequence()
+                .sortedBy { it.name }
+                .associate { it.name to it.colorValue.toString() }
         }
         ThemeColorDataType.ColorTokens -> {
-            this.sortedBy { it.name }.associate { it.name to it.colorToken }
+            this
+                .asSequence()
+                .sortedBy { it.name }
+                .associate { it.name to it.colorToken }
         }
         ThemeColorDataType.ColorValuesFromDevicesColorScheme -> {
             this
+                .asSequence()
                 .sortedBy { it.name }
                 .associate {
                     it.name to getColorValueFromColorToken(it.colorToken, palette).toArgb().toString()

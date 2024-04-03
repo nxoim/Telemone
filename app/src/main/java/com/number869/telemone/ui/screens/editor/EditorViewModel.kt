@@ -21,16 +21,22 @@ import kotlinx.coroutines.launch
 class EditorViewModel(
 	private val themeManager: ThemeManager = inject()
 ) : ViewModel() {
-	val themeList get() = themeManager.themeList
+	val themeList = themeManager.themeList
 
-	val mappedValues get() = themeManager.mappedValues.values.toList().sortedBy { it.name }
+	val mappedValues get() = themeManager.mappedValues
+	val mappedValuesAsList get() = mappedValues.values.toList()
 	private val defaultCurrentTheme get() = themeManager.defaultCurrentTheme
-	val newUiElements get() = mappedValues.filter {
-		it.name !in defaultCurrentTheme.map { it.name }
-	}
-	val incompatibleValues get() = mappedValues.filter {
-		it.colorToken == "INCOMPATIBLE VALUE"
-	}
+	val newUiElements get() = mappedValues.values
+		.asSequence()
+		.filter { it.name !in defaultCurrentTheme.map { it.name } }
+		.sortedByDescending { it.name }
+		.toList()
+
+	val incompatibleValues get() = mappedValues.values
+		.asSequence()
+		.filter { it.colorToken == "INCOMPATIBLE VALUE" }
+		.sortedByDescending { it.name }
+		.toList()
 
 	val selectedThemes = mutableStateListOf<String>()
 	var themeSelectionToolbarIsVisible by mutableStateOf(false)
@@ -75,8 +81,7 @@ class EditorViewModel(
 	fun changeValue(uiElementName: String, colorToken: String, colorValue: Color) =
 		themeManager.changeValue(uiElementName, colorToken, colorValue)
 
-	fun colorFromCurrentTheme(uiElementName: String): Color = mappedValues
-		.find { it.name == uiElementName }
+	fun colorFromCurrentTheme(uiElementName: String): Color = mappedValues[uiElementName]
 		?.let { Color(it.colorValue) }
 		?: Color.Red
 

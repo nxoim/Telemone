@@ -66,7 +66,7 @@ import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.colorOf
 import com.number869.telemone.shared.utils.getColorDisplayType
-import com.number869.telemone.shared.utils.incorrectUiElementColorData
+import com.number869.telemone.shared.utils.incompatibleUiElementColorData
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
@@ -101,7 +101,7 @@ fun EditorScreen(
 		topBar = {
 			EditorTopAppBar(
 				topAppBarState,
-				vm.mappedValues,
+				vm.mappedValuesAsList,
 				exportCustomTheme = vm::exportCustomTheme,
 				saveCurrentTheme = vm::saveCurrentTheme,
 				resetCurrentTheme = vm::resetCurrentTheme,
@@ -249,7 +249,7 @@ private fun SavedThemesSection(
 							colorOf(
 								theme.values
 									.find { it.name == targetUiElement }
-									?: incorrectUiElementColorData(targetUiElement),
+									?: incompatibleUiElementColorData(targetUiElement),
 								colorDisplayType
 							)
 						},
@@ -386,22 +386,22 @@ private fun LazyListScope.IncompatibleValuesSection(vm: EditorViewModel) {
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
-				lastIndexInList = vm.mappedValues.lastIndex
+				lastIndexInList = vm.mappedValuesAsList.lastIndex
 			)
 		}
 	}
 }
 
 private fun LazyListScope.AllColorsSection(vm: EditorViewModel) {
-	itemsIndexed(vm.mappedValues, key = { _, it -> it.name }) { index, uiElementData ->
+	itemsIndexed(vm.mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementColorData ->
 		ElementColorItem(
 			Modifier
 				.padding(horizontal = 16.dp)
 				.animateItemPlacement(),
-			uiElementData = uiElementData,
+			uiElementData = uiElementColorData,
 			index = index,
 			changeValue = vm::changeValue,
-			lastIndexInList = vm.mappedValues.lastIndex
+			lastIndexInList = vm.mappedValues.size
 		)
 	}
 }

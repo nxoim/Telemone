@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,9 +29,8 @@ import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 @Composable
 fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
 	var showValues by remember { mutableStateOf(false) }
-	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
 	val text = stringify(
-		mappedValues.toList(),
+		vm.mappedValuesAsList.toList(),
 		if (showValues)
 			ThemeColorDataType.ColorValues
 		else

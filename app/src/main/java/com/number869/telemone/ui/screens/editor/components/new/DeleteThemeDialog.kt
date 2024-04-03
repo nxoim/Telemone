@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.colorOf
-import com.number869.telemone.shared.utils.incorrectUiElementColorData
+import com.number869.telemone.shared.utils.incompatibleUiElementColorData
 
 @Composable
 fun DeleteThemeDialog(
@@ -41,7 +41,7 @@ fun DeleteThemeDialog(
 				colorOf = { targetUiElement ->
 					val data = theme.values
 						.find { it.name == targetUiElement }
-						?: incorrectUiElementColorData(targetUiElement)
+						?: incompatibleUiElementColorData(targetUiElement)
 
 					colorOf(data, ThemeColorPreviewDisplayType.SavedColorValues)
 				},
