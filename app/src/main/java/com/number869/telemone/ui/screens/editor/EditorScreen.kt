@@ -63,8 +63,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.ui.SmallTintedLabel
+import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.colorOf
 import com.number869.telemone.shared.utils.getColorDisplayType
+import com.number869.telemone.shared.utils.incorrectUiElementColorData
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
 import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
@@ -245,7 +247,9 @@ private fun SavedThemesSection(
 						},
 						colorOf = { targetUiElement ->
 							colorOf(
-								theme.values.find { it.name == targetUiElement }!!,
+								theme.values
+									.find { it.name == targetUiElement }
+									?: incorrectUiElementColorData(targetUiElement),
 								colorDisplayType
 							)
 						},
@@ -254,7 +258,7 @@ private fun SavedThemesSection(
 				}
 			}
 
-			ThemeSelectionToolbarSection(vm, themeList)
+			ThemeSelectionToolbarSection(themeList = themeList)
 		}
 	}
 }
@@ -290,7 +294,8 @@ private fun NoSavedThemesPlaceholder() {
 
 @Composable
 private fun ThemeSelectionToolbarSection(
-	vm: EditorViewModel,
+	vm: EditorViewModel = getExistingViewModel(),
+	navController: NavController<EditorDestinations> = getExistingNavController(),
 	themeList: List<ThemeData>
 ) {
 	Row(
@@ -308,7 +313,13 @@ private fun ThemeSelectionToolbarSection(
 				allThemesAreSelected = vm.selectedThemes.count() == themeList.count(),
 				unselectAllThemes = vm::unselectAllThemes,
 				selectAllThemes = vm::selectAllThemes,
-				hideToolbarAction = { vm.hideThemeSelectionModeToolbar() }
+				hideToolbarAction = { vm.hideThemeSelectionModeToolbar() },
+				onRequestDeletion = {
+					navController.navigate(
+						EditorDestinations.Dialogs.DeleteSelectedThemes(vm.selectedThemes.count()),
+						ContentType.Overlay
+					)
+				}
 			)
 		}
 	}

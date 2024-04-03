@@ -9,10 +9,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.ui.screens.editor.ThemeColorPreviewDisplayType
 import com.number869.telemone.ui.theme.PaletteState
 
 val UiElementColorData.color get() = Color(colorValue)
+fun incorrectUiElementColorData(ofUiElement: String) = UiElementColorData(
+    ofUiElement,
+    "INCOMPATIBLE VALUE",
+    Color.Red.toArgb()
+)
 
 @Composable
 fun colorOf(
@@ -68,6 +72,13 @@ enum class ThemeColorDataType {
     ColorTokens,
     ColorValuesFromDevicesColorScheme
 }
+
+enum class ThemeColorPreviewDisplayType(val id: String) {
+    SavedColorValues("1"),
+    CurrentColorSchemeWithFallback("2"),
+    CurrentColorScheme("3")
+}
+
 fun getColorDisplayType(preferences: SharedPreferences): ThemeColorPreviewDisplayType {
     val colorDisplayTypePref = preferences.getString(
         AppSettings.SavedThemeItemDisplayType.id,

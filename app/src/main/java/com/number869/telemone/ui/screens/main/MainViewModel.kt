@@ -12,8 +12,8 @@ import com.number869.telemone.data.defaultDarkThemeUUID
 import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.inject
+import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.shared.utils.stringify
-import com.number869.telemone.ui.screens.editor.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.launch

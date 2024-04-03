@@ -21,17 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.number869.telemone.ui.theme.blendWith
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
-import com.nxoim.decomposite.core.common.ultils.ContentType
 
 @Composable
 fun ThemeSelectionToolbar(
@@ -40,12 +34,10 @@ fun ThemeSelectionToolbar(
 	allThemesAreSelected: Boolean,
 	unselectAllThemes: () -> Unit,
 	selectAllThemes: () -> Unit,
-	hideToolbarAction: () -> Unit
+	hideToolbarAction: () -> Unit,
+	onRequestDeletion: () -> Unit
 ) {
-	val navController = getExistingNavController<EditorDestinations>()
-
-	val noThemesAreSelected by remember { derivedStateOf { selectedThemeCount == 0 } }
-	val deleteButtonEnabled = selectedThemeCount > 1
+	val noThemesAreSelected = selectedThemeCount == 0
 
 	Box(modifier, contentAlignment = Alignment.Center) {
 		Row(
@@ -94,13 +86,8 @@ fun ThemeSelectionToolbar(
 			Spacer(modifier = Modifier.width(16.dp))
 
 			FilledTonalIconButton(
-				onClick = {
-					navController.navigate(
-						EditorDestinations.Dialogs.DeleteSelectedThemes(selectedThemeCount),
-						ContentType.Overlay
-					)
-				},
-				enabled = deleteButtonEnabled,
+				onClick = onRequestDeletion,
+				enabled = !noThemesAreSelected,
 				colors = IconButtonDefaults.filledTonalIconButtonColors(
 					containerColor = MaterialTheme.colorScheme.errorContainer,
 					contentColor = MaterialTheme.colorScheme.onErrorContainer

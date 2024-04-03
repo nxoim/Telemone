@@ -1,7 +1,5 @@
 package com.number869.telemone.ui.screens.editor
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -12,8 +10,9 @@ import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.inject
+import com.number869.telemone.shared.utils.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 @Stable
@@ -52,21 +51,26 @@ class EditorViewModel(
 		showToast("Reset completed.")
 	}
 
-	fun loadSavedTheme(themeStorageType: ThemeStorageType) =
-		themeManager.loadSavedTheme(
-			themeStorageType,
-			onSuccess = { storageTypeText, appearanceTypeText ->
+	fun loadSavedTheme(themeStorageType: ThemeStorageType) = themeManager.loadSavedTheme(
+		storedTheme = themeStorageType,
+		onSuccess = { storageTypeText, appearanceTypeText ->
+			viewModelScope.launch {
 				showToast(
 					"$storageTypeText ${appearanceTypeText}theme has been loaded successfully."
 				)
-			},
-			onIncompatibleValuesFound = {
+			}
+		},
+		onIncompatibleValuesFound = {
+			viewModelScope.launch {
 				showToast("Some colors are incompatible and were marked as such.")
-			},
-			onIncompatibleFileType = {
+			}
+		},
+		onIncompatibleFileType = {
+			viewModelScope.launch {
 				showToast("Chosen file isn't a Telegram (not Telegram X) theme.")
 			}
-		)
+		}
+	)
 
 	fun changeValue(uiElementName: String, colorToken: String, colorValue: Color) =
 		themeManager.changeValue(uiElementName, colorToken, colorValue)
@@ -88,7 +92,7 @@ class EditorViewModel(
 	fun selectAllThemes() {
 		selectedThemes.clear()
 		viewModelScope.launch {
-			themeList.first()?.forEach {
+			themeList.firstOrNull()?.forEach {
 				if (!selectedThemes.contains(it.uuid)) {
 					selectedThemes.add(it.uuid)
 				}
@@ -127,14 +131,3 @@ class EditorViewModel(
 		showToast("Default $themeType theme has been overwritten successfully.")
 	}
 }
-
-enum class ThemeColorPreviewDisplayType(val id: String) {
-	SavedColorValues("1"),
-	CurrentColorSchemeWithFallback("2"),
-	CurrentColorScheme("3")
-}
-
-fun showToast(text: String, context: Context = inject()) {
-	Toast.makeText(context, text, Toast.LENGTH_LONG).show()
-}
-

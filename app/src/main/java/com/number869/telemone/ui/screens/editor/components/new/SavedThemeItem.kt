@@ -54,8 +54,8 @@ import androidx.compose.ui.unit.sp
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.ui.screens.editor.EditorDestinations
-import com.number869.telemone.ui.screens.editor.showToast
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
