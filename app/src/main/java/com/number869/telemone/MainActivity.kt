@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
 import com.number869.telemone.data.InstanceLocator
 import com.number869.telemone.data.ThemeManager
-import com.number869.telemone.data.initializeThemeRepository
+import com.number869.telemone.data.themeRepositoryInitializer
 import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.single
 import com.number869.telemone.ui.Navigator
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 					// not in a launched effect because this needs to be
 					// executed synchronously, before other ui
 					single<Context>(cacheInstance = false) { this@MainActivity }
-					single { initializeThemeRepository(context = inject()) }
+					single { themeRepositoryInitializer(context = inject()) }
 					// update palette state on config changes
 					single(cacheInstance = false) { paletteState }
 					single {

@@ -17,10 +17,6 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,26 +32,16 @@ private typealias UiElementData = Map<UiElementName, DataAboutColors>
 private typealias Theme = Map<ThemeUUID, UiElementData>
 private typealias ThemeList = SnapshotStateList<Theme>
 
-interface ThemeRepository {
-	fun getAllThemes(): Flow<List<ThemeData>>
-	fun getThemeByUUID(uuid: String): ThemeData?
-	fun getThemeByUUIDAsFlow(uuid: String): Flow<ThemeData?>
-	fun saveTheme(theme: ThemeData)
-	fun deleteTheme(uuid: String)
-//	fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>)
-	fun getStockTheme(palette: Map<String, Color>, light: Boolean): ThemeData
-}
-
-class RealmThemeRepositoryImpl(
+class ThemeRepository(
 	private val realm: Realm = Realm.open(
 		RealmConfiguration.create(
 			setOf(ThemeDataRealm::class, UiElementColorDataRealm::class)
 		)
 	),
 	private val context: Context
-) : ThemeRepository {
+) {
 	private val scope = CoroutineScope(Dispatchers.IO)
-	override fun getAllThemes() = realm.query(ThemeDataRealm::class)
+	fun getAllThemes() = realm.query(ThemeDataRealm::class)
 		.asFlow()
 		.flowOn(Dispatchers.IO)
 		.map {
@@ -69,27 +55,27 @@ class RealmThemeRepositoryImpl(
 				}
 	}
 
-	override fun getThemeByUUID(uuid: String): ThemeData? {
+	fun getThemeByUUID(uuid: String): ThemeData? {
 		return realm.query(ThemeDataRealm::class, "uuid == $0", uuid)
 			.first()
 			.find()
 			?.toThemeData()
 	}
 
-	override fun getThemeByUUIDAsFlow(uuid: String) = realm
+	fun getThemeByUUIDAsFlow(uuid: String) = realm
 		.query(ThemeDataRealm::class, "uuid = $0", uuid)
 		.first()
 		.asFlow()
 		.flowOn(Dispatchers.IO)
 		.map { it.obj?.toThemeData() }
 
-	override fun saveTheme(theme: ThemeData) {
+	fun saveTheme(theme: ThemeData) {
 		realm.writeBlocking {
 			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
 		}
 	}
 
-	override fun deleteTheme(uuid: String) {
+	fun deleteTheme(uuid: String) {
 		scope.launch {
 			realm.write {
 				this.delete(this.query(ThemeDataRealm::class, "uuid == $0", uuid).first())
@@ -97,7 +83,7 @@ class RealmThemeRepositoryImpl(
 		}
 	}
 
-	override fun getStockTheme(
+	fun getStockTheme(
 		palette: Map<String, Color>,
 		light: Boolean
 	) = getStockTheme(palette, context, light)
@@ -123,100 +109,6 @@ class RealmThemeRepositoryImpl(
 		name = name,
 		colorToken = colorToken,
 		colorValue = colorValue
-	)
-}
-
-class SharedPreferencesThemeRepositoryImpl(private val context: Context) : ThemeRepository {
-	private val oldThemeListKey = "AppPreferences.ThemeList"
-	private val preferences = context.getSharedPreferences(
-		"AppPreferences",
-		Context.MODE_PRIVATE
-	)
-	private var _themeList = MutableStateFlow(getAllThemesFromStorage())
-
-	override fun getAllThemes() = _themeList.asStateFlow()
-
-	private fun getAllThemesFromStorage(): List<ThemeData> {
-		var endResult = listOf<ThemeData>()
-		val oldSavedThemeList = preferences.getString(oldThemeListKey, "[]")
-		val oldType = object : TypeToken<ThemeList>() {}.type
-		val oldList = Gson().fromJson<ThemeList>(oldSavedThemeList, oldType)
-
-		if (oldList.isNotEmpty()) {
-			val oldThemeList = oldList.map { map ->
-				map.mapValues { entry ->
-					entry.value.mapValues { (_, value) -> Pair(value.first, value.second) }
-				}
-			}
-			val convertedToNew = oldThemeList.map { it.toNew() }
-			endResult = convertedToNew
-		}
-
-		return endResult
-	}
-
-	override fun getThemeByUUID(uuid: String): ThemeData? = _themeList.value.find { it.uuid == uuid }
-	override fun getThemeByUUIDAsFlow(uuid: String)= flow {
-		_themeList.value.find { it.uuid == uuid }.let { emit(it) }
-	}
-
-	override fun saveTheme(theme: ThemeData) {
-		_themeList.value += theme
-		saveThemeListToStorage()
-	}
-
-	override fun deleteTheme(uuid: String) {
-		_themeList.value.find { it.uuid == uuid }?.let {
-			_themeList.value -= it
-		}
-		saveThemeListToStorage()
-	}
-
-//	override fun replaceTheme(targetThemesUUID: String, newData: List<UiElementColorData>) {
-//		val newList = _themeList.value.toMutableList()
-//
-//		newList.replaceAll {
-//			if (it.uuid == targetThemesUUID)
-//				ThemeData(targetThemesUUID, newData)
-//			else
-//				it
-//		}
-//
-//		_themeList.value = newList
-//
-//		if (targetThemesUUID !in _themeList.value.map { it.uuid }) {
-//			_themeList.value += ThemeData(targetThemesUUID, newData)
-//		}
-//		saveThemeListToStorage()
-//	}
-
-	private fun saveThemeListToStorage() {
-		val oldThemeList = _themeList.value.map { it.toOld() }
-		val contents = Gson().toJson(oldThemeList)
-		preferences.edit().putString(oldThemeListKey, contents).apply()
-	}
-
-	override fun getStockTheme(
-		palette: Map<String, Color>,
-		light: Boolean
-	) = getStockTheme(palette, context, light)
-
-	private fun Theme.toNew(): ThemeData {
-		val themeData = this.values.first().map { (elementName, pair) ->
-			UiElementColorData(
-				name = elementName,
-				colorToken = pair.first,
-				colorValue = pair.second
-			)
-		}
-
-		return ThemeData(this.keys.first(), themeData)
-	}
-
-	private fun ThemeData.toOld() = mapOf(
-		uuid to values.associate { data ->
-			data.name to (data.colorToken to data.colorValue)
-		}
 	)
 }
 
@@ -254,7 +146,7 @@ private fun getStockTheme(
 		themeData
 	)
 }
-fun initializeThemeRepository(context: Context): ThemeRepository {
+fun themeRepositoryInitializer(context: Context): ThemeRepository {
 	val oldThemeListKey = "AppPreferences.ThemeList"
 	val preferences = context.getSharedPreferences(
 		"AppPreferences",
@@ -262,23 +154,43 @@ fun initializeThemeRepository(context: Context): ThemeRepository {
 	)
 
 	println("initializing repo")
+	val newRepo = ThemeRepository(context = context)
 
-	return if (preferences.contains(oldThemeListKey)) {
+	if (preferences.contains(oldThemeListKey)) {
 		println("preparing repo migration")
-		val oldRepo = SharedPreferencesThemeRepositoryImpl(context)
+		val oldSavedThemeList = preferences.getString(oldThemeListKey, "[]")
+		val oldType = object : TypeToken<ThemeList>() {}.type
+		val oldList = Gson().fromJson<ThemeList>(oldSavedThemeList, oldType)
 
-		val themes = oldRepo.getAllThemes().value
-		val newRepo = RealmThemeRepositoryImpl(context = context)
-		themes.forEach { theme -> newRepo.saveTheme(theme) }
+		val themes = oldList.map { map ->
+			map.mapValues { entry ->
+				entry.value.mapValues { (_, value) -> Pair(value.first, value.second) }
+			}
+		}.map { it.toNew() }
+
+		// reversed for sorting newest->oldest
+		themes.reversed().forEach { theme -> newRepo.saveTheme(theme) }
 
 		// delete the data in old repo after migration
 		preferences.edit().remove(oldThemeListKey).apply()
 
-		newRepo
+		return newRepo
 	} else {
 		println("no migration needed")
-		RealmThemeRepositoryImpl(context = context)
+		return newRepo
 	}
+}
+
+private fun Theme.toNew(): ThemeData {
+	val themeData = this.values.first().map { (elementName, pair) ->
+		UiElementColorData(
+			name = elementName,
+			colorToken = pair.first,
+			colorValue = pair.second
+		)
+	}
+
+	return ThemeData(this.keys.first(), themeData)
 }
 
 @Serializable
