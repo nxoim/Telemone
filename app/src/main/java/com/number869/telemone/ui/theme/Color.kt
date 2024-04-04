@@ -65,21 +65,19 @@ import android.R.color.system_neutral2_600
 import android.R.color.system_neutral2_700
 import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
-import android.annotation.SuppressLint
 import androidx.annotation.FloatRange
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.materialkolor.hct.Hct
-import com.materialkolor.ktx.fromColor
+import com.materialkolor.ktx.from
 import com.materialkolor.ktx.harmonize
 import com.materialkolor.ktx.toHct
 import com.materialkolor.palettes.TonalPalette
@@ -92,25 +90,29 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-class PaletteState(val entirePaletteAsMap: MutableState<LinkedHashMap<String, Color>>) {
-	val allPossibleColorTokensAsList = entirePaletteAsMap.value.keys
+class PaletteState(
+	val entirePaletteAsMap: LinkedHashMap<String, Color>,
+	val isDarkMode: Boolean
+) {
+	val allPossibleColorTokensAsList = entirePaletteAsMap.keys
 }
 
-@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun rememberPaletteState(): PaletteState {
-	val entirePaletteAsMap = remember { mutableStateOf(linkedMapOf<String, Color>()) }
+	val isDarkMode = isSystemInDarkTheme()
+	val entirePaletteAsMap = remember { linkedMapOf<String, Color>() }
+
 
 	AdditionalColors.entries.forEach {
-		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	ColorRolesLight.entries.forEach {
-		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	ColorRolesDark.entries.forEach {
-		entirePaletteAsMap.value[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
 	listOf(
@@ -127,10 +129,10 @@ fun rememberPaletteState(): PaletteState {
 		cyanTones,
 		pinkTones
 	).forEach { toneList ->
-		toneList.forEach { entirePaletteAsMap.value[it.colorToken] = it.colorValue }
+		toneList.forEach { entirePaletteAsMap[it.colorToken] = it.colorValue }
 	}
 
-	return remember { PaletteState(entirePaletteAsMap) }
+	return remember { PaletteState(entirePaletteAsMap, isDarkMode) }
 }
 
 enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
@@ -786,7 +788,7 @@ fun Color.matchSaturation(toThatOf: Color, saturationMultiplier: Double = 0.9): 
 
 val possibleTones = listOf(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100)
 
-fun Color.getTone(tone: Int) = Color(TonalPalette.fromColor(this).tone(tone))
+fun Color.getTone(tone: Int) = Color(TonalPalette.from(this).tone(tone))
 
 fun Color.blendWith(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float): Color {
 	val inv = 1f - ratio

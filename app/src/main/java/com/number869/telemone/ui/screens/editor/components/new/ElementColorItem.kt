@@ -30,30 +30,27 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.number869.telemone.data.LoadedTheme
+import com.number869.telemone.data.UiElementColorData
+import com.number869.telemone.shared.utils.color
 import kotlinx.coroutines.delay
 
 @Composable
 fun ElementColorItem(
 	modifier: Modifier = Modifier,
-	uiElementData: Pair<String, Pair<String, Color>>,
+	uiElementData: UiElementColorData,
 	index: Int,
-	themeMap: LoadedTheme,
+	changeValue: (String, String, Color) -> Unit,
 	lastIndexInList: Int
 ) {
-	val backgroundColor by animateColorAsState(
-		when (themeMap.containsKey(uiElementData.first)) {
-			true -> themeMap[uiElementData.first]!!.second
-			else -> Color.Red
-		}, label = ""
-	)
+	val backgroundColor by animateColorAsState(uiElementData.color, label = "")
 
-	val roundedCornerShape = if (index == 0)
-		RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
-	else if (index == lastIndexInList)
-		RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 32.dp, bottomEnd = 32.dp)
-	else
-		RoundedCornerShape(4.dp)
+	val roundedCornerShape = remember(index) {
+		when (index) {
+			0 -> RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
+			lastIndexInList -> RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 32.dp, bottomEnd = 32.dp)
+			else -> RoundedCornerShape(4.dp)
+		}
+	}
 
 	Box(contentAlignment = Alignment.Center) {
 		var showPopUp by remember { mutableStateOf(false) }
@@ -70,7 +67,7 @@ fun ElementColorItem(
 		) {
 			// name
 			Text(
-				text = uiElementData.first,
+				text = uiElementData.name,
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
 				color = Color.White,
 				modifier = Modifier
@@ -83,7 +80,7 @@ fun ElementColorItem(
 
 			// material you palette color token
 			Text(
-				text = uiElementData.second.first,
+				text = uiElementData.colorToken,
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
 				color = Color.White,
 				modifier = Modifier
@@ -116,10 +113,9 @@ fun ElementColorItem(
 					)
 
 					PalettePopup(
-						uiElementData.first,
-						backgroundColor,
-						uiElementData.second.first,
-						startPopupAnimation
+						uiElementData,
+						startPopupAnimation,
+						changeValue = changeValue,
 					) { startPopupAnimation = false }
 				}
 			}

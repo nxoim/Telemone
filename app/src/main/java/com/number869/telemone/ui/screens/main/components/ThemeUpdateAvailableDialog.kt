@@ -8,15 +8,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
-fun ThemeUpdateAvailableDialog(ofLight: Boolean) {
-	val navController = navController<Destinations>()
-	val vm = viewModel<MainViewModel>()
+fun ThemeUpdateAvailableDialog(
+	ofLight: Boolean,
+	decline: () -> Unit,
+	acceptStockThemeUpdate: () -> Unit
+) {
+	val navController = getExistingNavController<RootDestinations>()
 	val typeText = if (ofLight) "light" else "dark"
 
 	AlertDialog(
@@ -37,7 +38,7 @@ If you decline - you can always change your mind and update by pressing the menu
 		confirmButton = {
 			Button(
 				onClick = {
-					vm.acceptTheStockThemeUpdate(ofLight)
+					acceptStockThemeUpdate()
 					navController.navigateBack()
 				}
 			) {
@@ -47,7 +48,7 @@ If you decline - you can always change your mind and update by pressing the menu
 		dismissButton = {
 			OutlinedButton(
 				onClick = {
-					vm.declineDefaultThemeUpdate(ofLight)
+					decline()
 					navController.navigateBack()
 				}
 			) {

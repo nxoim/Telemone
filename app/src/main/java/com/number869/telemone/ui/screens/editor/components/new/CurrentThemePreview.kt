@@ -47,34 +47,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
 
 @Composable
-fun CurrentThemePreview() {
+fun CurrentThemePreview(colorOf: @Composable (String) -> Color) {
 	Row(
 		Modifier
 			.padding(16.dp)
 			.fillMaxWidth(),
 		horizontalArrangement = Arrangement.SpaceEvenly
 	) {
-		PreviewHomeScreen()
-		PreviewChat()
+		PreviewHomeScreen(colorOf)
+		PreviewChat(colorOf)
 	}
 }
 
 @Composable
-private fun PreviewHomeScreen() {
-	val vm = viewModel<MainViewModel>()
-
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
+private fun PreviewHomeScreen(colorOf: @Composable (String) -> Color) {
 	OutlinedCard(
 		Modifier
 			.width(150.dp)
@@ -98,27 +86,17 @@ private fun PreviewHomeScreen() {
 
 			Spacer(modifier = Modifier.height(2.dp))
 
-			ChatItem(pinned = true)
-			ChatItem(unread = true)
-			ChatItem(secret = true, sent = true)
-			ChatItem(muted = true, unread = true)
-			ChatItem(verified = true)
+			ChatItem(pinned = true, colorOf = colorOf)
+			ChatItem(unread = true, colorOf = colorOf)
+			ChatItem(secret = true, sent = true, colorOf = colorOf)
+			ChatItem(muted = true, unread = true, colorOf = colorOf)
+			ChatItem(verified = true, colorOf = colorOf)
 		}
 	}
 }
 
 @Composable
-private fun PreviewChat() {
-	val vm = viewModel<MainViewModel>()
-
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
+private fun PreviewChat(colorOf: @Composable (String) -> Color) {
 	OutlinedCard(
 		Modifier
 			.width(150.dp)
@@ -353,18 +331,9 @@ fun ChatItem(
 	sent: Boolean = false,
 	secret: Boolean = false,
 	muted: Boolean = false,
-	verified: Boolean = false
+	verified: Boolean = false,
+	colorOf: @Composable (String) -> Color
 ) {
-	val vm = viewModel<MainViewModel>()
-
-	fun colorOf(colorValueOf: String): Color {
-		return try {
-			vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-		} catch (e: NoSuchElementException) {
-			Color.Red
-		}
-	}
-
 	val avatarBackgroundNumber by remember {
 		derivedStateOf {
 			(1..7).random()
@@ -392,35 +361,30 @@ fun ChatItem(
 	val verifiedIconColor = colorOf("chats_verifiedCheck")
 	val avatarTextColor = colorOf("avatar_text")
 
-	val avatarColor1 by remember {
-		derivedStateOf {
-			when (avatarBackgroundNumber) {
-				1 -> colorOf("avatar_backgroundBlue")
-				2 -> colorOf("avatar_backgroundGreen")
-				3 -> colorOf("avatar_backgroundOrange")
-				4 -> colorOf("avatar_backgroundPink")
-				5 -> colorOf("avatar_backgroundRed")
-				6 -> colorOf("avatar_backgroundViolet")
-				7 -> colorOf("avatar_backgroundCyan")
-				else -> colorOf("avatar_backgroundBlue")
-			}
-		}
+	val avatarColor1 = when (avatarBackgroundNumber) {
+		1 -> colorOf("avatar_backgroundBlue")
+		2 -> colorOf("avatar_backgroundGreen")
+		3 -> colorOf("avatar_backgroundOrange")
+		4 -> colorOf("avatar_backgroundPink")
+		5 -> colorOf("avatar_backgroundRed")
+		6 -> colorOf("avatar_backgroundViolet")
+		7 -> colorOf("avatar_backgroundCyan")
+		else -> colorOf("avatar_backgroundBlue")
 	}
 
-	val avatarColor2 by remember {
-		derivedStateOf {
-			when (avatarBackgroundNumber) {
-				1 -> colorOf("avatar_background2Blue")
-				2 -> colorOf("avatar_background2Green")
-				3 -> colorOf("avatar_background2Orange")
-				4 -> colorOf("avatar_background2Pink")
-				5 -> colorOf("avatar_background2Red")
-				6 -> colorOf("avatar_background2Violet")
-				7 -> colorOf("avatar_background2Cyan")
-				else -> colorOf("avatar_background2Blue")
-			}
-		}
+
+
+	val avatarColor2 = when (avatarBackgroundNumber) {
+		1 -> colorOf("avatar_background2Blue")
+		2 -> colorOf("avatar_background2Green")
+		3 -> colorOf("avatar_background2Orange")
+		4 -> colorOf("avatar_background2Pink")
+		5 -> colorOf("avatar_background2Red")
+		6 -> colorOf("avatar_background2Violet")
+		7 -> colorOf("avatar_background2Cyan")
+		else -> colorOf("avatar_background2Blue")
 	}
+
 
 	Column {
 		Row(

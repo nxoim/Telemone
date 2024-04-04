@@ -15,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,32 +22,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
+import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
+import com.nxoim.decomposite.core.common.navigation.NavController
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.viewModel.viewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-	val vm = viewModel<MainViewModel>()
-	val navController = navController<Destinations>()
-
-	LaunchedEffect(Unit) {
-		if (vm.displayLightThemeUpdateChoiceDialog) navController.navigate(
-			Destinations.GlobalDialogs.ThemeUpdateAvailable(true),
-			ContentType.Overlay
-		)
-
-		if (vm.displayDarkThemeUpdateChoiceDialog) navController.navigate(
-			Destinations.GlobalDialogs.ThemeUpdateAvailable(false),
-			ContentType.Overlay
-		)
-	}
-
+fun MainScreen(
+	navController: NavController<RootDestinations> = getExistingNavController(),
+	vm: MainViewModel = viewModel { MainViewModel() }
+) {
 	Column(Modifier.fillMaxSize()) {
 		var showMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -67,10 +54,7 @@ fun MainScreen() {
 						DropdownMenuItem(
 							text = { Text("Update default light theme") },
 							onClick = {
-								navController.navigate(
-									Destinations.GlobalDialogs.ThemeUpdateAvailable(true),
-									ContentType.Overlay
-								)
+								vm.displayLightThemeUpdateChoiceDialog = true
 								showMenu = false
 							}
 						)
@@ -80,10 +64,7 @@ fun MainScreen() {
 						DropdownMenuItem(
 							text = { Text("Update default dark theme") },
 							onClick = {
-								navController.navigate(
-									Destinations.GlobalDialogs.ThemeUpdateAvailable(false),
-									ContentType.Overlay
-								)
+								vm.displayDarkThemeUpdateChoiceDialog = true
 								showMenu = false
 							}
 						)
@@ -92,7 +73,7 @@ fun MainScreen() {
 					DropdownMenuItem(
 						text = { Text("About") },
 						onClick = {
-							navController.navigate(Destinations.AboutScreen.About)
+							navController.navigate(RootDestinations.About)
 							showMenu = false
 						}
 					)
@@ -107,11 +88,23 @@ fun MainScreen() {
 			verticalArrangement = Arrangement.SpaceAround,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			DefaultThemesButtons()
+			DefaultThemesButtons(exportTheme = vm::exportDefaultTheme)
 
-			OutlinedButton(onClick = { navController.navigate(Destinations.EditorScreen.Editor) }) {
+			OutlinedButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
 				Text(text = "Go to theme editor")
 			}
 		}
 	}
+
+	if (vm.displayLightThemeUpdateChoiceDialog) ThemeUpdateAvailableDialog(
+		ofLight = true,
+		decline = { vm.declineDefaultThemeUpdate(true) },
+		acceptStockThemeUpdate = { vm.acceptTheStockThemeUpdate(true) }
+	)
+
+	if (vm.displayDarkThemeUpdateChoiceDialog) ThemeUpdateAvailableDialog(
+		ofLight = false,
+		decline = { vm.declineDefaultThemeUpdate(false) },
+		acceptStockThemeUpdate = { vm.acceptTheStockThemeUpdate(false) }
+	)
 }

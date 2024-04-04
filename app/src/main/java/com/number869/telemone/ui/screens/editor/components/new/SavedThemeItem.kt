@@ -1,7 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.scaleIn
@@ -39,7 +37,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,39 +46,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
-import com.number869.telemone.ThemeColorDataType
-import com.number869.telemone.ThemeStorageType
-import com.number869.telemone.data.AppSettings
-import com.number869.telemone.getColorValueFromColorToken
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.data.ThemeData
+import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.showToast
+import com.number869.telemone.ui.screens.editor.EditorDestinations
+import com.nxoim.decomposite.core.common.navigation.NavController
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SavedThemeItem(
 	modifier: Modifier,
-	uuid: String,
+	themeData: ThemeData,
+	selected: Boolean = false,
 	isInSavedThemesRow: Boolean = false,
-	colorDisplayTypeOverwrite: String? = null,
 	changeSelectionMode: () -> Unit = { },
-	themeSelectionModeIsActive: Boolean = false
+	loadSavedTheme: (ThemeStorageType) -> Unit,
+	selectOrUnselectSavedTheme: () -> Unit,
+	exportTheme: (ThemeColorDataType) -> Unit,
+	colorOf: @Composable (String) -> Color,
+	themeSelectionModeIsActive: Boolean = false,
+	navController: NavController<EditorDestinations> = getExistingNavController()
 ) {
-	val navController = navController<Destinations>()
-	val vm = viewModel<MainViewModel>()
-
-	val context = LocalContext.current
 	var showMenu by remember { mutableStateOf(false) }
 
-	val selected by remember { derivedStateOf { vm.selectedThemes.contains(uuid) } }
 	val selectedOverlayColor by animateColorAsState(
 		if (themeSelectionModeIsActive && selected)
 			MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
@@ -89,55 +84,6 @@ fun SavedThemeItem(
 			Color.Transparent,
 		label = ""
 	)
-
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-
-	// 1 - Saved color values
-	// 2 - Current color scheme (fallback to saved colors)
-	// 3 - Current color scheme
-	val colorDisplayType = preferences.getString(
-		AppSettings.SavedThemeItemDisplayType.id,
-		"1"
-	)
-
-	// cry about it being here
-	// tho this whole file could be prettier, yes
-	@Composable
-	fun colorOf(colorValueOf: String): Color {
-		return animateColorAsState(
-			when (colorDisplayTypeOverwrite ?: colorDisplayType) {
-				"1" -> {
-					vm.themeList.find { it.containsKey(uuid) }
-						?.get(uuid)
-						?.get(colorValueOf)
-						?.let { Color(it.second) } ?: Color.Red
-				}
-				"2" -> { // in case theres a need to show monet colors only when available
-					vm.themeList.find { it.containsKey(uuid) }
-						?.get(uuid)
-						?.get(colorValueOf)
-						?.let {
-							val colorFromToken = getColorValueFromColorToken(it.first, vm.palette)
-							val colorAsSaved = Color(it.second)
-
-							// colorFromToken prob should be Color? so it can
-							// be null
-							if (colorFromToken == Color.Red) colorAsSaved else colorFromToken
-						} ?: Color.Red
-				}
-				else -> {
-					vm.themeList.find { it.containsKey(uuid) }
-						?.get(uuid)
-						?.get(colorValueOf)
-						?.let { getColorValueFromColorToken(it.first, vm.palette) } ?: Color.Red
-				}
-			},
-			label = "i hate these labels"
-		).value
-	}
 
 	Box {
 		OutlinedCard(
@@ -149,26 +95,20 @@ fun SavedThemeItem(
 					return@let if (isInSavedThemesRow && !themeSelectionModeIsActive)
 						it.combinedClickable(
 							onClick = {
-								vm.loadSavedTheme(
+								loadSavedTheme(
 									ThemeStorageType.ByUuid(
-										uuid,
+										themeData.uuid,
 										withTokens = false,
 										clearCurrentTheme = true
 									)
 								)
 
-								Toast
-									.makeText(
-										context,
-										"Theme loaded",
-										Toast.LENGTH_SHORT
-									)
-									.show()
+								showToast("Theme loaded")
 							},
 							onLongClick = { showMenu = true }
 						)
 					else if (themeSelectionModeIsActive)
-						it.clickable { vm.selectOrUnselectSavedTheme(uuid) }
+						it.clickable { selectOrUnselectSavedTheme() }
 					else
 						it
 				}
@@ -201,7 +141,7 @@ fun SavedThemeItem(
 		) {
 			Checkbox(
 				checked = selected,
-				onCheckedChange = { vm.selectOrUnselectSavedTheme(uuid) },
+				onCheckedChange = { selectOrUnselectSavedTheme() },
 				colors = CheckboxDefaults.colors(
 					uncheckedColor = Color.Transparent
 				),
@@ -221,7 +161,7 @@ fun SavedThemeItem(
 				text = { Text("Load theme with options") },
 				onClick = {
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.LoadThemeWithOptions(uuid),
+						EditorDestinations.Dialogs.LoadThemeWithOptions(themeData.uuid),
 						ContentType.Overlay
 					)
 				}
@@ -230,14 +170,14 @@ fun SavedThemeItem(
 				text = { Text("Export this theme")},
 				onClick = {
 					showMenu = false
-					vm.exportTheme(uuid, exportDataType = ThemeColorDataType.ColorValues)
+					exportTheme(ThemeColorDataType.ColorValues)
 				}
 			)
 			DropdownMenuItem(
 				text = { Text("Export this theme in Telemone format")},
 				onClick = {
 					showMenu = false
-					vm.exportTheme(uuid, exportDataType = ThemeColorDataType.ColorTokens)
+					exportTheme(ThemeColorDataType.ColorTokens)
 				}
 			)
 			DropdownMenuItem(
@@ -245,7 +185,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.OverwriteDefaultThemeChoice(uuid),
+						EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(themeData),
 						ContentType.Overlay
 					)
 				}
@@ -255,7 +195,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.DeleteOneTheme(uuid),
+						EditorDestinations.Dialogs.DeleteOneTheme(themeData),
 						ContentType.Overlay
 					)
 				}
@@ -265,7 +205,7 @@ fun SavedThemeItem(
 				onClick = {
 					showMenu = false
 					changeSelectionMode()
-					vm.selectOrUnselectSavedTheme(uuid)
+					selectOrUnselectSavedTheme()
 				}
 			)
 		}
