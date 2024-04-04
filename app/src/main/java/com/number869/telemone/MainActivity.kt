@@ -8,14 +8,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
+import com.number869.telemone.data.InstanceDeclarator
 import com.number869.telemone.data.InstanceLocator
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.themeRepositoryInitializer
 import com.number869.telemone.shared.utils.inject
-import com.number869.telemone.shared.utils.single
 import com.number869.telemone.ui.Navigator
 import com.number869.telemone.ui.theme.TelemoneTheme
 import com.number869.telemone.ui.theme.rememberPaletteState
@@ -35,7 +34,8 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			TelemoneTheme {
 				val paletteState = rememberPaletteState()
-				remember {
+
+				InstanceDeclarator {
 					// not in a launched effect because this needs to be
 					// executed synchronously, before other ui
 					single<Context>(cacheInstance = false) { this@MainActivity }

@@ -1,5 +1,10 @@
 package com.number869.telemone.data
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.remember
+import com.number869.telemone.App
 import kotlin.reflect.KClass
 
 class InstanceLocator {
@@ -44,4 +49,21 @@ class InstanceLocator {
         instanceReferences.remove(T::class)
         instanceCache.remove(T::class)
     }
+}
+
+@NonRestartableComposable
+@Composable
+fun InstanceDeclarator(block: InstanceDeclaratorScope.() -> Unit) {
+    val initializer = remember { InstanceDeclaratorScope() }
+
+    block(initializer)
+}
+
+@Immutable
+class InstanceDeclaratorScope(val instanceLocator: InstanceLocator = App.instanceLocator) {
+    inline fun <reified T : Any> single(
+        cacheInstance: Boolean = true,
+        createEagerly: Boolean = false,
+        crossinline instanceProvider: () -> T
+    ) = instanceLocator.put(cacheInstance, createEagerly, instanceProvider)
 }
