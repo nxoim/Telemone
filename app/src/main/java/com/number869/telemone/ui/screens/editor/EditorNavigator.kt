@@ -50,7 +50,7 @@ private fun Dialogs(
     EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile -> {
         val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
 
-        // stuff for loading files.
+        // stuff for loadingMappedValues files.
         // this one is used when pressing the "clear" button
         val launcherThatClears = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenDocument()

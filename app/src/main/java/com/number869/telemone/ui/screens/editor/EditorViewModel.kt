@@ -13,7 +13,15 @@ import com.number869.telemone.shared.utils.color
 import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Stable
@@ -22,28 +30,47 @@ import kotlinx.coroutines.launch
 class EditorViewModel(
 	private val themeManager: ThemeManager = inject()
 ) : ViewModel() {
-	val themeList = themeManager.themeList
+	var loadingMappedValues by mutableStateOf(true)
+	var loadingThemes by mutableStateOf(true)
 
-	val mappedValues get() = themeManager.mappedValues
-	val mappedValuesAsList get() = mappedValues.values.toList()
-	private val defaultCurrentTheme get() = themeManager.defaultCurrentTheme
-	val newUiElements get() = mappedValues.values
-		.asSequence()
-		.filter { it.name !in defaultCurrentTheme.map { it.name } }
-		.sortedByDescending { it.name }
-		.toList()
+	val themeList = themeManager.themeList.onEach { loadingThemes = false }
+	private val mappedValues = themeManager.mappedValues
+	var mappedValuesAsList = mappedValues
+		.map {
+			it.values
+				.sortedBy { it.name }
+				.also { loadingMappedValues = false }
+		}
+		.stateIn(
+			scope = CoroutineScope(Dispatchers.Default),
+			started = SharingStarted.WhileSubscribed(),
+			initialValue = mappedValues.value.values.toList()
+		)
+	private val defaultCurrentTheme = themeManager.defaultCurrentTheme
+	var newUiElements = mappedValues
+		.map {
+			it.values
+				.asSequence()
+				.filter { it.name !in defaultCurrentTheme.map { it.name } }
+				.sortedBy { it.name }
+				.toList()
+	}
 
-	val incompatibleValues get() = mappedValues.values
-		.asSequence()
-		.filter { it.colorToken == "INCOMPATIBLE VALUE" }
-		.sortedByDescending { it.name }
-		.toList()
+	var incompatibleValues = mappedValues
+		.map {
+			it.values
+				.asSequence()
+				.filter { it.colorToken == "INCOMPATIBLE VALUE" }
+				.sortedByDescending { it.name }
+				.toList()
+	}
 
 	val selectedThemes = mutableStateListOf<String>()
 	var themeSelectionToolbarIsVisible by mutableStateOf(false)
 
 	override fun onDestroy(removeFromViewModelStore: () -> Unit) {
-		// do nothing
+		loadingMappedValues = true
+		loadingThemes = true
 	}
 
 	fun exportCustomTheme() = themeManager.exportCustomTheme()
@@ -82,7 +109,14 @@ class EditorViewModel(
 	fun changeValue(uiElementName: String, colorToken: String, colorValue: Color) =
 		themeManager.changeValue(uiElementName, colorToken, colorValue)
 
-	fun colorFromCurrentTheme(uiElementName: String): Color = mappedValues[uiElementName]?.color ?: Color.Red
+	@OptIn(ExperimentalCoroutinesApi::class)
+	fun colorFromCurrentTheme(uiElementName: String) = mappedValues
+		.mapLatest { it[uiElementName]?.color ?: Color.Red }
+		.stateIn(
+			scope = CoroutineScope(Dispatchers.Default),
+			started = SharingStarted.WhileSubscribed(),
+			initialValue = mappedValues.value[uiElementName]?.color ?: Color.Red
+		)
 
 	fun selectOrUnselectSavedTheme(uuid: String) = if (selectedThemes.contains(uuid))
 		selectedThemes.remove(uuid)

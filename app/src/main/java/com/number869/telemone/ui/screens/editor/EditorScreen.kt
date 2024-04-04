@@ -6,6 +6,7 @@ import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -38,6 +39,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -47,7 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -63,6 +65,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.ThemeData
+import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.colorOf
@@ -77,6 +80,7 @@ import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.ultils.ContentType
 import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
+import kotlinx.coroutines.Dispatchers
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
@@ -97,12 +101,17 @@ fun EditorScreen(
 	)
 	val colorDisplayType = getColorDisplayType(preferences)
 
+	val themeList = vm.themeList.collectAsState(listOf(), Dispatchers.Default)
+	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState(Dispatchers.Default)
+	val newUiElements by vm.newUiElements.collectAsState(listOf(), Dispatchers.Default)
+	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf(), Dispatchers.Default)
+
 	Scaffold(
 		Modifier.nestedScroll(topAppBarState.nestedScrollConnection),
 		topBar = {
 			EditorTopAppBar(
 				topAppBarState,
-				vm.mappedValuesAsList,
+				mappedValuesAsList,
 				exportCustomTheme = vm::exportCustomTheme,
 				saveCurrentTheme = vm::saveCurrentTheme,
 				resetCurrentTheme = vm::resetCurrentTheme,
@@ -113,51 +122,69 @@ fun EditorScreen(
 		bottomBar = { Box {} } // hello edge-to-edge
 	) { scaffoldPadding ->
 		Box() {
-			LazyColumn(
-				state = wholeThingListState,
-				verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
-				contentPadding = PaddingValues(
-					bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
-				)
+			AnimatedVisibility(
+				visible = vm.loadingMappedValues,
+				enter = fadeIn(tween(300)),
+				exit = fadeOut(tween(300)),
+				modifier = Modifier.align(Alignment.Center)
 			) {
-				item {
-					CurrentThemeSection(
-						Modifier.padding(top = scaffoldPadding.calculateTopPadding()),
-						colorOf = {
-							animateColorAsState(vm.colorFromCurrentTheme(it)).value
-						}
-					)
-					SavedThemesSection(
-						navController,
-						vm,
-						colorDisplayType
-					)
-				}
-
-				NewValuesSection(vm)
-				IncompatibleValuesSection(vm)
-
-				item {
-					SmallTintedLabel(
-						Modifier.padding(start = 16.dp),
-						labelText = "All Colors"
-					)
-					Spacer(modifier = Modifier.height(16.dp))
-				}
-
-				AllColorsSection(vm)
+				CircularProgressIndicator()
 			}
 
-			InternalLazyColumnScrollbar(
-				listState = wholeThingListState,
-				thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-				thumbSelectedColor = MaterialTheme.colorScheme.primary,
-				selectionActionable = ScrollbarSelectionActionable.WhenVisible,
-				modifier = Modifier.padding(
-					top = scaffoldPadding.calculateTopPadding() + 8.dp,
-					bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
+			AnimatedVisibility(
+				visible = !vm.loadingMappedValues,
+				enter = fadeIn(tween(300)),
+				exit = fadeOut(tween(300)),
+			) {
+				LazyColumn(
+					state = wholeThingListState,
+					verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
+					contentPadding = PaddingValues(
+						bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
+					)
+				) {
+					item {
+						CurrentThemeSection(
+							Modifier.padding(top = scaffoldPadding.calculateTopPadding()),
+							colorOf = {
+								val color by vm.colorFromCurrentTheme(it).collectAsState()
+
+								animateColorAsState(color).value
+							}
+						)
+						SavedThemesSection(
+							navController,
+							vm,
+							themeList,
+							colorDisplayType
+						)
+					}
+
+					NewValuesSection(vm, newUiElements)
+					IncompatibleValuesSection(vm, incompatibleValues, mappedValuesAsList)
+
+					item {
+						SmallTintedLabel(
+							Modifier.padding(start = 16.dp),
+							labelText = "All Colors"
+						)
+						Spacer(modifier = Modifier.height(16.dp))
+					}
+
+					AllColorsSection(vm, mappedValuesAsList)
+				}
+
+				InternalLazyColumnScrollbar(
+					listState = wholeThingListState,
+					thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+					thumbSelectedColor = MaterialTheme.colorScheme.primary,
+					selectionActionable = ScrollbarSelectionActionable.WhenVisible,
+					modifier = Modifier.padding(
+						top = scaffoldPadding.calculateTopPadding() + 8.dp,
+						bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
+					)
 				)
-			)
+			}
 		}
 	}
 }
@@ -173,14 +200,14 @@ private fun CurrentThemeSection(
 }
 
 @Composable
-@Stable
 private fun SavedThemesSection(
 	navController: NavController<EditorDestinations>,
 	vm: EditorViewModel,
+	themeListState: State<List<ThemeData>>,
 	colorDisplayType: ThemeColorPreviewDisplayType
 ) {
+	val themeList by themeListState
 	val savedThemesRowState = rememberLazyListState()
-	val themeList by vm.themeList.collectAsState(listOf())
 	val displayingSavedThemes by remember {
 		derivedStateOf { themeList.isNotEmpty() }
 	}
@@ -216,52 +243,66 @@ private fun SavedThemesSection(
 		}
 	}
 
-	AnimatedVisibility(
-		visible = !displayingSavedThemes,
-		enter = fadeIn() + expandVertically(),
-		exit = fadeOut() + shrinkVertically()
-	) {
-		NoSavedThemesPlaceholder()
-	}
 
-	AnimatedVisibility(
-		visible = displayingSavedThemes,
-		enter = fadeIn() + expandVertically(),
-		exit = fadeOut() + shrinkVertically()
-	) {
-		Column {
-			LazyRow(
-				state = savedThemesRowState,
-				contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
-				horizontalArrangement = spacedBy(16.dp),
-				modifier = Modifier.animateContentSize()
-			) {
-				items(themeList, key = { item -> item.uuid }) { theme ->
-					SavedThemeItem(
-						Modifier.animateItem(),
-						theme,
-						selected = vm.selectedThemes.contains(theme.uuid),
-						true,
-						loadSavedTheme = { vm.loadSavedTheme(it) },
-						selectOrUnselectSavedTheme = { vm.selectOrUnselectSavedTheme(theme.uuid) },
-						exportTheme = { vm.exportTheme(theme.uuid, it) },
-						changeSelectionMode = {
-							vm.toggleThemeSelectionModeToolbar()
-						},
-						colorOf = { targetUiElement ->
-							colorOf(
-								theme.values
-									.find { it.name == targetUiElement }
-									?: incompatibleUiElementColorData(targetUiElement),
-								colorDisplayType
-							)
-						},
-						themeSelectionModeIsActive = vm.themeSelectionToolbarIsVisible
-					)
-				}
+	Box {
+		AnimatedVisibility(
+			visible = vm.loadingThemes,
+			enter = fadeIn(tween(200)),
+			exit = fadeOut(tween(200))
+		) {
+			Box(modifier = Modifier.fillMaxWidth().height(64.dp)) {
+				CircularProgressIndicator(Modifier.align(Alignment.Center))
 			}
+		}
 
-			ThemeSelectionToolbarSection(themeList = themeList)
+		AnimatedVisibility(
+			visible = !vm.loadingThemes && !displayingSavedThemes,
+			enter = fadeIn() + expandVertically(),
+			exit = fadeOut() + shrinkVertically(),
+			modifier = Modifier.align(Alignment.Center)
+		) {
+			NoSavedThemesPlaceholder()
+		}
+
+		AnimatedVisibility(
+			visible = displayingSavedThemes,
+			enter = fadeIn() + expandVertically(),
+			exit = fadeOut() + shrinkVertically()
+		) {
+			Column {
+				LazyRow(
+					state = savedThemesRowState,
+					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
+					horizontalArrangement = spacedBy(16.dp),
+					modifier = Modifier.animateContentSize()
+				) {
+					items(themeList, key = { item -> item.uuid }) { theme ->
+						SavedThemeItem(
+							Modifier.animateItem(),
+							theme,
+							selected = vm.selectedThemes.contains(theme.uuid),
+							true,
+							loadSavedTheme = { vm.loadSavedTheme(it) },
+							selectOrUnselectSavedTheme = { vm.selectOrUnselectSavedTheme(theme.uuid) },
+							exportTheme = { vm.exportTheme(theme.uuid, it) },
+							changeSelectionMode = {
+								vm.toggleThemeSelectionModeToolbar()
+							},
+							colorOf = { targetUiElement ->
+								colorOf(
+									theme.values
+										.find { it.name == targetUiElement }
+										?: incompatibleUiElementColorData(targetUiElement),
+									colorDisplayType
+								)
+							},
+							themeSelectionModeIsActive = vm.themeSelectionToolbarIsVisible
+						)
+					}
+				}
+
+				ThemeSelectionToolbarSection(themeList = themeList)
+			}
 		}
 	}
 }
@@ -334,8 +375,8 @@ private fun ThemeSelectionToolbarSection(
 	)
 }
 
-private fun LazyListScope.NewValuesSection(vm: EditorViewModel) {
-	if (vm.newUiElements.isNotEmpty()) {
+private fun LazyListScope.NewValuesSection(vm: EditorViewModel, newUiElements: List<UiElementColorData>) {
+	if (newUiElements.isNotEmpty()) {
 		item {
 			SmallTintedLabel(
 				Modifier
@@ -349,7 +390,7 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel) {
 				.animateItem())
 		}
 
-		itemsIndexed(vm.newUiElements) { index, uiElementData ->
+		itemsIndexed(newUiElements) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
 					.padding(horizontal = 16.dp)
@@ -357,7 +398,7 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel) {
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
-				lastIndexInList = vm.newUiElements.lastIndex
+				lastIndexInList = newUiElements.lastIndex
 			)
 		}
 
@@ -366,8 +407,12 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel) {
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private fun LazyListScope.IncompatibleValuesSection(vm: EditorViewModel) {
-	if (vm.incompatibleValues.isNotEmpty()) {
+private fun LazyListScope.IncompatibleValuesSection(
+	vm: EditorViewModel,
+	incompatibleValues: List<UiElementColorData>,
+	mappedValuesAsList: List<UiElementColorData>
+) {
+	if (incompatibleValues.isNotEmpty()) {
 		item {
 			SmallTintedLabel(
 				Modifier
@@ -381,7 +426,7 @@ private fun LazyListScope.IncompatibleValuesSection(vm: EditorViewModel) {
 				.animateItem())
 		}
 
-		itemsIndexed(vm.incompatibleValues) { index, uiElementData ->
+		itemsIndexed(incompatibleValues) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
 					.padding(horizontal = 16.dp)
@@ -389,14 +434,14 @@ private fun LazyListScope.IncompatibleValuesSection(vm: EditorViewModel) {
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
-				lastIndexInList = vm.mappedValuesAsList.lastIndex
+				lastIndexInList = mappedValuesAsList.lastIndex
 			)
 		}
 	}
 }
 
-private fun LazyListScope.AllColorsSection(vm: EditorViewModel) {
-	itemsIndexed(vm.mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementColorData ->
+private fun LazyListScope.AllColorsSection(vm: EditorViewModel, mappedValuesAsList: List<UiElementColorData>) {
+	itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementColorData ->
 		ElementColorItem(
 			Modifier
 				.padding(horizontal = 16.dp)
@@ -404,7 +449,7 @@ private fun LazyListScope.AllColorsSection(vm: EditorViewModel) {
 			uiElementData = uiElementColorData,
 			index = index,
 			changeValue = vm::changeValue,
-			lastIndexInList = vm.mappedValues.size
+			lastIndexInList = mappedValuesAsList.size
 		)
 	}
 }

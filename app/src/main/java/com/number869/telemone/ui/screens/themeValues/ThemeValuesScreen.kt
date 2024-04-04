@@ -29,13 +29,15 @@ import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 @Composable
 fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
 	var showValues by remember { mutableStateOf(false) }
-	val text = stringify(
-		vm.mappedValuesAsList.toList(),
-		if (showValues)
-			ThemeColorDataType.ColorValues
-		else
-			ThemeColorDataType.ColorTokens
-	)
+	val text = remember(showValues) {
+		stringify(
+			vm.mappedValuesAsList.value.toList(),
+			if (showValues)
+				ThemeColorDataType.ColorValues
+			else
+				ThemeColorDataType.ColorTokens
+		)
+	}
 
 	LazyColumn(
 		Modifier
