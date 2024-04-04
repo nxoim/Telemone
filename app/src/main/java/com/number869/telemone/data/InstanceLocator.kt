@@ -13,14 +13,16 @@ class InstanceLocator {
 
     inline fun <reified T : Any> put(
         cacheInstance: Boolean = true,
-        noinline instanceProvider: () -> T
+        createEagerly: Boolean = false,
+        crossinline instanceProvider: () -> T
     ) {
         if (cacheInstance)
             instancesToCache.add(T::class)
         else
             instancesToCache.remove(T::class)
 
-        instanceReferences[T::class] = instanceProvider
+        instanceReferences[T::class] = { instanceProvider() }
+        if (createEagerly) get<T>()
     }
 
     inline fun <reified T : Any> get(): T {
