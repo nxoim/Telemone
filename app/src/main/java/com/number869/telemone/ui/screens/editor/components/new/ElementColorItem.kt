@@ -44,12 +44,13 @@ fun ElementColorItem(
 ) {
 	val backgroundColor by animateColorAsState(uiElementData.color, label = "")
 
-	val roundedCornerShape = if (index == 0)
-		RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
-	else if (index == lastIndexInList)
-		RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 32.dp, bottomEnd = 32.dp)
-	else
-		RoundedCornerShape(4.dp)
+	val roundedCornerShape = remember(index) {
+		when (index) {
+			0 -> RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
+			lastIndexInList -> RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 32.dp, bottomEnd = 32.dp)
+			else -> RoundedCornerShape(4.dp)
+		}
+	}
 
 	Box(contentAlignment = Alignment.Center) {
 		var showPopUp by remember { mutableStateOf(false) }
