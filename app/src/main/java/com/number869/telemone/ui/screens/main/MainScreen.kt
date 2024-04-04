@@ -91,7 +91,7 @@ fun MainScreen(
 			DefaultThemesButtons(exportTheme = vm::exportDefaultTheme)
 
 			OutlinedButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
-				Text(text = "Go to theme editor")
+				Text(text = "Theme Editor")
 			}
 		}
 	}
