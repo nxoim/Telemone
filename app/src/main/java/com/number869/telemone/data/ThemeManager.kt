@@ -22,7 +22,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -51,28 +50,15 @@ class ThemeManager(
         println("ThemeManager initialized")
 
         startupConfigProcess()
-        val defaultThemeKey = if (paletteState.isDarkMode)
-            defaultDarkThemeUUID
-        else
-            defaultLightThemeUUID
-
-        defaultCurrentTheme.addAll(getThemeByUUID(defaultThemeKey)!!.values)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun saveCurrentTheme() = scope.launch(start = CoroutineStart.ATOMIC) {
-        coroutineScope {
-            val data: List<UiElementColorData>
+        val data: List<UiElementColorData>
 
-            withContext(Dispatchers.Default) {
-                data = _mappedValues.value.values.toList()
-            }
+        withContext(Dispatchers.Default) { data = _mappedValues.value.values.toList() }
 
-            themeRepository.saveTheme(
-                ThemeData(UUID.randomUUID().toString(), data)
-            )
-        }
-
+        themeRepository.saveTheme(ThemeData(UUID.randomUUID().toString(), data))
     }
 
     fun deleteTheme(uuid: String) = scope.launch { themeRepository.deleteTheme(uuid) }
@@ -84,6 +70,7 @@ class ThemeManager(
         onIncompatibleValuesFound: () -> Unit,
         onIncompatibleFileType: () -> Unit,
     ) = scope.launch {
+        backUpLastSessionPersistently()
         val loadedList = mutableStateMapOf<String, UiElementColorData>()
 
         runCatching {
@@ -174,10 +161,11 @@ class ThemeManager(
     fun resetCurrentTheme() = scope.launch(Dispatchers.Default) {
         _mappedValues.value = defaultCurrentTheme.associateBy { it.name }
         loadedFromFileTheme.clear()
+        backUpLastSessionPersistently()
     }
 
     fun overwriteTheme(uuid: String, isLightTheme: Boolean) = scope.launch {
-        val targetThemeId = if (isLightTheme) defaultLightThemeUUID else defaultDarkThemeUUID
+        val targetThemeId = PredefinedTheme.Default(isLightTheme).uuid
         val newDefaultTheme = themeRepository.getThemeByUUID(uuid) ?: error(
             "Upon overwriteTheme() theme did not exist in themeList"
         )
@@ -187,9 +175,13 @@ class ThemeManager(
 
     fun changeValue(key: String, colorToken: String, colorValue: Color) {
         _mappedValues.value += (key to UiElementColorData(key, colorToken, colorValue.toArgb()))
+
+        backUpLastSessionPersistently()
     }
 
     fun exportTheme(uuid: String, dataType: ThemeColorDataType) = scope.launch {
+        backUpLastSessionPersistently()
+
         val theme = themeRepository.getThemeByUUID(uuid)!!.values.stringify(dataType)
         val fileName = if (dataType == ThemeColorDataType.ColorTokens)
             "Telemone Export (Telemone Format).attheme"
@@ -218,6 +210,7 @@ class ThemeManager(
         loadSystemsColorsUsingTokens: Boolean,
         clearCurrentTheme: Boolean
     ) = scope.launch {
+        backUpLastSessionPersistently()
         val loadedTheme = themeRepository.getThemeByUUID(uuid) ?: error(
             "Theme was not available upon loadingMappedValues using loadSavedThemeByUuid()"
         )
@@ -236,8 +229,9 @@ class ThemeManager(
             loadedFromFileTheme.clear()
         }
 
-        _mappedValues.value = _mappedValues.value + uiElementDataToAdd.associateBy { it.name }
+        _mappedValues.value += uiElementDataToAdd.associateBy { it.name }
         loadedFromFileTheme.clear()
+        backUpLastSessionPersistently()
     }
 
     fun loadSavedTheme(
@@ -246,6 +240,8 @@ class ThemeManager(
         onIncompatibleValuesFound: () -> Unit,
         onIncompatibleFileType: () -> Unit
     ) = scope.launch {
+        backUpLastSessionPersistently()
+
         val storageTypeText = when (storedTheme) {
             is ThemeStorageType.Default -> "Default"
             is ThemeStorageType.Stock -> "Stock"
@@ -266,10 +262,7 @@ class ThemeManager(
             when(storedTheme) {
                 is ThemeStorageType.Default -> {
                     _mappedValues.value = themeRepository.getThemeByUUID(
-                        if (storedTheme.isLight)
-                            defaultLightThemeUUID
-                        else
-                            defaultDarkThemeUUID
+                        PredefinedTheme.Default(storedTheme.isLight).uuid
                     )!!.values.associateBy { it.name }
                 }
                 is ThemeStorageType.Stock -> {
@@ -308,9 +301,12 @@ class ThemeManager(
                 onIncompatibleValuesFound = onIncompatibleValuesFound
             )
         }
+        backUpLastSessionPersistently()
     }
 
     fun exportCustomTheme() = scope.launch {
+        backUpLastSessionPersistently()
+
         val result = _mappedValues.value.values.toList().stringify(ThemeColorDataType.ColorValues)
 
         with(context) {
@@ -340,26 +336,32 @@ class ThemeManager(
         }
 
         runBlocking {
-            if (getThemeByUUID(defaultLightThemeUUID) == null) {
-                themeRepository.saveTheme(ThemeData(defaultLightThemeUUID, stockLightTheme.values))
+            if (getThemeByUUID(PredefinedTheme.Default(true).uuid) == null) {
+                themeRepository.saveTheme(
+                    ThemeData(PredefinedTheme.Default(true).uuid, stockLightTheme.values)
+                )
             }
 
-            if (getThemeByUUID(defaultDarkThemeUUID) == null) {
-                themeRepository.saveTheme(ThemeData(defaultDarkThemeUUID, stockDarkTheme.values))
+            if (getThemeByUUID(PredefinedTheme.Default(false).uuid) == null) {
+                themeRepository.saveTheme(
+                    ThemeData(PredefinedTheme.Default(false).uuid, stockDarkTheme.values)
+                )
             }
         }
 
-        if (paletteState.isDarkMode)
-            _mappedValues.value = getThemeByUUID(defaultDarkThemeUUID)!!.values.associateBy { it.name }
-        else
-            _mappedValues.value = getThemeByUUID(defaultLightThemeUUID)!!.values.associateBy { it.name }
+        val defaultThemeMatchingSystemDarkMode = getThemeByUUID(
+            PredefinedTheme.Default(!paletteState.isDarkMode).uuid
+        )
+        // load last session, or default
+        val startupTheme = getThemeByUUID(PredefinedTheme.LastSession.uuid)
+            ?: defaultThemeMatchingSystemDarkMode
+
+        _mappedValues.value = startupTheme!!.values.associateBy { it.name }
+        defaultCurrentTheme.addAll(defaultThemeMatchingSystemDarkMode!!.values)
     }
 
     fun updateDefaultThemeFromStock(light: Boolean) {
-        val targetThemeId = if (light)
-            defaultLightThemeUUID
-        else
-            defaultDarkThemeUUID
+        val targetThemeId = PredefinedTheme.Default(light).uuid
 
         scope.launch {
             themeRepository.saveTheme(
@@ -379,6 +381,14 @@ class ThemeManager(
     }
 
     fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUID(uuid)
+    private fun backUpLastSessionPersistently() = scope.launch {
+        themeRepository.saveTheme(
+            ThemeData(
+                PredefinedTheme.LastSession.uuid,
+                _mappedValues.value.values.toList()
+            )
+        )
+    }
 }
 
 private class IncompatibleValuesException : Exception()

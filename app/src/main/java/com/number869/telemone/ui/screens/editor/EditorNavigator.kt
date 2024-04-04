@@ -6,9 +6,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.number869.telemone.data.PredefinedTheme
 import com.number869.telemone.data.ThemeData
-import com.number869.telemone.data.defaultDarkThemeUUID
-import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteSelectedThemesDialog
@@ -117,8 +116,8 @@ private fun Dialogs(
                 editorNavController.navigateBack()
             },
             overwriteDark = destination.overwriteDark,
-            lightTheme = vm.getThemeByUUID(defaultLightThemeUUID)!!,
-            darkTheme = vm.getThemeByUUID(defaultDarkThemeUUID)!!,
+            lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
+            darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
             overwriteWith = destination.withTheme,
         )
     }
@@ -145,8 +144,8 @@ private fun Dialogs(
                     ContentType.Overlay
                 )
             },
-            lightTheme = vm.getThemeByUUID(defaultLightThemeUUID)!!,
-            darkTheme = vm.getThemeByUUID(defaultDarkThemeUUID)!!,
+            lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
+            darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
         )
     }
     EditorDestinations.Dialogs.SavedThemeTypeSelection -> {

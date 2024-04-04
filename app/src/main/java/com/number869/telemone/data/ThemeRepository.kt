@@ -42,14 +42,18 @@ class ThemeRepository(
 	fun getAllThemes() = realm.query(ThemeDataRealm::class)
 		.asFlow()
 		.flowOn(Dispatchers.IO)
-		.map {
-			it.list
-				.sortedByDescending { it._id.timestamp }
-				.mapNotNull {
-					if (it.uuid != defaultLightThemeUUID && it.uuid != defaultDarkThemeUUID)
-						it.toThemeData()
-					else
-					null
+		.map { results ->
+			results.list
+				.sortedByDescending { theme -> theme._id.timestamp }
+				.mapNotNull { theme ->
+					val allowed = when(theme.uuid) {
+						PredefinedTheme.LastSession.uuid,
+						PredefinedTheme.Default(true).uuid,
+						PredefinedTheme.Default(false).uuid -> false
+						else -> true
+					}
+
+					if (allowed) theme.toThemeData() else null
 				}
 	}
 
@@ -69,14 +73,16 @@ class ThemeRepository(
 
 	suspend fun saveTheme(theme: ThemeData) = withContext(Dispatchers.IO) {
 		realm.write {
-			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
+			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", theme.uuid))
+			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ERROR)
 		}
 		return@withContext
 	}
 
 	fun saveThemeBlocking(theme: ThemeData) {
 		realm.writeBlocking {
-			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
+			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", theme.uuid))
+			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ERROR)
 		}
 	}
 
@@ -150,7 +156,7 @@ private fun getStockTheme(
 		}
 
 	return ThemeData(
-		if (light) defaultLightThemeUUID else defaultDarkThemeUUID,
+		PredefinedTheme.Default(light).uuid,
 		themeData
 	)
 }
@@ -223,8 +229,16 @@ private class UiElementColorDataRealm : EmbeddedRealmObject {
 	var colorValue: Int = 0
 }
 
-const val defaultLightThemeUUID = "defaultLightThemeUUID"
-const val defaultDarkThemeUUID = "defaultDarkThemeUUID"
+sealed class PredefinedTheme(val uuid: String) {
+	data class Default(private val light: Boolean) : PredefinedTheme(
+		if (light)
+			"defaultLightThemeUUID"
+		else
+			"defaultDarkThemeUUID"
+	)
+
+	data object LastSession : PredefinedTheme("lastSession")
+}
 
 val fallbackKeys = mapOf(
 	"chat_inAdminText" to "chat_inTimeText",

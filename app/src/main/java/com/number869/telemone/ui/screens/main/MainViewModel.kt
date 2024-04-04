@@ -7,9 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
+import com.number869.telemone.data.PredefinedTheme
 import com.number869.telemone.data.ThemeManager
-import com.number869.telemone.data.defaultDarkThemeUUID
-import com.number869.telemone.data.defaultLightThemeUUID
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
@@ -44,10 +43,9 @@ class MainViewModel(
     init { viewModelScope.launch { checkForThemeHashUpdates() } }
 
     fun exportDefaultTheme(light: Boolean) {
-        val targetThemeId = if (light) defaultLightThemeUUID else defaultDarkThemeUUID
         val themeName = if (light) "Telemone Light" else "Telemone Dark"
         val theme = stringify(
-            themeManager.getThemeByUUID(targetThemeId)!!.values,
+            themeManager.getThemeByUUID(PredefinedTheme.Default(light).uuid)!!.values,
             ThemeColorDataType.ColorValuesFromDevicesColorScheme
         )
 
