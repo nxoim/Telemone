@@ -21,6 +21,7 @@ import com.number869.telemone.ui.theme.PaletteState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.UUID
 
@@ -345,12 +346,14 @@ class ThemeManager(
             themeRepository.getStockTheme(palette, light = false)
         }
 
-        if (getThemeByUUID(defaultLightThemeUUID) == null) {
-            themeRepository.saveTheme(ThemeData(defaultLightThemeUUID, stockLightTheme.values))
-        }
+        runBlocking {
+            if (getThemeByUUID(defaultLightThemeUUID) == null) {
+                themeRepository.saveTheme(ThemeData(defaultLightThemeUUID, stockLightTheme.values))
+            }
 
-        if (getThemeByUUID(defaultDarkThemeUUID) == null) {
-            themeRepository.saveTheme(ThemeData(defaultDarkThemeUUID, stockDarkTheme.values))
+            if (getThemeByUUID(defaultDarkThemeUUID) == null) {
+                themeRepository.saveTheme(ThemeData(defaultDarkThemeUUID, stockDarkTheme.values))
+            }
         }
 
         if (paletteState.isDarkMode)
@@ -365,20 +368,22 @@ class ThemeManager(
         else
             defaultDarkThemeUUID
 
-        // back the current default theme up before replacing it
-        themeRepository.saveTheme(
-            ThemeData(
-                UUID.randomUUID().toString(),
-                getThemeByUUID(targetThemeId)!!.values
+        scope.launch {
+            // back the current default theme up before replacing it
+            themeRepository.saveTheme(
+                ThemeData(
+                    UUID.randomUUID().toString(),
+                    getThemeByUUID(targetThemeId)!!.values
+                )
             )
-        )
 
-        themeRepository.saveTheme(
-            ThemeData(
-                targetThemeId,
-                themeRepository.getStockTheme(palette, light).values
+            themeRepository.saveTheme(
+                ThemeData(
+                    targetThemeId,
+                    themeRepository.getStockTheme(palette, light).values
+                )
             )
-        )
+        }
     }
 
     fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUID(uuid)

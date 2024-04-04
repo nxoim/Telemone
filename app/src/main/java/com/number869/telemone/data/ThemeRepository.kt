@@ -15,11 +15,10 @@ import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.mongodb.kbson.ObjectId
 
@@ -40,7 +39,6 @@ class ThemeRepository(
 	),
 	private val context: Context
 ) {
-	private val scope = CoroutineScope(Dispatchers.IO)
 	fun getAllThemes() = realm.query(ThemeDataRealm::class)
 		.asFlow()
 		.flowOn(Dispatchers.IO)
@@ -69,17 +67,28 @@ class ThemeRepository(
 		.flowOn(Dispatchers.IO)
 		.map { it.obj?.toThemeData() }
 
-	fun saveTheme(theme: ThemeData) {
+	suspend fun saveTheme(theme: ThemeData) = withContext(Dispatchers.IO) {
+		realm.write {
+			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
+		}
+		return@withContext
+	}
+
+	fun saveThemeBlocking(theme: ThemeData) {
 		realm.writeBlocking {
 			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ALL)
 		}
 	}
 
-	fun deleteTheme(uuid: String) {
-		scope.launch {
-			realm.write {
-				this.delete(this.query(ThemeDataRealm::class, "uuid == $0", uuid).first())
-			}
+	suspend fun deleteTheme(uuid: String) = withContext(Dispatchers.IO) {
+		realm.write {
+			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", uuid).first())
+		}
+	}
+
+	fun deleteThemeBlocking(uuid: String) {
+		realm.writeBlocking {
+			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", uuid).first())
 		}
 	}
 
@@ -103,7 +112,6 @@ class ThemeRepository(
 		colorToken = this@toRealmRepresentation.colorToken
 		colorValue = this@toRealmRepresentation.colorValue
 	}
-
 
 	private fun UiElementColorDataRealm.toUiElementColorData() = UiElementColorData(
 		name = name,
@@ -169,7 +177,7 @@ fun themeRepositoryInitializer(context: Context): ThemeRepository {
 		}.map { it.toNew() }
 
 		// reversed for sorting newest->oldest
-		themes.reversed().forEach { theme -> newRepo.saveTheme(theme) }
+		themes.reversed().forEach { theme -> newRepo.saveThemeBlocking(theme) }
 
 		// delete the data in old repo after migration
 		preferences.edit().remove(oldThemeListKey).apply()
