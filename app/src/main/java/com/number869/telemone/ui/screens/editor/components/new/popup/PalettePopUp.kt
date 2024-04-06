@@ -27,6 +27,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,13 +58,13 @@ fun PalettePopup(
 	changeValue: (String, String, Color) -> Unit,
 	hidePopup: () -> Unit
 ) = SharedTransitionScopeProvider {
-	var currentContent by remember { mutableStateOf(PaletteMenuCategories.Home) }
+	var currentContent by rememberSaveable { mutableStateOf(PaletteMenuCategories.Home) }
 	val isOnHomePage by remember { derivedStateOf { currentContent == PaletteMenuCategories.Home } }
 	val animatedPopupHeight by animateDpAsState(
 		when (currentContent) {
 			PaletteMenuCategories.Home -> 516.dp
 			PaletteMenuCategories.AdditionalColors -> 226.dp
-			PaletteMenuCategories.ColorRoles -> 482.dp
+			PaletteMenuCategories.ColorRoles -> 510.dp
 			else -> 256.dp
 		},
 		animationSpec = spring(0.9f, 200f),

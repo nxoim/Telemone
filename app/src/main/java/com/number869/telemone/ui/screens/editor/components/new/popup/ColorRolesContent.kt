@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -315,9 +316,9 @@ private fun FifthRowLight(
     changeValue: (String, String, Color) -> Unit,
     uiElementName: String
 ) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
+    Row(Modifier.height(64.dp), horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             dataAboutColors = ColorRolesLight.SurfaceDim.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -325,7 +326,7 @@ private fun FifthRowLight(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             dataAboutColors = ColorRolesLight.Surface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -333,12 +334,32 @@ private fun FifthRowLight(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             dataAboutColors = ColorRolesLight.SurfaceBright.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
         )
+
+        Column(Modifier.weight(1f).height(64.dp)) {
+            ColorRoleItem(
+                modifier = Modifier.weight(1f),
+                dataAboutColors = ColorRolesLight.InverseSurface.dataAboutColors,
+                uiElementName = uiElementName,
+                changeValue = changeValue,
+                enabled = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ColorRoleItem(
+                modifier = Modifier.weight(1f),
+                dataAboutColors = ColorRolesLight.InverseOnSurface.dataAboutColors,
+                uiElementName = uiElementName,
+                changeValue = changeValue,
+                enabled = true
+            )
+        }
     }
 }
 
@@ -387,6 +408,14 @@ private fun SixthRowLight(
             changeValue = changeValue,
             enabled = true
         )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesLight.InversePrimary.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
     }
 }
 
@@ -423,6 +452,22 @@ private fun SeventhRowLight(
         ColorRoleItem(
             modifier = Modifier.weight(1f),
             dataAboutColors = ColorRolesLight.OutlineVariant.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesLight.Scrim.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesLight.Shadow.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -594,9 +639,9 @@ private fun FifthRowDark(
     changeValue: (String, String, Color) -> Unit,
     uiElementName: String
 ) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
+    Row(Modifier.height(64.dp), horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             dataAboutColors = ColorRolesDark.SurfaceDim.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -604,7 +649,7 @@ private fun FifthRowDark(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             dataAboutColors = ColorRolesDark.Surface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -612,12 +657,32 @@ private fun FifthRowDark(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             dataAboutColors = ColorRolesDark.SurfaceBright.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
         )
+
+        Column(Modifier.weight(1f).height(64.dp)) {
+            ColorRoleItem(
+                modifier = Modifier.weight(1f),
+                dataAboutColors = ColorRolesDark.InverseSurface.dataAboutColors,
+                uiElementName = uiElementName,
+                changeValue = changeValue,
+                enabled = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ColorRoleItem(
+                modifier = Modifier.weight(1f),
+                dataAboutColors = ColorRolesDark.InverseOnSurface.dataAboutColors,
+                uiElementName = uiElementName,
+                changeValue = changeValue,
+                enabled = true
+            )
+        }
     }
 }
 
@@ -666,6 +731,14 @@ private fun SixthRowDark(
             changeValue = changeValue,
             enabled = true
         )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesDark.InversePrimary.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
     }
 }
 
@@ -702,6 +775,22 @@ private fun SeventhRowDark(
         ColorRoleItem(
             modifier = Modifier.weight(1f),
             dataAboutColors = ColorRolesDark.OutlineVariant.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesDark.Scrim.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesDark.Shadow.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true

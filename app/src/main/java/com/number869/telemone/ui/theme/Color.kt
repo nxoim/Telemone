@@ -155,6 +155,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnPrimary(
 		DataAboutColors("on_primary_light") {
 			var color = Color.Red
@@ -162,6 +163,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	PrimaryContainer(
 		DataAboutColors("primary_container_light") {
 			var color = Color.Red
@@ -169,6 +171,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnPrimaryContainer(
 		DataAboutColors("on_primary_container_light") {
 			var color = Color.Red
@@ -176,6 +179,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	Secondary(
 		DataAboutColors("secondary_light") {
 			var color = Color.Red
@@ -183,6 +187,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnSecondary(
 		DataAboutColors("on_secondary_light") {
 			var color = Color.Red
@@ -190,6 +195,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SecondaryContainer(
 		DataAboutColors("secondary_container_light") {
 			var color = Color.Red
@@ -197,6 +203,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnSecondaryContainer(
 		DataAboutColors("on_secondary_container_light") {
 			var color = Color.Red
@@ -204,6 +211,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	Tertiary(
 		DataAboutColors("tertiary_light") {
 			var color = Color.Red
@@ -211,6 +219,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnTertiary(
 		DataAboutColors("on_tertiary_light") {
 			var color = Color.Red
@@ -218,6 +227,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	TertiaryContainer(
 		DataAboutColors("tertiary_container_light") {
 			var color = Color.Red
@@ -225,6 +235,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnTertiaryContainer(
 		DataAboutColors("on_tertiary_container_light") {
 			var color = Color.Red
@@ -232,6 +243,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	Surface(
 		DataAboutColors("surface_light") {
 			var color = Color.Red
@@ -239,6 +251,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceDim(
 		DataAboutColors("surface_dim_light") {
 			var color = Color.Red
@@ -246,6 +259,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceBright(
 		DataAboutColors("surface_bright_light") {
 			var color = Color.Red
@@ -253,6 +267,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnSurface(
 		DataAboutColors("on_surface_light") {
 			var color = Color.Red
@@ -260,6 +275,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceContainerLowest(
 		DataAboutColors("surface_container_lowest_light") {
 			var color = Color.Red
@@ -267,6 +283,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceContainerLow(
 		DataAboutColors("surface_container_low_light") {
 			var color = Color.Red
@@ -274,6 +291,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceContainer(
 		DataAboutColors("surface_container_light") {
 			var color = Color.Red
@@ -281,6 +299,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceContainerHigh(
 		DataAboutColors("surface_container_high_light") {
 			var color = Color.Red
@@ -288,6 +307,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	SurfaceContainerHighest(
 		DataAboutColors("surface_container_highest_light") {
 			var color = Color.Red
@@ -295,6 +315,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnSurfaceVariant(
 		DataAboutColors("on_surface_variant_light") {
 			var color = Color.Red
@@ -302,6 +323,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	Error(
 		DataAboutColors("error_light") {
 			var color = Color.Red
@@ -309,6 +331,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnError(
 		DataAboutColors("on_error_light") {
 			var color = Color.Red
@@ -316,6 +339,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	ErrorContainer(
 		DataAboutColors("error_container_light") {
 			var color = Color.Red
@@ -323,6 +347,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OnErrorContainer(
 		DataAboutColors("on_error_container_light") {
 			var color = Color.Red
@@ -330,6 +355,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	Outline(
 		DataAboutColors("outline_light") {
 			var color = Color.Red
@@ -337,10 +363,53 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 			color
 		}
 	),
+
 	OutlineVariant(
 		DataAboutColors("outline_variant_light") {
 			var color = Color.Red
 			LightTheme { color = MaterialTheme.colorScheme.outlineVariant }
+			color
+		}
+	),
+
+	InverseSurface(
+		DataAboutColors("inverse_surface_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.inverseSurface }
+			color
+		}
+	),
+
+	InverseOnSurface(
+		DataAboutColors("inverse_on_surface_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.inverseOnSurface }
+			color
+		}
+	),
+
+	InversePrimary(
+		DataAboutColors("inverse_primary_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.inversePrimary }
+			color
+		}
+	),
+
+	Scrim(
+		DataAboutColors("scrim_light") {
+			var color = Color.Red
+			LightTheme { color = MaterialTheme.colorScheme.scrim }
+			color
+		}
+	),
+
+	Shadow(
+		DataAboutColors("outline_variant_light") {
+			var color = Color.Red
+			// TODO: not yet added in the lib. fix once its added
+//			DarkTheme { color = MaterialTheme.colorScheme.shadow }
+			color = Color.Black
 			color
 		}
 	);
@@ -574,6 +643,46 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 			DarkTheme { color = MaterialTheme.colorScheme.outlineVariant }
 			color
 		}
+	),
+
+	InverseSurface(
+		DataAboutColors("inverse_surface_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.inverseSurface }
+			color
+		}
+	),
+
+	InverseOnSurface(
+		DataAboutColors("inverse_on_surface_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.inverseOnSurface }
+			color
+		}
+	),
+
+	InversePrimary(
+		DataAboutColors("inverse_primary_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.inversePrimary }
+			color
+		}
+	),
+	Scrim(
+		DataAboutColors("scrim_dark") {
+			var color = Color.Red
+			DarkTheme { color = MaterialTheme.colorScheme.scrim }
+			color
+		}
+	),
+	Shadow(
+		DataAboutColors("outline_variant_dark") {
+			var color = Color.Red
+			// TODO: not yet added in the lib. fix once its added
+//			DarkTheme { color = MaterialTheme.colorScheme.shadow }
+			color = Color.Black
+			color
+		}
 	);
 
 	operator fun component1() = this.dataAboutColors.colorToken
@@ -605,20 +714,6 @@ enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
 	),
 	Transparent(
 		DataAboutColors("transparent") { Color.Transparent }
-	),
-	ScrimLight(
-		DataAboutColors("scrim_light") {
-			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.scrim }
-			color
-		}
-	),
-	ScrimDark(
-		DataAboutColors("scrim_dark") {
-			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.scrim }
-			color
-		}
 	);
 
 	operator fun component1() = this.dataAboutColors.colorToken
