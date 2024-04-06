@@ -56,9 +56,9 @@ fun ColorRolesCategoryButton(
         Box(Modifier.width(72.dp).height(32.dp)) {
             listOfColors.forEach {
                 val zIndex = when (it) {
-                    ColorRolesLight.PrimaryContainerLight.dataAboutColors -> 1f
-                    ColorRolesLight.SecondaryContainerLight.dataAboutColors -> 2f
-                    ColorRolesLight.TertiaryContainerLight.dataAboutColors -> 3f
+                    ColorRolesLight.PrimaryContainer.dataAboutColors -> 1f
+                    ColorRolesLight.SecondaryContainer.dataAboutColors -> 2f
+                    ColorRolesLight.TertiaryContainer.dataAboutColors -> 3f
                     else -> 0f
                 }
                 val startPadding = if(zIndex in 1f..3f)

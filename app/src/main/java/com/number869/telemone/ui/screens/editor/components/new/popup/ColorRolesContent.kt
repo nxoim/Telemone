@@ -158,7 +158,7 @@ private fun FirstRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.PrimaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.PrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -166,7 +166,7 @@ private fun FirstRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SecondaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -174,7 +174,7 @@ private fun FirstRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.TertiaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.TertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -182,7 +182,7 @@ private fun FirstRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.ErrorContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.ErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -198,7 +198,7 @@ private fun SecondRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnPrimaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnPrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -206,7 +206,7 @@ private fun SecondRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSecondaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnSecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -214,7 +214,7 @@ private fun SecondRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnTertiaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnTertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -222,7 +222,7 @@ private fun SecondRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnErrorContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -238,7 +238,7 @@ private fun ThirdRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.PrimaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.PrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -246,7 +246,7 @@ private fun ThirdRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SecondaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -254,7 +254,7 @@ private fun ThirdRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.TertiaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.TertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -262,7 +262,7 @@ private fun ThirdRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.ErrorContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.ErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -278,7 +278,7 @@ private fun FourthRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnPrimaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnPrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -286,7 +286,7 @@ private fun FourthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSecondaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnSecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -294,7 +294,7 @@ private fun FourthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnTertiaryContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnTertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -302,7 +302,7 @@ private fun FourthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnErrorContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -318,7 +318,7 @@ private fun FifthRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceDimLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceDim.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -326,7 +326,7 @@ private fun FifthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.Surface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -334,7 +334,7 @@ private fun FifthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceBrightLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceBright.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -350,7 +350,7 @@ private fun SixthRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerLowestLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceContainerLowest.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -358,7 +358,7 @@ private fun SixthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerLowLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceContainerLow.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -366,7 +366,7 @@ private fun SixthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -374,7 +374,7 @@ private fun SixthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerHighLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceContainerHigh.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -382,7 +382,7 @@ private fun SixthRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerHighestLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.SurfaceContainerHighest.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -398,7 +398,7 @@ private fun SeventhRowLight(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSurfaceLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnSurface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -406,7 +406,7 @@ private fun SeventhRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSurfaceVariantLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OnSurfaceVariant.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -414,7 +414,7 @@ private fun SeventhRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OutlineLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.Outline.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -422,7 +422,7 @@ private fun SeventhRowLight(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OutlineVariantLight.dataAboutColors,
+            dataAboutColors = ColorRolesLight.OutlineVariant.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -437,7 +437,7 @@ private fun FirstRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.PrimaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.PrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -445,7 +445,7 @@ private fun FirstRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SecondaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -453,7 +453,7 @@ private fun FirstRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.TertiaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.TertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -461,7 +461,7 @@ private fun FirstRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.ErrorContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.ErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -477,7 +477,7 @@ private fun SecondRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnPrimaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnPrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -485,7 +485,7 @@ private fun SecondRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSecondaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnSecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -493,7 +493,7 @@ private fun SecondRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnTertiaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnTertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -501,7 +501,7 @@ private fun SecondRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnErrorContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -517,7 +517,7 @@ private fun ThirdRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.PrimaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.PrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -525,7 +525,7 @@ private fun ThirdRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SecondaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -533,7 +533,7 @@ private fun ThirdRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.TertiaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.TertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -541,7 +541,7 @@ private fun ThirdRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.ErrorContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.ErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -557,7 +557,7 @@ private fun FourthRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnPrimaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnPrimaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -565,7 +565,7 @@ private fun FourthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSecondaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnSecondaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -573,7 +573,7 @@ private fun FourthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnTertiaryContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnTertiaryContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -581,7 +581,7 @@ private fun FourthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnErrorContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnErrorContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -597,7 +597,7 @@ private fun FifthRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceDimDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceDim.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -605,7 +605,7 @@ private fun FifthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.Surface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -613,7 +613,7 @@ private fun FifthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceBrightDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceBright.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -629,7 +629,7 @@ private fun SixthRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerLowestDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceContainerLowest.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -637,7 +637,7 @@ private fun SixthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerLowDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceContainerLow.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -645,7 +645,7 @@ private fun SixthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceContainer.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -653,7 +653,7 @@ private fun SixthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerHighDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceContainerHigh.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -661,7 +661,7 @@ private fun SixthRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerHighestDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.SurfaceContainerHighest.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -677,7 +677,7 @@ private fun SeventhRowDark(
     Row(horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSurfaceDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnSurface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -685,7 +685,7 @@ private fun SeventhRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSurfaceVariantDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OnSurfaceVariant.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -693,7 +693,7 @@ private fun SeventhRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OutlineDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.Outline.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
@@ -701,7 +701,7 @@ private fun SeventhRowDark(
 
         ColorRoleItem(
             modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OutlineVariantDark.dataAboutColors,
+            dataAboutColors = ColorRolesDark.OutlineVariant.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
