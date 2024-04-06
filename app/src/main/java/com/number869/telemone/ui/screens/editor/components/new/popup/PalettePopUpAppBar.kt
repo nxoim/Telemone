@@ -1,7 +1,6 @@
-package com.number869.telemone.ui.screens.editor.components.new
+package com.number869.telemone.ui.screens.editor.components.new.popup
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PalettePopupAppBar(
 	isOnHomePage: Boolean,

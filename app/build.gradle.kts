@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.materialkolor)
     implementation(libs.androidx.test.core.ktx)
     implementation(libs.androidx.compose.animation.tooling.internal)
+    implementation(libs.androidx.compose.animation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
