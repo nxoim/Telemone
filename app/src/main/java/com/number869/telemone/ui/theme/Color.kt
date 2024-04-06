@@ -107,12 +107,24 @@ fun rememberPaletteState(): PaletteState {
 		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
-	ColorRolesLight.entries.forEach {
-		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-	}
+	// order of execution should depend on isDarkMode for correct
+	// theme import color token inference
+	if (isDarkMode) {
+		ColorRolesDark.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
 
-	ColorRolesDark.entries.forEach {
-		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		ColorRolesLight.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
+	} else {
+		ColorRolesLight.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
+
+		ColorRolesDark.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
 	}
 
 	listOf(
