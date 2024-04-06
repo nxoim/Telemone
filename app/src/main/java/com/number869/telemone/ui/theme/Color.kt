@@ -405,7 +405,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 	),
 
 	Shadow(
-		DataAboutColors("outline_variant_light") {
+		DataAboutColors("shadow_light") {
 			var color = Color.Red
 			// TODO: not yet added in the lib. fix once its added
 //			DarkTheme { color = MaterialTheme.colorScheme.shadow }
@@ -676,7 +676,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 	Shadow(
-		DataAboutColors("outline_variant_dark") {
+		DataAboutColors("shadow_dark") {
 			var color = Color.Red
 			// TODO: not yet added in the lib. fix once its added
 //			DarkTheme { color = MaterialTheme.colorScheme.shadow }
