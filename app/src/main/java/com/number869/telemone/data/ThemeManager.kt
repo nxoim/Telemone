@@ -270,8 +270,13 @@ class ThemeManager(
                 is ThemeStorageType.Default -> {
                     _mappedValues.value = themeRepository.getThemeByUUID(
                         PredefinedTheme.Default(storedTheme.isLight).uuid
-                    )!!.values.associateBy { it.name }
+                    )!!.values.associate {
+                        it.name to it.copy(
+                            colorValue = getColorValueFromColorToken(it.colorToken, palette).toArgb()
+                        )
+                    }
                 }
+
                 is ThemeStorageType.Stock -> {
                     _mappedValues.value = themeRepository.getStockTheme(
                         palette,
