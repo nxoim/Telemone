@@ -44,28 +44,20 @@ fun colorOf(
     label = "i hate these labels"
 ).value
 
-fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
-    return if (palette.containsKey(tokenToLookFor))
-        palette.getValue(tokenToLookFor)
-    else
-        Color.Red
-}
+fun getColorValueFromColorToken(
+    tokenToLookFor: String,
+    palette: Map<String, Color>
+) = palette[tokenToLookFor] ?: Color.Red
 
-fun getColorValueFromColorTokenOrNull(tokenToLookFor: String, palette: Map<String, Color>): Color? {
-    return if (palette.containsKey(tokenToLookFor))
-        palette.getValue(tokenToLookFor)
-    else
-        null
-}
+fun getColorValueFromColorTokenOrNull(
+    tokenToLookFor: String,
+    palette: Map<String, Color>
+) = palette[tokenToLookFor]
 
-fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Color>): String {
-    val tokenIndex = palette.values.indexOf(valueToLookFor)
-
-    return if (palette.containsValue(valueToLookFor))
-        palette.keys.elementAt(tokenIndex)
-    else
-        ""
-}
+fun getColorTokenFromColorValue(
+    valueToLookFor: Color,
+    palette: Map<String, Color>
+) = palette.entries.find { it.value == valueToLookFor }?.key
 
 enum class ThemeColorDataType {
     ColorValues,

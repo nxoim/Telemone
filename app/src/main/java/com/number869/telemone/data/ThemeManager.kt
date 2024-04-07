@@ -83,7 +83,11 @@ class ThemeManager(
                             val uiElementName = splitLine[0]
                             val colorEitherValueOrTokenAsString = splitLine[1]
 
-                            if (uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()) {
+                            val validFormat = uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()
+
+                            if (!validFormat) {
+                                throw IncompatibleFileTypeException()
+                            } else {
                                 val isValueANumber = colorEitherValueOrTokenAsString
                                     .replace("-", "")
                                     .isDigitsOnly()
@@ -92,8 +96,11 @@ class ThemeManager(
                                     .contains(colorEitherValueOrTokenAsString)
 
                                 if (isValueANumber) {
-                                    val colorValue = Color(colorEitherValueOrTokenAsString.toLong())
-                                    val colorToken = getColorTokenFromColorValue(colorValue, paletteState.entirePaletteAsMap)
+                                    val colorValue = Color(colorEitherValueOrTokenAsString.toInt())
+                                    val colorToken = getColorTokenFromColorValue(
+                                        colorValue,
+                                        paletteState.entirePaletteAsMap
+                                    ) ?: ""
 
                                     loadedList[uiElementName] = UiElementColorData(
                                         uiElementName,
@@ -101,12 +108,14 @@ class ThemeManager(
                                         colorEitherValueOrTokenAsString.toInt()
                                     )
                                 } else if (isValueActuallyAColorToken) {
-                                    val colorToken = colorEitherValueOrTokenAsString
-                                    val colorValue = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap)
+                                    val colorValue = getColorValueFromColorToken(
+                                        colorEitherValueOrTokenAsString,
+                                        paletteState.entirePaletteAsMap
+                                    )
 
                                     loadedList[uiElementName] = UiElementColorData(
                                         uiElementName,
-                                        colorToken,
+                                        colorEitherValueOrTokenAsString,
                                         colorValue.toArgb()
                                     )
                                 } else {
@@ -114,8 +123,6 @@ class ThemeManager(
 
                                     throw IncompatibleValuesException()
                                 }
-                            } else {
-                                throw IncompatibleFileTypeException()
                             }
                         }
                     }

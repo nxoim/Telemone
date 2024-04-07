@@ -102,7 +102,6 @@ fun rememberPaletteState(): PaletteState {
 	val isDarkMode = isSystemInDarkTheme()
 	val entirePaletteAsMap = remember { linkedMapOf<String, Color>() }
 
-
 	AdditionalColors.entries.forEach {
 		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
@@ -139,196 +138,196 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 	PrimaryLight(
 		DataAboutColors("primary_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.primary }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.primary }
 			color
 		}
 	),
 	OnPrimaryLight(
 		DataAboutColors("on_primary_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onPrimary }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onPrimary }
 			color
 		}
 	),
 	PrimaryContainerLight(
 		DataAboutColors("primary_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.primaryContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.primaryContainer }
 			color
 		}
 	),
 	OnPrimaryContainerLight(
 		DataAboutColors("on_primary_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onPrimaryContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onPrimaryContainer }
 			color
 		}
 	),
 	SecondaryLight(
 		DataAboutColors("secondary_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.secondary }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.secondary }
 			color
 		}
 	),
 	OnSecondaryLight(
 		DataAboutColors("on_secondary_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onSecondary }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSecondary }
 			color
 		}
 	),
 	SecondaryContainerLight(
 		DataAboutColors("secondary_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.secondaryContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.secondaryContainer }
 			color
 		}
 	),
 	OnSecondaryContainerLight(
 		DataAboutColors("on_secondary_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onSecondaryContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSecondaryContainer }
 			color
 		}
 	),
 	TertiaryLight(
 		DataAboutColors("tertiary_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.tertiary }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.tertiary }
 			color
 		}
 	),
 	OnTertiaryLight(
 		DataAboutColors("on_tertiary_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onTertiary }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onTertiary }
 			color
 		}
 	),
 	TertiaryContainerLight(
 		DataAboutColors("tertiary_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.tertiaryContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.tertiaryContainer }
 			color
 		}
 	),
 	OnTertiaryContainerLight(
 		DataAboutColors("on_tertiary_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onTertiaryContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onTertiaryContainer }
 			color
 		}
 	),
 	SurfaceLight(
 		DataAboutColors("surface_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surface }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surface }
 			color
 		}
 	),
 	SurfaceDimLight(
 		DataAboutColors("surface_dim_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceDim }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceDim }
 			color
 		}
 	),
 	SurfaceBrightLight(
 		DataAboutColors("surface_bright_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceBright }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceBright }
 			color
 		}
 	),
 	OnSurfaceLight(
 		DataAboutColors("on_surface_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onSurface }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSurface }
 			color
 		}
 	),
 	SurfaceContainerLowestLight(
 		DataAboutColors("surface_container_lowest_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerLowest }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerLowest }
 			color
 		}
 	),
 	SurfaceContainerLowLight(
 		DataAboutColors("surface_container_low_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerLow }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerLow }
 			color
 		}
 	),
 	SurfaceContainerLight(
 		DataAboutColors("surface_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainer }
 			color
 		}
 	),
 	SurfaceContainerHighLight(
 		DataAboutColors("surface_container_high_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerHigh }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerHigh }
 			color
 		}
 	),
 	SurfaceContainerHighestLight(
 		DataAboutColors("surface_container_highest_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceContainerHighest }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerHighest }
 			color
 		}
 	),
 	OnSurfaceVariantLight(
 		DataAboutColors("on_surface_variant_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onSurfaceVariant }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSurfaceVariant }
 			color
 		}
 	),
 	ErrorLight(
 		DataAboutColors("error_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.error }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.error }
 			color
 		}
 	),
 	OnErrorLight(
 		DataAboutColors("on_error_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onError }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onError }
 			color
 		}
 	),
 	ErrorContainerLight(
 		DataAboutColors("error_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.errorContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.errorContainer }
 			color
 		}
 	),
 	OnErrorContainerLight(
 		DataAboutColors("on_error_container_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.onErrorContainer }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onErrorContainer }
 			color
 		}
 	),
 	OutlineLight(
 		DataAboutColors("outline_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.outline }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.outline }
 			color
 		}
 	),
 	OutlineVariantLight(
 		DataAboutColors("outline_variant_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.outlineVariant }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.outlineVariant }
 			color
 		}
 	);
@@ -343,7 +342,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	PrimaryDark(
 		DataAboutColors("primary_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.primary }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.primary }
 			color
 		}
 	),
@@ -351,7 +350,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnPrimaryDark(
 		DataAboutColors("on_primary_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onPrimary }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onPrimary }
 			color
 		}
 	),
@@ -359,7 +358,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	PrimaryContainerDark(
 		DataAboutColors("primary_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.primaryContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.primaryContainer }
 			color
 		}
 	),
@@ -367,7 +366,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnPrimaryContainerDark(
 		DataAboutColors("on_primary_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onPrimaryContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onPrimaryContainer }
 			color
 		}
 	),
@@ -375,7 +374,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SecondaryDark(
 		DataAboutColors("secondary_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.secondary }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.secondary }
 			color
 		}
 	),
@@ -383,7 +382,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnSecondaryDark(
 		DataAboutColors("on_secondary_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onSecondary }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSecondary }
 			color
 		}
 	),
@@ -391,7 +390,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SecondaryContainerDark(
 		DataAboutColors("secondary_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.secondaryContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.secondaryContainer }
 			color
 		}
 	),
@@ -399,7 +398,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnSecondaryContainerDark(
 		DataAboutColors("on_secondary_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onSecondaryContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSecondaryContainer }
 			color
 		}
 	),
@@ -407,7 +406,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	TertiaryDark(
 		DataAboutColors("tertiary_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.tertiary }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.tertiary }
 			color
 		}
 	),
@@ -415,7 +414,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnTertiaryDark(
 		DataAboutColors("on_tertiary_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onTertiary }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onTertiary }
 			color
 		}
 	),
@@ -423,7 +422,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	TertiaryContainerDark(
 		DataAboutColors("tertiary_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.tertiaryContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.tertiaryContainer }
 			color
 		}
 	),
@@ -431,7 +430,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnTertiaryContainerDark(
 		DataAboutColors("on_tertiary_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onTertiaryContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onTertiaryContainer }
 			color
 		}
 	),
@@ -439,7 +438,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceDark(
 		DataAboutColors("surface_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surface }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surface }
 			color
 		}
 	),
@@ -447,7 +446,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceDimDark(
 		DataAboutColors("surface_dim_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceDim }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceDim }
 			color
 		}
 	),
@@ -455,7 +454,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceBrightDark(
 		DataAboutColors("surface_bright_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceBright }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceBright }
 			color
 		}
 	),
@@ -463,7 +462,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnSurfaceDark(
 		DataAboutColors("on_surface_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onSurface }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSurface }
 			color
 		}
 	),
@@ -471,7 +470,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceContainerLowestDark(
 		DataAboutColors("surface_container_lowest_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerLowest }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerLowest }
 			color
 		}
 	),
@@ -479,7 +478,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceContainerLowDark(
 		DataAboutColors("surface_container_low_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerLow }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerLow }
 			color
 		}
 	),
@@ -487,7 +486,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceContainerDark(
 		DataAboutColors("surface_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainer }
 			color
 		}
 	),
@@ -495,7 +494,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceContainerHighDark(
 		DataAboutColors("surface_container_high_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerHigh }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerHigh }
 			color
 		}
 	),
@@ -503,7 +502,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	SurfaceContainerHighestDark(
 		DataAboutColors("surface_container_highest_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceContainerHighest }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerHighest }
 			color
 		}
 	),
@@ -511,7 +510,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnSurfaceVariantDark(
 		DataAboutColors("on_surface_variant_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onSurfaceVariant }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSurfaceVariant }
 			color
 		}
 	),
@@ -519,7 +518,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	ErrorDark(
 		DataAboutColors("error_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.error }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.error }
 			color
 		}
 	),
@@ -527,7 +526,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnErrorDark(
 		DataAboutColors("on_error_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onError }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onError }
 			color
 		}
 	),
@@ -535,7 +534,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	ErrorContainerDark(
 		DataAboutColors("error_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.errorContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.errorContainer }
 			color
 		}
 	),
@@ -543,7 +542,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OnErrorContainerDark(
 		DataAboutColors("on_error_container_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.onErrorContainer }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onErrorContainer }
 			color
 		}
 	),
@@ -551,7 +550,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OutlineDark(
 		DataAboutColors("outline_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.outline }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.outline }
 			color
 		}
 	),
@@ -559,7 +558,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 	OutlineVariantDark(
 		DataAboutColors("outline_variant_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.outlineVariant }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.outlineVariant }
 			color
 		}
 	);
@@ -580,14 +579,14 @@ enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
 	SurfaceElevationLevel3Light(
 		DataAboutColors("surface_elevation_level_3_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
 			color
 		}
 	),
 	SurfaceElevationLevel3Dark(
 		DataAboutColors("surface_elevation_level_3_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
 			color
 		}
 	),
@@ -597,14 +596,14 @@ enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
 	ScrimLight(
 		DataAboutColors("scrim_light") {
 			var color = Color.Red
-			LightTheme { color = MaterialTheme.colorScheme.scrim }
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.scrim }
 			color
 		}
 	),
 	ScrimDark(
 		DataAboutColors("scrim_dark") {
 			var color = Color.Red
-			DarkTheme { color = MaterialTheme.colorScheme.scrim }
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.scrim }
 			color
 		}
 	);
