@@ -7,18 +7,19 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalSharedTransitionApi::class)
-@NonRestartableComposable
+val customBoundaTransform = BoundsTransform { _, _ -> spring(0.9f, 600f) }
+
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Modifier.sharedElement(
     key: Any,
     visible: Boolean,
     renderInOverlay: Boolean = true,
-    boundsTransform: BoundsTransform = BoundsTransform { _, _ -> spring(0.9f, 600f) },
+    boundsTransform: BoundsTransform = customBoundaTransform,
     zIndexInOverlay: Float = 0f
 ) = with(LocalSharedTransitionScope.current) {
     sharedElementWithCallerManagedVisibility(
@@ -37,9 +38,11 @@ val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope>
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScopeProvider(content: @Composable () -> Unit) = SharedTransitionLayout {
+fun SharedTransitionScopeProvider(content: @Composable SharedTransitionScope.() -> Unit) = SharedTransitionLayout {
     CompositionLocalProvider(
         LocalSharedTransitionScope provides this,
-        content = content
+        content = { content() }
     )
 }
+
+val LocalBooleanProvider = staticCompositionLocalOf<Boolean> { true }

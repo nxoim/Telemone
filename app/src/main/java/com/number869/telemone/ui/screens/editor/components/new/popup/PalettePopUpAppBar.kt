@@ -44,11 +44,11 @@ fun PalettePopupAppBar(
 	Row(Modifier.fillMaxWidth(), horizontalArrangement = spacedBy(4.dp)) {
 		Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
 			if (isOnHomePage) {
-				IconButton(onClick = { hidePopup() }) {
+				IconButton(onClick = hidePopup) {
 					Icon(Icons.Default.Close, contentDescription = "Close popup")
 				}
 			} else {
-				IconButton(onClick = { openHome() }) {
+				IconButton(onClick = openHome) {
 					Icon(Icons.Default.ArrowBack, contentDescription = "Back")
 				}
 			}

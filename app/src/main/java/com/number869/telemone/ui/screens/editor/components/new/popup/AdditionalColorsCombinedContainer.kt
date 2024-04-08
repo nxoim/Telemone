@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.shared.utils.sharedElement
 import com.number869.telemone.ui.theme.AdditionalColors
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -32,7 +31,9 @@ import com.number869.telemone.ui.theme.AdditionalColors
 fun AdditionalColorsCombinedContainer(
     modifier: Modifier = Modifier,
     expand: () -> Unit,
-    isOnHomePage:Boolean,
+    // passing as state because its an object
+    isOnHomePage: Boolean,
+    chosen: Boolean,
     changeValue: (String, String, Color) -> Unit,
     uiElementName: String,
 ) {
@@ -40,7 +41,6 @@ fun AdditionalColorsCombinedContainer(
 
     Box(
         modifier
-            .sharedElement("additionalSection", isOnHomePage)
             .fillMaxSize()
             .border(
                 1.dp,
@@ -66,11 +66,7 @@ fun AdditionalColorsCombinedContainer(
             )
         }
 
-        AnimatedVisibility(
-            visible = !isOnHomePage,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
+        if(chosen) {
             Column(verticalArrangement = Arrangement.Absolute.spacedBy(8.dp)) {
                 Row(horizontalArrangement = Arrangement.Absolute.spacedBy(8.dp)) {
                     ColorRoleItem(

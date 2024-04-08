@@ -23,6 +23,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.shared.utils.LocalBooleanProvider
 import com.number869.telemone.shared.utils.sharedElement
 import com.number869.telemone.ui.theme.ColorRolesDark
 import com.number869.telemone.ui.theme.ColorRolesLight
@@ -52,66 +55,71 @@ fun ColorRolesContent(
         }
     }
 
-    Column {
-        Box(
-            contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)
-        ) {
-            HorizontalDivider()
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(0.5f),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
+    CompositionLocalProvider(
+        // "visible" color item's shared element parameter
+        LocalBooleanProvider provides true
+    ) {
+        Column {
+            Box(
+                contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)
+            ) {
+                HorizontalDivider()
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        BoxWithConstraints {
-            val maxSize = DpSize(maxWidth, maxHeight)
+            Spacer(modifier = Modifier.height(16.dp))
+            BoxWithConstraints {
+                val maxSize = DpSize(maxWidth, maxHeight)
 
-            Row(Modifier.horizontalScroll(notPagerScrollState)) {
-                Box(Modifier.size(maxSize)) {
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            SolarSet.Sun,
-                            contentDescription = "Light theme colorValue roles",
-                            Modifier
-                                .size(32.dp)
-                        )
+                Row(Modifier.horizontalScroll(notPagerScrollState)) {
+                    Box(Modifier.size(maxSize)) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                SolarSet.Sun,
+                                contentDescription = "Light theme colorValue roles",
+                                Modifier
+                                    .size(32.dp)
+                            )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        Column(verticalArrangement = spacedBy(8.dp)) {
-                            FirstRowLight(changeValue, uiElementName)
-                            SecondRowLight(changeValue, uiElementName)
-                            ThirdRowLight(changeValue, uiElementName)
-                            FourthRowLight(changeValue, uiElementName)
-                            FifthRowLight(changeValue, uiElementName)
-                            SixthRowLight(changeValue, uiElementName)
-                            SeventhRowLight(changeValue, uiElementName)
+                            Column(verticalArrangement = spacedBy(8.dp)) {
+                                FirstRowLight(changeValue, uiElementName)
+                                SecondRowLight(changeValue, uiElementName)
+                                ThirdRowLight(changeValue, uiElementName)
+                                FourthRowLight(changeValue, uiElementName)
+                                FifthRowLight(changeValue, uiElementName)
+                                SixthRowLight(changeValue, uiElementName)
+                                SeventhRowLight(changeValue, uiElementName)
+                            }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Box(Modifier.size(maxSize)) {
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            SolarSet.Moon,
-                            contentDescription = "Dark theme colorValue roles",
-                            Modifier
-                                .size(32.dp)
-                        )
+                    Box(Modifier.size(maxSize)) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                SolarSet.Moon,
+                                contentDescription = "Dark theme colorValue roles",
+                                Modifier
+                                    .size(32.dp)
+                            )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        Column(verticalArrangement = spacedBy(8.dp)) {
-                            FirstRowDark(changeValue, uiElementName)
-                            SecondRowDark(changeValue, uiElementName)
-                            ThirdRowDark(changeValue, uiElementName)
-                            FourthRowDark(changeValue, uiElementName)
-                            FifthRowDark(changeValue, uiElementName)
-                            SixthRowDark(changeValue, uiElementName)
-                            SeventhRowDark(changeValue, uiElementName)
+                            Column(verticalArrangement = spacedBy(8.dp)) {
+                                FirstRowDark(changeValue, uiElementName)
+                                SecondRowDark(changeValue, uiElementName)
+                                ThirdRowDark(changeValue, uiElementName)
+                                FourthRowDark(changeValue, uiElementName)
+                                FifthRowDark(changeValue, uiElementName)
+                                SixthRowDark(changeValue, uiElementName)
+                                SeventhRowDark(changeValue, uiElementName)
+                            }
                         }
                     }
                 }
@@ -121,6 +129,7 @@ fun ColorRolesContent(
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
+@NonRestartableComposable
 @Composable
 fun ColorRoleItem(
     modifier: Modifier = Modifier,
@@ -133,10 +142,20 @@ fun ColorRoleItem(
     val colorValue = dataAboutColors.colorValue()
 
     val outlineAlpha by animateFloatAsState(if (enabled) 1f else 0f, label = "")
+    val zIndex = when (dataAboutColors) {
+        ColorRolesLight.PrimaryContainer.dataAboutColors -> 1f
+        ColorRolesLight.SecondaryContainer.dataAboutColors -> 2f
+        ColorRolesLight.TertiaryContainer.dataAboutColors -> 3f
+        else -> 0f
+    }
 
     Box(
         modifier
-            .sharedElement(colorToken + "colorRoleItem", enabled, renderInOverlay = false)
+            .sharedElement(
+                dataAboutColors.toString() + "colorRoleItem",
+                visible = LocalBooleanProvider.current,
+                zIndexInOverlay = zIndex
+            )
             .height(40.dp)
             .fillMaxWidth()
             .clip(CircleShape)
@@ -318,7 +337,9 @@ private fun FifthRowLight(
 ) {
     Row(Modifier.height(64.dp), horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             dataAboutColors = ColorRolesLight.SurfaceDim.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -326,7 +347,9 @@ private fun FifthRowLight(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             dataAboutColors = ColorRolesLight.Surface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -334,14 +357,19 @@ private fun FifthRowLight(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             dataAboutColors = ColorRolesLight.SurfaceBright.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
         )
 
-        Column(Modifier.weight(1f).height(64.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .height(64.dp)) {
             ColorRoleItem(
                 modifier = Modifier.weight(1f),
                 dataAboutColors = ColorRolesLight.InverseSurface.dataAboutColors,
@@ -641,7 +669,9 @@ private fun FifthRowDark(
 ) {
     Row(Modifier.height(64.dp), horizontalArrangement = spacedBy(8.dp)) {
         ColorRoleItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             dataAboutColors = ColorRolesDark.SurfaceDim.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -649,7 +679,9 @@ private fun FifthRowDark(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             dataAboutColors = ColorRolesDark.Surface.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
@@ -657,14 +689,19 @@ private fun FifthRowDark(
         )
 
         ColorRoleItem(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             dataAboutColors = ColorRolesDark.SurfaceBright.dataAboutColors,
             uiElementName = uiElementName,
             changeValue = changeValue,
             enabled = true
         )
 
-        Column(Modifier.weight(1f).height(64.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .height(64.dp)) {
             ColorRoleItem(
                 modifier = Modifier.weight(1f),
                 dataAboutColors = ColorRolesDark.InverseSurface.dataAboutColors,
