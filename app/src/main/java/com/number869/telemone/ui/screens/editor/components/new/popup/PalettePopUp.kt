@@ -48,6 +48,7 @@ import com.number869.telemone.shared.utils.SharedTransitionScopeProvider
 import com.number869.telemone.shared.utils.color
 import com.number869.telemone.shared.utils.customBoundaTransform
 import com.number869.telemone.ui.theme.ColorRolesLight
+import com.number869.telemone.ui.theme.ColorRolesShared
 import com.number869.telemone.ui.theme.blueTones
 import com.number869.telemone.ui.theme.cyanTones
 import com.number869.telemone.ui.theme.greenTones
@@ -75,7 +76,7 @@ fun PalettePopup(
 		when (currentContent) {
 			PaletteMenuCategories.Home -> 516.dp
 			PaletteMenuCategories.AdditionalColors -> 226.dp
-			PaletteMenuCategories.ColorRoles -> 508.dp
+			PaletteMenuCategories.ColorRoles -> 655.dp
 			else -> 256.dp
 		},
 		animationSpec = spring(0.9f, 200f),
@@ -288,7 +289,8 @@ fun PalettePopup(
 
 							Row(Modifier.weight(1f)) {
 								val allColors = remember {
-									ColorRolesLight.entries.map { it.dataAboutColors }
+									ColorRolesLight.entries.map { it.dataAboutColors } +
+											ColorRolesShared.entries.map { it.dataAboutColors }
 								}
 
 								CompositionLocalProvider(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -39,6 +40,7 @@ import com.number869.telemone.shared.utils.LocalBooleanProvider
 import com.number869.telemone.shared.utils.sharedElement
 import com.number869.telemone.ui.theme.ColorRolesDark
 import com.number869.telemone.ui.theme.ColorRolesLight
+import com.number869.telemone.ui.theme.ColorRolesShared
 import com.number869.telemone.ui.theme.DataAboutColors
 import com.number869.telemone.ui.theme.SolarSet
 
@@ -91,6 +93,7 @@ fun ColorRolesContent(
                                 SecondRowLight(changeValue, uiElementName)
                                 ThirdRowLight(changeValue, uiElementName)
                                 FourthRowLight(changeValue, uiElementName)
+                                Box(Modifier.height(136.dp)) // space for shared tokens
                                 FifthRowLight(changeValue, uiElementName)
                                 SixthRowLight(changeValue, uiElementName)
                                 SeventhRowLight(changeValue, uiElementName)
@@ -116,12 +119,22 @@ fun ColorRolesContent(
                                 SecondRowDark(changeValue, uiElementName)
                                 ThirdRowDark(changeValue, uiElementName)
                                 FourthRowDark(changeValue, uiElementName)
+                                Box(Modifier.height(136.dp)) // space for shared tokens
                                 FifthRowDark(changeValue, uiElementName)
                                 SixthRowDark(changeValue, uiElementName)
                                 SeventhRowDark(changeValue, uiElementName)
                             }
                         }
                     }
+                }
+
+                Column(
+                    Modifier.padding(top = 240.dp),
+                    verticalArrangement = spacedBy(8.dp)
+                ) {
+                    FirstSharedRow(changeValue, uiElementName)
+                    SecondSharedRow(changeValue, uiElementName)
+                    ThirdSharedRow(changeValue, uiElementName)
                 }
             }
         }
@@ -168,6 +181,126 @@ fun ColorRoleItem(
                     it
             }
     )
+}
+
+@Composable
+private fun FirstSharedRow(
+    changeValue: (String, String, Color) -> Unit,
+    uiElementName: String
+) {
+    Row(horizontalArrangement = spacedBy(8.dp)) {
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.PrimaryFixed.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.PrimaryFixedDim.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.SecondaryFixed.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.SecondaryFixedDim.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.TertiaryFixed.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.TertiaryFixedDim.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+    }
+}
+
+@Composable
+private fun SecondSharedRow(
+    changeValue: (String, String, Color) -> Unit,
+    uiElementName: String
+) {
+    Row(horizontalArrangement = spacedBy(8.dp)) {
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.OnPrimaryFixed.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.OnSecondaryFixed.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.OnTertiaryFixed.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+    }
+}
+
+@Composable
+private fun ThirdSharedRow(
+    changeValue: (String, String, Color) -> Unit,
+    uiElementName: String
+) {
+    Row(horizontalArrangement = spacedBy(8.dp)) {
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.OnPrimaryFixedVariant.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.OnSecondaryFixedVariant.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+
+        ColorRoleItem(
+            modifier = Modifier.weight(1f),
+            dataAboutColors = ColorRolesShared.OnTertiaryFixedVariant.dataAboutColors,
+            uiElementName = uiElementName,
+            changeValue = changeValue,
+            enabled = true
+        )
+    }
 }
 
 @Composable

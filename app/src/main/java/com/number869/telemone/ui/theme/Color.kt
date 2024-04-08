@@ -127,6 +127,10 @@ fun rememberPaletteState(): PaletteState {
 		}
 	}
 
+	ColorRolesShared.entries.forEach {
+		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	}
+
 	listOf(
 		primaryTones,
 		secondaryTones,
@@ -689,6 +693,69 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 
 	@Composable
 	operator fun component2() = this.dataAboutColors.colorValue()
+}
+
+enum class ColorRolesShared(val dataAboutColors: DataAboutColors) {
+	PrimaryFixed(
+		DataAboutColors("primary_fixed") {
+			primaryTones.find { it.tone == 90 }!!.colorValue
+		}
+	),
+	OnPrimaryFixed(
+		DataAboutColors("on_primary_fixed") {
+			primaryTones.find { it.tone == 10 }!!.colorValue
+		}
+	),
+	PrimaryFixedDim(
+		DataAboutColors("on_primary_fixed_dim") {
+			primaryTones.find { it.tone == 80 }!!.colorValue
+		}
+	),
+	OnPrimaryFixedVariant(
+		DataAboutColors("on_primary_fixed_variant") {
+			primaryTones.find { it.tone == 30 }!!.colorValue
+		}
+	),
+	SecondaryFixed(
+		DataAboutColors("secondary_fixed") {
+			secondaryTones.find { it.tone == 90 }!!.colorValue
+		}
+	),
+	OnSecondaryFixed(
+		DataAboutColors("on_secondary_fixed") {
+			secondaryTones.find { it.tone == 10 }!!.colorValue
+		}
+	),
+	SecondaryFixedDim(
+		DataAboutColors("on_secondary_fixed_dim") {
+			secondaryTones.find { it.tone == 80 }!!.colorValue
+		}
+	),
+	OnSecondaryFixedVariant(
+		DataAboutColors("on_secondary_fixed_variant") {
+			secondaryTones.find { it.tone == 30 }!!.colorValue
+		}
+	),
+	TertiaryFixed(
+		DataAboutColors("tertiary_fixed") {
+			tertiaryTones.find { it.tone == 90 }!!.colorValue
+		}
+	),
+	OnTertiaryFixed(
+		DataAboutColors("on_tertiary_fixed") {
+			tertiaryTones.find { it.tone == 10 }!!.colorValue
+		}
+	),
+	TertiaryFixedDim(
+		DataAboutColors("on_tertiary_fixed_dim") {
+			tertiaryTones.find { it.tone == 80 }!!.colorValue
+		}
+	),
+	OnTertiaryFixedVariant(
+		DataAboutColors("on_tertiary_fixed_variant") {
+			tertiaryTones.find { it.tone == 30 }!!.colorValue
+		}
+	)
 }
 
 enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
