@@ -1,7 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.new.popup
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -245,7 +244,6 @@ fun ColorRoleItem(
     val colorToken = dataAboutColors.colorToken
     val colorValue = dataAboutColors.colorValue()
 
-    val outlineAlpha by animateFloatAsState(if (enabled) 1f else 0f, label = "")
     val zIndex = when (dataAboutColors) {
         ColorRolesLight.PrimaryContainer.dataAboutColors -> 1f
         ColorRolesLight.SecondaryContainer.dataAboutColors -> 2f
@@ -263,7 +261,7 @@ fun ColorRoleItem(
             .height(40.dp)
             .fillMaxWidth()
             .clip(CircleShape)
-            .border(1.dp, MaterialTheme.colorScheme.outline.copy(outlineAlpha), CircleShape)
+            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
             .background(colorValue)
             .let {
                 return@let if (enabled)
