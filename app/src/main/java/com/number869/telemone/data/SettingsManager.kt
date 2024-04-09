@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
 import javax.annotation.concurrent.Immutable
 
-fun SettingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
+fun settingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
     RealmConfiguration.Builder(setOf(RealmSetting::class)).run {
         name(key)
         if (encryptionKey != null) encryptionKey(encryptionKey)
@@ -28,12 +28,7 @@ fun SettingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
     }
 )
 
-class SettingsManager(
-    private val database: Realm = SettingsRealm("default")
-//        Realm.open(
-//        RealmConfiguration.create(setOf(RealmSetting::class))
-//    )
-) {
+class SettingsManager(private val database: Realm = settingsRealm("default")) {
     private val scope = CoroutineScope(Dispatchers.IO)
     fun <T> set(key: String, value: T?) = scope.launch {
         database.write {
@@ -100,8 +95,7 @@ class SettingsManager(
         )
 }
 
-// making this private causes crashes
-open class RealmSetting : RealmObject {
+private open class RealmSetting : RealmObject {
     @PrimaryKey var _id = ObjectId()
     var key: String = ""
     var stringValue: String? = null

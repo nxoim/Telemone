@@ -28,9 +28,12 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
+		// just for migration
 		MMKV.initialize(this)
 
-		val navigationRootDataProvider = navigationRootDataProvider(defaultComponentContext())
+		val navigationRootDataProvider = navigationRootDataProvider(
+			defaultComponentContext()
+		)
 
 		setContent {
 			TelemoneTheme {
