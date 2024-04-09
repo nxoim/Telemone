@@ -32,6 +32,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import com.number869.telemone.shared.utils.sharedElement
 import com.number869.telemone.ui.theme.ToneInfo
@@ -93,7 +94,7 @@ fun TonalPaletteCategoryButton(
                     .height(24.dp)
                     .width(48.dp)
             ) {
-                allItems.forEachIndexed { index, toneInfo ->
+                allItems.fastForEachIndexed { index, toneInfo ->
                     val availableInPreview = index in 4..6
                     val zIndex = if (availableInPreview) (index).toFloat() else 0f
                     val startPadding = if (availableInPreview) ((index - 4) * 8).dp else 8.dp

@@ -6,13 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -36,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 import com.number869.telemone.shared.utils.LocalBooleanProvider
 import com.number869.telemone.shared.utils.sharedElement
 import com.number869.telemone.ui.theme.ColorRolesDark
@@ -89,14 +92,51 @@ fun ColorRolesContent(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Column(verticalArrangement = spacedBy(8.dp)) {
-                                FirstRowLight(changeValue, uiElementName)
-                                SecondRowLight(changeValue, uiElementName)
-                                ThirdRowLight(changeValue, uiElementName)
-                                FourthRowLight(changeValue, uiElementName)
+                                ItemRow(
+                                    items = ColorRoleItems.firstRowLightItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.secondRowLightItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.thirdRowLightItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.fourthRowLightItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
                                 Box(Modifier.height(136.dp)) // space for shared tokens
-                                FifthRowLight(changeValue, uiElementName)
-                                SixthRowLight(changeValue, uiElementName)
-                                SeventhRowLight(changeValue, uiElementName)
+
+                                ItemRow(
+                                    Modifier.height(64.dp),
+                                    items = ColorRoleItems.fifthRowLightItems,
+                                    additionalItems = ColorRoleItems.fifthRowLightItemsInverse,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.sixthRowLightItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.seventhRowLightItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
                             }
                         }
                     }
@@ -115,14 +155,51 @@ fun ColorRolesContent(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Column(verticalArrangement = spacedBy(8.dp)) {
-                                FirstRowDark(changeValue, uiElementName)
-                                SecondRowDark(changeValue, uiElementName)
-                                ThirdRowDark(changeValue, uiElementName)
-                                FourthRowDark(changeValue, uiElementName)
+                                ItemRow(
+                                    items = ColorRoleItems.firstRowDarkItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.secondRowDarkItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.thirdRowDarkItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.fourthRowDarkItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
                                 Box(Modifier.height(136.dp)) // space for shared tokens
-                                FifthRowDark(changeValue, uiElementName)
-                                SixthRowDark(changeValue, uiElementName)
-                                SeventhRowDark(changeValue, uiElementName)
+
+                                ItemRow(
+                                    Modifier.height(64.dp),
+                                    items = ColorRoleItems.fifthRowDarkItems,
+                                    additionalItems = ColorRoleItems.fifthRowDarkItemsInverse,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.sixthRowDarkItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
+
+                                ItemRow(
+                                    items = ColorRoleItems.seventhRowDarkItems,
+                                    uiElementName = uiElementName,
+                                    changeValue = changeValue
+                                )
                             }
                         }
                     }
@@ -132,9 +209,23 @@ fun ColorRolesContent(
                     Modifier.padding(top = 240.dp),
                     verticalArrangement = spacedBy(8.dp)
                 ) {
-                    FirstSharedRow(changeValue, uiElementName)
-                    SecondSharedRow(changeValue, uiElementName)
-                    ThirdSharedRow(changeValue, uiElementName)
+                    ItemRow(
+                        items = ColorRoleItems.firstSharedRowItems,
+                        uiElementName = uiElementName,
+                        changeValue = changeValue
+                    )
+
+                    ItemRow(
+                        items = ColorRoleItems.secondSharedRowItems,
+                        uiElementName = uiElementName,
+                        changeValue = changeValue
+                    )
+
+                    ItemRow(
+                        items = ColorRoleItems.thirdSharedRowItems,
+                        uiElementName = uiElementName,
+                        changeValue = changeValue
+                    )
                 }
             }
         }
@@ -183,787 +274,181 @@ fun ColorRoleItem(
     )
 }
 
+@Stable
 @Composable
-private fun FirstSharedRow(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
+private fun ItemRow(
+    modifier: Modifier = Modifier.height(40.dp),
+    items: List<DataAboutColors>,
+    additionalItems: List<DataAboutColors>? = null,
+    uiElementName: String,
+    changeValue: (String, String, Color) -> Unit
 ) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.PrimaryFixed.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.PrimaryFixedDim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.SecondaryFixed.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.SecondaryFixedDim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.TertiaryFixed.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.TertiaryFixedDim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun SecondSharedRow(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.OnPrimaryFixed.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.OnSecondaryFixed.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.OnTertiaryFixed.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun ThirdSharedRow(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.OnPrimaryFixedVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.OnSecondaryFixedVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesShared.OnTertiaryFixedVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun FirstRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.PrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.TertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.ErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun SecondRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnPrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnTertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun ThirdRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.PrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.TertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.ErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun FourthRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnPrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnTertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun FifthRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(Modifier.height(64.dp), horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            dataAboutColors = ColorRolesLight.SurfaceDim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            dataAboutColors = ColorRolesLight.Surface.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            dataAboutColors = ColorRolesLight.SurfaceBright.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        Column(
-            Modifier
-                .weight(1f)
-                .height(64.dp)) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items.fastForEach { item ->
             ColorRoleItem(
-                modifier = Modifier.weight(1f),
-                dataAboutColors = ColorRolesLight.InverseSurface.dataAboutColors,
-                uiElementName = uiElementName,
-                changeValue = changeValue,
-                enabled = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            ColorRoleItem(
-                modifier = Modifier.weight(1f),
-                dataAboutColors = ColorRolesLight.InverseOnSurface.dataAboutColors,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                dataAboutColors = item,
                 uiElementName = uiElementName,
                 changeValue = changeValue,
                 enabled = true
             )
         }
-    }
-}
 
-@Composable
-private fun SixthRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerLowest.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerLow.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerHigh.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.SurfaceContainerHighest.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.InversePrimary.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun SeventhRowLight(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSurface.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OnSurfaceVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.Outline.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.OutlineVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.Scrim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesLight.Shadow.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-@Composable
-private fun FirstRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.PrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.TertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.ErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun SecondRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnPrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnTertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun ThirdRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.PrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.TertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.ErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun FourthRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnPrimaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSecondaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnTertiaryContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnErrorContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
-
-@Composable
-private fun FifthRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(Modifier.height(64.dp), horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            dataAboutColors = ColorRolesDark.SurfaceDim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            dataAboutColors = ColorRolesDark.Surface.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        ColorRoleItem(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            dataAboutColors = ColorRolesDark.SurfaceBright.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-
-        Column(
-            Modifier
-                .weight(1f)
-                .height(64.dp)) {
-            ColorRoleItem(
-                modifier = Modifier.weight(1f),
-                dataAboutColors = ColorRolesDark.InverseSurface.dataAboutColors,
-                uiElementName = uiElementName,
-                changeValue = changeValue,
-                enabled = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            ColorRoleItem(
-                modifier = Modifier.weight(1f),
-                dataAboutColors = ColorRolesDark.InverseOnSurface.dataAboutColors,
-                uiElementName = uiElementName,
-                changeValue = changeValue,
-                enabled = true
-            )
+        additionalItems?.let {
+            Column(Modifier.weight(1f), verticalArrangement = spacedBy(8.dp)) {
+                it.fastForEach { item  ->
+                    ColorRoleItem(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize(),
+                        dataAboutColors = item,
+                        uiElementName = uiElementName,
+                        changeValue = changeValue,
+                        enabled = true
+                    )
+                }
+            }
         }
     }
 }
 
-@Composable
-private fun SixthRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerLowest.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+private object ColorRoleItems {
+    val firstSharedRowItems = listOf(
+        ColorRolesShared.PrimaryFixed.dataAboutColors,
+        ColorRolesShared.PrimaryFixedDim.dataAboutColors,
+        ColorRolesShared.SecondaryFixed.dataAboutColors,
+        ColorRolesShared.SecondaryFixedDim.dataAboutColors,
+        ColorRolesShared.TertiaryFixed.dataAboutColors,
+        ColorRolesShared.TertiaryFixedDim.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerLow.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val secondSharedRowItems = listOf(
+        ColorRolesShared.OnPrimaryFixed.dataAboutColors,
+        ColorRolesShared.OnSecondaryFixed.dataAboutColors,
+        ColorRolesShared.OnTertiaryFixed.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainer.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val thirdSharedRowItems = listOf(
+        ColorRolesShared.OnPrimaryFixedVariant.dataAboutColors,
+        ColorRolesShared.OnSecondaryFixedVariant.dataAboutColors,
+        ColorRolesShared.OnTertiaryFixedVariant.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerHigh.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val firstRowLightItems = listOf(
+        ColorRolesLight.PrimaryContainer.dataAboutColors,
+        ColorRolesLight.SecondaryContainer.dataAboutColors,
+        ColorRolesLight.TertiaryContainer.dataAboutColors,
+        ColorRolesLight.ErrorContainer.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.SurfaceContainerHighest.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val secondRowLightItems = listOf(
+        ColorRolesLight.OnPrimaryContainer.dataAboutColors,
+        ColorRolesLight.OnSecondaryContainer.dataAboutColors,
+        ColorRolesLight.OnTertiaryContainer.dataAboutColors,
+        ColorRolesLight.OnErrorContainer.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.InversePrimary.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
-}
+    val thirdRowLightItems = listOf(
+        ColorRolesLight.PrimaryContainer.dataAboutColors,
+        ColorRolesLight.SecondaryContainer.dataAboutColors,
+        ColorRolesLight.TertiaryContainer.dataAboutColors,
+        ColorRolesLight.ErrorContainer.dataAboutColors
+    )
 
-@Composable
-private fun SeventhRowDark(
-    changeValue: (String, String, Color) -> Unit,
-    uiElementName: String
-) {
-    Row(horizontalArrangement = spacedBy(8.dp)) {
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSurface.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val fourthRowLightItems = listOf(
+        ColorRolesLight.OnPrimaryContainer.dataAboutColors,
+        ColorRolesLight.OnSecondaryContainer.dataAboutColors,
+        ColorRolesLight.OnTertiaryContainer.dataAboutColors,
+        ColorRolesLight.OnErrorContainer.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OnSurfaceVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val fifthRowLightItems = listOf(
+        ColorRolesLight.SurfaceDim.dataAboutColors,
+        ColorRolesLight.Surface.dataAboutColors,
+        ColorRolesLight.SurfaceBright.dataAboutColors,
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.Outline.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val fifthRowLightItemsInverse = listOf(
+        ColorRolesLight.InverseSurface.dataAboutColors,
+        ColorRolesLight.InverseOnSurface.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.OutlineVariant.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val sixthRowLightItems = listOf(
+        ColorRolesLight.SurfaceContainerLowest.dataAboutColors,
+        ColorRolesLight.SurfaceContainerLow.dataAboutColors,
+        ColorRolesLight.SurfaceContainer.dataAboutColors,
+        ColorRolesLight.SurfaceContainerHigh.dataAboutColors,
+        ColorRolesLight.SurfaceContainerHighest.dataAboutColors,
+        ColorRolesLight.InversePrimary.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.Scrim.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
+    val seventhRowLightItems = listOf(
+        ColorRolesLight.OnSurface.dataAboutColors,
+        ColorRolesLight.OnSurfaceVariant.dataAboutColors,
+        ColorRolesLight.Outline.dataAboutColors,
+        ColorRolesLight.OutlineVariant.dataAboutColors,
+        ColorRolesLight.Scrim.dataAboutColors,
+        ColorRolesLight.Shadow.dataAboutColors
+    )
 
-        ColorRoleItem(
-            modifier = Modifier.weight(1f),
-            dataAboutColors = ColorRolesDark.Shadow.dataAboutColors,
-            uiElementName = uiElementName,
-            changeValue = changeValue,
-            enabled = true
-        )
-    }
+    val firstRowDarkItems = listOf(
+        ColorRolesDark.PrimaryContainer.dataAboutColors,
+        ColorRolesDark.SecondaryContainer.dataAboutColors,
+        ColorRolesDark.TertiaryContainer.dataAboutColors,
+        ColorRolesDark.ErrorContainer.dataAboutColors
+    )
+
+    val secondRowDarkItems = listOf(
+        ColorRolesDark.OnPrimaryContainer.dataAboutColors,
+        ColorRolesDark.OnSecondaryContainer.dataAboutColors,
+        ColorRolesDark.OnTertiaryContainer.dataAboutColors,
+        ColorRolesDark.OnErrorContainer.dataAboutColors
+    )
+
+    val thirdRowDarkItems = listOf(
+        ColorRolesDark.PrimaryContainer.dataAboutColors,
+        ColorRolesDark.SecondaryContainer.dataAboutColors,
+        ColorRolesDark.TertiaryContainer.dataAboutColors,
+        ColorRolesDark.ErrorContainer.dataAboutColors
+    )
+
+    val fourthRowDarkItems = listOf(
+        ColorRolesDark.OnPrimaryContainer.dataAboutColors,
+        ColorRolesDark.OnSecondaryContainer.dataAboutColors,
+        ColorRolesDark.OnTertiaryContainer.dataAboutColors,
+        ColorRolesDark.OnErrorContainer.dataAboutColors
+    )
+
+    val fifthRowDarkItems = listOf(
+        ColorRolesDark.InverseSurface.dataAboutColors,
+        ColorRolesDark.InverseOnSurface.dataAboutColors
+    )
+
+    val fifthRowDarkItemsInverse = listOf(
+        ColorRolesDark.InverseSurface.dataAboutColors,
+        ColorRolesDark.InverseOnSurface.dataAboutColors
+    )
+
+    val sixthRowDarkItems = listOf(
+        ColorRolesDark.SurfaceContainerLowest.dataAboutColors,
+        ColorRolesDark.SurfaceContainerLow.dataAboutColors,
+        ColorRolesDark.SurfaceContainer.dataAboutColors,
+        ColorRolesDark.SurfaceContainerHigh.dataAboutColors,
+        ColorRolesDark.SurfaceContainerHighest.dataAboutColors,
+        ColorRolesDark.InversePrimary.dataAboutColors
+    )
+
+    val seventhRowDarkItems = listOf(
+        ColorRolesDark.OnSurface.dataAboutColors,
+        ColorRolesDark.OnSurfaceVariant.dataAboutColors,
+        ColorRolesDark.Outline.dataAboutColors,
+        ColorRolesDark.OutlineVariant.dataAboutColors,
+        ColorRolesDark.Scrim.dataAboutColors,
+        ColorRolesDark.Shadow.dataAboutColors
+    )
 }

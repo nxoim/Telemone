@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import com.number869.telemone.shared.utils.sharedElement
 import com.number869.telemone.ui.theme.ToneInfo
 
@@ -31,7 +32,7 @@ fun TonalPalette(
 ) {
     Column {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            remember { tones.subList(1, 6) }.forEachIndexed { index, toneInfo ->
+            remember { tones.subList(1, 6) }.fastForEachIndexed { index, toneInfo ->
                 TonalPaletteItem(
                     modifier = Modifier.weight(1f),
                     toneInfo = toneInfo,
@@ -47,7 +48,7 @@ fun TonalPalette(
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            remember { tones.subList(6, tones.lastIndex) }.forEachIndexed { index, toneInfo ->
+            remember { tones.subList(6, tones.lastIndex) }.fastForEachIndexed { index, toneInfo ->
                 TonalPaletteItem(
                     modifier = Modifier.weight(1f),
                     toneInfo = toneInfo,

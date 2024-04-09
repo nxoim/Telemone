@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import com.number869.telemone.ui.theme.ColorRolesLight
 import com.number869.telemone.ui.theme.DataAboutColors
@@ -89,7 +90,7 @@ fun ColorRolesCategoryButton(
         horizontalArrangement = Arrangement.Center
     ) {
         Box(Modifier.width(72.dp).height(32.dp)) {
-            listOfColors.forEach {
+            listOfColors.fastForEach {
                 val allowInPreview = when (it) {
                     ColorRolesLight.PrimaryContainer.dataAboutColors,
                     ColorRolesLight.SecondaryContainer.dataAboutColors,
