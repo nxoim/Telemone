@@ -17,11 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.shared.utils.canThemeBeUpdated
+import com.number869.telemone.shared.utils.shouldDisplayUpdateDialog
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
 import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
@@ -29,13 +32,15 @@ import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.viewModel.viewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
 	navController: NavController<RootDestinations> = getExistingNavController(),
 	vm: MainViewModel = viewModel { MainViewModel() }
 ) {
+	var userChoseToSeeUpdateLight by remember { mutableStateOf(false) }
+	var userChoseToSeeUpdateDark by remember { mutableStateOf(false) }
+
 	Column(Modifier.fillMaxSize()) {
 		var showMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -50,21 +55,21 @@ fun MainScreen(
 					expanded = showMenu,
 					onDismissRequest = { showMenu = false }
 				) {
-					if (vm.lightThemeCanBeUpdated) {
+					if (canThemeBeUpdated(true)) {
 						DropdownMenuItem(
 							text = { Text("Update default light theme") },
 							onClick = {
-								vm.displayLightThemeUpdateChoiceDialog = true
+								userChoseToSeeUpdateLight = true
 								showMenu = false
 							}
 						)
 					}
 
-					if (vm.darkThemeCanBeUpdated) {
+					if (canThemeBeUpdated(false)) {
 						DropdownMenuItem(
 							text = { Text("Update default dark theme") },
 							onClick = {
-								vm.displayDarkThemeUpdateChoiceDialog = true
+								userChoseToSeeUpdateDark = true
 								showMenu = false
 							}
 						)
@@ -96,15 +101,29 @@ fun MainScreen(
 		}
 	}
 
-	if (vm.displayLightThemeUpdateChoiceDialog) ThemeUpdateAvailableDialog(
-		ofLight = true,
-		decline = { vm.declineDefaultThemeUpdate(true) },
-		acceptStockThemeUpdate = { vm.acceptTheStockThemeUpdate(true) }
-	)
+	if (shouldDisplayUpdateDialog(light = true) || userChoseToSeeUpdateLight)
+		ThemeUpdateAvailableDialog(
+			ofLight = true,
+			decline = {
+				vm.declineThemeUpdate(true)
+				userChoseToSeeUpdateLight = false
+			},
+			acceptStockThemeUpdate = {
+				vm.acceptThemeUpdate(true)
+				userChoseToSeeUpdateLight = false
+			}
+		)
 
-	if (vm.displayDarkThemeUpdateChoiceDialog) ThemeUpdateAvailableDialog(
-		ofLight = false,
-		decline = { vm.declineDefaultThemeUpdate(false) },
-		acceptStockThemeUpdate = { vm.acceptTheStockThemeUpdate(false) }
-	)
+	if (shouldDisplayUpdateDialog(light = false) || userChoseToSeeUpdateDark)
+		ThemeUpdateAvailableDialog(
+			ofLight = false,
+			decline = {
+				vm.declineThemeUpdate(false)
+				userChoseToSeeUpdateDark = false
+			},
+			acceptStockThemeUpdate = {
+				vm.acceptThemeUpdate(false)
+				userChoseToSeeUpdateDark = false
+			}
+		)
 }

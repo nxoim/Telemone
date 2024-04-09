@@ -1,9 +1,10 @@
 package com.number869.telemone.shared.utils
 
-import android.content.SharedPreferences
+import android.content.Context
 import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -44,28 +45,20 @@ fun colorOf(
     label = "i hate these labels"
 ).value
 
-fun getColorValueFromColorToken(tokenToLookFor: String, palette: Map<String, Color>): Color {
-    return if (palette.containsKey(tokenToLookFor))
-        palette.getValue(tokenToLookFor)
-    else
-        Color.Red
-}
+fun getColorValueFromColorToken(
+    tokenToLookFor: String,
+    palette: Map<String, Color>
+) = palette[tokenToLookFor] ?: Color.Red
 
-fun getColorValueFromColorTokenOrNull(tokenToLookFor: String, palette: Map<String, Color>): Color? {
-    return if (palette.containsKey(tokenToLookFor))
-        palette.getValue(tokenToLookFor)
-    else
-        null
-}
+fun getColorValueFromColorTokenOrNull(
+    tokenToLookFor: String,
+    palette: Map<String, Color>
+) = palette[tokenToLookFor]
 
-fun getColorTokenFromColorValue(valueToLookFor: Color, palette: Map<String, Color>): String {
-    val tokenIndex = palette.values.indexOf(valueToLookFor)
-
-    return if (palette.containsValue(valueToLookFor))
-        palette.keys.elementAt(tokenIndex)
-    else
-        ""
-}
+fun getColorTokenFromColorValue(
+    valueToLookFor: Color,
+    palette: Map<String, Color>
+) = palette.entries.find { it.value == valueToLookFor }?.key
 
 enum class ThemeColorDataType {
     ColorValues,
@@ -73,20 +66,19 @@ enum class ThemeColorDataType {
     ColorValuesFromDevicesColorScheme
 }
 
-enum class ThemeColorPreviewDisplayType(val id: String) {
-    SavedColorValues("1"),
-    CurrentColorSchemeWithFallback("2"),
-    CurrentColorScheme("3")
+enum class ThemeColorPreviewDisplayType(val id: Int) {
+    SavedColorValues(1),
+    CurrentColorSchemeWithFallback(2),
+    CurrentColorScheme(3)
 }
 
-fun getColorDisplayType(preferences: SharedPreferences): ThemeColorPreviewDisplayType {
-    val colorDisplayTypePref = preferences.getString(
-        AppSettings.SavedThemeItemDisplayType.id,
-        "1"
-    )
-    return when (colorDisplayTypePref) {
-        "1" -> ThemeColorPreviewDisplayType.SavedColorValues
-        "2" -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
+@Composable
+fun getColorDisplayType(): ThemeColorPreviewDisplayType {
+    val colorDisplayType by AppSettings.savedThemeDisplayType.asState()
+
+    return when (colorDisplayType) {
+        1 -> ThemeColorPreviewDisplayType.SavedColorValues
+        2 -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
         else -> ThemeColorPreviewDisplayType.CurrentColorScheme
     }
 }
@@ -146,3 +138,38 @@ fun List<UiElementColorData>.stringify(
         themeAsString
     }\n"
 }
+
+// composable because used in ui and needs reactivity via state
+@Composable
+fun shouldDisplayUpdateDialog(light: Boolean): Boolean {
+    val lastDeclinedThemeHash by if (light)
+        AppSettings.lastDeclinedStockThemeHashLight.asState()
+    else
+        AppSettings.lastDeclinedStockThemeHashDark.asState()
+
+    return (lastDeclinedThemeHash != assetFoldersThemeHash(light))
+}
+
+@Composable
+fun canThemeBeUpdated(light: Boolean): Boolean {
+    val lastAcceptedHash = if (light)
+        AppSettings.lastAcceptedStockThemeHashLight
+            .asState()
+            .value
+    else
+        AppSettings.lastAcceptedStockThemeHashDark
+            .asState()
+            .value
+
+    return lastAcceptedHash == "" || assetFoldersThemeHash(light) != lastAcceptedHash
+}
+
+fun assetFoldersThemeHash(
+    light: Boolean,
+    context: Context = inject()
+) = context.assets
+    .open("default${if (light) "Light" else "Dark"}File.attheme")
+    .bufferedReader()
+    .readText()
+    .hashCode()
+    .toString()

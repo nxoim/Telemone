@@ -13,7 +13,7 @@ fun ClearBeforeLoadDialog(
 ) {
 	AlertDialog(
 		onDismissRequest = { close() },
-		title = { Text("Clear current theme before loadingMappedValues?") },
+		title = { Text("Clear current theme before loading an external theme?") },
 		text = { Text("""Loading a theme will save the current theme to "Saved Themes".""") },
 		confirmButton = {
 			TextButton(onClick = { clear() }) {

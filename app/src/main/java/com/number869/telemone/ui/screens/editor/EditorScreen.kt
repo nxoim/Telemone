@@ -2,7 +2,6 @@
 
 package com.number869.telemone.ui.screens.editor
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -59,7 +58,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -95,11 +93,7 @@ fun EditorScreen(
 	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 	val wholeThingListState = rememberLazyListState()
 
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-	val colorDisplayType = getColorDisplayType(preferences)
+	val colorDisplayType = getColorDisplayType()
 
 	val themeList = vm.themeList.collectAsState(listOf(), Dispatchers.Default)
 	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState(Dispatchers.Default)

@@ -1,11 +1,12 @@
 package com.number869.telemone.data
 
+object AppSettings {
+	val agreedToConditions = Setting("userAgreedToV1OnWelcomeScreen", false)
+	val savedThemeDisplayType = Setting("savedThemeItemDisplayType", 1)
 
-// access these by context.getSharedPreferences("AppPreferences",
-// Context.MODE_PRIVATE).getSomethingSomething(
-// AppSettings.Whatever.id, whateverDefaultValue)
-enum class AppSettings(val id: String) {
-	// whenever pp and tos change - bump the version number in the id
-	AgreedToPpAndTos("userAgreedToV1OnWelcomeScreen"),
-	SavedThemeItemDisplayType("savedThemeItemDisplayType");
+	val lastAcceptedStockThemeHashDark = NullableSetting<String>("lastAcceptedStockThemeHashDark")
+	val lastAcceptedStockThemeHashLight = NullableSetting<String>("lastAcceptedStockThemeHashLight")
+
+	val lastDeclinedStockThemeHashDark = Setting("lastDeclinedStockThemeHashDark", "")
+	val lastDeclinedStockThemeHashLight = Setting("lastDeclinedStockThemeHashLight", "")
 }

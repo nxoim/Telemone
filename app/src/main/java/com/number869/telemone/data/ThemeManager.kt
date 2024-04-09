@@ -13,6 +13,7 @@ import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.assetFoldersThemeHash
 import com.number869.telemone.shared.utils.getColorTokenFromColorValue
 import com.number869.telemone.shared.utils.getColorValueFromColorToken
 import com.number869.telemone.shared.utils.incompatibleUiElementColorData
@@ -83,7 +84,11 @@ class ThemeManager(
                             val uiElementName = splitLine[0]
                             val colorEitherValueOrTokenAsString = splitLine[1]
 
-                            if (uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()) {
+                            val validFormat = uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()
+
+                            if (!validFormat) {
+                                throw IncompatibleFileTypeException()
+                            } else {
                                 val isValueANumber = colorEitherValueOrTokenAsString
                                     .replace("-", "")
                                     .isDigitsOnly()
@@ -92,8 +97,11 @@ class ThemeManager(
                                     .contains(colorEitherValueOrTokenAsString)
 
                                 if (isValueANumber) {
-                                    val colorValue = Color(colorEitherValueOrTokenAsString.toLong())
-                                    val colorToken = getColorTokenFromColorValue(colorValue, paletteState.entirePaletteAsMap)
+                                    val colorValue = Color(colorEitherValueOrTokenAsString.toInt())
+                                    val colorToken = getColorTokenFromColorValue(
+                                        colorValue,
+                                        paletteState.entirePaletteAsMap
+                                    ) ?: ""
 
                                     loadedList[uiElementName] = UiElementColorData(
                                         uiElementName,
@@ -101,12 +109,14 @@ class ThemeManager(
                                         colorEitherValueOrTokenAsString.toInt()
                                     )
                                 } else if (isValueActuallyAColorToken) {
-                                    val colorToken = colorEitherValueOrTokenAsString
-                                    val colorValue = getColorValueFromColorToken(colorToken, paletteState.entirePaletteAsMap)
+                                    val colorValue = getColorValueFromColorToken(
+                                        colorEitherValueOrTokenAsString,
+                                        paletteState.entirePaletteAsMap
+                                    )
 
                                     loadedList[uiElementName] = UiElementColorData(
                                         uiElementName,
-                                        colorToken,
+                                        colorEitherValueOrTokenAsString,
                                         colorValue.toArgb()
                                     )
                                 } else {
@@ -114,8 +124,6 @@ class ThemeManager(
 
                                     throw IncompatibleValuesException()
                                 }
-                            } else {
-                                throw IncompatibleFileTypeException()
                             }
                         }
                     }
@@ -263,8 +271,13 @@ class ThemeManager(
                 is ThemeStorageType.Default -> {
                     _mappedValues.value = themeRepository.getThemeByUUID(
                         PredefinedTheme.Default(storedTheme.isLight).uuid
-                    )!!.values.associateBy { it.name }
+                    )!!.values.associate {
+                        it.name to it.copy(
+                            colorValue = getColorValueFromColorToken(it.colorToken, palette).toArgb()
+                        )
+                    }
                 }
+
                 is ThemeStorageType.Stock -> {
                     _mappedValues.value = themeRepository.getStockTheme(
                         palette,
@@ -347,6 +360,29 @@ class ThemeManager(
                     ThemeData(PredefinedTheme.Default(false).uuid, stockDarkTheme.values)
                 )
             }
+
+            // save values so we can keep track of updates
+            // instead of relying on default values
+            if (AppSettings.lastDeclinedStockThemeHashLight.get().isEmpty())
+                AppSettings.lastDeclinedStockThemeHashLight.setBlocking(
+                    assetFoldersThemeHash(light = true)
+                )
+
+            if (AppSettings.lastDeclinedStockThemeHashDark.get().isEmpty())
+                AppSettings.lastDeclinedStockThemeHashDark.setBlocking(
+                    assetFoldersThemeHash(light = false)
+                )
+
+            // see canThemeBeUpdated in theme utils
+            if (AppSettings.lastAcceptedStockThemeHashLight.get() == null)
+                AppSettings.lastAcceptedStockThemeHashLight.set(
+                    assetFoldersThemeHash(true)
+                )
+
+            if (AppSettings.lastAcceptedStockThemeHashDark.get() == null)
+                AppSettings.lastAcceptedStockThemeHashDark.setBlocking(
+                    assetFoldersThemeHash(false)
+                )
         }
 
         val defaultThemeMatchingSystemDarkMode = getThemeByUUID(

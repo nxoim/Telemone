@@ -1,10 +1,10 @@
 # Telemone
 
-Telemone is a theme builder made to bring dynamic themes to Telegram (for Android).
+Telemone is a theme builder made to bring Material You-like dynamic themes to Telegram (for Android).
 
 ### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/nxoim/Telemone/releases "Github Releases")
 
-![SCREENSHOTS](https://github.com/nxoim/Telemone/assets/52751853/17412115-639f-4ae3-b1fd-3cca0fb97201)
+![SCREENSHOTS](https://github.com/Number869/Telemone/assets/52751853/f884b31b-035d-4de5-b8bd-98fba121e3f0)
 
 ## Features
 - **Default Themes.**
@@ -21,13 +21,14 @@ Telemone is a theme builder made to bring dynamic themes to Telegram (for Androi
 - Kotlin
 - Jetpack Compose
 - Material You
-- Gson
-- Accompanist Navigation
+- Custom navigation [(Decomposite)](https://github.com/nxoim/decomposite)
+- Realm Kotlin SDK for storing themes
+- Custom settings manager also based on Realm
+- Custom basic "service locator"
 - MVVM
 - Kotlin Coroutines
-- Shared Preferences
-- Single Activity
-
+- Single activity
+- Single module
 
 ## License
 
@@ -41,7 +42,7 @@ Contributions to Telemone are welcome! If you have any bug fixes, improvements, 
 2. Create a new branch for your feature/fix.
 3. Make the necessary changes and commit them.
 4. Push your branch to your forked repository.
-5. Open a pull request to the **dev** branch of the main repository.
+5. Create an issue describing and referencing your contribution
 
 ## Credits
 - [Telegram Monet project](https://github.com/c3r5b8/Telegram-Monet "Telegram Monet project"). Their themes are the base of the default themes in Telemone and because of them i have started this project.

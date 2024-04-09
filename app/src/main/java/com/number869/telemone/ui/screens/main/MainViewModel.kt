@@ -2,46 +2,22 @@ package com.number869.telemone.ui.screens.main
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
+import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.PredefinedTheme
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.shared.utils.assetFoldersThemeHash
 import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.shared.utils.stringify
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
-import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.launch
 import java.io.File
 
-@Stable
-// funny of you to actually expect some sort of documentation in the
-// comments
 class MainViewModel(
     private val context: Context = inject(),
     private val themeManager: ThemeManager = inject()
 ) : ViewModel() {
-    private val storageForStockThemeComparison by lazy {
-        MMKV.mmkvWithID("storageForStockThemeComparison")
-    }
-
-    var lightThemeCanBeUpdated by mutableStateOf(
-        assetFoldersThemeHash(true)	!= lastThemeUpdatesHash(true)
-    )
-    var darkThemeCanBeUpdated  by mutableStateOf(
-        assetFoldersThemeHash(false) != lastThemeUpdatesHash(false)
-    )
-
-    var displayLightThemeUpdateChoiceDialog by mutableStateOf(false)
-    var displayDarkThemeUpdateChoiceDialog by mutableStateOf(false)
-
-    // move into theme manager
-    init { viewModelScope.launch { checkForThemeHashUpdates() } }
-
     fun exportDefaultTheme(light: Boolean) {
         val themeName = if (light) "Telemone Light" else "Telemone Dark"
         val theme = stringify(
@@ -67,80 +43,27 @@ class MainViewModel(
         }
     }
 
-    private fun dialogVisibilitySettingKey(ofLight: Boolean) = "display${if (ofLight) "Light" else "Dark"}ThemeUpdateChoiceDialogFor}"
-    private fun lastRememberedStockThemeKey(ofLight: Boolean) = "lastRememberedStock${if (ofLight) "Light" else "Dark"}ThemeHash"
-    private fun lastThemeUpdatesHash(ofLight: Boolean) = storageForStockThemeComparison
-        .decodeString(lastRememberedStockThemeKey(ofLight))
+    fun acceptThemeUpdate(light: Boolean) {
+        themeManager.updateDefaultThemeFromStock(light)
 
-    private fun assetFoldersThemeHash(ofLight: Boolean) = context.assets
-        .open("default${if (ofLight) "Light" else "Dark"}File.attheme")
-        .bufferedReader()
-        .readText()
-        .hashCode()
-        .toString()
-
-    private fun checkForThemeHashUpdates() {
-        listOf(true, false).forEach { ofLight ->
-            // on first launch, when no previous theme hashes are saved,
-            // hashes need to be saved
-            if (lastThemeUpdatesHash(ofLight) == null) {
-                storageForStockThemeComparison.encode(
-                    lastRememberedStockThemeKey(ofLight),
-                    assetFoldersThemeHash(ofLight)
-                )
-            } else {
-                if (ofLight) {
-                    if (lightThemeCanBeUpdated) {
-                        displayLightThemeUpdateChoiceDialog = storageForStockThemeComparison.decodeBool(
-                            dialogVisibilitySettingKey(true),
-                            true
-                        )
-                    }
-                } else {
-                    if (darkThemeCanBeUpdated) {
-                        displayDarkThemeUpdateChoiceDialog = storageForStockThemeComparison.decodeBool(
-                            dialogVisibilitySettingKey(false),
-                            true
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    fun acceptTheStockThemeUpdate(ofLight: Boolean) {
-        // remove the previously saved hashes so they don't accumulate
-        val nullString: String? = null
-        storageForStockThemeComparison.encode(lastRememberedStockThemeKey(ofLight), nullString)
-
-        themeManager.updateDefaultThemeFromStock(ofLight)
-        val themeType = if (ofLight) "light" else "dark"
-        showToast("Default $themeType theme has been overwritten successfully.")
-
-        storageForStockThemeComparison.encode(
-            dialogVisibilitySettingKey(ofLight),
-            false
-        )
-
-        if (ofLight) {
-            displayLightThemeUpdateChoiceDialog = false
-            lightThemeCanBeUpdated = false
+        if (light) {
+            AppSettings.lastAcceptedStockThemeHashLight.set(
+                assetFoldersThemeHash(light = true)
+            )
         } else {
-            displayDarkThemeUpdateChoiceDialog = false
-            darkThemeCanBeUpdated = false
+            AppSettings.lastAcceptedStockThemeHashDark.set(
+                assetFoldersThemeHash(light = false)
+            )
         }
+
+        showToast("Default theme updated")
     }
-
-    fun declineDefaultThemeUpdate(ofLight: Boolean) {
-        storageForStockThemeComparison.encode(
-            dialogVisibilitySettingKey(ofLight),
-            false
-        )
-
-        if (ofLight) {
-            displayLightThemeUpdateChoiceDialog = false
-        } else {
-            displayDarkThemeUpdateChoiceDialog = false
-        }
+    fun declineThemeUpdate(light: Boolean) {
+        if (light)
+            AppSettings.lastDeclinedStockThemeHashLight
+                .set(assetFoldersThemeHash(light = true))
+        else
+            AppSettings.lastDeclinedStockThemeHashDark
+                .set(assetFoldersThemeHash(light = false))
     }
 }
