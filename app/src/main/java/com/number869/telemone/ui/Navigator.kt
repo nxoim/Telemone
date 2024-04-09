@@ -1,8 +1,6 @@
 package com.number869.telemone.ui
 
-import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.ui.screens.about.AboutNavigator
 import com.number869.telemone.ui.screens.editor.EditorNavigator
@@ -15,11 +13,7 @@ import javax.annotation.concurrent.Immutable
 
 @Composable
 fun Navigator() {
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-	val skipWelcomeScreen = preferences.getBoolean(AppSettings.AgreedToPpAndTos.id, false)
+	val skipWelcomeScreen = AppSettings.agreedToConditions.get()
 	val startDestination = if (skipWelcomeScreen) RootDestinations.Main else RootDestinations.Welcome
 
 	val mainNavController = navController(startingDestination = startDestination)

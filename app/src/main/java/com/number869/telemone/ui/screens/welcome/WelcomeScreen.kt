@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.welcome
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -34,11 +32,6 @@ import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 fun WelcomeScreen(
 	navController: NavController<RootDestinations> = getExistingNavController()
 ) {
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-
 	val privacyPolicyText = stringResource(R.string.privacy_policy_text)
 	val tosText = stringResource(R.string.tos_text)
 
@@ -98,7 +91,7 @@ fun WelcomeScreen(
 
 		LargeTonalButton(
 			onClick = {
-				preferences.edit().putBoolean(AppSettings.AgreedToPpAndTos.id, true).apply()
+				AppSettings.agreedToConditions.set(true)
 				navController.replaceAll(RootDestinations.Main)
 			},
 			label = "I Agree",

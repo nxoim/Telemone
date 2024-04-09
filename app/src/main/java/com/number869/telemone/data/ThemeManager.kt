@@ -13,6 +13,7 @@ import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.assetFoldersThemeHash
 import com.number869.telemone.shared.utils.getColorTokenFromColorValue
 import com.number869.telemone.shared.utils.getColorValueFromColorToken
 import com.number869.telemone.shared.utils.incompatibleUiElementColorData
@@ -359,6 +360,29 @@ class ThemeManager(
                     ThemeData(PredefinedTheme.Default(false).uuid, stockDarkTheme.values)
                 )
             }
+
+            // save values so we can keep track of updates
+            // instead of relying on default values
+            if (AppSettings.lastDeclinedStockThemeHashLight.get().isEmpty())
+                AppSettings.lastDeclinedStockThemeHashLight.setBlocking(
+                    assetFoldersThemeHash(light = true)
+                )
+
+            if (AppSettings.lastDeclinedStockThemeHashDark.get().isEmpty())
+                AppSettings.lastDeclinedStockThemeHashDark.setBlocking(
+                    assetFoldersThemeHash(light = false)
+                )
+
+            // see canThemeBeUpdated in theme utils
+            if (AppSettings.lastAcceptedStockThemeHashLight.get() == null)
+                AppSettings.lastAcceptedStockThemeHashLight.set(
+                    assetFoldersThemeHash(true)
+                )
+
+            if (AppSettings.lastAcceptedStockThemeHashDark.get() == null)
+                AppSettings.lastAcceptedStockThemeHashDark.setBlocking(
+                    assetFoldersThemeHash(false)
+                )
         }
 
         val defaultThemeMatchingSystemDarkMode = getThemeByUUID(

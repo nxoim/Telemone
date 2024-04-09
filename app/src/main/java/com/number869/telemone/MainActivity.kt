@@ -13,6 +13,7 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.number869.telemone.data.InstanceDeclarator
 import com.number869.telemone.data.InstanceLocator
 import com.number869.telemone.data.ThemeManager
+import com.number869.telemone.data.settingsManagerInitializer
 import com.number869.telemone.data.themeRepositoryInitializer
 import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.ui.Navigator
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
 					// executed synchronously, before other ui
 					single<Context>(cacheInstance = false) { this@MainActivity }
 					single { themeRepositoryInitializer(context = inject()) }
+					settingsManagerInitializer(context = inject())
 					// update palette state on config changes
 					single(cacheInstance = false) { paletteState }
 					single {

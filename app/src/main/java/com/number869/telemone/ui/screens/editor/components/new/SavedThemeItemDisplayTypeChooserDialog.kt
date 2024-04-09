@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutExpo
@@ -30,13 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.SelectionDialog
 import com.number869.telemone.shared.ui.SelectionDialogItem
+import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
+import com.number869.telemone.shared.utils.getColorDisplayType
 
 @Composable
 fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
@@ -44,18 +44,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
 			WindowInsets.statusBars.asPaddingValues().calculateTopPadding() +
 			WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-
-	// 1 - Saved color values
-	// 2 - Current color scheme (fallback to saved colors)
-	// 3 - Current color scheme
-	val savedThemeItemDisplayType = preferences.getString(
-		AppSettings.SavedThemeItemDisplayType.id,
-		"1"
-	)
+	val savedThemeItemDisplayType = getColorDisplayType()
 
 	var displayTheDialog by remember { mutableStateOf(false) }
 	val animatedDialogHeight by animateDpAsState(
@@ -124,37 +113,35 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
 					SelectionDialogItem(
 						text = "Saved color values",
 						selectThisItem = {
-							preferences.edit().putString(
-								AppSettings.SavedThemeItemDisplayType.id,
-								"1"
-							).apply()
+							AppSettings.savedThemeDisplayType.set(
+								ThemeColorPreviewDisplayType.SavedColorValues.id
+							)
 							displayTheDialog = false
 						},
-						selected = savedThemeItemDisplayType == "1"
+						selected = savedThemeItemDisplayType == ThemeColorPreviewDisplayType.SavedColorValues
 					)
 
 					SelectionDialogItem(
 						text = "Current color scheme (fallback to saved colors)",
 						selectThisItem = {
-							preferences.edit().putString(
-								AppSettings.SavedThemeItemDisplayType.id,
-								"2"
-							).apply()
+							AppSettings.savedThemeDisplayType.set(
+								ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback.id
+							)
 							displayTheDialog = false
 						},
-						selected = savedThemeItemDisplayType == "2"
+						selected = savedThemeItemDisplayType
+								== ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
 					)
 
 					SelectionDialogItem(
 						text = "Current color scheme",
 						selectThisItem = {
-							preferences.edit().putString(
-								AppSettings.SavedThemeItemDisplayType.id,
-								"3"
-							).apply()
+							AppSettings.savedThemeDisplayType.set(
+								ThemeColorPreviewDisplayType.CurrentColorScheme.id
+							)
 							displayTheDialog = false
 						},
-						selected = savedThemeItemDisplayType == "3"
+						selected = savedThemeItemDisplayType == ThemeColorPreviewDisplayType.CurrentColorScheme
 					)
 				}
 			}
