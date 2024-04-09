@@ -102,15 +102,32 @@ fun rememberPaletteState(): PaletteState {
 	val isDarkMode = isSystemInDarkTheme()
 	val entirePaletteAsMap = remember { linkedMapOf<String, Color>() }
 
+
 	AdditionalColors.entries.forEach {
 		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
-	ColorRolesLight.entries.forEach {
-		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+	// order of execution should depend on isDarkMode for correct
+	// theme import color token inference
+	if (isDarkMode) {
+		ColorRolesDark.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
+
+		ColorRolesLight.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
+	} else {
+		ColorRolesLight.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
+
+		ColorRolesDark.entries.forEach {
+			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
+		}
 	}
 
-	ColorRolesDark.entries.forEach {
+	ColorRolesShared.entries.forEach {
 		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
 	}
 
@@ -135,199 +152,268 @@ fun rememberPaletteState(): PaletteState {
 }
 
 enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
-	PrimaryLight(
+	Primary(
 		DataAboutColors("primary_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.primary }
 			color
 		}
 	),
-	OnPrimaryLight(
+
+	OnPrimary(
 		DataAboutColors("on_primary_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onPrimary }
 			color
 		}
 	),
-	PrimaryContainerLight(
+
+	PrimaryContainer(
 		DataAboutColors("primary_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.primaryContainer }
 			color
 		}
 	),
-	OnPrimaryContainerLight(
+
+	OnPrimaryContainer(
 		DataAboutColors("on_primary_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onPrimaryContainer }
 			color
 		}
 	),
-	SecondaryLight(
+
+	Secondary(
 		DataAboutColors("secondary_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.secondary }
 			color
 		}
 	),
-	OnSecondaryLight(
+
+	OnSecondary(
 		DataAboutColors("on_secondary_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSecondary }
 			color
 		}
 	),
-	SecondaryContainerLight(
+
+	SecondaryContainer(
 		DataAboutColors("secondary_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.secondaryContainer }
 			color
 		}
 	),
-	OnSecondaryContainerLight(
+
+	OnSecondaryContainer(
 		DataAboutColors("on_secondary_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSecondaryContainer }
 			color
 		}
 	),
-	TertiaryLight(
+
+	Tertiary(
 		DataAboutColors("tertiary_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.tertiary }
 			color
 		}
 	),
-	OnTertiaryLight(
+
+	OnTertiary(
 		DataAboutColors("on_tertiary_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onTertiary }
 			color
 		}
 	),
-	TertiaryContainerLight(
+
+	TertiaryContainer(
 		DataAboutColors("tertiary_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.tertiaryContainer }
 			color
 		}
 	),
-	OnTertiaryContainerLight(
+
+	OnTertiaryContainer(
 		DataAboutColors("on_tertiary_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onTertiaryContainer }
 			color
 		}
 	),
-	SurfaceLight(
+
+	Surface(
 		DataAboutColors("surface_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surface }
 			color
 		}
 	),
-	SurfaceDimLight(
+
+	SurfaceDim(
 		DataAboutColors("surface_dim_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceDim }
 			color
 		}
 	),
-	SurfaceBrightLight(
+
+	SurfaceBright(
 		DataAboutColors("surface_bright_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceBright }
 			color
 		}
 	),
-	OnSurfaceLight(
+
+	OnSurface(
 		DataAboutColors("on_surface_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSurface }
 			color
 		}
 	),
-	SurfaceContainerLowestLight(
+
+	SurfaceContainerLowest(
 		DataAboutColors("surface_container_lowest_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerLowest }
 			color
 		}
 	),
-	SurfaceContainerLowLight(
+
+	SurfaceContainerLow(
 		DataAboutColors("surface_container_low_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerLow }
 			color
 		}
 	),
-	SurfaceContainerLight(
+
+	SurfaceContainer(
 		DataAboutColors("surface_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainer }
 			color
 		}
 	),
-	SurfaceContainerHighLight(
+
+	SurfaceContainerHigh(
 		DataAboutColors("surface_container_high_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerHigh }
 			color
 		}
 	),
-	SurfaceContainerHighestLight(
+
+	SurfaceContainerHighest(
 		DataAboutColors("surface_container_highest_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerHighest }
 			color
 		}
 	),
-	OnSurfaceVariantLight(
+
+	OnSurfaceVariant(
 		DataAboutColors("on_surface_variant_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSurfaceVariant }
 			color
 		}
 	),
-	ErrorLight(
+
+	Error(
 		DataAboutColors("error_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.error }
 			color
 		}
 	),
-	OnErrorLight(
+
+	OnError(
 		DataAboutColors("on_error_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onError }
 			color
 		}
 	),
-	ErrorContainerLight(
+
+	ErrorContainer(
 		DataAboutColors("error_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.errorContainer }
 			color
 		}
 	),
-	OnErrorContainerLight(
+
+	OnErrorContainer(
 		DataAboutColors("on_error_container_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onErrorContainer }
 			color
 		}
 	),
-	OutlineLight(
+
+	Outline(
 		DataAboutColors("outline_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.outline }
 			color
 		}
 	),
-	OutlineVariantLight(
+
+	OutlineVariant(
 		DataAboutColors("outline_variant_light") {
 			var color = Color.Red
 			TelemoneTheme(false) { color = MaterialTheme.colorScheme.outlineVariant }
+			color
+		}
+	),
+
+	InverseSurface(
+		DataAboutColors("inverse_surface_light") {
+			var color = Color.Red
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.inverseSurface }
+			color
+		}
+	),
+
+	InverseOnSurface(
+		DataAboutColors("inverse_on_surface_light") {
+			var color = Color.Red
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.inverseOnSurface }
+			color
+		}
+	),
+
+	InversePrimary(
+		DataAboutColors("inverse_primary_light") {
+			var color = Color.Red
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.inversePrimary }
+			color
+		}
+	),
+
+	Scrim(
+		DataAboutColors("scrim_light") {
+			var color = Color.Red
+			TelemoneTheme(false) { color = MaterialTheme.colorScheme.scrim }
+			color
+		}
+	),
+
+	Shadow(
+		DataAboutColors("shadow_light") {
+			var color = Color.Red
+			// TODO: not yet added in the lib. fix once its added
+//			TelemoneTheme(true) { color = MaterialTheme.colorScheme.shadow }
+			color = Color.Black
 			color
 		}
 	);
@@ -339,7 +425,7 @@ enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
 }
 
 enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
-	PrimaryDark(
+	Primary(
 		DataAboutColors("primary_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.primary }
@@ -347,7 +433,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnPrimaryDark(
+	OnPrimary(
 		DataAboutColors("on_primary_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onPrimary }
@@ -355,7 +441,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	PrimaryContainerDark(
+	PrimaryContainer(
 		DataAboutColors("primary_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.primaryContainer }
@@ -363,7 +449,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnPrimaryContainerDark(
+	OnPrimaryContainer(
 		DataAboutColors("on_primary_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onPrimaryContainer }
@@ -371,7 +457,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SecondaryDark(
+	Secondary(
 		DataAboutColors("secondary_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.secondary }
@@ -379,7 +465,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnSecondaryDark(
+	OnSecondary(
 		DataAboutColors("on_secondary_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSecondary }
@@ -387,7 +473,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SecondaryContainerDark(
+	SecondaryContainer(
 		DataAboutColors("secondary_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.secondaryContainer }
@@ -395,7 +481,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnSecondaryContainerDark(
+	OnSecondaryContainer(
 		DataAboutColors("on_secondary_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSecondaryContainer }
@@ -403,7 +489,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	TertiaryDark(
+	Tertiary(
 		DataAboutColors("tertiary_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.tertiary }
@@ -411,7 +497,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnTertiaryDark(
+	OnTertiary(
 		DataAboutColors("on_tertiary_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onTertiary }
@@ -419,7 +505,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	TertiaryContainerDark(
+	TertiaryContainer(
 		DataAboutColors("tertiary_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.tertiaryContainer }
@@ -427,7 +513,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnTertiaryContainerDark(
+	OnTertiaryContainer(
 		DataAboutColors("on_tertiary_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onTertiaryContainer }
@@ -435,7 +521,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceDark(
+	Surface(
 		DataAboutColors("surface_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surface }
@@ -443,7 +529,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceDimDark(
+	SurfaceDim(
 		DataAboutColors("surface_dim_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceDim }
@@ -451,7 +537,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceBrightDark(
+	SurfaceBright(
 		DataAboutColors("surface_bright_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceBright }
@@ -459,7 +545,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnSurfaceDark(
+	OnSurface(
 		DataAboutColors("on_surface_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSurface }
@@ -467,7 +553,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceContainerLowestDark(
+	SurfaceContainerLowest(
 		DataAboutColors("surface_container_lowest_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerLowest }
@@ -475,7 +561,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceContainerLowDark(
+	SurfaceContainerLow(
 		DataAboutColors("surface_container_low_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerLow }
@@ -483,7 +569,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceContainerDark(
+	SurfaceContainer(
 		DataAboutColors("surface_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainer }
@@ -491,7 +577,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceContainerHighDark(
+	SurfaceContainerHigh(
 		DataAboutColors("surface_container_high_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerHigh }
@@ -499,7 +585,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	SurfaceContainerHighestDark(
+	SurfaceContainerHighest(
 		DataAboutColors("surface_container_highest_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerHighest }
@@ -507,7 +593,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnSurfaceVariantDark(
+	OnSurfaceVariant(
 		DataAboutColors("on_surface_variant_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSurfaceVariant }
@@ -515,7 +601,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	ErrorDark(
+	Error(
 		DataAboutColors("error_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.error }
@@ -523,7 +609,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnErrorDark(
+	OnError(
 		DataAboutColors("on_error_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onError }
@@ -531,7 +617,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	ErrorContainerDark(
+	ErrorContainer(
 		DataAboutColors("error_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.errorContainer }
@@ -539,7 +625,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OnErrorContainerDark(
+	OnErrorContainer(
 		DataAboutColors("on_error_container_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onErrorContainer }
@@ -547,7 +633,7 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OutlineDark(
+	Outline(
 		DataAboutColors("outline_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.outline }
@@ -555,10 +641,50 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 		}
 	),
 
-	OutlineVariantDark(
+	OutlineVariant(
 		DataAboutColors("outline_variant_dark") {
 			var color = Color.Red
 			TelemoneTheme(true) { color = MaterialTheme.colorScheme.outlineVariant }
+			color
+		}
+	),
+
+	InverseSurface(
+		DataAboutColors("inverse_surface_dark") {
+			var color = Color.Red
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.inverseSurface }
+			color
+		}
+	),
+
+	InverseOnSurface(
+		DataAboutColors("inverse_on_surface_dark") {
+			var color = Color.Red
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.inverseOnSurface }
+			color
+		}
+	),
+
+	InversePrimary(
+		DataAboutColors("inverse_primary_dark") {
+			var color = Color.Red
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.inversePrimary }
+			color
+		}
+	),
+	Scrim(
+		DataAboutColors("scrim_dark") {
+			var color = Color.Red
+			TelemoneTheme(true) { color = MaterialTheme.colorScheme.scrim }
+			color
+		}
+	),
+	Shadow(
+		DataAboutColors("shadow_dark") {
+			var color = Color.Red
+			// TODO: not yet added in the lib. fix once its added
+//			TelemoneTheme(true) { color = MaterialTheme.colorScheme.shadow }
+			color = Color.Black
 			color
 		}
 	);
@@ -567,6 +693,69 @@ enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
 
 	@Composable
 	operator fun component2() = this.dataAboutColors.colorValue()
+}
+
+enum class ColorRolesShared(val dataAboutColors: DataAboutColors) {
+	PrimaryFixed(
+		DataAboutColors("primary_fixed") {
+			primaryTones.find { it.tone == 90 }!!.colorValue
+		}
+	),
+	OnPrimaryFixed(
+		DataAboutColors("on_primary_fixed") {
+			primaryTones.find { it.tone == 10 }!!.colorValue
+		}
+	),
+	PrimaryFixedDim(
+		DataAboutColors("on_primary_fixed_dim") {
+			primaryTones.find { it.tone == 80 }!!.colorValue
+		}
+	),
+	OnPrimaryFixedVariant(
+		DataAboutColors("on_primary_fixed_variant") {
+			primaryTones.find { it.tone == 30 }!!.colorValue
+		}
+	),
+	SecondaryFixed(
+		DataAboutColors("secondary_fixed") {
+			secondaryTones.find { it.tone == 90 }!!.colorValue
+		}
+	),
+	OnSecondaryFixed(
+		DataAboutColors("on_secondary_fixed") {
+			secondaryTones.find { it.tone == 10 }!!.colorValue
+		}
+	),
+	SecondaryFixedDim(
+		DataAboutColors("on_secondary_fixed_dim") {
+			secondaryTones.find { it.tone == 80 }!!.colorValue
+		}
+	),
+	OnSecondaryFixedVariant(
+		DataAboutColors("on_secondary_fixed_variant") {
+			secondaryTones.find { it.tone == 30 }!!.colorValue
+		}
+	),
+	TertiaryFixed(
+		DataAboutColors("tertiary_fixed") {
+			tertiaryTones.find { it.tone == 90 }!!.colorValue
+		}
+	),
+	OnTertiaryFixed(
+		DataAboutColors("on_tertiary_fixed") {
+			tertiaryTones.find { it.tone == 10 }!!.colorValue
+		}
+	),
+	TertiaryFixedDim(
+		DataAboutColors("on_tertiary_fixed_dim") {
+			tertiaryTones.find { it.tone == 80 }!!.colorValue
+		}
+	),
+	OnTertiaryFixedVariant(
+		DataAboutColors("on_tertiary_fixed_variant") {
+			tertiaryTones.find { it.tone == 30 }!!.colorValue
+		}
+	)
 }
 
 enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
@@ -592,20 +781,6 @@ enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
 	),
 	Transparent(
 		DataAboutColors("transparent") { Color.Transparent }
-	),
-	ScrimLight(
-		DataAboutColors("scrim_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.scrim }
-			color
-		}
-	),
-	ScrimDark(
-		DataAboutColors("scrim_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.scrim }
-			color
-		}
 	);
 
 	operator fun component1() = this.dataAboutColors.colorToken
