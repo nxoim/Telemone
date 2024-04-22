@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -57,6 +58,7 @@ fun SelectionDialog(
 	Box(
 		modifier
 			.widthIn(min = 280.dp, max = 560.dp)
+			.heightIn(max = 640.dp)
 			.padding(horizontal = 48.dp)
 			.shadow(
 				8.dp,
@@ -71,8 +73,7 @@ fun SelectionDialog(
 				style = MaterialTheme.typography.headlineSmall,
 				modifier = Modifier
 					.align(Alignment.CenterHorizontally).basicMarquee()
-					.graphicsLayer { alpha = contentAlpha() }
-				,
+					.graphicsLayer { alpha = contentAlpha() },
 				color = MaterialTheme.colorScheme.onSurface,
 				maxLines = 1
 			)
@@ -82,7 +83,7 @@ fun SelectionDialog(
 			LazyColumn(
 				modifier = Modifier.graphicsLayer { alpha = contentAlpha() },
 				content = content,
-				verticalArrangement = spacedBy(0.dp)
+				verticalArrangement = spacedBy(4.dp)
 			)
 		}
 
@@ -133,7 +134,7 @@ fun LazyListScope.SelectionDialogItem(
 			Row(
 				Modifier
 					.fillMaxWidth()
-					.height(70.dp),
+					.heightIn(70.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Spacer(modifier = Modifier.width(16.dp))
