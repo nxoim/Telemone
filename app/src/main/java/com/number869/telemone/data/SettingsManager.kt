@@ -7,16 +7,19 @@ import com.number869.telemone.shared.utils.inject
 import com.tencent.mmkv.MMKV
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
+import kotlin.reflect.KClass
 
 fun settingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
     RealmConfiguration.Builder(settingsRealmSchemas).run {
@@ -29,91 +32,89 @@ fun settingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
 class SettingsManager(private val database: Realm = settingsRealm("default")) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun <T> set(key: String, value: T?) = scope.launch {
+    fun <T : Any> set(key: String, value: T?, type: KClass<out T>) = scope.launch {
         database.write {
-            runCatching { delete(this.query(getSettingType(value), "key = '$key'")) }
-            copyToRealm(asSettingType(key, value))
+            copyToRealm(asSettingType(key, value, type), UpdatePolicy.ALL)
         }
     }
 
-    fun <T> setBlocking(key: String, value: T?) {
+    fun <T : Any> setBlocking(key: String, value: T?, type: KClass<out T>) {
         database.writeBlocking {
-            runCatching { delete(this.query(getSettingType(value), "key = '$key'")) }
-            copyToRealm(asSettingType(key, value))
+            copyToRealm(asSettingType(key, value, type), UpdatePolicy.ALL)
         }
     }
 
-    fun <T> get(key: String, defaultValue: T? = null): T? {
+    fun <T : Any> get(key: String, defaultValue: T? = null, type: KClass<out T>): T? {
         val realmSettingContainer = database
-            .query(getSettingType(defaultValue),"key = '$key'")
+            .query(getSettingType(type),"key = '$key'")
             .first()
             .find()
 
         return realmSettingContainer
-            ?.let { getValueFromSettingContainer(defaultValue, it) as T }
+            ?.let { getValueFromSettingContainer(type, it) as T? }
             ?: defaultValue
     }
 
-    fun <T> getAsStateFlow(key: String, defaultValue: T) = database
-        .query(getSettingType(defaultValue),"key = '$key'")
+    fun <T : Any> getAsStateFlow(key: String, defaultValue: T?, type: KClass<out T>) = database
+        .query(getSettingType(type),"key = '$key'")
         .first()
         .asFlow()
-        .flowOn(Dispatchers.IO)
+        .flowOn(Dispatchers.Default)
         .map() { queried ->
             queried.obj
-                ?.let { getValueFromSettingContainer(defaultValue, it) as T }
+                ?.let { getValueFromSettingContainer(type, it) as T? }
                 ?: defaultValue
         }
         .stateIn(
             scope = CoroutineScope(Dispatchers.Default),
             started = SharingStarted.WhileSubscribed(),
-            initialValue = get<T>(key, defaultValue) ?: defaultValue
+            initialValue = get(key, defaultValue, type)
         )
 }
 
-private fun <T> getValueFromSettingContainer(type: T, obj: RealmObject) = when(type) {
-    is Boolean? -> (obj as BooleanSetting).value
-    is String? -> (obj as StringSetting).value
-    is Int? -> (obj as IntSetting).value
-    is Float? -> (obj as FloatSetting).value
-    is Long? -> (obj as LongSetting).value
-    is Double? -> (obj as DoubleSetting).value
+private fun <T : Any> getValueFromSettingContainer(type: KClass<T>, obj: RealmObject) = when(type) {
+    Boolean::class -> (obj as BooleanSetting).value
+    String::class -> (obj as StringSetting).value
+    Int::class -> (obj as IntSetting).value
+    Float::class -> (obj as FloatSetting).value
+    Long::class -> (obj as LongSetting).value
+    Double::class -> (obj as DoubleSetting).value
     else -> error("unsupported setting class")
 }
-private fun <T> getSettingType(type: T) = when(type) {
-    is Boolean? -> BooleanSetting::class
-    is String? -> StringSetting::class
-    is Int? -> IntSetting::class
-    is Float? -> FloatSetting::class
-    is Long? -> LongSetting::class
-    is Double? -> DoubleSetting::class
+private fun <T : Any> getSettingType(type: KClass<T>) = when(type) {
+    Boolean::class -> BooleanSetting::class
+    String::class -> StringSetting::class
+    Int::class -> IntSetting::class
+    Float::class -> FloatSetting::class
+    Long::class -> LongSetting::class
+    Double::class -> DoubleSetting::class
     else -> error("unsupported setting class")
 }
 
-private fun <T> asSettingType(targetKey: String, newValue: T) = when(newValue) {
-    is Boolean? -> BooleanSetting().apply {
+private fun <T : Any> asSettingType(targetKey: String, newValue: T?, type: KClass<out T>) = when(type) {
+    Boolean::class -> BooleanSetting().apply {
         key = targetKey
-        value = newValue
+        value = newValue as Boolean?
     }
-    is String? -> StringSetting().apply {
+    String::class -> StringSetting().apply {
         key = targetKey
-        value = newValue
+        value = newValue as String?
     }
-    is Int? -> IntSetting().apply {
+    Int::class -> IntSetting().apply {
         key = targetKey
-        value = newValue
+        value = newValue as Int?
     }
-    is Float? -> FloatSetting().apply {
+    Float::class -> FloatSetting().apply {
         key = targetKey
-        value = newValue
+        value = newValue as Float?
     }
-    is Long? -> LongSetting().apply {
+    Long::class -> LongSetting().apply {
         key = targetKey
-        value = newValue
+        value = newValue as Long?
     }
-    is Double? -> DoubleSetting().apply {
+    Double::class -> DoubleSetting().apply {
         key = targetKey
-        value = newValue
+        value = newValue as Double?
     }
     else -> error("unsupported setting class")
 }
@@ -164,29 +165,35 @@ val settingsRealmSchemas = setOf(
 )
 
 @androidx.compose.runtime.Immutable
-data class Setting<T>(
+data class Setting<T : Any>(
     private val key: String,
     private val defaultValue: T,
     private val targetSettingsManager: SettingsManager = inject()
 ) {
-    fun set(newValue: T) = targetSettingsManager.set(key, newValue)
-    fun setBlocking(newValue: T) = targetSettingsManager.setBlocking(key, newValue)
-    fun get() = targetSettingsManager.get(key, defaultValue) ?: defaultValue
-    fun getAsStateFlow() = targetSettingsManager.getAsStateFlow(key, defaultValue)
+    fun set(newValue: T) = targetSettingsManager
+        .set(key, newValue, defaultValue::class)
+    fun setBlocking(newValue: T) = targetSettingsManager
+        .setBlocking(key, newValue, defaultValue::class)
+    fun get() = targetSettingsManager
+        .get(key, defaultValue, defaultValue::class) ?: defaultValue
+    fun getAsStateFlow() = targetSettingsManager
+        .getAsStateFlow(key, defaultValue, defaultValue::class) as StateFlow<T>
     @Composable
     fun asState() = getAsStateFlow().collectAsState()
 }
 
 @androidx.compose.runtime.Immutable
-data class NullableSetting<T>(
+data class NullableSetting<T : Any>(
     private val key: String,
+    private val type: KClass<out T>,
     private val defaultValue: T? = null,
     private val targetSettingsManager: SettingsManager = inject(),
 ) {
-    fun set(newValue: T?) = targetSettingsManager.set(key, newValue)
-    fun setBlocking(newValue: T?) = targetSettingsManager.setBlocking(key, newValue)
-    fun get() = targetSettingsManager.get(key, defaultValue)
-    fun getAsStateFlow() = targetSettingsManager.getAsStateFlow(key, defaultValue)
+    fun set(newValue: T?) = targetSettingsManager.set(key, newValue, type)
+    fun setBlocking(newValue: T?) = targetSettingsManager
+        .setBlocking(key, newValue, type)
+    fun get() = targetSettingsManager.get(key, defaultValue, type)
+    fun getAsStateFlow() = targetSettingsManager.getAsStateFlow(key, defaultValue, type)
     @Composable
     fun asState() = getAsStateFlow().collectAsState()
 }

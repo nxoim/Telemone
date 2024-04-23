@@ -152,14 +152,10 @@ fun shouldDisplayUpdateDialog(light: Boolean): Boolean {
 
 @Composable
 fun canThemeBeUpdated(light: Boolean): Boolean {
-    val lastAcceptedHash = if (light)
-        AppSettings.lastAcceptedStockThemeHashLight
-            .asState()
-            .value
+    val lastAcceptedHash by if (light)
+        AppSettings.lastAcceptedStockThemeHashLight.asState()
     else
-        AppSettings.lastAcceptedStockThemeHashDark
-            .asState()
-            .value
+        AppSettings.lastAcceptedStockThemeHashDark.asState()
 
     return lastAcceptedHash == "" || assetFoldersThemeHash(light) != lastAcceptedHash
 }
