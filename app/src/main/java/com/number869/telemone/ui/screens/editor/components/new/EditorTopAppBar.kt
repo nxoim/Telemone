@@ -40,6 +40,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -237,95 +238,110 @@ private fun TheSearchbar(
 				it.colorToken.contains(searchQuery, true)
 	}
 
+	// clears search when back button is pressed.
+	// its here because it doesnt work if i put it
+	// beside the other back handler at the top
+	// of this composable
 	SearchBar(
-		query = searchQuery,
-		onQueryChange = {
-			searchQuery = it
-			fullscreen = true
+		inputField = {
+			SearchBarDefaults.InputField(
+				query = searchQuery,
+				onQueryChange = {
+					searchQuery = it
+					fullscreen = true
+				},
+				onSearch = {  }, // it desperately wants me to keep this line
+				expanded = fullscreen,
+				onExpandedChange = {  },
+				enabled = true,
+				placeholder = { Text(text = "Search in current theme") },
+				leadingIcon = { Icon(Icons.Default.Search, "Search")},
+				trailingIcon = {
+					AnimatedVisibility(
+						visible = searchQueryIsEmpty && !fullscreen,
+						enter = fadeIn(),
+						exit = fadeOut()
+					) {
+						IconButton(onClick = { hideSearchbar() }) {
+							Icon(Icons.Default.ArrowUpward, "Hide searchbar")
+						}
+					}
+
+					AnimatedVisibility(
+						visible = !searchQueryIsEmpty,
+						enter = fadeIn(),
+						exit = fadeOut()
+					) {
+						IconButton(onClick = { searchQuery = "" }) {
+							Icon(Icons.Default.Clear, "Clear search")
+						}
+					}
+				},
+				// TODO maybe make it active when its focused
+				interactionSource = null,
+			)
 		},
-		onSearch = {  }, // it desperately wants me to keep this line
-		placeholder = { Text(text = "Search in current theme") },
-		leadingIcon = { Icon(Icons.Default.Search, "Search")},
-		trailingIcon = {
-			AnimatedVisibility(
-				visible = searchQueryIsEmpty && !fullscreen,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				IconButton(onClick = { hideSearchbar() }) {
-					Icon(Icons.Default.ArrowUpward, "Hide searchbar")
-				}
+		expanded = fullscreen,
+		onExpandedChange = {  },
+		modifier = Modifier,
+		content = {
+			// clears search when back button is pressed.
+			// its here because it doesnt work if i put it
+			// beside the other back handler at the top
+			// of this composable
+			BackHandler(fullscreen) {
+				fullscreen = false
 			}
 
-			AnimatedVisibility(
-				visible = !searchQueryIsEmpty,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				IconButton(onClick = { searchQuery = "" }) {
-					Icon(Icons.Default.Clear, "Clear search")
-				}
-			}
-		},
-		// TODO maybe make it active when its focused
-		active = fullscreen,
-		onActiveChange = {  }
-	) {
-		// clears search when back button is pressed.
-		// its here because it doesnt work if i put it
-		// beside the other back handler at the top
-		// of this composable
-		BackHandler(fullscreen) {
-			fullscreen = false
-		}
-
-		Box {
-			this@SearchBar.AnimatedVisibility(
-				visible = searchQueryIsEmpty,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				Box(
-					Modifier
-						.clickable(
-							indication = null,
-							interactionSource = remember { MutableInteractionSource() }
-						) { fullscreen = false }
-						.imePadding()
-						.fillMaxSize()
+			Box {
+				this@SearchBar.AnimatedVisibility(
+					visible = searchQueryIsEmpty,
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
-					Text(
-						"Search is empty. Tap this to close",
-						modifier = Modifier.align(Alignment.Center)
-					)
-				}
-			}
-
-			this@SearchBar.AnimatedVisibility(
-				visible = !searchQueryIsEmpty,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				LazyColumn(
-					contentPadding = PaddingValues(
-						top = 8.dp,
-						bottom = 4.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-					),
-					verticalArrangement = spacedBy(4.dp)
-				) {
-					itemsIndexed(searchedThings) { index, uiElementData ->
-						ElementColorItem(
-							Modifier
-								.padding(horizontal = 16.dp)
-								.animateItemPlacement(),
-							uiElementData = uiElementData,
-							index = index,
-							changeValue = changeValue,
-							lastIndexInList = mappedValues.lastIndex
+					Box(
+						Modifier
+							.clickable(
+								indication = null,
+								interactionSource = remember { MutableInteractionSource() }
+							) { fullscreen = false }
+							.imePadding()
+							.fillMaxSize()
+					) {
+						Text(
+							"Search is empty. Tap this to close",
+							modifier = Modifier.align(Alignment.Center)
 						)
 					}
 				}
+
+				this@SearchBar.AnimatedVisibility(
+					visible = !searchQueryIsEmpty,
+					enter = fadeIn(),
+					exit = fadeOut()
+				) {
+					LazyColumn(
+						contentPadding = PaddingValues(
+							top = 8.dp,
+							bottom = 4.dp + WindowInsets.navigationBars.asPaddingValues()
+								.calculateBottomPadding()
+						),
+						verticalArrangement = spacedBy(4.dp)
+					) {
+						itemsIndexed(searchedThings) { index, uiElementData ->
+							ElementColorItem(
+								Modifier
+									.padding(horizontal = 16.dp)
+									.animateItemPlacement(),
+								uiElementData = uiElementData,
+								index = index,
+								changeValue = changeValue,
+								lastIndexInList = mappedValues.lastIndex
+							)
+						}
+					}
+				}
 			}
-		}
-	}
+		},
+	)
 }

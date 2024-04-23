@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
@@ -120,6 +121,7 @@ fun OverwriteDefaultsDialog(
 	darkTheme: ThemeData,
 	overwriteWith: ThemeData,
 ) {
+	val targetTheme = remember { if (overwriteDark) darkTheme else lightTheme }
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
 
 	AlertDialog(
@@ -144,18 +146,18 @@ fun OverwriteDefaultsDialog(
 			) {
 				// current default
 				SavedThemeItem(
-					Modifier
+					modifier = Modifier
 						.weight(1f)
 						.width(110.dp)
 						.height(140.dp)
 						.clip(RoundedCornerShape(16.dp)),
-					if (overwriteDark) darkTheme else lightTheme,
+					themeData = targetTheme,
 					loadSavedTheme = {  },
 					selectOrUnselectSavedTheme = {  },
 					exportTheme = {  },
 					changeSelectionMode = {  },
 					colorOf = { targetUiElementColor ->
-						val data = darkTheme.values.find { it.name == targetUiElementColor }!!
+						val data = targetTheme.values.find { it.name == targetUiElementColor }!!
 
 						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
 					},
@@ -169,12 +171,12 @@ fun OverwriteDefaultsDialog(
 
 				// new default
 				SavedThemeItem(
-					Modifier
+					modifier = Modifier
 						.weight(1f)
 						.width(110.dp)
 						.height(140.dp)
 						.clip(RoundedCornerShape(16.dp)),
-					overwriteWith,
+					themeData = overwriteWith,
 					loadSavedTheme = {  },
 					selectOrUnselectSavedTheme = {  },
 					exportTheme = {  },

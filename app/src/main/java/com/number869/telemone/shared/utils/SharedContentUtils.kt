@@ -44,5 +44,3 @@ fun SharedTransitionScopeProvider(content: @Composable SharedTransitionScope.() 
         content = { content() }
     )
 }
-
-val LocalBooleanProvider = staticCompositionLocalOf<Boolean> { true }
