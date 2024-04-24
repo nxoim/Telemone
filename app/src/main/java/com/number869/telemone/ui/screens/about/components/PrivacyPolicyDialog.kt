@@ -18,13 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
 import com.number869.telemone.R
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.screens.about.AboutDestinations
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
 fun PrivacyPolicyDialog() {
-	val navController = navController<Destinations>()
+	val navController = getExistingNavController<AboutDestinations>()
 
 	Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		Card(
@@ -32,7 +32,10 @@ fun PrivacyPolicyDialog() {
 			shape = RoundedCornerShape(32.dp)
 		) {
 			Column {
-				Column(Modifier.verticalScroll(rememberScrollState()).weight(1f, false)) {
+				Column(
+					Modifier
+						.verticalScroll(rememberScrollState())
+						.weight(1f, false)) {
 					Text(
 						stringResource(id = R.string.privacy_policy_text),
 						modifier = Modifier.padding(24.dp)

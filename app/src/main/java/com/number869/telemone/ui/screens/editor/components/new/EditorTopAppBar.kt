@@ -40,6 +40,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -55,24 +56,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
-import com.number869.decomposite.core.common.ultils.ContentType
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
-import com.number869.telemone.ThemeStorageType
-import com.number869.telemone.data.LoadedTheme
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.data.UiElementColorData
+import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.ui.RootDestinations
+import com.number869.telemone.ui.screens.editor.EditorDestinations
+import com.nxoim.decomposite.core.common.navigation.NavController
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
+import com.nxoim.decomposite.core.common.ultils.ContentType
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditorTopAppBar(
 	topAppBarState: TopAppBarScrollBehavior,
-	mappedValues: LoadedTheme,
-	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>
+	mappedValues: List<UiElementColorData>,
+	exportCustomTheme: () -> Unit,
+	saveCurrentTheme: () -> Unit,
+	resetCurrentTheme: () -> Unit,
+	loadSavedTheme: (ThemeStorageType) -> Unit,
+	changeValue: (String, String, Color) -> Unit,
+	navController: NavController<EditorDestinations> = getExistingNavController()
 ) {
-	val navController = navController<Destinations>()
-
 	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
 	Box(
@@ -88,10 +92,14 @@ fun EditorTopAppBar(
 				showSearchbar = { searchbarVisible = true },
 				showClearBeforeLoadDialog = {
 					navController.navigate(
-						Destinations.EditorScreen.Dialogs.ClearThemeBeforeLoadingFromFile,
+						EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile,
 						ContentType.Overlay
 					)
 				},
+				exportCustomTheme,
+				saveCurrentTheme,
+				resetCurrentTheme,
+				loadSavedTheme,
 				topAppBarState
 			)
 		}
@@ -103,7 +111,7 @@ fun EditorTopAppBar(
 		) {
 			TheSearchbar(
 				mappedValues = mappedValues ,
-				mappedValuesAsList = mappedValuesAsList,
+				changeValue = changeValue,
 				hideSearchbar = { searchbarVisible = false },
 			)
 		}
@@ -115,10 +123,14 @@ fun EditorTopAppBar(
 private fun TheAppBar(
 	showSearchbar: () -> Unit,
 	showClearBeforeLoadDialog: () -> Unit,
-	topAppBarState: TopAppBarScrollBehavior
+	exportCustomTheme: () -> Unit,
+	saveCurrentTheme: () -> Unit,
+	resetCurrentTheme: () -> Unit,
+	loadSavedTheme: (ThemeStorageType) -> Unit,
+	topAppBarState: TopAppBarScrollBehavior,
+	navController: NavController<EditorDestinations> = getExistingNavController(),
+	rootNavController: NavController<RootDestinations> = getExistingNavController()
 ) {
-	val vm = viewModel<MainViewModel>()
-	val navController = navController<Destinations>()
 	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
 
@@ -130,7 +142,7 @@ private fun TheAppBar(
 
 	TopAppBar(
 		navigationIcon = {
-			IconButton(onClick = { navController.navigateBack() }) {
+			IconButton(onClick = { rootNavController.navigateBack() }) {
 				Icon(Icons.Default.ArrowBack, contentDescription = "Back")
 			}
 		},
@@ -153,10 +165,10 @@ private fun TheAppBar(
 			}
 		},
 		actions = {
-			IconButton(onClick = { vm.exportCustomTheme() }) {
+			IconButton(onClick = { exportCustomTheme() }) {
 				Icon(Icons.Default.Upload, contentDescription = "Export current theme")
 			}
-			IconButton(onClick = { vm.saveCurrentTheme() }) {
+			IconButton(onClick = { saveCurrentTheme() }) {
 				Icon(Icons.Default.Save, contentDescription = "Save current theme")
 			}
 			Box {
@@ -167,35 +179,35 @@ private fun TheAppBar(
 				DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
 					DropdownMenuItem(
 						text = { Text(text = "Reset current theme") },
-						onClick = { vm.resetCurrentTheme() },
+						onClick = { resetCurrentTheme() },
 						leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reset current theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock light theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load stock light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load stock dark theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load stock dark theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Show values") },
 						onClick = {
-							navController.navigate(Destinations.EditorScreen.ThemeValuesScreen)
+							navController.navigate(EditorDestinations.ThemeValues)
 							showMenu = false
 						},
 						leadingIcon = { Icon(Icons.Default.ShortText, contentDescription = "Show values") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default light theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
 						leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = "Load default light theme") }
 					)
 					DropdownMenuItem(
 						text = { Text(text = "Load default dark theme") },
-						onClick = { vm.loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
+						onClick = { loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
 						leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = "Load default dark theme") }
 					)
 					DropdownMenuItem(
@@ -213,108 +225,123 @@ private fun TheAppBar(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TheSearchbar(
-	mappedValues: LoadedTheme,
-	mappedValuesAsList: List<Pair<String, Pair<String, Color>>>,
+	mappedValues: List<UiElementColorData>,
+	changeValue: (String, String, Color) -> Unit,
 	hideSearchbar: () -> Unit,
 ) {
 	var fullscreen by rememberSaveable { mutableStateOf(false) }
 	var searchQuery by rememberSaveable { mutableStateOf("") }
 	val searchQueryIsEmpty by remember { derivedStateOf { searchQuery == "" } }
-	val searchedThings = mappedValuesAsList.filter {
-		it.first.contains(searchQuery, true)
+	val searchedThings = mappedValues.filter {
+		it.name.contains(searchQuery, true)
 				||
-				it.second.first.contains(searchQuery, true)
+				it.colorToken.contains(searchQuery, true)
 	}
 
+	// clears search when back button is pressed.
+	// its here because it doesnt work if i put it
+	// beside the other back handler at the top
+	// of this composable
 	SearchBar(
-		query = searchQuery,
-		onQueryChange = {
-			searchQuery = it
-			fullscreen = true
+		inputField = {
+			SearchBarDefaults.InputField(
+				query = searchQuery,
+				onQueryChange = {
+					searchQuery = it
+					fullscreen = true
+				},
+				onSearch = {  }, // it desperately wants me to keep this line
+				expanded = fullscreen,
+				onExpandedChange = {  },
+				enabled = true,
+				placeholder = { Text(text = "Search in current theme") },
+				leadingIcon = { Icon(Icons.Default.Search, "Search")},
+				trailingIcon = {
+					AnimatedVisibility(
+						visible = searchQueryIsEmpty && !fullscreen,
+						enter = fadeIn(),
+						exit = fadeOut()
+					) {
+						IconButton(onClick = { hideSearchbar() }) {
+							Icon(Icons.Default.ArrowUpward, "Hide searchbar")
+						}
+					}
+
+					AnimatedVisibility(
+						visible = !searchQueryIsEmpty,
+						enter = fadeIn(),
+						exit = fadeOut()
+					) {
+						IconButton(onClick = { searchQuery = "" }) {
+							Icon(Icons.Default.Clear, "Clear search")
+						}
+					}
+				},
+				// TODO maybe make it active when its focused
+				interactionSource = null,
+			)
 		},
-		onSearch = {  }, // it desperately wants me to keep this line
-		placeholder = { Text(text = "Search in current theme") },
-		leadingIcon = { Icon(Icons.Default.Search, "Search")},
-		trailingIcon = {
-			AnimatedVisibility(
-				visible = searchQueryIsEmpty && !fullscreen,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				IconButton(onClick = { hideSearchbar() }) {
-					Icon(Icons.Default.ArrowUpward, "Hide searchbar")
-				}
+		expanded = fullscreen,
+		onExpandedChange = {  },
+		modifier = Modifier,
+		content = {
+			// clears search when back button is pressed.
+			// its here because it doesnt work if i put it
+			// beside the other back handler at the top
+			// of this composable
+			BackHandler(fullscreen) {
+				fullscreen = false
 			}
 
-			AnimatedVisibility(
-				visible = !searchQueryIsEmpty,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				IconButton(onClick = { searchQuery = "" }) {
-					Icon(Icons.Default.Clear, "Clear search")
-				}
-			}
-		},
-		// TODO maybe make it active when its focused
-		active = fullscreen,
-		onActiveChange = {  }
-	) {
-		// clears search when back button is pressed.
-		// its here because it doesnt work if i put it
-		// beside the other back handler at the top
-		// of this composable
-		BackHandler(fullscreen) {
-			fullscreen = false
-		}
-
-		Box {
-			this@SearchBar.AnimatedVisibility(
-				visible = searchQueryIsEmpty,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				Box(
-					Modifier
-						.clickable(
-							indication = null,
-							interactionSource = remember { MutableInteractionSource() }
-						) { fullscreen = false }
-						.imePadding()
-						.fillMaxSize()
+			Box {
+				this@SearchBar.AnimatedVisibility(
+					visible = searchQueryIsEmpty,
+					enter = fadeIn(),
+					exit = fadeOut()
 				) {
-					Text(
-						"Search is empty. Tap this to close",
-						modifier = Modifier.align(Alignment.Center)
-					)
-				}
-			}
-
-			this@SearchBar.AnimatedVisibility(
-				visible = !searchQueryIsEmpty,
-				enter = fadeIn(),
-				exit = fadeOut()
-			) {
-				LazyColumn(
-					contentPadding = PaddingValues(
-						top = 8.dp,
-						bottom = 4.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-					),
-					verticalArrangement = spacedBy(4.dp)
-				) {
-					itemsIndexed(searchedThings) { index, uiElementData ->
-						ElementColorItem(
-							Modifier
-								.padding(horizontal = 16.dp)
-								.animateItemPlacement(),
-							uiElementData = uiElementData,
-							index = index,
-							themeMap = mappedValues,
-							lastIndexInList = mappedValuesAsList.lastIndex
+					Box(
+						Modifier
+							.clickable(
+								indication = null,
+								interactionSource = remember { MutableInteractionSource() }
+							) { fullscreen = false }
+							.imePadding()
+							.fillMaxSize()
+					) {
+						Text(
+							"Search is empty. Tap this to close",
+							modifier = Modifier.align(Alignment.Center)
 						)
 					}
 				}
+
+				this@SearchBar.AnimatedVisibility(
+					visible = !searchQueryIsEmpty,
+					enter = fadeIn(),
+					exit = fadeOut()
+				) {
+					LazyColumn(
+						contentPadding = PaddingValues(
+							top = 8.dp,
+							bottom = 4.dp + WindowInsets.navigationBars.asPaddingValues()
+								.calculateBottomPadding()
+						),
+						verticalArrangement = spacedBy(4.dp)
+					) {
+						itemsIndexed(searchedThings) { index, uiElementData ->
+							ElementColorItem(
+								Modifier
+									.padding(horizontal = 16.dp)
+									.animateItemPlacement(),
+								uiElementData = uiElementData,
+								index = index,
+								changeValue = changeValue,
+								lastIndexInList = mappedValues.lastIndex
+							)
+						}
+					}
+				}
 			}
-		}
-	}
+		},
+	)
 }

@@ -15,30 +15,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.text.TextStyle
-import com.number869.decomposite.core.common.viewModel.viewModel
-import com.number869.telemone.MainViewModel
+import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.shared.utils.stringify
+import com.number869.telemone.ui.screens.editor.EditorViewModel
+import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
 
 @Composable
-fun ThemeValuesScreen() {
-	val vm = viewModel<MainViewModel>()
-
-	val mappedValues = remember { derivedStateOf { vm.mappedValues } }.value
-	val text = mutableListOf<String>()
+fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
 	var showValues by remember { mutableStateOf(false) }
-
-	mappedValues.toSortedMap().forEach {
-		val name = it.key
-		val token = if (showValues) it.value.second.toArgb() else it.value.first
-		text.add("$name = $token")
+	val text = remember(showValues) {
+		stringify(
+			vm.mappedValuesAsList.value.toList(),
+			if (showValues)
+				ThemeColorDataType.ColorValues
+			else
+				ThemeColorDataType.ColorTokens
+		)
 	}
 
 	LazyColumn(
@@ -59,7 +57,7 @@ fun ThemeValuesScreen() {
 		}
 		item {
 			SelectionContainer() {
-				Text(text = text.joinToString("\n"), style = TextStyle())
+				Text(text = text)
 			}
 		}
 	}

@@ -20,17 +20,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.data.ThemeData
+import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
+import com.number869.telemone.shared.utils.colorOf
 
 @Composable
 fun OverwriteChoiceDialog(
 	close: () -> Unit,
 	chooseLight: () -> Unit,
 	chooseDark: () -> Unit,
+	lightTheme: ThemeData,
+	darkTheme: ThemeData,
 ) {
 	AlertDialog(
 		onDismissRequest = { close() },
@@ -49,7 +55,16 @@ fun OverwriteChoiceDialog(
 								.clickable { chooseLight() }
 								.clip(RoundedCornerShape(16.dp))
 								.weight(1f, false),
-							"defaultLightThemeUUID"
+							lightTheme,
+							loadSavedTheme = {  },
+							selectOrUnselectSavedTheme = {  },
+							exportTheme = {  },
+							changeSelectionMode = {  },
+							colorOf = { targetUiElementColor ->
+								val data = lightTheme.values.find { it.name == targetUiElementColor }!!
+
+								colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+							},
 						)
 
 						Spacer(modifier = Modifier.height(16.dp))
@@ -70,7 +85,16 @@ fun OverwriteChoiceDialog(
 								.clickable { chooseDark() }
 								.clip(RoundedCornerShape(16.dp))
 								.weight(1f, false),
-							"defaultDarkThemeUUID"
+							darkTheme,
+							loadSavedTheme = {  },
+							selectOrUnselectSavedTheme = {  },
+							exportTheme = {  },
+							changeSelectionMode = {  },
+							colorOf = { targetUiElementColor ->
+								val data = darkTheme.values.find { it.name == targetUiElementColor }!!
+
+								colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+							},
 						)
 
 						Spacer(modifier = Modifier.height(16.dp))
@@ -93,8 +117,11 @@ fun OverwriteDefaultsDialog(
 	close: () -> Unit,
 	overwrite: () -> Unit,
 	overwriteDark: Boolean,
-	overwriteWith: String,
+	lightTheme: ThemeData,
+	darkTheme: ThemeData,
+	overwriteWith: ThemeData,
 ) {
+	val targetTheme = remember { if (overwriteDark) darkTheme else lightTheme }
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
 
 	AlertDialog(
@@ -119,13 +146,21 @@ fun OverwriteDefaultsDialog(
 			) {
 				// current default
 				SavedThemeItem(
-					Modifier
+					modifier = Modifier
 						.weight(1f)
 						.width(110.dp)
 						.height(140.dp)
 						.clip(RoundedCornerShape(16.dp)),
-					colorDisplayTypeOverwrite = "3",
-					uuid = if (overwriteDark) "defaultDarkThemeUUID" else "defaultLightThemeUUID",
+					themeData = targetTheme,
+					loadSavedTheme = {  },
+					selectOrUnselectSavedTheme = {  },
+					exportTheme = {  },
+					changeSelectionMode = {  },
+					colorOf = { targetUiElementColor ->
+						val data = targetTheme.values.find { it.name == targetUiElementColor }!!
+
+						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+					},
 				)
 
 				Icon(
@@ -136,13 +171,21 @@ fun OverwriteDefaultsDialog(
 
 				// new default
 				SavedThemeItem(
-					Modifier
+					modifier = Modifier
 						.weight(1f)
 						.width(110.dp)
 						.height(140.dp)
 						.clip(RoundedCornerShape(16.dp)),
-					colorDisplayTypeOverwrite = "3",
-					uuid = overwriteWith
+					themeData = overwriteWith,
+					loadSavedTheme = {  },
+					selectOrUnselectSavedTheme = {  },
+					exportTheme = {  },
+					changeSelectionMode = {  },
+					colorOf = { targetUiElementColor ->
+						val data = overwriteWith.values.find { it.name == targetUiElementColor }!!
+
+						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+					},
 				)
 			}
 		}

@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.welcome
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,26 +16,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.number869.decomposite.core.common.navigation.navController
 import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.LargeTonalButton
-import com.number869.telemone.ui.Destinations
+import com.number869.telemone.ui.RootDestinations
+import com.nxoim.decomposite.core.common.navigation.NavController
+import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
-fun WelcomeScreen() {
-	val navController = navController<Destinations>()
-	val preferences = LocalContext.current.getSharedPreferences(
-		"AppPreferences.Settings",
-		Context.MODE_PRIVATE
-	)
-
+fun WelcomeScreen(
+	navController: NavController<RootDestinations> = getExistingNavController()
+) {
 	val privacyPolicyText = stringResource(R.string.privacy_policy_text)
 	val tosText = stringResource(R.string.tos_text)
 
@@ -96,8 +91,8 @@ fun WelcomeScreen() {
 
 		LargeTonalButton(
 			onClick = {
-				preferences.edit().putBoolean(AppSettings.AgreedToPpAndTos.id, true).apply()
-				navController.replaceAll(Destinations.MainScreen)
+				AppSettings.agreedToConditions.set(true)
+				navController.replaceAll(RootDestinations.Main)
 			},
 			label = "I Agree",
 			modifier = Modifier.weight(1f, false)

@@ -44,19 +44,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.MainViewModel
 
 
 @Composable
-fun ChatScreenPreview(vm: MainViewModel) {
-    fun colorOf(colorValueOf: String): Color {
-        return try {
-            vm.mappedValues.getOrElse(colorValueOf) { Pair("", Color.Red) }.second
-        } catch (e: NoSuchElementException) {
-            Color.Red
-        }
-    }
-
+fun ChatScreenPreview(colorOf: (String) -> Color) {
     Column(
         modifier = Modifier
             .fillMaxSize(),

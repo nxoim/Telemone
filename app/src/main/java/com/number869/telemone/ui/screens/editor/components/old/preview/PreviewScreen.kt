@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavHostController
-import com.number869.telemone.MainViewModel
+import com.number869.telemone.ui.screens.editor.EditorViewModel
 
 val PreviewScreens = mapOf(
     "Chat Screen" to "ChatScreenPreview",
@@ -19,7 +19,7 @@ val PreviewScreens = mapOf(
 )
 
 @Composable
-fun ThemePreviewScreen(navController: NavHostController, vm: MainViewModel) {
+fun ThemePreviewScreen(navController: NavHostController, vm: EditorViewModel) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

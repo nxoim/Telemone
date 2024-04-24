@@ -2,9 +2,10 @@
 
 Telemone is a theme builder made to bring Material You-like dynamic themes to Telegram (for Android).
 
-### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/Number869/TeleMone/releases "Github Releases")
+### Download from [Google Play](https://play.google.com/store/apps/details?id=com.number869.telemone&hl=en "Google Play") or [Github Releases](https://github.com/nxoim/Telemone/releases "Github Releases")
 
-![SCREENSHOTS](https://github.com/Number869/Telemone/assets/52751853/f884b31b-035d-4de5-b8bd-98fba121e3f0)
+![SCREENSHOTS](https://github.com/nxoim/Telemone/assets/52751853/3f8e7652-f71c-4156-a5cb-9d3b257f977b)
+
 
 ## Features
 - **Default Themes.**
@@ -21,13 +22,14 @@ Telemone is a theme builder made to bring Material You-like dynamic themes to Te
 - Kotlin
 - Jetpack Compose
 - Material You
-- Gson
-- Accompanist Navigation
+- Custom navigation [(Decomposite)](https://github.com/nxoim/decomposite)
+- Realm Kotlin SDK for storing themes
+- Custom settings manager also based on Realm
+- Custom basic "service locator"
 - MVVM
 - Kotlin Coroutines
-- Shared Preferences
-- Single Activity
-
+- Single activity
+- Single module
 
 ## License
 
@@ -49,4 +51,4 @@ Contributions to Telemone are welcome! If you have any bug fixes, improvements, 
 
 ## Feedback and Support
 
-If you have any feedback or require support - feel free to join us on [Telegram](https://t.me/Number869Community "Telegram"). You are also welcome to open issues and use discussions in this repository.
+If you have any feedback or require support - feel free to join us on [Telegram](https://t.me/nxoimCommunity "Telegram"). You are also welcome to open issues and use discussions in this repository.
