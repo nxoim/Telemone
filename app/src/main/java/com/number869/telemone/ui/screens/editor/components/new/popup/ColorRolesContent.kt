@@ -325,17 +325,17 @@ private object ColorRoleItems {
     )
 
     val firstRowLightItems = listOf(
-        ColorRolesLight.PrimaryContainer.dataAboutColors,
-        ColorRolesLight.SecondaryContainer.dataAboutColors,
-        ColorRolesLight.TertiaryContainer.dataAboutColors,
-        ColorRolesLight.ErrorContainer.dataAboutColors
+        ColorRolesLight.Primary.dataAboutColors,
+        ColorRolesLight.Secondary.dataAboutColors,
+        ColorRolesLight.Tertiary.dataAboutColors,
+        ColorRolesLight.Error.dataAboutColors
     )
 
     val secondRowLightItems = listOf(
-        ColorRolesLight.OnPrimaryContainer.dataAboutColors,
-        ColorRolesLight.OnSecondaryContainer.dataAboutColors,
-        ColorRolesLight.OnTertiaryContainer.dataAboutColors,
-        ColorRolesLight.OnErrorContainer.dataAboutColors
+        ColorRolesLight.OnPrimary.dataAboutColors,
+        ColorRolesLight.OnSecondary.dataAboutColors,
+        ColorRolesLight.OnTertiary.dataAboutColors,
+        ColorRolesLight.OnError.dataAboutColors
     )
 
     val thirdRowLightItems = listOf(
@@ -382,17 +382,17 @@ private object ColorRoleItems {
     )
 
     val firstRowDarkItems = listOf(
-        ColorRolesDark.PrimaryContainer.dataAboutColors,
-        ColorRolesDark.SecondaryContainer.dataAboutColors,
-        ColorRolesDark.TertiaryContainer.dataAboutColors,
-        ColorRolesDark.ErrorContainer.dataAboutColors
+        ColorRolesDark.Primary.dataAboutColors,
+        ColorRolesDark.Secondary.dataAboutColors,
+        ColorRolesDark.Tertiary.dataAboutColors,
+        ColorRolesDark.Error.dataAboutColors
     )
 
     val secondRowDarkItems = listOf(
-        ColorRolesDark.OnPrimaryContainer.dataAboutColors,
-        ColorRolesDark.OnSecondaryContainer.dataAboutColors,
-        ColorRolesDark.OnTertiaryContainer.dataAboutColors,
-        ColorRolesDark.OnErrorContainer.dataAboutColors
+        ColorRolesDark.OnPrimary.dataAboutColors,
+        ColorRolesDark.OnSecondary.dataAboutColors,
+        ColorRolesDark.OnTertiary.dataAboutColors,
+        ColorRolesDark.OnError.dataAboutColors
     )
 
     val thirdRowDarkItems = listOf(

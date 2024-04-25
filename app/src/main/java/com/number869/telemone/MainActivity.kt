@@ -59,7 +59,11 @@ class MainActivity : ComponentActivity() {
 					}
 				}
 
-				BackGestureProviderContainer(navigationRootDataProvider.defaultComponentContext) {
+				BackGestureProviderContainer(
+					navigationRootDataProvider.defaultComponentContext,
+					blockChildDragInputs = false,
+					edgeWidth = null
+				) {
 					Surface(modifier = Modifier.fillMaxSize()) {
 						NavigationRootProvider(navigationRootDataProvider) { Navigator() }
 					}
