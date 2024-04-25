@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.realm)
 }
 
-val version = "1.4.0"
-val versionNumber = 7
+val version = "1.4.1"
+val versionNumber = 8
 
 android {
     namespace = "com.number869.telemone"

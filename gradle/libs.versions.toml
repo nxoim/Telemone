@@ -18,7 +18,7 @@ gson = "2.10.1"
 lazyColumnScrollbar = "1.7.2"
 mmkv = "1.3.2"
 decompose = "3.0.0-beta01"
-decomposite = "f48f36a314"
+decomposite = "e29e32921f"
 realm = "1.14.1"
 
 [libraries]
