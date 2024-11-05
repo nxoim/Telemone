@@ -55,11 +55,6 @@ fun OverwriteChoiceDialog(
 								.clickable { chooseLight() }
 								.clip(RoundedCornerShape(16.dp))
 								.weight(1f, false),
-							lightTheme,
-							loadSavedTheme = {  },
-							selectOrUnselectSavedTheme = {  },
-							exportTheme = {  },
-							changeSelectionMode = {  },
 							colorOf = { targetUiElementColor ->
 								val data = lightTheme.values.find { it.name == targetUiElementColor }!!
 
@@ -85,11 +80,6 @@ fun OverwriteChoiceDialog(
 								.clickable { chooseDark() }
 								.clip(RoundedCornerShape(16.dp))
 								.weight(1f, false),
-							darkTheme,
-							loadSavedTheme = {  },
-							selectOrUnselectSavedTheme = {  },
-							exportTheme = {  },
-							changeSelectionMode = {  },
 							colorOf = { targetUiElementColor ->
 								val data = darkTheme.values.find { it.name == targetUiElementColor }!!
 
@@ -151,11 +141,6 @@ fun OverwriteDefaultsDialog(
 						.width(110.dp)
 						.height(140.dp)
 						.clip(RoundedCornerShape(16.dp)),
-					themeData = targetTheme,
-					loadSavedTheme = {  },
-					selectOrUnselectSavedTheme = {  },
-					exportTheme = {  },
-					changeSelectionMode = {  },
 					colorOf = { targetUiElementColor ->
 						val data = targetTheme.values.find { it.name == targetUiElementColor }!!
 
@@ -176,11 +161,6 @@ fun OverwriteDefaultsDialog(
 						.width(110.dp)
 						.height(140.dp)
 						.clip(RoundedCornerShape(16.dp)),
-					themeData = overwriteWith,
-					loadSavedTheme = {  },
-					selectOrUnselectSavedTheme = {  },
-					exportTheme = {  },
-					changeSelectionMode = {  },
 					colorOf = { targetUiElementColor ->
 						val data = overwriteWith.values.find { it.name == targetUiElementColor }!!
 

@@ -29,13 +29,12 @@ import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
 import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
 import com.nxoim.decomposite.core.common.navigation.NavController
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 import com.nxoim.decomposite.core.common.viewModel.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-	navController: NavController<RootDestinations> = getExistingNavController(),
+	navController: NavController<RootDestinations>,
 	vm: MainViewModel = viewModel { MainViewModel() }
 ) {
 	var userChoseToSeeUpdateLight by remember { mutableStateOf(false) }
@@ -111,7 +110,7 @@ fun MainScreen(
 			acceptStockThemeUpdate = {
 				vm.acceptThemeUpdate(true)
 				userChoseToSeeUpdateLight = false
-			}
+			},
 		)
 
 	if (shouldDisplayUpdateDialog(light = false) || userChoseToSeeUpdateDark)

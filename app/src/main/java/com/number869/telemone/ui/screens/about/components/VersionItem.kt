@@ -16,7 +16,7 @@ fun VersionItem() {
 		).versionName
 
 		Text(
-			text = versionName,
+			text = versionName ?: "Cant get version name for some reason",
 			style = MaterialTheme.typography.bodyLarge
 		)
 	}

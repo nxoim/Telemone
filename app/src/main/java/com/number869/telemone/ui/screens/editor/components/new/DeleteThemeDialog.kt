@@ -25,7 +25,7 @@ fun DeleteThemeDialog(
 	theme: ThemeData,
 ) {
 	AlertDialog(
-		onDismissRequest = { close() },
+		onDismissRequest = close,
 		title = { Text("Delete this theme?") },
 		icon = {
 			SavedThemeItem(
@@ -33,11 +33,6 @@ fun DeleteThemeDialog(
 					.width(150.dp)
 					.height(180.dp)
 					.clip(RoundedCornerShape(16.dp)),
-				theme,
-				loadSavedTheme = {  },
-				selectOrUnselectSavedTheme = {  },
-				exportTheme = { },
-				changeSelectionMode = {  },
 				colorOf = { targetUiElement ->
 					val data = theme.values
 						.find { it.name == targetUiElement }

@@ -61,8 +61,6 @@ import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
-import com.nxoim.decomposite.core.common.ultils.ContentType
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -75,7 +73,9 @@ fun EditorTopAppBar(
 	resetCurrentTheme: () -> Unit,
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	changeValue: (String, String, Color) -> Unit,
-	navController: NavController<EditorDestinations> = getExistingNavController()
+	editorNavController: NavController<EditorDestinations>,
+	dialogsNavController: NavController<EditorDestinations.Dialogs>,
+	rootNavController: NavController<RootDestinations>
 ) {
 	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -91,16 +91,17 @@ fun EditorTopAppBar(
 			TheAppBar(
 				showSearchbar = { searchbarVisible = true },
 				showClearBeforeLoadDialog = {
-					navController.navigate(
-						EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile,
-						ContentType.Overlay
+					dialogsNavController.navigate(
+						EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile
 					)
 				},
 				exportCustomTheme,
 				saveCurrentTheme,
 				resetCurrentTheme,
 				loadSavedTheme,
-				topAppBarState
+				topAppBarState,
+				editorNavController,
+				rootNavController
 			)
 		}
 
@@ -128,8 +129,8 @@ private fun TheAppBar(
 	resetCurrentTheme: () -> Unit,
 	loadSavedTheme: (ThemeStorageType) -> Unit,
 	topAppBarState: TopAppBarScrollBehavior,
-	navController: NavController<EditorDestinations> = getExistingNavController(),
-	rootNavController: NavController<RootDestinations> = getExistingNavController()
+	editorNavController: NavController<EditorDestinations>,
+	rootNavController: NavController<RootDestinations>
 ) {
 	var showMenu by rememberSaveable { mutableStateOf(false) }
 	var isShowingTapToSearchText by remember { mutableStateOf(false) }
@@ -195,7 +196,7 @@ private fun TheAppBar(
 					DropdownMenuItem(
 						text = { Text(text = "Show values") },
 						onClick = {
-							navController.navigate(EditorDestinations.ThemeValues)
+							editorNavController.navigate(EditorDestinations.ThemeValues)
 							showMenu = false
 						},
 						leadingIcon = { Icon(Icons.Default.ShortText, contentDescription = "Show values") }
