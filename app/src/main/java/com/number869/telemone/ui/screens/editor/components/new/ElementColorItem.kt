@@ -31,10 +31,12 @@ import androidx.compose.ui.window.Popup
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.color
 import com.number869.telemone.ui.screens.editor.components.new.popup.PalettePopup
+import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun ElementColorItem(
 	modifier: Modifier = Modifier,
+	paletteState: PaletteState,
 	uiElementData: UiElementColorData,
 	index: Int,
 	changeValue: (String, String, Color) -> Unit,
@@ -95,6 +97,7 @@ fun ElementColorItem(
 					contentAlignment = BiasAlignment(0f, 0.8f)
 				) {
 					PalettePopup(
+						paletteState,
 						uiElementData,
 						changeValue = changeValue,
 						onDismissRequest = { showPopUp = false }

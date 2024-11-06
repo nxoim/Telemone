@@ -74,6 +74,7 @@ import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.colorOf
 import com.number869.telemone.shared.utils.getColorDisplayType
 import com.number869.telemone.shared.utils.incompatibleUiElementColorData
+import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.components.new.CheckboxSelectionOverlay
@@ -447,6 +448,7 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel, newUiElements: L
 				Modifier
 					.padding(horizontal = 16.dp)
 					.animateItem(),
+				paletteState = inject(),
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -483,6 +485,7 @@ private fun LazyListScope.IncompatibleValuesSection(
 				Modifier
 					.padding(horizontal = 16.dp)
 					.animateItem(),
+				paletteState = inject(),
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -498,6 +501,7 @@ private fun LazyListScope.AllColorsSection(vm: EditorViewModel, mappedValuesAsLi
 			Modifier
 				.padding(horizontal = 16.dp)
 				.animateItem(),
+			paletteState = inject(),
 			uiElementData = uiElementColorData,
 			index = index,
 			changeValue = vm::changeValue,

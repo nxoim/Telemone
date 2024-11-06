@@ -55,25 +55,14 @@ import androidx.compose.ui.util.fastFilter
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.CombineSharedTransitionAndAnimatedVisibility
 import com.number869.telemone.shared.utils.color
-import com.number869.telemone.ui.theme.ColorRolesLight
 import com.number869.telemone.ui.theme.ColorRolesShared
+import com.number869.telemone.ui.theme.PaletteState
 import com.number869.telemone.ui.theme.ToneInfo
-import com.number869.telemone.ui.theme.blueTones
-import com.number869.telemone.ui.theme.cyanTones
-import com.number869.telemone.ui.theme.greenTones
-import com.number869.telemone.ui.theme.neutralTones
-import com.number869.telemone.ui.theme.neutralVariantTones
-import com.number869.telemone.ui.theme.orangeTones
-import com.number869.telemone.ui.theme.pinkTones
-import com.number869.telemone.ui.theme.primaryTones
-import com.number869.telemone.ui.theme.redTones
-import com.number869.telemone.ui.theme.secondaryTones
-import com.number869.telemone.ui.theme.tertiaryTones
-import com.number869.telemone.ui.theme.violetTones
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PalettePopup(
+    paletteState: PaletteState,
     uiElementColorData: UiElementColorData,
     changeValue: (String, String, Color) -> Unit,
     onDismissRequest: () -> Unit
@@ -81,19 +70,6 @@ fun PalettePopup(
     var visible by rememberSaveable { mutableStateOf(false) }
     var targetContent by rememberSaveable { mutableStateOf(PaletteMenuCategories.Home) }
     val isOnHomePage = targetContent == PaletteMenuCategories.Home
-
-    val primaryTones = primaryTones.filterOutBlackAndWhite()
-    val secondaryTones = secondaryTones.filterOutBlackAndWhite()
-    val tertiaryTones = tertiaryTones.filterOutBlackAndWhite()
-    val neutralTones = neutralTones.filterOutBlackAndWhite()
-    val neutralVariantTones = neutralVariantTones.filterOutBlackAndWhite()
-    val blueTones = blueTones.filterOutBlackAndWhite()
-    val redTones = redTones.filterOutBlackAndWhite()
-    val greenTones = greenTones.filterOutBlackAndWhite()
-    val orangeTones = orangeTones.filterOutBlackAndWhite()
-    val violetTones = violetTones.filterOutBlackAndWhite()
-    val pinkTones = pinkTones.filterOutBlackAndWhite()
-    val cyanTones = cyanTones.filterOutBlackAndWhite()
 
     LaunchedEffect(Unit) { visible = true }
 
@@ -177,7 +153,7 @@ fun PalettePopup(
                                                             PaletteMenuCategories.Primary
                                                     },
                                                     label = "Primary",
-                                                    listOfColors = primaryTones
+                                                    listOfColors = paletteState.primaryTones
                                                 )
 
                                                 TonalPaletteCategoryButton(
@@ -187,7 +163,7 @@ fun PalettePopup(
                                                             PaletteMenuCategories.Secondary
                                                     },
                                                     label = "Secondary",
-                                                    listOfColors = secondaryTones
+                                                    listOfColors = paletteState.secondaryTones
                                                 )
 
                                                 TonalPaletteCategoryButton(
@@ -197,7 +173,7 @@ fun PalettePopup(
                                                             PaletteMenuCategories.Tertiary
                                                     },
                                                     label = "Tertiary",
-                                                    listOfColors = tertiaryTones
+                                                    listOfColors = paletteState.tertiaryTones
                                                 )
                                             }
                                         }
@@ -212,7 +188,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Neutral
                                                 },
                                                 label = "Neutral",
-                                                listOfColors = neutralTones
+                                                listOfColors = paletteState.neutralTones
                                             )
 
                                             TonalPaletteCategoryButton(
@@ -222,7 +198,7 @@ fun PalettePopup(
                                                         PaletteMenuCategories.NeutralVariant
                                                 },
                                                 label = "Neutral Variant",
-                                                listOfColors = neutralVariantTones
+                                                listOfColors = paletteState.neutralVariantTones
                                             )
                                         }
 
@@ -236,7 +212,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Red
                                                 },
                                                 label = "Red",
-                                                listOfColors = redTones
+                                                listOfColors = paletteState.redTones
                                             )
 
                                             TonalPaletteCategoryButton(
@@ -245,7 +221,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Green
                                                 },
                                                 label = "Green",
-                                                listOfColors = greenTones
+                                                listOfColors = paletteState.greenTones
                                             )
 
                                             TonalPaletteCategoryButton(
@@ -254,7 +230,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Blue
                                                 },
                                                 label = "Blue",
-                                                listOfColors = blueTones
+                                                listOfColors = paletteState.blueTones
                                             )
                                         }
 
@@ -268,7 +244,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Orange
                                                 },
                                                 label = "Orange",
-                                                listOfColors = orangeTones
+                                                listOfColors = paletteState.orangeTones
                                             )
 
                                             TonalPaletteCategoryButton(
@@ -277,7 +253,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Violet
                                                 },
                                                 label = "Violet",
-                                                listOfColors = violetTones
+                                                listOfColors = paletteState.violetTones
                                             )
 
                                             TonalPaletteCategoryButton(
@@ -286,7 +262,7 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Pink
                                                 },
                                                 label = "Pink",
-                                                listOfColors = pinkTones
+                                                listOfColors = paletteState.pinkTones
                                             )
 
                                             TonalPaletteCategoryButton(
@@ -295,18 +271,13 @@ fun PalettePopup(
                                                     targetContent = PaletteMenuCategories.Cyan
                                                 },
                                                 label = "Cyan",
-                                                listOfColors = cyanTones
+                                                listOfColors = paletteState.cyanTones
                                             )
                                         }
 
                                         Spacer(modifier = Modifier.height(4.dp))
 
                                         Row(Modifier.weight(1f, false)) {
-                                            val allColors = remember {
-                                                ColorRolesLight.entries.map { it.dataAboutColors } +
-                                                        ColorRolesShared.entries.map { it.dataAboutColors }
-                                            }
-
                                             AnimatedVisibility(
                                                 targetContent != PaletteMenuCategories.ColorRoles,
                                                 enter = EnterTransition.None,
@@ -326,11 +297,8 @@ fun PalettePopup(
                                                         targetContent =
                                                             PaletteMenuCategories.ColorRoles
                                                     },
-                                                    isOnHomePage = isOnHomePage,
+                                                    colorRolesLight = paletteState.colorRolesLight,
                                                     label = "Color Roles",
-                                                    enabled =
-                                                    targetContent != PaletteMenuCategories.ColorRoles,
-                                                    listOfColors = allColors,
                                                     changeValue = changeValue,
                                                     key = uiElementColorData.name
                                                 )
@@ -369,6 +337,9 @@ fun PalettePopup(
                                                         ContentScale.FillBounds
                                                     )
                                                 ),
+                                            colorRolesLight = paletteState.colorRolesLight,
+                                            colorRolesDark = paletteState.colorRolesDark,
+                                            colorRolesShared = paletteState.colorRolesShared,
                                             changeValue,
                                             uiElementName = uiElementColorData.name
                                         )
@@ -384,23 +355,24 @@ fun PalettePopup(
                                             )
                                             .padding(horizontal = 16.dp),
                                         changeValue = changeValue,
+                                        additionalColors = paletteState.additionalColors,
                                         uiElementName = uiElementColorData.name
                                     )
 
                                     else -> {
                                         val palette = when (currentContentType) {
-                                            PaletteMenuCategories.Primary -> primaryTones
-                                            PaletteMenuCategories.Secondary -> secondaryTones
-                                            PaletteMenuCategories.Tertiary -> tertiaryTones
-                                            PaletteMenuCategories.Neutral -> neutralTones
-                                            PaletteMenuCategories.NeutralVariant -> neutralVariantTones
-                                            PaletteMenuCategories.Blue -> blueTones
-                                            PaletteMenuCategories.Red -> redTones
-                                            PaletteMenuCategories.Green -> greenTones
-                                            PaletteMenuCategories.Orange -> orangeTones
-                                            PaletteMenuCategories.Violet -> violetTones
-                                            PaletteMenuCategories.Pink -> pinkTones
-                                            PaletteMenuCategories.Cyan -> cyanTones
+                                            PaletteMenuCategories.Primary -> paletteState.primaryTones
+                                            PaletteMenuCategories.Secondary -> paletteState.secondaryTones
+                                            PaletteMenuCategories.Tertiary -> paletteState.tertiaryTones
+                                            PaletteMenuCategories.Neutral -> paletteState.neutralTones
+                                            PaletteMenuCategories.NeutralVariant -> paletteState.neutralVariantTones
+                                            PaletteMenuCategories.Blue -> paletteState.blueTones
+                                            PaletteMenuCategories.Red -> paletteState.redTones
+                                            PaletteMenuCategories.Green -> paletteState.greenTones
+                                            PaletteMenuCategories.Orange -> paletteState.orangeTones
+                                            PaletteMenuCategories.Violet -> paletteState.violetTones
+                                            PaletteMenuCategories.Pink -> paletteState.pinkTones
+                                            PaletteMenuCategories.Cyan -> paletteState.cyanTones
                                             else -> null
                                         }
 
@@ -437,7 +409,5 @@ fun PalettePopup(
         }
     }
 }
-
-private fun List<ToneInfo>.filterOutBlackAndWhite() = fastFilter { it.tone != 0 && it.tone != 100 }
 
 private val softSpring = spring<Float>(1.8f, 2500f)

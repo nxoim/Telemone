@@ -11,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.ui.theme.AdditionalColors
+import com.number869.telemone.ui.theme.PaletteState
 
 @Composable
 fun AdditionalColorsContent(
     modifier: Modifier = Modifier,
+    additionalColors: AdditionalColors,
     changeValue: (String, String, Color) -> Unit,
     uiElementName: String
 ) {
@@ -22,7 +24,7 @@ fun AdditionalColorsContent(
         Row(horizontalArrangement = Arrangement.Absolute.spacedBy(8.dp)) {
             ColorRoleItem(
                 Modifier.weight(1f),
-                AdditionalColors.White.dataAboutColors,
+                additionalColors.white,
                 uiElementName = uiElementName,
                 changeValue = changeValue,
                 enabled = true
@@ -30,7 +32,7 @@ fun AdditionalColorsContent(
 
             ColorRoleItem(
                 Modifier.weight(1f),
-                AdditionalColors.Black.dataAboutColors,
+                additionalColors.black,
                 uiElementName = uiElementName,
                 changeValue = changeValue,
                 enabled = true
@@ -40,7 +42,7 @@ fun AdditionalColorsContent(
         Row(horizontalArrangement = Arrangement.Absolute.spacedBy(8.dp)) {
             ColorRoleItem(
                 Modifier.weight(1f),
-                AdditionalColors.SurfaceElevationLevel3Light.dataAboutColors,
+                additionalColors.surfaceElevationLevel3Light,
                 uiElementName = uiElementName,
                 changeValue = changeValue,
                 enabled = true
@@ -48,7 +50,7 @@ fun AdditionalColorsContent(
 
             ColorRoleItem(
                 Modifier.weight(1f),
-                AdditionalColors.SurfaceElevationLevel3Dark.dataAboutColors,
+                additionalColors.surfaceElevationLevel3Dark,
                 uiElementName = uiElementName,
                 changeValue = changeValue,
                 enabled = true
@@ -58,7 +60,7 @@ fun AdditionalColorsContent(
         Box(contentAlignment = Alignment.Center) {
             ColorRoleItem(
                 Modifier,
-                AdditionalColors.Transparent.dataAboutColors,
+                additionalColors.transparent,
                 uiElementName = uiElementName,
                 changeValue = changeValue,
                 enabled = true

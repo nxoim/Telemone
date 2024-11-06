@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController
@@ -334,6 +335,7 @@ private fun TheSearchbar(
 								Modifier
 									.padding(horizontal = 16.dp)
 									.animateItemPlacement(),
+								paletteState = inject(),
 								uiElementData = uiElementData,
 								index = index,
 								changeValue = changeValue,

@@ -1,8 +1,8 @@
 package com.number869.telemone.ui.theme
 
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -18,17 +18,17 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-	primary = Purple80,
-	secondary = PurpleGrey80,
-	tertiary = Pink80
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-	primary = Purple40,
-	secondary = PurpleGrey40,
-	tertiary = Pink40
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Pink40
 
-	/* Other default colors to override
+    /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
@@ -41,38 +41,39 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun TelemoneTheme(
-	darkTheme: Boolean = isSystemInDarkTheme(),
-	// Dynamic color is available on Android 12+
-	dynamicColor: Boolean = true,
-	content: @Composable () -> Unit
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
 ) {
-	val colorScheme = when {
-		dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-			val context = LocalContext.current
-			remember {if (darkTheme)  dynamicDarkColorScheme(context) else dynamicLightColorScheme(context) }
-		}
+    val colorScheme = getColorScheme(darkTheme)
 
-		darkTheme -> DarkColorScheme
-		else -> LightColorScheme
-	}
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = Color.Transparent.toArgb()
+            window.navigationBarColor = Color.Transparent.toArgb()
+            window.isStatusBarContrastEnforced = false
+            window.isNavigationBarContrastEnforced = false
 
-	val view = LocalView.current
-	if (!view.isInEditMode) {
-		SideEffect {
-			val window = (view.context as Activity).window
-			window.statusBarColor = Color.Transparent.toArgb()
-			window.navigationBarColor = Color.Transparent.toArgb()
-			window.isStatusBarContrastEnforced = false
-			window.isNavigationBarContrastEnforced = false
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+        }
+    }
 
-			WindowCompat.setDecorFitsSystemWindows(window, false)
-			WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-		}
-	}
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}
 
-	MaterialTheme(
-		colorScheme = colorScheme,
-		typography = Typography,
-		content = content
-	)
+@Composable
+fun getColorScheme(isDark: Boolean): ColorScheme {
+    val context = LocalContext.current
+    return remember(isDark) {
+        if (isDark)
+            dynamicDarkColorScheme(context)
+        else
+            dynamicLightColorScheme(context)
+    }
 }
