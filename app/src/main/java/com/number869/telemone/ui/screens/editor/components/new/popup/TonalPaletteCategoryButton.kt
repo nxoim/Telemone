@@ -64,7 +64,7 @@ fun CombinedSharedTransitionScope.TonalPaletteCategoryButton(
             verticalArrangement = Arrangement.Center
         ) {
             Box(Modifier.height(24.dp).width(48.dp)) {
-                listOfColors.fastForEachIndexed { index, toneInfo ->
+                remember { listOfColors.subList(1, listOfColors.size - 1) }.fastForEachIndexed { index, toneInfo ->
                     key(index) {
                         val shouldBeVisibleInPreview = index in 4..6
                         val zIndex = if (shouldBeVisibleInPreview) (index).toFloat() else 0f
