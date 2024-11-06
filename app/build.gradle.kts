@@ -29,7 +29,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -70,14 +71,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    implementation(libs.accompanist.navigation.animation)
-    implementation(libs.accompanist.systemuicontroller)
-
-    implementation(libs.google.code.gson)
-
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.lazycolumnscrollbar)
-    implementation(libs.mmkv)
 
     implementation(libs.decomposite)
 
