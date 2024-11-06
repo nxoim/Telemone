@@ -278,53 +278,38 @@ fun PalettePopup(
                                         Spacer(modifier = Modifier.height(4.dp))
 
                                         Row(Modifier.weight(1f, false)) {
-                                            AnimatedVisibility(
-                                                targetContent != PaletteMenuCategories.ColorRoles,
-                                                enter = EnterTransition.None,
-                                                exit = ExitTransition.None,
-                                                modifier = Modifier.weight(1f)
-                                            ) {
-                                                ColorRolesCategoryButton(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .sharedBounds(
-                                                            rememberSharedContentState(
-                                                                PaletteMenuCategories.ColorRoles
-                                                            ),
-                                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
-                                                        ),
-                                                    expand = {
-                                                        targetContent =
+                                            ColorRolesCategoryButton(
+                                                modifier = Modifier
+                                                    .sharedBounds(
+                                                        rememberSharedContentState(
                                                             PaletteMenuCategories.ColorRoles
-                                                    },
-                                                    colorRolesLight = paletteState.colorRolesLight,
-                                                    label = "Color Roles",
-                                                    changeValue = changeValue,
-                                                    key = uiElementColorData.name
-                                                )
-                                            }
+                                                        ),
+                                                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                                                    )
+                                                    .weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.ColorRoles
+                                                },
+                                                colorRolesLight = paletteState.colorRolesLight,
+                                                label = "Color Roles",
+                                                changeValue = changeValue,
+                                                key = uiElementColorData.name
+                                            )
 
                                             Spacer(modifier = Modifier.width(8.dp))
 
-                                            AnimatedVisibility(
-                                                targetContent != PaletteMenuCategories.AdditionalColors,
-                                                enter = EnterTransition.None,
-                                                exit = ExitTransition.None
-                                            ) {
-                                                AdditionalColorsCategoryButton(
-                                                    modifier = Modifier
-                                                        .sharedBounds(
-                                                            rememberSharedContentState("additionalSection"),
-                                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
-                                                        )
-                                                        .width(44.dp),
-                                                    expand = {
-                                                        targetContent =
-                                                            PaletteMenuCategories.AdditionalColors
-                                                    },
-                                                )
-                                            }
-
+                                            AdditionalColorsCategoryButton(
+                                                modifier = Modifier
+                                                    .sharedBounds(
+                                                        rememberSharedContentState("additionalSection"),
+                                                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                                                    )
+                                                    .width(44.dp),
+                                                expand = {
+                                                    targetContent =
+                                                        PaletteMenuCategories.AdditionalColors
+                                                },
+                                            )
                                         }
                                     }
 
