@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +37,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.util.fastForEach
+import com.number869.telemone.shared.utils.CombinedSharedTransitionScope
 import com.number869.telemone.ui.theme.ColorRolesDark
 import com.number869.telemone.ui.theme.ColorRolesLight
 import com.number869.telemone.ui.theme.ColorRolesShared
@@ -57,7 +60,7 @@ fun ColorRolesContent(
         }
     }
 
-    Column(modifier) {
+    Column(modifier.height(560.dp).fillMaxWidth()) {
         Box(
             contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)
         ) {
@@ -69,143 +72,145 @@ fun ColorRolesContent(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
         BoxWithConstraints {
-            val maxSize = DpSize(maxWidth, maxHeight)
+            val maxWidth = this.maxWidth - 32.dp
+            val maxHeight = this.maxHeight
 
             Row(Modifier.horizontalScroll(notPagerScrollState)) {
-                Box(Modifier.size(maxSize)) {
-                    Column(
-                        Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            SolarSet.Sun,
-                            contentDescription = "Light theme colorValue roles",
-                            Modifier
-                                .size(32.dp)
+                Spacer(Modifier.width(16.dp))
+
+                Column(
+                    Modifier.size(maxWidth, maxHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        SolarSet.Sun,
+                        contentDescription = "Light theme colorValue roles",
+                        Modifier
+                            .size(32.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(verticalArrangement = spacedBy(8.dp)) {
+                        ItemRow(
+                            items = ColorRoleItems.firstRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        ItemRow(
+                            items = ColorRoleItems.secondRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                        Column(verticalArrangement = spacedBy(8.dp)) {
-                            ItemRow(
-                                items = ColorRoleItems.firstRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = ColorRoleItems.thirdRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.secondRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = ColorRoleItems.fourthRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.thirdRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        Box(Modifier.height(136.dp)) // space for shared tokens
 
-                            ItemRow(
-                                items = ColorRoleItems.fourthRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            Modifier.height(64.dp),
+                            items = ColorRoleItems.fifthRowLightItems,
+                            additionalItems = ColorRoleItems.fifthRowLightItemsInverse,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            Box(Modifier.height(136.dp)) // space for shared tokens
+                        ItemRow(
+                            items = ColorRoleItems.sixthRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                Modifier.height(64.dp),
-                                items = ColorRoleItems.fifthRowLightItems,
-                                additionalItems = ColorRoleItems.fifthRowLightItemsInverse,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.sixthRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.seventhRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-                        }
+                        ItemRow(
+                            items = ColorRoleItems.seventhRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Box(Modifier.size(maxSize)) {
-                    Column(
-                        Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            SolarSet.Moon,
-                            contentDescription = "Dark theme colorValue roles",
-                            Modifier
-                                .size(32.dp)
+                Column(
+                    Modifier.size(maxWidth, maxHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        SolarSet.Moon,
+                        contentDescription = "Dark theme colorValue roles",
+                        Modifier
+                            .size(32.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(verticalArrangement = spacedBy(8.dp)) {
+                        ItemRow(
+                            items = ColorRoleItems.firstRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        ItemRow(
+                            items = ColorRoleItems.secondRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                        Column(verticalArrangement = spacedBy(8.dp)) {
-                            ItemRow(
-                                items = ColorRoleItems.firstRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = ColorRoleItems.thirdRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.secondRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = ColorRoleItems.fourthRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.thirdRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        Box(Modifier.height(136.dp)) // space for shared tokens
 
-                            ItemRow(
-                                items = ColorRoleItems.fourthRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            Modifier.height(64.dp),
+                            items = ColorRoleItems.fifthRowDarkItems,
+                            additionalItems = ColorRoleItems.fifthRowDarkItemsInverse,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            Box(Modifier.height(136.dp)) // space for shared tokens
+                        ItemRow(
+                            items = ColorRoleItems.sixthRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                Modifier.height(64.dp),
-                                items = ColorRoleItems.fifthRowDarkItems,
-                                additionalItems = ColorRoleItems.fifthRowDarkItemsInverse,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.sixthRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.seventhRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-                        }
+                        ItemRow(
+                            items = ColorRoleItems.seventhRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
                     }
                 }
+
+                Spacer(Modifier.width(16.dp))
             }
 
             Column(
-                Modifier.padding(top = 240.dp),
+                Modifier.padding(top = 240.dp).padding(horizontal = 16.dp),
                 verticalArrangement = spacedBy(8.dp)
             ) {
                 ItemRow(
@@ -230,7 +235,6 @@ fun ColorRolesContent(
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @NonRestartableComposable
 @Composable
 fun ColorRoleItem(

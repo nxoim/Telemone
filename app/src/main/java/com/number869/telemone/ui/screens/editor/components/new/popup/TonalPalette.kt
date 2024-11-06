@@ -19,27 +19,31 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
-import com.number869.telemone.shared.utils.sharedElement
+import com.number869.telemone.shared.utils.CombinedSharedTransitionScope
 import com.number869.telemone.ui.theme.ToneInfo
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun TonalPalette(
+fun CombinedSharedTransitionScope.TonalPalette(
+    modifier: Modifier = Modifier,
     tones: List<ToneInfo>,
     changeValue: (String, String, Color) -> Unit,
     touchActionEnabled: Boolean,
     uiElementName: String
 ) {
-    Column {
+    Column(modifier) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             remember { tones.subList(1, 6) }.fastForEachIndexed { index, toneInfo ->
                 TonalPaletteItem(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .sharedElement(
+                            rememberSharedContentState("shared$toneInfo"),
+                            zIndexInOverlay = index.toFloat()
+                        )
+                        .weight(1f),
                     toneInfo = toneInfo,
                     uiElementName = uiElementName,
                     changeValue = changeValue,
-                    visible = true,
-                    zIndex = index.toFloat(),
                     enabled = touchActionEnabled
                 )
             }
@@ -50,12 +54,15 @@ fun TonalPalette(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             remember { tones.subList(6, tones.lastIndex) }.fastForEachIndexed { index, toneInfo ->
                 TonalPaletteItem(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .sharedElement(
+                            rememberSharedContentState("shared$toneInfo"),
+                            zIndexInOverlay = if (index == 1) 6f else 0f
+                        )
+                        .weight(1f),
                     toneInfo = toneInfo,
                     uiElementName = uiElementName,
                     changeValue = changeValue,
-                    visible = true,
-                    zIndex = if (index == 1) 6f else 0f,
                     enabled = touchActionEnabled
                 )
             }
@@ -70,8 +77,6 @@ fun TonalPaletteItem(
     toneInfo: ToneInfo,
     uiElementName: String,
     changeValue: (String, String, Color) -> Unit,
-    visible: Boolean,
-    zIndex: Float,
     enabled: Boolean
 ) {
     val size = if (!enabled)
@@ -81,11 +86,6 @@ fun TonalPaletteItem(
 
     Box(
         modifier
-            .sharedElement(
-                "shared$toneInfo",
-                visible,
-                zIndexInOverlay = zIndex
-            )
             .width(size.width.dp)
             .height(size.height.dp)
             .clip(CircleShape)

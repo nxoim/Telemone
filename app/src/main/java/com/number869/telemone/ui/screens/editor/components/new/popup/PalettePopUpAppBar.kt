@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +37,7 @@ fun PalettePopupAppBar(
 	isOnHomePage: Boolean,
 	isPopupVisible: Boolean,
 	currentUiElement: String,
-	currentColor: Color,
+	currentColor: State<Color>,
 	currentColorName: String,
 	openHome: () -> Unit,
 	hidePopup: () -> Unit,
@@ -61,7 +62,7 @@ fun PalettePopupAppBar(
 			Box(
 				Modifier
 					.clip(CircleShape)
-					.background(currentColor)
+					.background(currentColor.value)
 					.width(24.dp)
 					.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
 					.height(16.dp)
