@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -35,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
-import com.number869.telemone.ui.theme.ColorRolesLight
+import com.number869.telemone.ui.theme.ColorRoles
 import com.number869.telemone.ui.theme.DataAboutColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,42 +46,16 @@ import kotlinx.coroutines.launch
 fun ColorRolesCategoryButton(
     modifier: Modifier,
     expand: () -> Unit,
-    isOnHomePage: Boolean,
-    enabled: Boolean,
     label: String,
+    colorRolesLight: ColorRoles,
     changeValue: (String, String, Color) -> Unit,
-    listOfColors: List<DataAboutColors>,
     key: String
 ) {
-    val scope = rememberCoroutineScope()
-    val visibilityAlpha by animateFloatAsState(if (isOnHomePage) 1f else 0f)
-
-    var previewMode by rememberSaveable { mutableStateOf(true) }
-
-    LaunchedEffect(enabled) {
-        if (!enabled) {
-            delay(2000)
-            previewMode = false
-        }
-    }
-
     Row(
         modifier
-            .graphicsLayer { alpha = visibilityAlpha }
             .fillMaxSize()
             .clip(RoundedCornerShape(16.dp))
-            .let {
-                return@let if (isOnHomePage)
-                    it.clickable {
-                        scope.launch {
-                            previewMode = false
-                            delay(16)
-                            expand()
-                        }
-                    }
-                else
-                    it
-            }
+            .clickable(onClick = expand)
             .border(
                 1.dp,
                 MaterialTheme.colorScheme.outlineVariant,
@@ -89,30 +64,31 @@ fun ColorRolesCategoryButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Box(Modifier.width(72.dp).height(32.dp)) {
-            listOfColors.fastForEach {
-                val allowInPreview = when (it) {
-                    ColorRolesLight.PrimaryContainer.dataAboutColors,
-                    ColorRolesLight.SecondaryContainer.dataAboutColors,
-                    ColorRolesLight.TertiaryContainer.dataAboutColors -> true
-                    else -> false
-                }
+        Box(
+            Modifier
+                .width(72.dp)
+                .height(32.dp)
+        ) {
+            remember {
+                setOf(
+                    colorRolesLight.primaryContainer,
+                    colorRolesLight.secondaryContainer,
+                    colorRolesLight.tertiaryContainer,
+                )
+            }.forEach {
                 val zIndex = when (it) {
-                    ColorRolesLight.PrimaryContainer.dataAboutColors -> 1f
-                    ColorRolesLight.SecondaryContainer.dataAboutColors -> 2f
-                    ColorRolesLight.TertiaryContainer.dataAboutColors -> 3f
+                    colorRolesLight.primaryContainer -> 1f
+                    colorRolesLight.secondaryContainer -> 2f
+                    colorRolesLight.tertiaryContainer -> 3f
                     else -> 0f
                 }
-                val startPadding = if(zIndex in 1f..3f)
+                val startPadding = if (zIndex in 1f..3f)
                     ((zIndex.coerceAtLeast(1f) - 1) * 8).dp
                 else
                     16.dp
 
-                if (allowInPreview || !previewMode) ColorRoleItem(
+                ColorRoleItem(
                     Modifier
-                        .graphicsLayer {
-                            alpha = if (!isOnHomePage && enabled) visibilityAlpha else 1f
-                        }
                         .padding(start = startPadding)
                         .zIndex(zIndex),
                     dataAboutColors = it,

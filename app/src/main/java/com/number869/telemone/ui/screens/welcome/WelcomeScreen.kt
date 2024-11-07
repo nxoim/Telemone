@@ -26,11 +26,10 @@ import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.LargeTonalButton
 import com.number869.telemone.ui.RootDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
 fun WelcomeScreen(
-	navController: NavController<RootDestinations> = getExistingNavController()
+	navController: NavController<RootDestinations>
 ) {
 	val privacyPolicyText = stringResource(R.string.privacy_policy_text)
 	val tosText = stringResource(R.string.tos_text)

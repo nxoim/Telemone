@@ -55,159 +55,43 @@ import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.showToast
-import com.number869.telemone.ui.screens.editor.EditorDestinations
-import com.nxoim.decomposite.core.common.navigation.NavController
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
-import com.nxoim.decomposite.core.common.ultils.ContentType
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SavedThemeItem(
 	modifier: Modifier,
-	themeData: ThemeData,
-	selected: Boolean = false,
-	isInSavedThemesRow: Boolean = false,
-	changeSelectionMode: () -> Unit = { },
-	loadSavedTheme: (ThemeStorageType) -> Unit,
-	selectOrUnselectSavedTheme: () -> Unit,
-	exportTheme: (ThemeColorDataType) -> Unit,
 	colorOf: @Composable (String) -> Color,
-	themeSelectionModeIsActive: Boolean = false,
-	navController: NavController<EditorDestinations> = getExistingNavController()
+	overlay: (@Composable () -> Unit)? = null
 ) {
-	var showMenu by remember { mutableStateOf(false) }
-
-	val selectedOverlayColor by animateColorAsState(
-		if (themeSelectionModeIsActive && selected)
-			MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-		else
-			Color.Transparent,
-		label = ""
-	)
-
 	Box {
 		OutlinedCard(
-			modifier
+			Modifier
 				.clip(RoundedCornerShape(16.dp))
+				.then(modifier)
 				.width(150.dp)
-				.height(180.dp)
-				.let {
-					return@let if (isInSavedThemesRow && !themeSelectionModeIsActive)
-						it.combinedClickable(
-							onClick = {
-								loadSavedTheme(
-									ThemeStorageType.ByUuid(
-										themeData.uuid,
-										withTokens = false,
-										clearCurrentTheme = true
-									)
-								)
-
-								showToast("Theme loaded")
-							},
-							onLongClick = { showMenu = true }
-						)
-					else if (themeSelectionModeIsActive)
-						it.clickable { selectOrUnselectSavedTheme() }
-					else
-						it
-				}
-				.drawWithContent {
-					drawContent()
-					drawRect(selectedOverlayColor)
-				},
+				.height(180.dp),
 			shape = RoundedCornerShape(16.dp)
 		) {
-			ChatTopAppBar(
-				colorOf("actionBarDefault"),
-				colorOf("actionBarDefaultIcon"),
-				colorOf("avatar_backgroundOrange"),
-				colorOf("avatar_text"),
-				colorOf("actionBarDefaultTitle"),
-				colorOf("actionBarDefaultSubtitle")
-			)
-			Messages(Modifier.weight(1f), colorOf("windowBackgroundWhite"))
-			ChatBottomAppBar(
-				colorOf("chat_messagePanelBackground"),
-				colorOf("chat_messagePanelIcons"),
-				colorOf("chat_messagePanelHint")
-			)
-		}
+			Box {
+				Column {
+					ChatTopAppBar(
+						colorOf("actionBarDefault"),
+						colorOf("actionBarDefaultIcon"),
+						colorOf("avatar_backgroundOrange"),
+						colorOf("avatar_text"),
+						colorOf("actionBarDefaultTitle"),
+						colorOf("actionBarDefaultSubtitle")
+					)
+					Messages(Modifier.weight(1f), colorOf("windowBackgroundWhite"))
+					ChatBottomAppBar(
+						colorOf("chat_messagePanelBackground"),
+						colorOf("chat_messagePanelIcons"),
+						colorOf("chat_messagePanelHint")
+					)
+				}
 
-		AnimatedVisibility(
-			visible = themeSelectionModeIsActive,
-			enter = scaleIn(),
-			exit = scaleOut()
-		) {
-			Checkbox(
-				checked = selected,
-				onCheckedChange = { selectOrUnselectSavedTheme() },
-				colors = CheckboxDefaults.colors(
-					uncheckedColor = Color.Transparent
-				),
-				modifier = Modifier
-					.padding(8.dp)
-					.clip(CircleShape)
-					.border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
-					.size(24.dp)
-			)
-		}
-
-		DropdownMenu(
-			expanded = showMenu,
-			onDismissRequest = { showMenu = false }
-		) {
-			DropdownMenuItem(
-				text = { Text("Load theme with options") },
-				onClick = {
-					navController.navigate(
-						EditorDestinations.Dialogs.LoadThemeWithOptions(themeData.uuid),
-						ContentType.Overlay
-					)
-				}
-			)
-			DropdownMenuItem(
-				text = { Text("Export this theme")},
-				onClick = {
-					showMenu = false
-					exportTheme(ThemeColorDataType.ColorValues)
-				}
-			)
-			DropdownMenuItem(
-				text = { Text("Export this theme in Telemone format")},
-				onClick = {
-					showMenu = false
-					exportTheme(ThemeColorDataType.ColorTokens)
-				}
-			)
-			DropdownMenuItem(
-				text = { Text("Overwrite a default theme")},
-				onClick = {
-					showMenu = false
-					navController.navigate(
-						EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(themeData),
-						ContentType.Overlay
-					)
-				}
-			)
-			DropdownMenuItem(
-				text = { Text("Delete theme") },
-				onClick = {
-					showMenu = false
-					navController.navigate(
-						EditorDestinations.Dialogs.DeleteOneTheme(themeData),
-						ContentType.Overlay
-					)
-				}
-			)
-			DropdownMenuItem(
-				text = { Text("Select") },
-				onClick = {
-					showMenu = false
-					changeSelectionMode()
-					selectOrUnselectSavedTheme()
-				}
-			)
+				overlay?.invoke()
+			}
 		}
 	}
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.number869.telemone.shared.utils.inject
-import com.tencent.mmkv.MMKV
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
@@ -198,49 +197,5 @@ data class NullableSetting<T : Any>(
     fun asState() = getAsStateFlow().collectAsState()
 }
 
-fun InstanceDeclaratorScope.settingsManagerInitializer(context: Context) {
-    single { SettingsManager() } // init before migration
+fun settingsManagerInitializer() = SettingsManager()
 
-    val preferences = context.getSharedPreferences(
-        "AppPreferences.Settings",
-        Context.MODE_PRIVATE
-    )
-
-    val mmkv by lazy { MMKV.mmkvWithID("storageForStockThemeComparison") }
-
-    if (preferences.all.isNotEmpty()) {
-        val agreedToConditions = preferences.getBoolean(
-            "userAgreedToV1OnWelcomeScreen",
-            false
-        )
-        val savedThemeDisplayType = preferences.getString(
-            "savedThemeItemDisplayType",
-            "1"
-        )?.toInt()
-
-        AppSettings.agreedToConditions.setBlocking(agreedToConditions)
-        AppSettings.savedThemeDisplayType.setBlocking(savedThemeDisplayType ?: 1)
-
-        preferences.edit().clear().apply()
-    }
-
-    if (mmkv.allKeys()?.isNotEmpty() == true) {
-        AppSettings.lastDeclinedStockThemeHashLight.setBlocking(
-            "well the theme definetely changed"
-        )
-
-        AppSettings.lastDeclinedStockThemeHashDark.setBlocking(
-            "well the theme definetely changed"
-        )
-
-        AppSettings.lastAcceptedStockThemeHashLight.setBlocking(
-            ""
-        )
-
-        AppSettings.lastAcceptedStockThemeHashDark.setBlocking(
-            ""
-        )
-
-        mmkv.clear()
-    }
-}

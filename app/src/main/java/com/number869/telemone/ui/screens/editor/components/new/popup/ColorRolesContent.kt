@@ -1,6 +1,5 @@
 package com.number869.telemone.ui.screens.editor.components.new.popup
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,11 +33,9 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
-import com.number869.telemone.ui.theme.ColorRolesDark
-import com.number869.telemone.ui.theme.ColorRolesLight
+import com.number869.telemone.ui.theme.ColorRoles
 import com.number869.telemone.ui.theme.ColorRolesShared
 import com.number869.telemone.ui.theme.DataAboutColors
 import com.number869.telemone.ui.theme.SolarSet
@@ -46,9 +43,16 @@ import com.number869.telemone.ui.theme.SolarSet
 @Composable
 fun ColorRolesContent(
     modifier: Modifier = Modifier,
+    colorRolesLight: ColorRoles,
+    colorRolesDark: ColorRoles,
+    colorRolesShared: ColorRolesShared,
     changeValue: (String, String, Color) -> Unit,
     uiElementName: String,
 ) {
+    val colorRoleItems = remember {
+        ColorRoleItems(colorRolesDark, colorRolesLight, colorRolesShared)
+    }
+
     val notPagerScrollState = rememberScrollState()
 
     val indicatorHorizontalAlignment by remember {
@@ -57,7 +61,7 @@ fun ColorRolesContent(
         }
     }
 
-    Column(modifier) {
+    Column(modifier.height(560.dp).fillMaxWidth()) {
         Box(
             contentAlignment = BiasAlignment(indicatorHorizontalAlignment, 0f)
         ) {
@@ -69,159 +73,161 @@ fun ColorRolesContent(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
         BoxWithConstraints {
-            val maxSize = DpSize(maxWidth, maxHeight)
+            val maxWidth = this.maxWidth - 32.dp
+            val maxHeight = this.maxHeight
 
             Row(Modifier.horizontalScroll(notPagerScrollState)) {
-                Box(Modifier.size(maxSize)) {
-                    Column(
-                        Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            SolarSet.Sun,
-                            contentDescription = "Light theme colorValue roles",
-                            Modifier
-                                .size(32.dp)
+                Spacer(Modifier.width(16.dp))
+
+                Column(
+                    Modifier.size(maxWidth, maxHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        SolarSet.Sun,
+                        contentDescription = "Light theme colorValue roles",
+                        Modifier
+                            .size(32.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(verticalArrangement = spacedBy(8.dp)) {
+                        ItemRow(
+                            items = colorRoleItems.firstRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        ItemRow(
+                            items = colorRoleItems.secondRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                        Column(verticalArrangement = spacedBy(8.dp)) {
-                            ItemRow(
-                                items = ColorRoleItems.firstRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = colorRoleItems.thirdRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.secondRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = colorRoleItems.fourthRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.thirdRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        Box(Modifier.height(136.dp)) // space for shared tokens
 
-                            ItemRow(
-                                items = ColorRoleItems.fourthRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            Modifier.height(64.dp),
+                            items = colorRoleItems.fifthRowLightItems,
+                            additionalItems = colorRoleItems.fifthRowLightItemsInverse,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            Box(Modifier.height(136.dp)) // space for shared tokens
+                        ItemRow(
+                            items = colorRoleItems.sixthRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                Modifier.height(64.dp),
-                                items = ColorRoleItems.fifthRowLightItems,
-                                additionalItems = ColorRoleItems.fifthRowLightItemsInverse,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.sixthRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.seventhRowLightItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-                        }
+                        ItemRow(
+                            items = colorRoleItems.seventhRowLightItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Box(Modifier.size(maxSize)) {
-                    Column(
-                        Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            SolarSet.Moon,
-                            contentDescription = "Dark theme colorValue roles",
-                            Modifier
-                                .size(32.dp)
+                Column(
+                    Modifier.size(maxWidth, maxHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        SolarSet.Moon,
+                        contentDescription = "Dark theme colorValue roles",
+                        Modifier
+                            .size(32.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(verticalArrangement = spacedBy(8.dp)) {
+                        ItemRow(
+                            items = colorRoleItems.firstRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        ItemRow(
+                            items = colorRoleItems.secondRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                        Column(verticalArrangement = spacedBy(8.dp)) {
-                            ItemRow(
-                                items = ColorRoleItems.firstRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = colorRoleItems.thirdRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.secondRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            items = colorRoleItems.fourthRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                items = ColorRoleItems.thirdRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        Box(Modifier.height(136.dp)) // space for shared tokens
 
-                            ItemRow(
-                                items = ColorRoleItems.fourthRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
+                        ItemRow(
+                            Modifier.height(64.dp),
+                            items = colorRoleItems.fifthRowDarkItems,
+                            additionalItems = colorRoleItems.fifthRowDarkItemsInverse,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            Box(Modifier.height(136.dp)) // space for shared tokens
+                        ItemRow(
+                            items = colorRoleItems.sixthRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
 
-                            ItemRow(
-                                Modifier.height(64.dp),
-                                items = ColorRoleItems.fifthRowDarkItems,
-                                additionalItems = ColorRoleItems.fifthRowDarkItemsInverse,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.sixthRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-
-                            ItemRow(
-                                items = ColorRoleItems.seventhRowDarkItems,
-                                uiElementName = uiElementName,
-                                changeValue = changeValue
-                            )
-                        }
+                        ItemRow(
+                            items = colorRoleItems.seventhRowDarkItems,
+                            uiElementName = uiElementName,
+                            changeValue = changeValue
+                        )
                     }
                 }
+
+                Spacer(Modifier.width(16.dp))
             }
 
             Column(
-                Modifier.padding(top = 240.dp),
+                Modifier.padding(top = 240.dp).padding(horizontal = 16.dp),
                 verticalArrangement = spacedBy(8.dp)
             ) {
                 ItemRow(
-                    items = ColorRoleItems.firstSharedRowItems,
+                    items = colorRoleItems.firstSharedRowItems,
                     uiElementName = uiElementName,
                     changeValue = changeValue
                 )
 
                 ItemRow(
-                    items = ColorRoleItems.secondSharedRowItems,
+                    items = colorRoleItems.secondSharedRowItems,
                     uiElementName = uiElementName,
                     changeValue = changeValue
                 )
 
                 ItemRow(
-                    items = ColorRoleItems.thirdSharedRowItems,
+                    items = colorRoleItems.thirdSharedRowItems,
                     uiElementName = uiElementName,
                     changeValue = changeValue
                 )
@@ -230,7 +236,6 @@ fun ColorRolesContent(
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @NonRestartableComposable
 @Composable
 fun ColorRoleItem(
@@ -241,7 +246,7 @@ fun ColorRoleItem(
     enabled: Boolean,
 ) {
     val colorToken = dataAboutColors.colorToken
-    val colorValue = dataAboutColors.colorValue()
+    val colorValue = dataAboutColors.colorValue
 
     Box(
         modifier
@@ -302,139 +307,143 @@ private fun ItemRow(
     }
 }
 
-private object ColorRoleItems {
+private class ColorRoleItems(
+    private val colorRolesDark: ColorRoles,
+    private val colorRolesLight: ColorRoles,
+    private val colorRolesShared: ColorRolesShared
+) {
     val firstSharedRowItems = listOf(
-        ColorRolesShared.PrimaryFixed.dataAboutColors,
-        ColorRolesShared.PrimaryFixedDim.dataAboutColors,
-        ColorRolesShared.SecondaryFixed.dataAboutColors,
-        ColorRolesShared.SecondaryFixedDim.dataAboutColors,
-        ColorRolesShared.TertiaryFixed.dataAboutColors,
-        ColorRolesShared.TertiaryFixedDim.dataAboutColors
+        colorRolesShared.primaryFixed,
+        colorRolesShared.primaryFixedDim,
+        colorRolesShared.secondaryFixed,
+        colorRolesShared.secondaryFixedDim,
+        colorRolesShared.tertiaryFixed,
+        colorRolesShared.tertiaryFixedDim
     )
 
     val secondSharedRowItems = listOf(
-        ColorRolesShared.OnPrimaryFixed.dataAboutColors,
-        ColorRolesShared.OnSecondaryFixed.dataAboutColors,
-        ColorRolesShared.OnTertiaryFixed.dataAboutColors
+        colorRolesShared.onPrimaryFixed,
+        colorRolesShared.onSecondaryFixed,
+        colorRolesShared.onTertiaryFixed
     )
 
     val thirdSharedRowItems = listOf(
-        ColorRolesShared.OnPrimaryFixedVariant.dataAboutColors,
-        ColorRolesShared.OnSecondaryFixedVariant.dataAboutColors,
-        ColorRolesShared.OnTertiaryFixedVariant.dataAboutColors
+        colorRolesShared.onPrimaryFixedVariant,
+        colorRolesShared.onSecondaryFixedVariant,
+        colorRolesShared.onTertiaryFixedVariant
     )
 
     val firstRowLightItems = listOf(
-        ColorRolesLight.Primary.dataAboutColors,
-        ColorRolesLight.Secondary.dataAboutColors,
-        ColorRolesLight.Tertiary.dataAboutColors,
-        ColorRolesLight.Error.dataAboutColors
+        colorRolesLight.primary,
+        colorRolesLight.secondary,
+        colorRolesLight.tertiary,
+        colorRolesLight.error
     )
 
     val secondRowLightItems = listOf(
-        ColorRolesLight.OnPrimary.dataAboutColors,
-        ColorRolesLight.OnSecondary.dataAboutColors,
-        ColorRolesLight.OnTertiary.dataAboutColors,
-        ColorRolesLight.OnError.dataAboutColors
+        colorRolesLight.onPrimary,
+        colorRolesLight.onSecondary,
+        colorRolesLight.onTertiary,
+        colorRolesLight.onError
     )
 
     val thirdRowLightItems = listOf(
-        ColorRolesLight.PrimaryContainer.dataAboutColors,
-        ColorRolesLight.SecondaryContainer.dataAboutColors,
-        ColorRolesLight.TertiaryContainer.dataAboutColors,
-        ColorRolesLight.ErrorContainer.dataAboutColors
+        colorRolesLight.primaryContainer,
+        colorRolesLight.secondaryContainer,
+        colorRolesLight.tertiaryContainer,
+        colorRolesLight.errorContainer
     )
 
     val fourthRowLightItems = listOf(
-        ColorRolesLight.OnPrimaryContainer.dataAboutColors,
-        ColorRolesLight.OnSecondaryContainer.dataAboutColors,
-        ColorRolesLight.OnTertiaryContainer.dataAboutColors,
-        ColorRolesLight.OnErrorContainer.dataAboutColors
+        colorRolesLight.onPrimaryContainer,
+        colorRolesLight.onSecondaryContainer,
+        colorRolesLight.onTertiaryContainer,
+        colorRolesLight.onErrorContainer
     )
 
     val fifthRowLightItems = listOf(
-        ColorRolesLight.SurfaceDim.dataAboutColors,
-        ColorRolesLight.Surface.dataAboutColors,
-        ColorRolesLight.SurfaceBright.dataAboutColors,
+        colorRolesLight.surfaceDim,
+        colorRolesLight.surface,
+        colorRolesLight.surfaceBright,
     )
 
     val fifthRowLightItemsInverse = listOf(
-        ColorRolesLight.InverseSurface.dataAboutColors,
-        ColorRolesLight.InverseOnSurface.dataAboutColors
+        colorRolesLight.inverseSurface,
+        colorRolesLight.inverseOnSurface
     )
 
     val sixthRowLightItems = listOf(
-        ColorRolesLight.SurfaceContainerLowest.dataAboutColors,
-        ColorRolesLight.SurfaceContainerLow.dataAboutColors,
-        ColorRolesLight.SurfaceContainer.dataAboutColors,
-        ColorRolesLight.SurfaceContainerHigh.dataAboutColors,
-        ColorRolesLight.SurfaceContainerHighest.dataAboutColors,
-        ColorRolesLight.InversePrimary.dataAboutColors
+        colorRolesLight.surfaceContainerLowest,
+        colorRolesLight.surfaceContainerLow,
+        colorRolesLight.surfaceContainer,
+        colorRolesLight.surfaceContainerHigh,
+        colorRolesLight.surfaceContainerHighest,
+        colorRolesLight.inversePrimary
     )
 
     val seventhRowLightItems = listOf(
-        ColorRolesLight.OnSurface.dataAboutColors,
-        ColorRolesLight.OnSurfaceVariant.dataAboutColors,
-        ColorRolesLight.Outline.dataAboutColors,
-        ColorRolesLight.OutlineVariant.dataAboutColors,
-        ColorRolesLight.Scrim.dataAboutColors,
-        ColorRolesLight.Shadow.dataAboutColors
+        colorRolesLight.onSurface,
+        colorRolesLight.onSurfaceVariant,
+        colorRolesLight.outline,
+        colorRolesLight.outlineVariant,
+        colorRolesLight.scrim,
+        colorRolesLight.shadow
     )
 
     val firstRowDarkItems = listOf(
-        ColorRolesDark.Primary.dataAboutColors,
-        ColorRolesDark.Secondary.dataAboutColors,
-        ColorRolesDark.Tertiary.dataAboutColors,
-        ColorRolesDark.Error.dataAboutColors
+        colorRolesDark.primary,
+        colorRolesDark.secondary,
+        colorRolesDark.tertiary,
+        colorRolesDark.error
     )
 
     val secondRowDarkItems = listOf(
-        ColorRolesDark.OnPrimary.dataAboutColors,
-        ColorRolesDark.OnSecondary.dataAboutColors,
-        ColorRolesDark.OnTertiary.dataAboutColors,
-        ColorRolesDark.OnError.dataAboutColors
+        colorRolesDark.onPrimary,
+        colorRolesDark.onSecondary,
+        colorRolesDark.onTertiary,
+        colorRolesDark.onError
     )
 
     val thirdRowDarkItems = listOf(
-        ColorRolesDark.PrimaryContainer.dataAboutColors,
-        ColorRolesDark.SecondaryContainer.dataAboutColors,
-        ColorRolesDark.TertiaryContainer.dataAboutColors,
-        ColorRolesDark.ErrorContainer.dataAboutColors
+        colorRolesDark.primaryContainer,
+        colorRolesDark.secondaryContainer,
+        colorRolesDark.tertiaryContainer,
+        colorRolesDark.errorContainer
     )
 
     val fourthRowDarkItems = listOf(
-        ColorRolesDark.OnPrimaryContainer.dataAboutColors,
-        ColorRolesDark.OnSecondaryContainer.dataAboutColors,
-        ColorRolesDark.OnTertiaryContainer.dataAboutColors,
-        ColorRolesDark.OnErrorContainer.dataAboutColors
+        colorRolesDark.onPrimaryContainer,
+        colorRolesDark.onSecondaryContainer,
+        colorRolesDark.onTertiaryContainer,
+        colorRolesDark.onErrorContainer
     )
 
     val fifthRowDarkItems = listOf(
-        ColorRolesDark.SurfaceDim.dataAboutColors,
-        ColorRolesDark.Surface.dataAboutColors,
-        ColorRolesDark.SurfaceBright.dataAboutColors,
+        colorRolesDark.surfaceDim,
+        colorRolesDark.surface,
+        colorRolesDark.surfaceBright,
     )
 
     val fifthRowDarkItemsInverse = listOf(
-        ColorRolesDark.InverseSurface.dataAboutColors,
-        ColorRolesDark.InverseOnSurface.dataAboutColors
+        colorRolesDark.inverseSurface,
+        colorRolesDark.inverseOnSurface
     )
 
     val sixthRowDarkItems = listOf(
-        ColorRolesDark.SurfaceContainerLowest.dataAboutColors,
-        ColorRolesDark.SurfaceContainerLow.dataAboutColors,
-        ColorRolesDark.SurfaceContainer.dataAboutColors,
-        ColorRolesDark.SurfaceContainerHigh.dataAboutColors,
-        ColorRolesDark.SurfaceContainerHighest.dataAboutColors,
-        ColorRolesDark.InversePrimary.dataAboutColors
+        colorRolesDark.surfaceContainerLowest,
+        colorRolesDark.surfaceContainerLow,
+        colorRolesDark.surfaceContainer,
+        colorRolesDark.surfaceContainerHigh,
+        colorRolesDark.surfaceContainerHighest,
+        colorRolesDark.inversePrimary
     )
 
     val seventhRowDarkItems = listOf(
-        ColorRolesDark.OnSurface.dataAboutColors,
-        ColorRolesDark.OnSurfaceVariant.dataAboutColors,
-        ColorRolesDark.Outline.dataAboutColors,
-        ColorRolesDark.OutlineVariant.dataAboutColors,
-        ColorRolesDark.Scrim.dataAboutColors,
-        ColorRolesDark.Shadow.dataAboutColors
+        colorRolesDark.onSurface,
+        colorRolesDark.onSurfaceVariant,
+        colorRolesDark.outline,
+        colorRolesDark.outlineVariant,
+        colorRolesDark.scrim,
+        colorRolesDark.shadow
     )
 }

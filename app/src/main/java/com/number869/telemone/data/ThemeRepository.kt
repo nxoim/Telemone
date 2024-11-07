@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.number869.telemone.shared.utils.getColorValueFromColorToken
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -21,15 +19,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.mongodb.kbson.ObjectId
-
-private typealias ThemeUUID = String
-private typealias UiElementName = String
-private typealias ColorToken = String
-private typealias ColorValue = Int
-private typealias DataAboutColors = Pair<ColorToken, ColorValue>
-private typealias UiElementData = Map<UiElementName, DataAboutColors>
-private typealias Theme = Map<ThemeUUID, UiElementData>
-private typealias ThemeList = SnapshotStateList<Theme>
 
 class ThemeRepository(
 	private val realm: Realm = Realm.open(
@@ -160,52 +149,9 @@ private fun getStockTheme(
 		themeData
 	)
 }
-fun themeRepositoryInitializer(context: Context): ThemeRepository {
-	val oldThemeListKey = "AppPreferences.ThemeList"
-	val preferences = context.getSharedPreferences(
-		"AppPreferences",
-		Context.MODE_PRIVATE
-	)
 
-	println("initializing repo")
-	val newRepo = ThemeRepository(context = context)
+fun themeRepositoryInitializer(context: Context) = ThemeRepository(context = context)
 
-	if (preferences.contains(oldThemeListKey)) {
-		println("preparing repo migration")
-		val oldSavedThemeList = preferences.getString(oldThemeListKey, "[]")
-		val oldType = object : TypeToken<ThemeList>() {}.type
-		val oldList = Gson().fromJson<ThemeList>(oldSavedThemeList, oldType)
-
-		val themes = oldList.map { map ->
-			map.mapValues { entry ->
-				entry.value.mapValues { (_, value) -> Pair(value.first, value.second) }
-			}
-		}.map { it.toNew() }
-
-		// reversed for sorting newest->oldest
-		themes.reversed().forEach { theme -> newRepo.saveThemeBlocking(theme) }
-
-		// delete the data in old repo after migration
-		preferences.edit().remove(oldThemeListKey).apply()
-
-		return newRepo
-	} else {
-		println("no migration needed")
-		return newRepo
-	}
-}
-
-private fun Theme.toNew(): ThemeData {
-	val themeData = this.values.first().map { (elementName, pair) ->
-		UiElementColorData(
-			name = elementName,
-			colorToken = pair.first,
-			colorValue = pair.second
-		)
-	}
-
-	return ThemeData(this.keys.first(), themeData)
-}
 
 @Serializable
 data class UiElementColorData(

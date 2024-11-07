@@ -3,19 +3,20 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.realm)
+    alias(libs.plugins.composeCompiler)
 }
 
-val version = "1.4.1"
-val versionNumber = 8
+val version = "1.4.2"
+val versionNumber = 9
 
 android {
     namespace = "com.number869.telemone"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.number869.telemone"
         minSdk = 31
-        targetSdk = 34
+        targetSdk = 35
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -28,7 +29,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -41,9 +43,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
     packagingOptions {
         resources {
@@ -72,17 +71,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    implementation(libs.accompanist.navigation.animation)
-    implementation(libs.accompanist.systemuicontroller)
-
-    implementation(libs.google.code.gson)
-
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.lazycolumnscrollbar)
-    implementation(libs.mmkv)
 
-    implementation(libs.decompose)
-    implementation(libs.decompose.extensions.compose)
     implementation(libs.decomposite)
 
     implementation(libs.realm.library.base)

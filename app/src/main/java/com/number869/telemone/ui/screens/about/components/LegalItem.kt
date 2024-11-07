@@ -14,21 +14,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.ui.screens.about.AboutDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
-import com.nxoim.decomposite.core.common.ultils.ContentType
 
 @Composable
 fun LegalItem(
-	navController: NavController<AboutDestinations> = getExistingNavController()
+	navController: NavController<AboutDestinations.Dialogs>
 ) {
 	AboutCard(label = "Legal") {
 		Column(
 			Modifier
 				.clickable {
-					navController.navigate(
-						AboutDestinations.Dialogs.PrivacyPolicyDialog,
-						ContentType.Overlay
-					)
+					navController.navigate(AboutDestinations.Dialogs.PrivacyPolicyDialog)
 				}
 				.fillMaxWidth()
 		) {
@@ -47,10 +42,7 @@ fun LegalItem(
 		Column(
 			Modifier
 				.clickable {
-					navController.navigate(
-						AboutDestinations.Dialogs.TosDialog,
-						ContentType.Overlay
-					)
+					navController.navigate(AboutDestinations.Dialogs.TosDialog)
 				}
 				.fillMaxWidth()
 		) {

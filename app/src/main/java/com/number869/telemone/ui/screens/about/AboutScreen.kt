@@ -30,12 +30,12 @@ import com.number869.telemone.ui.screens.about.components.SourceAndLinksItem
 import com.number869.telemone.ui.screens.about.components.SpecialMentionsItem
 import com.number869.telemone.ui.screens.about.components.VersionItem
 import com.nxoim.decomposite.core.common.navigation.NavController
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
-    navController: NavController<RootDestinations> = getExistingNavController()
+    rootNavController: NavController<RootDestinations>,
+    dialogsNavController: NavController<AboutDestinations.Dialogs>
 ) {
     val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -45,7 +45,7 @@ fun AboutScreen(
         { DevelopersItem() },
         { SourceAndLinksItem() },
         { SpecialMentionsItem() },
-        { LegalItem() }
+        { LegalItem(dialogsNavController) }
     )
 
     Scaffold(
@@ -53,7 +53,7 @@ fun AboutScreen(
             CenterAlignedTopAppBar(
                 title = { Text(text = "About Telemone") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateBack() }) {
+                    IconButton(onClick = { rootNavController.navigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back",

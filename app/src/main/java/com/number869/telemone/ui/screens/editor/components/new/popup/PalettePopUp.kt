@@ -1,17 +1,23 @@
 package com.number869.telemone.ui.screens.editor.components.new.popup
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,70 +37,40 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFilter
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.shared.utils.SharedTransitionScopeProvider
+import com.number869.telemone.shared.utils.CombineSharedTransitionAndAnimatedVisibility
 import com.number869.telemone.shared.utils.color
-import com.number869.telemone.shared.utils.customBoundaTransform
-import com.number869.telemone.ui.theme.ColorRolesLight
 import com.number869.telemone.ui.theme.ColorRolesShared
-import com.number869.telemone.ui.theme.blueTones
-import com.number869.telemone.ui.theme.cyanTones
-import com.number869.telemone.ui.theme.greenTones
-import com.number869.telemone.ui.theme.neutralTones
-import com.number869.telemone.ui.theme.neutralVariantTones
-import com.number869.telemone.ui.theme.orangeTones
-import com.number869.telemone.ui.theme.pinkTones
-import com.number869.telemone.ui.theme.primaryTones
-import com.number869.telemone.ui.theme.redTones
-import com.number869.telemone.ui.theme.secondaryTones
-import com.number869.telemone.ui.theme.tertiaryTones
-import com.number869.telemone.ui.theme.violetTones
+import com.number869.telemone.ui.theme.PaletteState
+import com.number869.telemone.ui.theme.ToneInfo
 
+// TODO more optimisations can be done but its fast enough
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PalettePopup(
+    paletteState: PaletteState,
     uiElementColorData: UiElementColorData,
     changeValue: (String, String, Color) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    var visible by remember { mutableStateOf(false) }
-    var currentContent by rememberSaveable { mutableStateOf(PaletteMenuCategories.Home) }
-    val isOnHomePage by remember { derivedStateOf { currentContent == PaletteMenuCategories.Home } }
-    val animatedPopupHeight by animateDpAsState(
-        when (currentContent) {
-            PaletteMenuCategories.Home -> 516.dp
-            PaletteMenuCategories.AdditionalColors -> 226.dp
-            PaletteMenuCategories.ColorRoles -> 655.dp
-            else -> 256.dp
-        },
-        animationSpec = spring(0.9f, 200f),
-        label = ""
-    )
-
-    val primaryTones = primaryTones
-    val secondaryTones = secondaryTones
-    val tertiaryTones = tertiaryTones
-    val neutralTones = neutralTones
-    val neutralVariantTones = neutralVariantTones
-    val blueTones = blueTones
-    val redTones = redTones
-    val greenTones = greenTones
-    val orangeTones = orangeTones
-    val violetTones = violetTones
-    val pinkTones = pinkTones
-    val cyanTones = cyanTones
+    var visible by rememberSaveable { mutableStateOf(false) }
+    var targetContent by rememberSaveable { mutableStateOf(PaletteMenuCategories.Home) }
+    val isOnHomePage = targetContent == PaletteMenuCategories.Home
 
     LaunchedEffect(Unit) { visible = true }
 
@@ -126,298 +102,291 @@ fun PalettePopup(
                     RoundedCornerShape(32.dp)
                 )
                 .background(MaterialTheme.colorScheme.background)
-                .height(animatedPopupHeight)
         ) {
-            SharedTransitionScopeProvider() {
-                Column {
-                    PalettePopupAppBar(
-                        isOnHomePage,
-                        visible,
-                        uiElementColorData.name,
-                        animateColorAsState(uiElementColorData.color).value,
-                        uiElementColorData.colorToken,
-                        hidePopup = { visible = false },
-                        openHome = { currentContent = PaletteMenuCategories.Home }
+            Column {
+                PalettePopupAppBar(
+                    isOnHomePage,
+                    visible,
+                    uiElementColorData.name,
+                    animateColorAsState(uiElementColorData.color),
+                    uiElementColorData.colorToken,
+                    hidePopup = { visible = false },
+                    openHome = { targetContent = PaletteMenuCategories.Home }
+                )
+
+                Box(
+                    Modifier.padding(
+                        top = 8.dp,
+                        bottom = 16.dp
                     )
+                ) {
+                    SharedTransitionLayout {
+                        AnimatedContent(
+                            targetContent,
+                            Modifier.animateContentSize(), // weird jumps without this modifier
+                            transitionSpec = {
+                                (fadeIn(softSpring) + scaleIn(softSpring, 0.85f)) togetherWith
+                                        (fadeOut(softSpring) + scaleOut(softSpring, 0.95f))
+                            },
+                            label = ""
+                        ) { currentContentType ->
+                            CombineSharedTransitionAndAnimatedVisibility(this) {
+                                when (currentContentType) {
+                                    PaletteMenuCategories.Home -> Column(
+                                        Modifier
+                                            .height(420.dp)
+                                            .padding(horizontal = 16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = spacedBy(8.dp)
+                                    ) {
+                                        Row(
+                                            Modifier.weight(1f, false),
+                                            horizontalArrangement = spacedBy(8.dp)
+                                        ) {
+                                            Row(
+                                                Modifier.weight(1f, false),
+                                                horizontalArrangement = spacedBy(8.dp)
+                                            ) {
+                                                TonalPaletteCategoryButton(
+                                                    Modifier.weight(1f),
+                                                    expand = {
+                                                        targetContent =
+                                                            PaletteMenuCategories.Primary
+                                                    },
+                                                    label = "Primary",
+                                                    listOfColors = paletteState.primaryTones
+                                                )
 
-                    Box(
-                        Modifier.padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            bottom = 16.dp
-                        )
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = spacedBy(8.dp)
-                        ) {
-                            Row(
-                                Modifier.weight(1f),
-                                horizontalArrangement = spacedBy(8.dp)
-                            ) {
-                                Row(
-                                    Modifier.weight(1f),
-                                    horizontalArrangement = spacedBy(8.dp)
-                                ) {
-                                    TonalPaletteCategoryButton(
-                                        Modifier.weight(1f),
-                                        expand = { currentContent = PaletteMenuCategories.Primary },
-                                        enabled = currentContent != PaletteMenuCategories.Primary,
-                                        label = "Primary",
-                                        isOnHomePage = isOnHomePage,
-                                        listOfColors = primaryTones
-                                    )
+                                                TonalPaletteCategoryButton(
+                                                    Modifier.weight(1f),
+                                                    expand = {
+                                                        targetContent =
+                                                            PaletteMenuCategories.Secondary
+                                                    },
+                                                    label = "Secondary",
+                                                    listOfColors = paletteState.secondaryTones
+                                                )
 
-                                    TonalPaletteCategoryButton(
-                                        Modifier.weight(1f),
-                                        expand = {
-                                            currentContent = PaletteMenuCategories.Secondary
-                                        },
-                                        enabled = currentContent != PaletteMenuCategories.Secondary,
-                                        label = "Secondary",
-                                        isOnHomePage = isOnHomePage,
-                                        listOfColors = secondaryTones
-                                    )
+                                                TonalPaletteCategoryButton(
+                                                    Modifier.weight(1f),
+                                                    expand = {
+                                                        targetContent =
+                                                            PaletteMenuCategories.Tertiary
+                                                    },
+                                                    label = "Tertiary",
+                                                    listOfColors = paletteState.tertiaryTones
+                                                )
+                                            }
+                                        }
 
-                                    TonalPaletteCategoryButton(
-                                        Modifier.weight(1f),
-                                        expand = {
-                                            currentContent = PaletteMenuCategories.Tertiary
-                                        },
-                                        enabled = currentContent != PaletteMenuCategories.Tertiary,
-                                        label = "Tertiary",
-                                        isOnHomePage = isOnHomePage,
-                                        listOfColors = tertiaryTones
-                                    )
-                                }
-                            }
+                                        Row(
+                                            Modifier.weight(1f, false),
+                                            horizontalArrangement = spacedBy(8.dp)
+                                        ) {
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Neutral
+                                                },
+                                                label = "Neutral",
+                                                listOfColors = paletteState.neutralTones
+                                            )
 
-                            Row(
-                                Modifier.weight(1f),
-                                horizontalArrangement = spacedBy(8.dp)
-                            ) {
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Neutral },
-                                    enabled = currentContent != PaletteMenuCategories.Neutral,
-                                    label = "Neutral",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = neutralTones
-                                )
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent =
+                                                        PaletteMenuCategories.NeutralVariant
+                                                },
+                                                label = "Neutral Variant",
+                                                listOfColors = paletteState.neutralVariantTones
+                                            )
+                                        }
 
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = {
-                                        currentContent = PaletteMenuCategories.NeutralVariant
-                                    },
-                                    enabled = currentContent != PaletteMenuCategories.NeutralVariant,
-                                    label = "Neutral Variant",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = neutralVariantTones
-                                )
-                            }
+                                        Row(
+                                            Modifier.weight(1f, false),
+                                            horizontalArrangement = spacedBy(8.dp)
+                                        ) {
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Red
+                                                },
+                                                label = "Red",
+                                                listOfColors = paletteState.redTones
+                                            )
 
-                            Row(
-                                Modifier.weight(1f),
-                                horizontalArrangement = spacedBy(8.dp)
-                            ) {
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Red },
-                                    enabled = currentContent != PaletteMenuCategories.Red,
-                                    label = "Red",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = redTones
-                                )
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Green
+                                                },
+                                                label = "Green",
+                                                listOfColors = paletteState.greenTones
+                                            )
 
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Green },
-                                    enabled = currentContent != PaletteMenuCategories.Green,
-                                    label = "Green",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = greenTones
-                                )
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Blue
+                                                },
+                                                label = "Blue",
+                                                listOfColors = paletteState.blueTones
+                                            )
+                                        }
 
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Blue },
-                                    enabled = currentContent != PaletteMenuCategories.Blue,
-                                    label = "Blue",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = blueTones
-                                )
-                            }
+                                        Row(
+                                            Modifier.weight(1f, false),
+                                            horizontalArrangement = spacedBy(8.dp)
+                                        ) {
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Orange
+                                                },
+                                                label = "Orange",
+                                                listOfColors = paletteState.orangeTones
+                                            )
 
-                            Row(
-                                Modifier.weight(1f),
-                                horizontalArrangement = spacedBy(8.dp)
-                            ) {
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Orange },
-                                    enabled = currentContent != PaletteMenuCategories.Orange,
-                                    label = "Orange",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = orangeTones
-                                )
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Violet
+                                                },
+                                                label = "Violet",
+                                                listOfColors = paletteState.violetTones
+                                            )
 
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Violet },
-                                    enabled = currentContent != PaletteMenuCategories.Violet,
-                                    label = "Violet",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = violetTones
-                                )
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Pink
+                                                },
+                                                label = "Pink",
+                                                listOfColors = paletteState.pinkTones
+                                            )
 
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Pink },
-                                    enabled = currentContent != PaletteMenuCategories.Pink,
-                                    label = "Pink",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = pinkTones
-                                )
+                                            TonalPaletteCategoryButton(
+                                                Modifier.weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.Cyan
+                                                },
+                                                label = "Cyan",
+                                                listOfColors = paletteState.cyanTones
+                                            )
+                                        }
 
-                                TonalPaletteCategoryButton(
-                                    Modifier.weight(1f),
-                                    expand = { currentContent = PaletteMenuCategories.Cyan },
-                                    enabled = currentContent != PaletteMenuCategories.Cyan,
-                                    label = "Cyan",
-                                    isOnHomePage = isOnHomePage,
-                                    listOfColors = cyanTones
-                                )
-                            }
+                                        Spacer(modifier = Modifier.height(4.dp))
 
-                            Spacer(modifier = Modifier.height(4.dp))
+                                        Row(Modifier.weight(1f, false)) {
+                                            ColorRolesCategoryButton(
+                                                modifier = Modifier
+                                                    .sharedBounds(
+                                                        rememberSharedContentState(
+                                                            PaletteMenuCategories.ColorRoles
+                                                        ),
+                                                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                                                    )
+                                                    .weight(1f),
+                                                expand = {
+                                                    targetContent = PaletteMenuCategories.ColorRoles
+                                                },
+                                                colorRolesLight = paletteState.colorRolesLight,
+                                                label = "Color Roles",
+                                                changeValue = changeValue,
+                                                key = uiElementColorData.name
+                                            )
 
-                            Row(Modifier.weight(1f)) {
-                                val allColors = remember {
-                                    ColorRolesLight.entries.map { it.dataAboutColors } +
-                                            ColorRolesShared.entries.map { it.dataAboutColors }
-                                }
+                                            Spacer(modifier = Modifier.width(8.dp))
 
-                                AnimatedVisibility(
-                                    currentContent != PaletteMenuCategories.ColorRoles,
-                                    enter = EnterTransition.None,
-                                    exit = ExitTransition.None,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    ColorRolesCategoryButton(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .sharedBounds(
-                                                rememberSharedContentState(PaletteMenuCategories.ColorRoles),
-                                                animatedVisibilityScope = this,
-                                                boundsTransform = customBoundaTransform
-                                            ),
-                                        expand = {
-                                            currentContent = PaletteMenuCategories.ColorRoles
-                                        },
-                                        isOnHomePage = isOnHomePage,
-                                        label = "Color Roles",
-                                        enabled =
-                                        currentContent != PaletteMenuCategories.ColorRoles,
-                                        listOfColors = allColors,
-                                        changeValue = changeValue,
-                                        key = uiElementColorData.name
-                                    )
-                                }
+                                            AdditionalColorsCategoryButton(
+                                                modifier = Modifier
+                                                    .sharedBounds(
+                                                        rememberSharedContentState("additionalSection"),
+                                                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                                                    )
+                                                    .width(44.dp),
+                                                expand = {
+                                                    targetContent =
+                                                        PaletteMenuCategories.AdditionalColors
+                                                },
+                                            )
+                                        }
+                                    }
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                    PaletteMenuCategories.ColorRoles ->
+                                        ColorRolesContent(
+                                            Modifier
+                                                .sharedBounds(
+                                                    rememberSharedContentState(PaletteMenuCategories.ColorRoles),
+                                                    resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds(
+                                                        ContentScale.FillBounds
+                                                    )
+                                                ),
+                                            colorRolesLight = paletteState.colorRolesLight,
+                                            colorRolesDark = paletteState.colorRolesDark,
+                                            colorRolesShared = paletteState.colorRolesShared,
+                                            changeValue,
+                                            uiElementName = uiElementColorData.name
+                                        )
 
-                                AnimatedVisibility(
-                                    currentContent != PaletteMenuCategories.AdditionalColors,
-                                    enter = EnterTransition.None,
-                                    exit = ExitTransition.None
-                                ) {
-                                    AdditionalColorsCombinedContainer(
-                                        modifier = Modifier
+
+                                    PaletteMenuCategories.AdditionalColors -> AdditionalColorsContent(
+                                        Modifier
                                             .sharedBounds(
                                                 rememberSharedContentState("additionalSection"),
-                                                animatedVisibilityScope = this,
-                                                boundsTransform = customBoundaTransform,
-                                                enter = fadeIn() + scaleInSharedContentToBounds(ContentScale.FillBounds),
-                                                exit = fadeOut() + scaleOutSharedContentToBounds(ContentScale.FillBounds),
+                                                resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds(
+                                                    ContentScale.FillBounds
+                                                )
                                             )
-                                            .width(44.dp),
-                                        expand = {
-                                            currentContent = PaletteMenuCategories.AdditionalColors
-                                        },
-                                        isOnHomePage = isOnHomePage,
+                                            .padding(horizontal = 16.dp),
                                         changeValue = changeValue,
-                                        chosen = false,
+                                        additionalColors = paletteState.additionalColors,
                                         uiElementName = uiElementColorData.name
                                     )
+
+                                    else -> {
+                                        val palette = when (currentContentType) {
+                                            PaletteMenuCategories.Primary -> paletteState.primaryTones
+                                            PaletteMenuCategories.Secondary -> paletteState.secondaryTones
+                                            PaletteMenuCategories.Tertiary -> paletteState.tertiaryTones
+                                            PaletteMenuCategories.Neutral -> paletteState.neutralTones
+                                            PaletteMenuCategories.NeutralVariant -> paletteState.neutralVariantTones
+                                            PaletteMenuCategories.Blue -> paletteState.blueTones
+                                            PaletteMenuCategories.Red -> paletteState.redTones
+                                            PaletteMenuCategories.Green -> paletteState.greenTones
+                                            PaletteMenuCategories.Orange -> paletteState.orangeTones
+                                            PaletteMenuCategories.Violet -> paletteState.violetTones
+                                            PaletteMenuCategories.Pink -> paletteState.pinkTones
+                                            PaletteMenuCategories.Cyan -> paletteState.cyanTones
+                                            else -> null
+                                        }
+
+                                        if (palette != null) {
+                                            TonalPalette(
+                                                Modifier.padding(horizontal = 16.dp),
+                                                tones = palette,
+                                                changeValue = changeValue,
+                                                touchActionEnabled = true,
+                                                uiElementColorData.name,
+                                            )
+                                        }
+                                    }
                                 }
-
                             }
-                        }
 
-                        // content in expanded state
-                        val palette = when (currentContent) {
-                            PaletteMenuCategories.Primary -> primaryTones
-                            PaletteMenuCategories.Secondary -> secondaryTones
-                            PaletteMenuCategories.Tertiary -> tertiaryTones
-                            PaletteMenuCategories.Neutral -> neutralTones
-                            PaletteMenuCategories.NeutralVariant -> neutralVariantTones
-                            PaletteMenuCategories.Blue -> blueTones
-                            PaletteMenuCategories.Red -> redTones
-                            PaletteMenuCategories.Green -> greenTones
-                            PaletteMenuCategories.Orange -> orangeTones
-                            PaletteMenuCategories.Violet -> violetTones
-                            PaletteMenuCategories.Pink -> pinkTones
-                            PaletteMenuCategories.Cyan -> cyanTones
-                            else -> null
-                        }
-
-                        palette?.let {
-                            TonalPalette(
-                                tones = it,
-                                changeValue = changeValue,
-                                touchActionEnabled = true,
-                                uiElementColorData.name,
-                            )
-                        }
-
-                        this@Column.AnimatedVisibility(
-                            currentContent == PaletteMenuCategories.ColorRoles,
-                            enter = EnterTransition.None,
-                            exit = ExitTransition.None
-                        ) {
-                            ColorRolesContent(
-                                Modifier.sharedBounds(
-                                    rememberSharedContentState(PaletteMenuCategories.ColorRoles),
-                                    animatedVisibilityScope = this,
-                                    boundsTransform = customBoundaTransform,
-                                    enter = fadeIn() + scaleInSharedContentToBounds(ContentScale.FillBounds),
-                                    exit = fadeOut() + scaleOutSharedContentToBounds(ContentScale.FillBounds),
-                                ),
-                                changeValue,
-                                uiElementName = uiElementColorData.name
-                            )
-                        }
-
-                        this@Column.AnimatedVisibility(
-                            currentContent == PaletteMenuCategories.AdditionalColors,
-                            enter = EnterTransition.None,
-                            exit = ExitTransition.None
-                        ) {
-                            AdditionalColorsCombinedContainer(
-                                Modifier.sharedBounds(
-                                    rememberSharedContentState("additionalSection"),
-                                    this,
-                                    boundsTransform = customBoundaTransform
-                                ),
-                                expand = {
-                                    currentContent = PaletteMenuCategories.AdditionalColors
-                                },
-                                isOnHomePage = false,
-                                changeValue = changeValue,
-                                chosen = true,
-                                uiElementName = uiElementColorData.name
+                            val isSelected = targetContent == currentContentType
+                            if (!isSelected && targetContent != PaletteMenuCategories.Home) Spacer(
+                                Modifier
+                                    .fillMaxSize()
+                                    .pointerInput(Unit) { // block input on unselected layers
+                                        awaitPointerEventScope {
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                event.changes.forEach { it.consume() }
+                                            }
+                                        }
+                                    }
                             )
                         }
                     }
@@ -426,3 +395,5 @@ fun PalettePopup(
         }
     }
 }
+
+private val softSpring = spring<Float>(1.8f, 2500f)

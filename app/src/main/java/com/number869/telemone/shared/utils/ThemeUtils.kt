@@ -160,6 +160,8 @@ fun canThemeBeUpdated(light: Boolean): Boolean {
     return lastAcceptedHash == "" || assetFoldersThemeHash(light) != lastAcceptedHash
 }
 
+// pretend it does actually calculate a hash. i dont want to import a library just to
+// calculate the hash
 fun assetFoldersThemeHash(
     light: Boolean,
     context: Context = inject()
@@ -167,5 +169,3 @@ fun assetFoldersThemeHash(
     .open("default${if (light) "Light" else "Dark"}File.attheme")
     .bufferedReader()
     .readText()
-    .hashCode()
-    .toString()

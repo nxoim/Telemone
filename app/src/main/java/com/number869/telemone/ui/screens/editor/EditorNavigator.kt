@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import com.number869.telemone.data.PredefinedTheme
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteSelectedThemesDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteThemeDialog
@@ -20,140 +21,145 @@ import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.NavHost
 import com.nxoim.decomposite.core.common.navigation.navController
-import com.nxoim.decomposite.core.common.ultils.ContentType
-import com.nxoim.decomposite.core.common.viewModel.viewModel
 import kotlinx.serialization.Serializable
 
 @Composable
-fun EditorNavigator() {
-    val vm = viewModel { EditorViewModel() }
-    val editorNavController = navController<EditorDestinations>(EditorDestinations.Editor)
-
+fun EditorNavigator(
+    vm: EditorViewModel,
+    rootNavController: NavController<RootDestinations>,
+    editorNavController: NavController<EditorDestinations>,
+    dialogsNavController: NavController<EditorDestinations.Dialogs>
+) {
     NavHost(editorNavController) {
         when (it) {
             EditorDestinations.ThemeValues -> ThemeValuesScreen()
 
-            EditorDestinations.Editor -> EditorScreen()
-
-            else -> Dialogs(destination = it, vm, editorNavController)
+            EditorDestinations.Editor -> EditorScreen(
+                rootNavController,
+                editorNavController,
+                dialogsNavController,
+                vm
+            )
         }
     }
+
+    DialogsHost(vm, dialogsNavController)
 }
 
 @Composable
-private fun Dialogs(
-    destination: EditorDestinations,
+private fun DialogsHost(
     vm: EditorViewModel,
-    editorNavController: NavController<EditorDestinations>
-) = when(destination) {
-    EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile -> {
-        val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
+    navController: NavController<EditorDestinations.Dialogs>
+) {
+    NavHost(navController) { destination ->
+        when(destination) {
+            EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile -> {
+                val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
 
-        // stuff for loadingMappedValues files.
-        // this one is used when pressing the "clear" button
-        val launcherThatClears = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocument()
-        ) { result ->
-            pickedFileUriState.value = result
+                // stuff for loadingMappedValues files.
+                // this one is used when pressing the "clear" button
+                val launcherThatClears = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.OpenDocument()
+                ) { result ->
+                    pickedFileUriState.value = result
 
-            result?.let { uri ->
-                vm.loadSavedTheme(ThemeStorageType.ExternalFile(uri, true))
-                editorNavController.navigateBack()
-            }
-        }
-        // this one is used when pressing the "leave as is" button
-        val launcherThatDoesnt = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocument()
-        ) { result ->
-            pickedFileUriState.value = result
+                    result?.let { uri ->
+                        vm.loadSavedTheme(ThemeStorageType.ExternalFile(uri, true))
+                        navController.navigateBack()
+                    }
+                }
+                // this one is used when pressing the "leave as is" button
+                val launcherThatDoesnt = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.OpenDocument()
+                ) { result ->
+                    pickedFileUriState.value = result
 
-            result?.let { uri ->
-                vm.loadSavedTheme(ThemeStorageType.ExternalFile(uri, false))
-                editorNavController.navigateBack()
-            }
-        }
+                    result?.let { uri ->
+                        vm.loadSavedTheme(ThemeStorageType.ExternalFile(uri, false))
+                        navController.navigateBack()
+                    }
+                }
 
-        ClearBeforeLoadDialog(
-            close = { editorNavController.navigateBack() },
-            clear = {
-                vm.saveCurrentTheme()
-                launcherThatClears.launch(arrayOf("*/*"))
-            },
-            leaveAsIs = {
-                vm.saveCurrentTheme()
-                launcherThatDoesnt.launch(arrayOf("*/*"))
-            }
-        )
-    }
-    is EditorDestinations.Dialogs.DeleteOneTheme -> {
-        DeleteThemeDialog(
-            close = { editorNavController.navigateBack() },
-            theme = destination.theme,
-            deleteTheme = { vm.deleteTheme(destination.theme.uuid) },
-        )
-    }
-    is EditorDestinations.Dialogs.DeleteSelectedThemes -> {
-        DeleteSelectedThemesDialog(
-            hideToolbar = { vm.hideThemeSelectionModeToolbar() },
-            hideDialog = { editorNavController.navigateBack() },
-            deleteSelectedThemes = vm::deleteSelectedThemes,
-            unselectAllThemes = vm::unselectAllThemes,
-            selectedThemeCount = destination.selectedThemeCount,
-        )
-    }
-    is EditorDestinations.Dialogs.LoadThemeWithOptions -> {
-        LoadWithOptionsDialog(
-            close = { editorNavController.navigateBack() },
-            loadSavedTheme = vm::loadSavedTheme,
-            uuid = destination.uuid
-        )
-    }
-    is EditorDestinations.Dialogs.OverwriteDefaultThemeConfirmation -> {
-        OverwriteDefaultsDialog(
-            close = { editorNavController.navigateBack() },
-            overwrite = {
-                vm.overwriteTheme(destination.withTheme.uuid, isLightTheme = !destination.overwriteDark)
-                editorNavController.navigateBack()
-            },
-            overwriteDark = destination.overwriteDark,
-            lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
-            darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
-            overwriteWith = destination.withTheme,
-        )
-    }
-    is EditorDestinations.Dialogs.OverwriteDefaultThemeChoice -> {
-        OverwriteChoiceDialog(
-            close = { editorNavController.navigateBack() },
-            chooseLight = {
-                editorNavController.navigateBack() // close this
-                editorNavController.navigate(
-                    EditorDestinations.Dialogs.OverwriteDefaultThemeConfirmation(
-                        overwriteDark = false,
-                        withTheme = destination.withTheme
-                    ),
-                    ContentType.Overlay
+                ClearBeforeLoadDialog(
+                    close = { navController.navigateBack() },
+                    clear = {
+                        vm.saveCurrentTheme()
+                        launcherThatClears.launch(arrayOf("*/*"))
+                    },
+                    leaveAsIs = {
+                        vm.saveCurrentTheme()
+                        launcherThatDoesnt.launch(arrayOf("*/*"))
+                    }
                 )
-            },
-            chooseDark = {
-                editorNavController.navigateBack()
-                editorNavController.navigate(
-                    EditorDestinations.Dialogs.OverwriteDefaultThemeConfirmation(
-                        overwriteDark = true,
-                        withTheme = destination.withTheme
-                    ),
-                    ContentType.Overlay
+            }
+            is EditorDestinations.Dialogs.DeleteOneTheme -> {
+                DeleteThemeDialog(
+                    close = { navController.navigateBack() },
+                    theme = destination.theme,
+                    deleteTheme = { vm.deleteTheme(destination.theme.uuid) },
                 )
-            },
-            lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
-            darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
-        )
+            }
+            is EditorDestinations.Dialogs.DeleteSelectedThemes -> {
+                DeleteSelectedThemesDialog(
+                    hideToolbar = { vm.hideThemeSelectionModeToolbar() },
+                    hideDialog = { navController.navigateBack() },
+                    deleteSelectedThemes = vm::deleteSelectedThemes,
+                    unselectAllThemes = vm::unselectAllThemes,
+                    selectedThemeCount = destination.selectedThemeCount,
+                )
+            }
+            is EditorDestinations.Dialogs.LoadThemeWithOptions -> {
+                LoadWithOptionsDialog(
+                    close = { navController.navigateBack() },
+                    loadSavedTheme = vm::loadSavedTheme,
+                    uuid = destination.uuid
+                )
+            }
+            is EditorDestinations.Dialogs.OverwriteDefaultThemeConfirmation -> {
+                OverwriteDefaultsDialog(
+                    close = { navController.navigateBack() },
+                    overwrite = {
+                        vm.overwriteTheme(destination.withTheme.uuid, isLightTheme = !destination.overwriteDark)
+                        navController.navigateBack()
+                    },
+                    overwriteDark = destination.overwriteDark,
+                    lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
+                    darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
+                    overwriteWith = destination.withTheme,
+                )
+            }
+            is EditorDestinations.Dialogs.OverwriteDefaultThemeChoice -> {
+                OverwriteChoiceDialog(
+                    close = { navController.navigateBack() },
+                    chooseLight = {
+                        navController.navigateBack() // close this
+                        navController.navigate(
+                            EditorDestinations.Dialogs.OverwriteDefaultThemeConfirmation(
+                                overwriteDark = false,
+                                withTheme = destination.withTheme
+                            ),
+                        )
+                    },
+                    chooseDark = {
+                        navController.navigateBack()
+                        navController.navigate(
+                            EditorDestinations.Dialogs.OverwriteDefaultThemeConfirmation(
+                                overwriteDark = true,
+                                withTheme = destination.withTheme
+                            ),
+                        )
+                    },
+                    lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
+                    darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
+                )
+            }
+            EditorDestinations.Dialogs.SavedThemeTypeSelection -> {
+                SavedThemeItemDisplayTypeChooserDialog { navController.navigateBack() }
+            }
+            else -> { }
+        }
     }
-    EditorDestinations.Dialogs.SavedThemeTypeSelection -> {
-        SavedThemeItemDisplayTypeChooserDialog { editorNavController.navigateBack() }
-    }
-    else -> { }
 }
-
 
 @Serializable
 sealed interface EditorDestinations {
@@ -163,7 +169,10 @@ sealed interface EditorDestinations {
     data object ThemeValues : EditorDestinations
 
     @Serializable
-    sealed interface Dialogs : EditorDestinations {
+    sealed interface Dialogs {
+        @Serializable
+        data object Empty : Dialogs
+
         @Serializable
         data object SavedThemeTypeSelection : Dialogs
 

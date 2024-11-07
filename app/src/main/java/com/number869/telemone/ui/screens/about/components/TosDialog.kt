@@ -20,12 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
 import com.number869.telemone.ui.screens.about.AboutDestinations
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
-fun TosDialog() {
-	val navController = getExistingNavController<AboutDestinations>()
-
+fun TosDialog(
+	onNavigateBackRequest: () -> Unit
+) {
 	Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		Card(
 			colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
@@ -43,7 +42,7 @@ fun TosDialog() {
 				}
 
 				TextButton(
-					onClick = { navController.navigateBack() },
+					onClick = onNavigateBackRequest,
 					modifier = Modifier
 						.align(Alignment.End)
 						.padding(top = 20.dp, bottom = 20.dp, end = 24.dp)

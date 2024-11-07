@@ -9,19 +9,17 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.number869.telemone.ui.RootDestinations
-import com.nxoim.decomposite.core.common.navigation.getExistingNavController
 
 @Composable
 fun ThemeUpdateAvailableDialog(
 	ofLight: Boolean,
 	decline: () -> Unit,
-	acceptStockThemeUpdate: () -> Unit
+	acceptStockThemeUpdate: () -> Unit,
 ) {
-	val navController = getExistingNavController<RootDestinations>()
 	val typeText = if (ofLight) "light" else "dark"
 
 	AlertDialog(
-		onDismissRequest = { navController.navigateBack() },
+		onDismissRequest = {  },
 		title = {
 			Text("Update default $typeText theme?")
 		},
@@ -36,22 +34,10 @@ If you decline - you can always change your mind and update by pressing the menu
 			Icon(Icons.Default.TipsAndUpdates, contentDescription = null)
 		},
 		confirmButton = {
-			Button(
-				onClick = {
-					acceptStockThemeUpdate()
-					navController.navigateBack()
-				}
-			) {
-				Text(text = "Apply")
-			}
+			Button(onClick = acceptStockThemeUpdate) { Text(text = "Apply") }
 		},
 		dismissButton = {
-			OutlinedButton(
-				onClick = {
-					decline()
-					navController.navigateBack()
-				}
-			) {
+			OutlinedButton(onClick = decline) {
 				Text(text = "Decline")
 			}
 		}

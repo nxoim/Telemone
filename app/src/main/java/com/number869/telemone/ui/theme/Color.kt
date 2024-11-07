@@ -67,12 +67,12 @@ import android.R.color.system_neutral2_800
 import android.R.color.system_neutral2_900
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -90,887 +90,525 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-class PaletteState(
-	val entirePaletteAsMap: LinkedHashMap<String, Color>,
-	val isDarkMode: Boolean
+@Immutable
+data class PaletteState(
+    val primaryTones: List<ToneInfo>,
+    val secondaryTones: List<ToneInfo>,
+    val tertiaryTones: List<ToneInfo>,
+    val neutralTones: List<ToneInfo>,
+    val neutralVariantTones: List<ToneInfo>,
+    val blueTones: List<ToneInfo>,
+    val redTones: List<ToneInfo>,
+    val greenTones: List<ToneInfo>,
+    val orangeTones: List<ToneInfo>,
+    val violetTones: List<ToneInfo>,
+    val cyanTones: List<ToneInfo>,
+    val pinkTones: List<ToneInfo>,
+    val colorRolesLight: ColorRoles,
+    val colorRolesDark: ColorRoles,
+    val colorRolesShared: ColorRolesShared,
+    val additionalColors: AdditionalColors,
+    val isDarkMode: Boolean
 ) {
-	val allPossibleColorTokensAsList = entirePaletteAsMap.keys
+    val entirePaletteAsMap: LinkedHashMap<String, Color> = linkedMapOf<String, Color>().apply {
+        additionalColors.toListOfDataAboutColors().forEach { put(it.colorToken, it.colorValue) }
+        if (isDarkMode) {
+            colorRolesDark.toListOfDataAboutColors().forEach { put(it.colorToken, it.colorValue) }
+            colorRolesLight.toListOfDataAboutColors().forEach { put(it.colorToken, it.colorValue) }
+        } else {
+            colorRolesLight.toListOfDataAboutColors().forEach { put(it.colorToken, it.colorValue) }
+            colorRolesDark.toListOfDataAboutColors().forEach { put(it.colorToken, it.colorValue) }
+        }
+        colorRolesShared.toListOfDataAboutColors().forEach { put(it.colorToken, it.colorValue) }
+
+        listOf(
+            primaryTones,
+            secondaryTones,
+            tertiaryTones,
+            neutralTones,
+            neutralVariantTones,
+            blueTones,
+            redTones,
+            greenTones,
+            orangeTones,
+            violetTones,
+            cyanTones,
+            pinkTones
+        ).forEach { toneList ->
+            toneList.forEach { put(it.colorToken, it.colorValue) }
+        }
+    }
+    val allPossibleColorTokensAsList = entirePaletteAsMap.keys
 }
 
 @Composable
 fun rememberPaletteState(): PaletteState {
-	val isDarkMode = isSystemInDarkTheme()
-	val entirePaletteAsMap = remember { linkedMapOf<String, Color>() }
+    val isDarkMode = isSystemInDarkTheme()
+    val lightColorScheme = getColorScheme(isDark = false)
+    val darkColorScheme = getColorScheme(isDark = true)
 
-
-	AdditionalColors.entries.forEach {
-		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-	}
-
-	// order of execution should depend on isDarkMode for correct
-	// theme import color token inference
-	if (isDarkMode) {
-		ColorRolesDark.entries.forEach {
-			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-		}
-
-		ColorRolesLight.entries.forEach {
-			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-		}
-	} else {
-		ColorRolesLight.entries.forEach {
-			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-		}
-
-		ColorRolesDark.entries.forEach {
-			entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-		}
-	}
-
-	ColorRolesShared.entries.forEach {
-		entirePaletteAsMap[it.dataAboutColors.colorToken] = it.dataAboutColors.colorValue()
-	}
-
-	listOf(
-		primaryTones,
-		secondaryTones,
-		tertiaryTones,
-		neutralTones,
-		neutralVariantTones,
-		blueTones,
-		redTones,
-		greenTones,
-		orangeTones,
-		violetTones,
-		cyanTones,
-		pinkTones
-	).forEach { toneList ->
-		toneList.forEach { entirePaletteAsMap[it.colorToken] = it.colorValue }
-	}
-
-	return remember { PaletteState(entirePaletteAsMap, isDarkMode) }
+    return rememberUpdatedState(
+        PaletteState(
+            primaryTones = primaryTones,
+            secondaryTones = secondaryTones,
+            tertiaryTones = tertiaryTones,
+            neutralTones = neutralTones,
+            neutralVariantTones = neutralVariantTones,
+            blueTones = blueTones,
+            redTones = redTones,
+            greenTones = greenTones,
+            orangeTones = orangeTones,
+            violetTones = violetTones,
+            cyanTones = cyanTones,
+            pinkTones = pinkTones,
+            colorRolesLight = lightColorScheme.toColorRoles(light = true),
+            colorRolesDark = darkColorScheme.toColorRoles(light = false),
+            colorRolesShared = getSharedColorRoles(primaryTones, secondaryTones, tertiaryTones),
+            additionalColors = getAdditionalColors(
+                surfaceElevationLevel3Light = lightColorScheme.surfaceColorAtElevation(3.dp),
+                surfaceElevationLevel3Dark = darkColorScheme.surfaceColorAtElevation(3.dp)
+            ),
+            isDarkMode = isDarkMode
+        )
+    ).value
 }
 
-enum class ColorRolesLight(val dataAboutColors: DataAboutColors) {
-	Primary(
-		DataAboutColors("primary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.primary }
-			color
-		}
-	),
+private fun ColorScheme.toColorRoles(light: Boolean): ColorRoles {
+    val suffix = if (light) "light" else "dark"
 
-	OnPrimary(
-		DataAboutColors("on_primary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onPrimary }
-			color
-		}
-	),
-
-	PrimaryContainer(
-		DataAboutColors("primary_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.primaryContainer }
-			color
-		}
-	),
-
-	OnPrimaryContainer(
-		DataAboutColors("on_primary_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onPrimaryContainer }
-			color
-		}
-	),
-
-	Secondary(
-		DataAboutColors("secondary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.secondary }
-			color
-		}
-	),
-
-	OnSecondary(
-		DataAboutColors("on_secondary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSecondary }
-			color
-		}
-	),
-
-	SecondaryContainer(
-		DataAboutColors("secondary_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.secondaryContainer }
-			color
-		}
-	),
-
-	OnSecondaryContainer(
-		DataAboutColors("on_secondary_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSecondaryContainer }
-			color
-		}
-	),
-
-	Tertiary(
-		DataAboutColors("tertiary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.tertiary }
-			color
-		}
-	),
-
-	OnTertiary(
-		DataAboutColors("on_tertiary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onTertiary }
-			color
-		}
-	),
-
-	TertiaryContainer(
-		DataAboutColors("tertiary_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.tertiaryContainer }
-			color
-		}
-	),
-
-	OnTertiaryContainer(
-		DataAboutColors("on_tertiary_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onTertiaryContainer }
-			color
-		}
-	),
-
-	Surface(
-		DataAboutColors("surface_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surface }
-			color
-		}
-	),
-
-	SurfaceDim(
-		DataAboutColors("surface_dim_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceDim }
-			color
-		}
-	),
-
-	SurfaceBright(
-		DataAboutColors("surface_bright_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceBright }
-			color
-		}
-	),
-
-	OnSurface(
-		DataAboutColors("on_surface_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSurface }
-			color
-		}
-	),
-
-	SurfaceContainerLowest(
-		DataAboutColors("surface_container_lowest_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerLowest }
-			color
-		}
-	),
-
-	SurfaceContainerLow(
-		DataAboutColors("surface_container_low_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerLow }
-			color
-		}
-	),
-
-	SurfaceContainer(
-		DataAboutColors("surface_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainer }
-			color
-		}
-	),
-
-	SurfaceContainerHigh(
-		DataAboutColors("surface_container_high_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerHigh }
-			color
-		}
-	),
-
-	SurfaceContainerHighest(
-		DataAboutColors("surface_container_highest_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceContainerHighest }
-			color
-		}
-	),
-
-	OnSurfaceVariant(
-		DataAboutColors("on_surface_variant_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onSurfaceVariant }
-			color
-		}
-	),
-
-	Error(
-		DataAboutColors("error_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.error }
-			color
-		}
-	),
-
-	OnError(
-		DataAboutColors("on_error_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onError }
-			color
-		}
-	),
-
-	ErrorContainer(
-		DataAboutColors("error_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.errorContainer }
-			color
-		}
-	),
-
-	OnErrorContainer(
-		DataAboutColors("on_error_container_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.onErrorContainer }
-			color
-		}
-	),
-
-	Outline(
-		DataAboutColors("outline_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.outline }
-			color
-		}
-	),
-
-	OutlineVariant(
-		DataAboutColors("outline_variant_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.outlineVariant }
-			color
-		}
-	),
-
-	InverseSurface(
-		DataAboutColors("inverse_surface_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.inverseSurface }
-			color
-		}
-	),
-
-	InverseOnSurface(
-		DataAboutColors("inverse_on_surface_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.inverseOnSurface }
-			color
-		}
-	),
-
-	InversePrimary(
-		DataAboutColors("inverse_primary_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.inversePrimary }
-			color
-		}
-	),
-
-	Scrim(
-		DataAboutColors("scrim_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.scrim }
-			color
-		}
-	),
-
-	Shadow(
-		DataAboutColors("shadow_light") {
-			var color = Color.Red
-			// TODO: not yet added in the lib. fix once its added
-//			TelemoneTheme(true) { color = MaterialTheme.colorScheme.shadow }
-			color = Color.Black
-			color
-		}
-	);
-
-	operator fun component1() = this.dataAboutColors.colorToken
-
-	@Composable
-	operator fun component2() = this.dataAboutColors.colorValue()
+    return ColorRoles(
+        primary = DataAboutColors("primary_$suffix", this.primary),
+        onPrimary = DataAboutColors("on_primary_$suffix", this.onPrimary),
+        primaryContainer = DataAboutColors("primary_container_$suffix", this.primaryContainer),
+        onPrimaryContainer = DataAboutColors(
+            "on_primary_container_$suffix",
+            this.onPrimaryContainer
+        ),
+        secondary = DataAboutColors("secondary_$suffix", this.secondary),
+        onSecondary = DataAboutColors("on_secondary_$suffix", this.onSecondary),
+        secondaryContainer = DataAboutColors(
+            "secondary_container_$suffix",
+            this.secondaryContainer
+        ),
+        onSecondaryContainer = DataAboutColors(
+            "on_secondary_container_$suffix",
+            this.onSecondaryContainer
+        ),
+        tertiary = DataAboutColors("tertiary_$suffix", this.tertiary),
+        onTertiary = DataAboutColors("on_tertiary_$suffix", this.onTertiary),
+        tertiaryContainer = DataAboutColors("tertiary_container_$suffix", this.tertiaryContainer),
+        onTertiaryContainer = DataAboutColors(
+            "on_tertiary_container_$suffix",
+            this.onTertiaryContainer
+        ),
+        surface = DataAboutColors("surface_$suffix", this.surface),
+        surfaceDim = DataAboutColors("surface_dim_$suffix", this.surfaceDim),
+        surfaceBright = DataAboutColors("surface_bright_$suffix", this.surfaceBright),
+        onSurface = DataAboutColors("on_surface_$suffix", this.onSurface),
+        surfaceContainerLowest = DataAboutColors(
+            "surface_container_lowest_$suffix",
+            this.surfaceContainerLowest
+        ),
+        surfaceContainerLow = DataAboutColors(
+            "surface_container_low_$suffix",
+            this.surfaceContainerLow
+        ),
+        surfaceContainer = DataAboutColors("surface_container_$suffix", this.surfaceContainer),
+        surfaceContainerHigh = DataAboutColors(
+            "surface_container_high_$suffix",
+            this.surfaceContainerHigh
+        ),
+        surfaceContainerHighest = DataAboutColors(
+            "surface_container_highest_$suffix",
+            this.surfaceContainerHighest
+        ),
+        onSurfaceVariant = DataAboutColors("on_surface_variant_$suffix", this.onSurfaceVariant),
+        error = DataAboutColors("error_$suffix", this.error),
+        onError = DataAboutColors("on_error_$suffix", this.onError),
+        errorContainer = DataAboutColors("error_container_$suffix", this.errorContainer),
+        onErrorContainer = DataAboutColors("on_error_container_$suffix", this.onErrorContainer),
+        outline = DataAboutColors("outline_$suffix", this.outline),
+        outlineVariant = DataAboutColors("outline_variant_$suffix", this.outlineVariant),
+        inverseSurface = DataAboutColors("inverse_surface_$suffix", this.inverseSurface),
+        inverseOnSurface = DataAboutColors("inverse_on_surface_$suffix", this.inverseOnSurface),
+        inversePrimary = DataAboutColors("inverse_primary_$suffix", this.inversePrimary),
+        scrim = DataAboutColors("scrim_$suffix", this.scrim),
+        shadow = DataAboutColors("shadow_$suffix", Color.Black)
+    )
 }
 
-enum class ColorRolesDark(val dataAboutColors: DataAboutColors) {
-	Primary(
-		DataAboutColors("primary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.primary }
-			color
-		}
-	),
-
-	OnPrimary(
-		DataAboutColors("on_primary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onPrimary }
-			color
-		}
-	),
-
-	PrimaryContainer(
-		DataAboutColors("primary_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.primaryContainer }
-			color
-		}
-	),
-
-	OnPrimaryContainer(
-		DataAboutColors("on_primary_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onPrimaryContainer }
-			color
-		}
-	),
-
-	Secondary(
-		DataAboutColors("secondary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.secondary }
-			color
-		}
-	),
-
-	OnSecondary(
-		DataAboutColors("on_secondary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSecondary }
-			color
-		}
-	),
-
-	SecondaryContainer(
-		DataAboutColors("secondary_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.secondaryContainer }
-			color
-		}
-	),
-
-	OnSecondaryContainer(
-		DataAboutColors("on_secondary_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSecondaryContainer }
-			color
-		}
-	),
-
-	Tertiary(
-		DataAboutColors("tertiary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.tertiary }
-			color
-		}
-	),
-
-	OnTertiary(
-		DataAboutColors("on_tertiary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onTertiary }
-			color
-		}
-	),
-
-	TertiaryContainer(
-		DataAboutColors("tertiary_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.tertiaryContainer }
-			color
-		}
-	),
-
-	OnTertiaryContainer(
-		DataAboutColors("on_tertiary_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onTertiaryContainer }
-			color
-		}
-	),
-
-	Surface(
-		DataAboutColors("surface_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surface }
-			color
-		}
-	),
-
-	SurfaceDim(
-		DataAboutColors("surface_dim_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceDim }
-			color
-		}
-	),
-
-	SurfaceBright(
-		DataAboutColors("surface_bright_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceBright }
-			color
-		}
-	),
-
-	OnSurface(
-		DataAboutColors("on_surface_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSurface }
-			color
-		}
-	),
-
-	SurfaceContainerLowest(
-		DataAboutColors("surface_container_lowest_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerLowest }
-			color
-		}
-	),
-
-	SurfaceContainerLow(
-		DataAboutColors("surface_container_low_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerLow }
-			color
-		}
-	),
-
-	SurfaceContainer(
-		DataAboutColors("surface_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainer }
-			color
-		}
-	),
-
-	SurfaceContainerHigh(
-		DataAboutColors("surface_container_high_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerHigh }
-			color
-		}
-	),
-
-	SurfaceContainerHighest(
-		DataAboutColors("surface_container_highest_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceContainerHighest }
-			color
-		}
-	),
-
-	OnSurfaceVariant(
-		DataAboutColors("on_surface_variant_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onSurfaceVariant }
-			color
-		}
-	),
-
-	Error(
-		DataAboutColors("error_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.error }
-			color
-		}
-	),
-
-	OnError(
-		DataAboutColors("on_error_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onError }
-			color
-		}
-	),
-
-	ErrorContainer(
-		DataAboutColors("error_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.errorContainer }
-			color
-		}
-	),
-
-	OnErrorContainer(
-		DataAboutColors("on_error_container_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.onErrorContainer }
-			color
-		}
-	),
-
-	Outline(
-		DataAboutColors("outline_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.outline }
-			color
-		}
-	),
-
-	OutlineVariant(
-		DataAboutColors("outline_variant_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.outlineVariant }
-			color
-		}
-	),
-
-	InverseSurface(
-		DataAboutColors("inverse_surface_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.inverseSurface }
-			color
-		}
-	),
-
-	InverseOnSurface(
-		DataAboutColors("inverse_on_surface_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.inverseOnSurface }
-			color
-		}
-	),
-
-	InversePrimary(
-		DataAboutColors("inverse_primary_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.inversePrimary }
-			color
-		}
-	),
-	Scrim(
-		DataAboutColors("scrim_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.scrim }
-			color
-		}
-	),
-	Shadow(
-		DataAboutColors("shadow_dark") {
-			var color = Color.Red
-			// TODO: not yet added in the lib. fix once its added
-//			TelemoneTheme(true) { color = MaterialTheme.colorScheme.shadow }
-			color = Color.Black
-			color
-		}
-	);
-
-	operator fun component1() = this.dataAboutColors.colorToken
-
-	@Composable
-	operator fun component2() = this.dataAboutColors.colorValue()
+data class ColorRoles(
+    val primary: DataAboutColors,
+    val onPrimary: DataAboutColors,
+    val primaryContainer: DataAboutColors,
+    val onPrimaryContainer: DataAboutColors,
+    val secondary: DataAboutColors,
+    val onSecondary: DataAboutColors,
+    val secondaryContainer: DataAboutColors,
+    val onSecondaryContainer: DataAboutColors,
+    val tertiary: DataAboutColors,
+    val onTertiary: DataAboutColors,
+    val tertiaryContainer: DataAboutColors,
+    val onTertiaryContainer: DataAboutColors,
+    val surface: DataAboutColors,
+    val surfaceDim: DataAboutColors,
+    val surfaceBright: DataAboutColors,
+    val onSurface: DataAboutColors,
+    val surfaceContainerLowest: DataAboutColors,
+    val surfaceContainerLow: DataAboutColors,
+    val surfaceContainer: DataAboutColors,
+    val surfaceContainerHigh: DataAboutColors,
+    val surfaceContainerHighest: DataAboutColors,
+    val onSurfaceVariant: DataAboutColors,
+    val error: DataAboutColors,
+    val onError: DataAboutColors,
+    val errorContainer: DataAboutColors,
+    val onErrorContainer: DataAboutColors,
+    val outline: DataAboutColors,
+    val outlineVariant: DataAboutColors,
+    val inverseSurface: DataAboutColors,
+    val inverseOnSurface: DataAboutColors,
+    val inversePrimary: DataAboutColors,
+    val scrim: DataAboutColors,
+    val shadow: DataAboutColors
+) {
+    fun toListOfDataAboutColors() = listOf(
+        primary,
+        onPrimary,
+        primaryContainer,
+        onPrimaryContainer,
+        secondary,
+        onSecondary,
+        secondaryContainer,
+        onSecondaryContainer,
+        tertiary,
+        onTertiary,
+        tertiaryContainer,
+        onTertiaryContainer,
+        surface,
+        surfaceDim,
+        surfaceBright,
+        onSurface,
+        surfaceContainerLowest,
+        surfaceContainerLow,
+        surfaceContainer,
+        surfaceContainerHigh,
+        surfaceContainerHighest,
+        onSurfaceVariant,
+        error,
+        onError,
+        errorContainer,
+        onErrorContainer,
+        outline,
+        outlineVariant,
+        inverseSurface,
+        inverseOnSurface,
+        inversePrimary,
+        scrim,
+        shadow
+    )
 }
 
-enum class ColorRolesShared(val dataAboutColors: DataAboutColors) {
-	PrimaryFixed(
-		DataAboutColors("primary_fixed") {
-			primaryTones.find { it.tone == 90 }!!.colorValue
-		}
-	),
-	OnPrimaryFixed(
-		DataAboutColors("on_primary_fixed") {
-			primaryTones.find { it.tone == 10 }!!.colorValue
-		}
-	),
-	PrimaryFixedDim(
-		DataAboutColors("on_primary_fixed_dim") {
-			primaryTones.find { it.tone == 80 }!!.colorValue
-		}
-	),
-	OnPrimaryFixedVariant(
-		DataAboutColors("on_primary_fixed_variant") {
-			primaryTones.find { it.tone == 30 }!!.colorValue
-		}
-	),
-	SecondaryFixed(
-		DataAboutColors("secondary_fixed") {
-			secondaryTones.find { it.tone == 90 }!!.colorValue
-		}
-	),
-	OnSecondaryFixed(
-		DataAboutColors("on_secondary_fixed") {
-			secondaryTones.find { it.tone == 10 }!!.colorValue
-		}
-	),
-	SecondaryFixedDim(
-		DataAboutColors("on_secondary_fixed_dim") {
-			secondaryTones.find { it.tone == 80 }!!.colorValue
-		}
-	),
-	OnSecondaryFixedVariant(
-		DataAboutColors("on_secondary_fixed_variant") {
-			secondaryTones.find { it.tone == 30 }!!.colorValue
-		}
-	),
-	TertiaryFixed(
-		DataAboutColors("tertiary_fixed") {
-			tertiaryTones.find { it.tone == 90 }!!.colorValue
-		}
-	),
-	OnTertiaryFixed(
-		DataAboutColors("on_tertiary_fixed") {
-			tertiaryTones.find { it.tone == 10 }!!.colorValue
-		}
-	),
-	TertiaryFixedDim(
-		DataAboutColors("on_tertiary_fixed_dim") {
-			tertiaryTones.find { it.tone == 80 }!!.colorValue
-		}
-	),
-	OnTertiaryFixedVariant(
-		DataAboutColors("on_tertiary_fixed_variant") {
-			tertiaryTones.find { it.tone == 30 }!!.colorValue
-		}
-	)
+data class ColorRolesShared(
+    val primaryFixed: DataAboutColors,
+    val onPrimaryFixed: DataAboutColors,
+    val primaryFixedDim: DataAboutColors,
+    val onPrimaryFixedVariant: DataAboutColors,
+    val secondaryFixed: DataAboutColors,
+    val onSecondaryFixed: DataAboutColors,
+    val secondaryFixedDim: DataAboutColors,
+    val onSecondaryFixedVariant: DataAboutColors,
+    val tertiaryFixed: DataAboutColors,
+    val onTertiaryFixed: DataAboutColors,
+    val tertiaryFixedDim: DataAboutColors,
+    val onTertiaryFixedVariant: DataAboutColors
+) {
+    fun toListOfDataAboutColors() = listOf(
+        primaryFixed,
+        onPrimaryFixed,
+        primaryFixedDim,
+        onPrimaryFixedVariant,
+        secondaryFixed,
+        onSecondaryFixed,
+        secondaryFixedDim,
+        onSecondaryFixedVariant,
+        tertiaryFixed,
+        onTertiaryFixed,
+        tertiaryFixedDim,
+        onTertiaryFixedVariant
+    )
 }
 
-enum class AdditionalColors(val dataAboutColors: DataAboutColors) {
-	White(
-		DataAboutColors("white") { Color.White }
-	),
-	Black(
-		DataAboutColors("black") { Color.Black }
-	),
-	SurfaceElevationLevel3Light(
-		DataAboutColors("surface_elevation_level_3_light") {
-			var color = Color.Red
-			TelemoneTheme(false) { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
-			color
-		}
-	),
-	SurfaceElevationLevel3Dark(
-		DataAboutColors("surface_elevation_level_3_dark") {
-			var color = Color.Red
-			TelemoneTheme(true) { color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) }
-			color
-		}
-	),
-	Transparent(
-		DataAboutColors("transparent") { Color.Transparent }
-	);
+private fun getSharedColorRoles(
+    primaryTones: List<ToneInfo>,
+    secondaryTones: List<ToneInfo>,
+    tertiaryTones: List<ToneInfo>
+) = ColorRolesShared(
+    primaryFixed = DataAboutColors(
+        "primary_fixed",
+        primaryTones.find { it.tone == 90 }!!.colorValue
+    ),
+    onPrimaryFixed = DataAboutColors(
+        "on_primary_fixed",
+        primaryTones.find { it.tone == 10 }!!.colorValue
+    ),
+    primaryFixedDim = DataAboutColors(
+        "on_primary_fixed_dim", // oops TODO migration (maybe. this app does not have much time to live)
+        primaryTones.find { it.tone == 80 }!!.colorValue
+    ),
+    onPrimaryFixedVariant = DataAboutColors(
+        "on_primary_fixed_variant",
+        primaryTones.find { it.tone == 30 }!!.colorValue
+    ),
+    secondaryFixed = DataAboutColors(
+        "secondary_fixed",
+        secondaryTones.find { it.tone == 90 }!!.colorValue
+    ),
+    onSecondaryFixed = DataAboutColors(
+        "on_secondary_fixed",
+        secondaryTones.find { it.tone == 10 }!!.colorValue
+    ),
+    secondaryFixedDim = DataAboutColors(
+        "on_secondary_fixed_dim",
+        secondaryTones.find { it.tone == 80 }!!.colorValue
+    ),
+    onSecondaryFixedVariant = DataAboutColors(
+        "on_secondary_fixed_variant",
+        secondaryTones.find { it.tone == 30 }!!.colorValue
+    ),
+    tertiaryFixed = DataAboutColors(
+        "tertiary_fixed",
+        tertiaryTones.find { it.tone == 90 }!!.colorValue
+    ),
+    onTertiaryFixed = DataAboutColors(
+        "on_tertiary_fixed",
+        tertiaryTones.find { it.tone == 10 }!!.colorValue
+    ),
+    tertiaryFixedDim = DataAboutColors(
+        "on_tertiary_fixed_dim",
+        tertiaryTones.find { it.tone == 80 }!!.colorValue
+    ),
+    onTertiaryFixedVariant = DataAboutColors(
+        "on_tertiary_fixed_variant",
+        tertiaryTones.find { it.tone == 30 }!!.colorValue
+    )
+)
 
-	operator fun component1() = this.dataAboutColors.colorToken
-
-	@Composable
-	operator fun component2() = this.dataAboutColors.colorValue()
+data class AdditionalColors(
+    val white: DataAboutColors,
+    val black: DataAboutColors,
+    val surfaceElevationLevel3Light: DataAboutColors,
+    val surfaceElevationLevel3Dark: DataAboutColors,
+    val transparent: DataAboutColors
+) {
+    fun toListOfDataAboutColors() = listOf(
+        white,
+        black,
+        surfaceElevationLevel3Light,
+        surfaceElevationLevel3Dark,
+        transparent
+    )
 }
 
-val primaryTones
-	@Composable
-	get() = possibleTones.map { toneNumber ->
-		val color = when (toneNumber) {
-			100 -> colorResource(system_accent1_0)
-			99 -> colorResource(system_accent1_10)
-			95 -> colorResource(system_accent1_50)
-			90 -> colorResource(system_accent1_100)
-			80 -> colorResource(system_accent1_200)
-			70 -> colorResource(system_accent1_300)
-			60 -> colorResource(system_accent1_400)
-			50 -> colorResource(system_accent1_500)
-			40 -> colorResource(system_accent1_600)
-			30 -> colorResource(system_accent1_700)
-			20 -> colorResource(system_accent1_800)
-			10 -> colorResource(system_accent1_900)
-			else -> colorResource(system_accent1_1000)
-		}
+private fun getAdditionalColors(
+    surfaceElevationLevel3Light: Color,
+    surfaceElevationLevel3Dark: Color
+) = AdditionalColors(
+    white = DataAboutColors("white", Color.White),
+    black = DataAboutColors("black", Color.Black),
+    surfaceElevationLevel3Light = DataAboutColors(
+        "surface_elevation_level_3_light",
+        surfaceElevationLevel3Light
+    ),
+    surfaceElevationLevel3Dark = DataAboutColors(
+        "surface_elevation_level_3_dark",
+        surfaceElevationLevel3Dark
+    ),
+    transparent = DataAboutColors("transparent", Color.Transparent)
+)
 
-		ToneInfo(
-			toneNumber,
-			colorToken ="primary_$toneNumber",
-			colorValue = color
-		)
-	}
+private val primaryTones
+    @Composable
+    get() = possibleTones.map { toneNumber ->
+        val color = when (toneNumber) {
+            100 -> colorResource(system_accent1_0)
+            99 -> colorResource(system_accent1_10)
+            95 -> colorResource(system_accent1_50)
+            90 -> colorResource(system_accent1_100)
+            80 -> colorResource(system_accent1_200)
+            70 -> colorResource(system_accent1_300)
+            60 -> colorResource(system_accent1_400)
+            50 -> colorResource(system_accent1_500)
+            40 -> colorResource(system_accent1_600)
+            30 -> colorResource(system_accent1_700)
+            20 -> colorResource(system_accent1_800)
+            10 -> colorResource(system_accent1_900)
+            else -> colorResource(system_accent1_1000)
+        }
 
-val secondaryTones
-	@Composable
-	get() = possibleTones.map { toneNumber ->
-		val color = when (toneNumber) {
-			100 -> colorResource(system_accent2_0)
-			99 -> colorResource(system_accent2_10)
-			95 -> colorResource(system_accent2_50)
-			90 -> colorResource(system_accent2_100)
-			80 -> colorResource(system_accent2_200)
-			70 -> colorResource(system_accent2_300)
-			60 -> colorResource(system_accent2_400)
-			50 -> colorResource(system_accent2_500)
-			40 -> colorResource(system_accent2_600)
-			30 -> colorResource(system_accent2_700)
-			20 -> colorResource(system_accent2_800)
-			10 -> colorResource(system_accent2_900)
-			else -> colorResource(system_accent2_1000)
-		}
+        ToneInfo(
+            toneNumber,
+            colorToken = "primary_$toneNumber",
+            colorValue = color
+        )
+    }
 
-		ToneInfo(
-			toneNumber,
-			colorToken ="secondary_$toneNumber",
-			colorValue = color
-		)
-	}
+private val secondaryTones
+    @Composable
+    get() = possibleTones.map { toneNumber ->
+        val color = when (toneNumber) {
+            100 -> colorResource(system_accent2_0)
+            99 -> colorResource(system_accent2_10)
+            95 -> colorResource(system_accent2_50)
+            90 -> colorResource(system_accent2_100)
+            80 -> colorResource(system_accent2_200)
+            70 -> colorResource(system_accent2_300)
+            60 -> colorResource(system_accent2_400)
+            50 -> colorResource(system_accent2_500)
+            40 -> colorResource(system_accent2_600)
+            30 -> colorResource(system_accent2_700)
+            20 -> colorResource(system_accent2_800)
+            10 -> colorResource(system_accent2_900)
+            else -> colorResource(system_accent2_1000)
+        }
 
-val tertiaryTones
-	@Composable
-	get() = possibleTones.map { toneNumber ->
-		val color = when (toneNumber) {
-			100 -> colorResource(system_accent3_0)
-			99 -> colorResource(system_accent3_10)
-			95 -> colorResource(system_accent3_50)
-			90 -> colorResource(system_accent3_100)
-			80 -> colorResource(system_accent3_200)
-			70 -> colorResource(system_accent3_300)
-			60 -> colorResource(system_accent3_400)
-			50 -> colorResource(system_accent3_500)
-			40 -> colorResource(system_accent3_600)
-			30 -> colorResource(system_accent3_700)
-			20 -> colorResource(system_accent3_800)
-			10 -> colorResource(system_accent3_900)
-			else -> colorResource(system_accent3_1000)
-		}
-		ToneInfo(
-			toneNumber,
-			colorToken ="tertiary_$toneNumber",
-			colorValue = color
-		)
-	}
+        ToneInfo(
+            toneNumber,
+            colorToken = "secondary_$toneNumber",
+            colorValue = color
+        )
+    }
 
-val neutralTones
-	@Composable
-	get() = possibleTones.map { toneNumber ->
-		val color = when (toneNumber) {
-			100 -> colorResource(system_neutral1_0)
-			99 -> colorResource(system_neutral1_10)
-			95 -> colorResource(system_neutral1_50)
-			90 -> colorResource(system_neutral1_100)
-			80 -> colorResource(system_neutral1_200)
-			70 -> colorResource(system_neutral1_300)
-			60 -> colorResource(system_neutral1_400)
-			50 -> colorResource(system_neutral1_500)
-			40 -> colorResource(system_neutral1_600)
-			30 -> colorResource(system_neutral1_700)
-			20 -> colorResource(system_neutral1_800)
-			10 -> colorResource(system_neutral1_900)
-			else -> colorResource(system_neutral1_1000)
-		}
-		ToneInfo(
-			toneNumber,
-			colorToken ="neutral_$toneNumber",
-			colorValue = color
-		)
-	}
+private val tertiaryTones
+    @Composable
+    get() = possibleTones.map { toneNumber ->
+        val color = when (toneNumber) {
+            100 -> colorResource(system_accent3_0)
+            99 -> colorResource(system_accent3_10)
+            95 -> colorResource(system_accent3_50)
+            90 -> colorResource(system_accent3_100)
+            80 -> colorResource(system_accent3_200)
+            70 -> colorResource(system_accent3_300)
+            60 -> colorResource(system_accent3_400)
+            50 -> colorResource(system_accent3_500)
+            40 -> colorResource(system_accent3_600)
+            30 -> colorResource(system_accent3_700)
+            20 -> colorResource(system_accent3_800)
+            10 -> colorResource(system_accent3_900)
+            else -> colorResource(system_accent3_1000)
+        }
+        ToneInfo(
+            toneNumber,
+            colorToken = "tertiary_$toneNumber",
+            colorValue = color
+        )
+    }
+
+private val neutralTones
+    @Composable
+    get() = possibleTones.map { toneNumber ->
+        val color = when (toneNumber) {
+            100 -> colorResource(system_neutral1_0)
+            99 -> colorResource(system_neutral1_10)
+            95 -> colorResource(system_neutral1_50)
+            90 -> colorResource(system_neutral1_100)
+            80 -> colorResource(system_neutral1_200)
+            70 -> colorResource(system_neutral1_300)
+            60 -> colorResource(system_neutral1_400)
+            50 -> colorResource(system_neutral1_500)
+            40 -> colorResource(system_neutral1_600)
+            30 -> colorResource(system_neutral1_700)
+            20 -> colorResource(system_neutral1_800)
+            10 -> colorResource(system_neutral1_900)
+            else -> colorResource(system_neutral1_1000)
+        }
+        ToneInfo(
+            toneNumber,
+            colorToken = "neutral_$toneNumber",
+            colorValue = color
+        )
+    }
 
 // if only google provided a way to get the m3 tonal palette🤡🤡🤡
-val neutralVariantTones
-	@Composable
-	get () = possibleTones.map { toneNumber ->
-		val color = when (toneNumber) {
-			100 -> colorResource(system_neutral2_0)
-			99 -> colorResource(system_neutral2_10)
-			95 -> colorResource(system_neutral2_50)
-			90 -> colorResource(system_neutral2_100)
-			80 -> colorResource(system_neutral2_200)
-			70 -> colorResource(system_neutral2_300)
-			60 -> colorResource(system_neutral2_400)
-			50 -> colorResource(system_neutral2_500)
-			40 -> colorResource(system_neutral2_600)
-			30 -> colorResource(system_neutral2_700)
-			20 -> colorResource(system_neutral2_800)
-			10 -> colorResource(system_neutral2_900)
-			else -> colorResource(system_neutral2_1000)
-		}
+private val neutralVariantTones
+    @Composable
+    get() = possibleTones.map { toneNumber ->
+        val color = when (toneNumber) {
+            100 -> colorResource(system_neutral2_0)
+            99 -> colorResource(system_neutral2_10)
+            95 -> colorResource(system_neutral2_50)
+            90 -> colorResource(system_neutral2_100)
+            80 -> colorResource(system_neutral2_200)
+            70 -> colorResource(system_neutral2_300)
+            60 -> colorResource(system_neutral2_400)
+            50 -> colorResource(system_neutral2_500)
+            40 -> colorResource(system_neutral2_600)
+            30 -> colorResource(system_neutral2_700)
+            20 -> colorResource(system_neutral2_800)
+            10 -> colorResource(system_neutral2_900)
+            else -> colorResource(system_neutral2_1000)
+        }
 
-		ToneInfo(
-			toneNumber,
-			colorToken ="neutral_variant_$toneNumber",
-			colorValue = color
-		)
-	}
+        ToneInfo(
+            toneNumber,
+            colorToken = "neutral_variant_$toneNumber",
+            colorValue = color
+        )
+    }
 
-val blueTones @Composable get() = blue.getCustomTones(name = "blue")
-val redTones @Composable get() = red.getCustomTones(name = "red")
-val greenTones @Composable get() = green.getCustomTones(name = "green")
-val orangeTones @Composable get() = orange.getCustomTones(name = "orange")
-val violetTones @Composable get() = violet.getCustomTones(name = "violet")
-val pinkTones @Composable get() = pink.getCustomTones(name = "pink")
-val cyanTones @Composable get() = cyan.getCustomTones(name = "cyan")
+private val blueTones @Composable get() = blue.getCustomTones(name = "blue")
+private val redTones @Composable get() = red.getCustomTones(name = "red")
+private val greenTones @Composable get() = green.getCustomTones(name = "green")
+private val orangeTones @Composable get() = orange.getCustomTones(name = "orange")
+private val violetTones @Composable get() = violet.getCustomTones(name = "violet")
+private val pinkTones @Composable get() = pink.getCustomTones(name = "pink")
+private val cyanTones @Composable get() = cyan.getCustomTones(name = "cyan")
 
 @Stable
 @Composable
-fun Color.getCustomTones(name: String): List<ToneInfo> {
-	return possibleTones.map { toneNumber ->
-		ToneInfo(
-			toneNumber,
-			colorToken = "${name}_$toneNumber",
-			colorValue = this
-				.harmonize(colorResource(system_accent1_500))
-				.matchSaturation(toThatOf = colorResource(system_accent1_500))
-				.getTone(toneNumber)
-		)
-	}
+private fun Color.getCustomTones(name: String): List<ToneInfo> {
+    return possibleTones.map { toneNumber ->
+        ToneInfo(
+            toneNumber,
+            colorToken = "${name}_$toneNumber",
+            colorValue = this
+                .harmonize(colorResource(system_accent1_500))
+                .matchSaturation(toThatOf = colorResource(system_accent1_500))
+                .getTone(toneNumber)
+        )
+    }
 }
 
 @Immutable
 data class ToneInfo(val tone: Int, val colorToken: String, val colorValue: Color)
 
 @Immutable
-data class DataAboutColors(val colorToken: String, val colorValue: @Composable () -> Color)
+data class DataAboutColors(val colorToken: String, val colorValue: Color)
 
-fun Color.matchSaturation(toThatOf: Color, saturationMultiplier: Double = 0.9): Color {
-	val source = this.toHct()
-	val target = toThatOf.toHct()
+private fun Color.matchSaturation(toThatOf: Color, saturationMultiplier: Double = 0.9): Color {
+    val source = this.toHct()
+    val target = toThatOf.toHct()
 
-	val result = Hct.from(
-		hue = source.hue,
-		chroma = target.chroma * saturationMultiplier,
-		tone = source.tone
-	)
+    val result = Hct.from(
+        hue = source.hue,
+        chroma = target.chroma * saturationMultiplier,
+        tone = source.tone
+    )
 
-	return Color(result.toInt())
+    return Color(result.toInt())
 }
 
-val possibleTones = listOf(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100)
+private val possibleTones = listOf(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100)
 
-fun Color.getTone(tone: Int) = Color(TonalPalette.from(this).tone(tone))
+private fun Color.getTone(tone: Int) = Color(TonalPalette.from(this).tone(tone))
 
 fun Color.blendWith(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float): Color {
-	val inv = 1f - ratio
-	return copy(
-		red = red * inv + color.red * ratio,
-		blue = blue * inv + color.blue * ratio,
-		green = green * inv + color.green * ratio,
-	)
+    val inv = 1f - ratio
+    return copy(
+        red = red * inv + color.red * ratio,
+        blue = blue * inv + color.blue * ratio,
+        green = green * inv + color.green * ratio,
+    )
 }
 
 val blue = Color.Blue
