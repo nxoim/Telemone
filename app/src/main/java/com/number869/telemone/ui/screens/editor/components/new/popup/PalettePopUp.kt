@@ -59,6 +59,7 @@ import com.number869.telemone.ui.theme.ColorRolesShared
 import com.number869.telemone.ui.theme.PaletteState
 import com.number869.telemone.ui.theme.ToneInfo
 
+// TODO more optimisations can be done but its fast enough
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PalettePopup(
