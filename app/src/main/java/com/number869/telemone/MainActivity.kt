@@ -6,9 +6,11 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.defaultComponentContext
 import com.number869.telemone.data.InstanceDeclarator
@@ -31,6 +33,8 @@ class MainActivity : ComponentActivity() {
 	@SuppressLint("RememberReturnType")
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		installSplashScreen()
 
 		val navigationRootDataProvider = defaultNavigationRootData()
 

@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-val version = "1.4.2"
-val versionNumber = 9
+val version = "1.4.3"
+val versionNumber = 10
 
 android {
     namespace = "com.number869.telemone"
@@ -70,6 +70,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.androidx.splashscreen)
 
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.lazycolumnscrollbar)

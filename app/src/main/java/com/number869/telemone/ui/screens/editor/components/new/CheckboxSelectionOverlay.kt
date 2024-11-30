@@ -29,12 +29,11 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 @OptIn(ExperimentalTransitionApi::class)
 @Composable
 fun CheckboxSelectionOverlay(
-    isVisible: Boolean,
     selected: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     AnimatedVisibility(
-        visible = isVisible,
+        visible = selected,
         enter = fadeIn(),
         exit = fadeOut()
     ) {

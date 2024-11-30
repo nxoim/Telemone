@@ -15,6 +15,7 @@ androidxTestEspresso = "3.6.1"
 lazyColumnScrollbar = "1.7.2"
 decomposite = "0.2.1.0-p0"
 realm = "3.0.0"
+androidx-splashscreen = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -39,6 +40,7 @@ androidx-compose-material-icons-extended = { module = "androidx.compose.material
 lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazyColumnScrollbar" }
 decomposite = { module = "com.nxoim:decomposite", version.ref = "decomposite" }
 realm-library-base = { module = "io.realm.kotlin:library-base", version.ref = "realm"}
+androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-splashscreen" }
 
 
 [plugins]
