@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-val version = "1.4.2"
-val versionNumber = 9
+val version = "1.4.3"
+val versionNumber = 10
 
 android {
     namespace = "com.number869.telemone"
