@@ -4,7 +4,7 @@
     <style name="Theme.Telemone" parent="Theme.AppCompat.DayNight.DarkActionBar" />
 
     <style name="Theme.TelemoneSplash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@android:color/system_neutral1_10</item>
+        <item name="windowSplashScreenBackground">@android:color/system_neutral1_900</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_splash</item>
         <item name="postSplashScreenTheme">@style/Theme.Telemone</item>
     </style>
