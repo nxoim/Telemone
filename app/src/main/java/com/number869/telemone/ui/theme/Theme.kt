@@ -56,7 +56,7 @@ fun TelemoneTheme(
             window.isNavigationBarContrastEnforced = false
 
             WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
