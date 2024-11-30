@@ -316,7 +316,6 @@ private fun SavedThemesSection(
 								},
 								overlay = {
 									CheckboxSelectionOverlay(
-										isVisible = vm.themeSelectionToolbarIsVisible,
 										selected = vm.selectedThemes.contains(theme.uuid),
 										onCheckedChange = { vm.selectOrUnselectSavedTheme(theme.uuid) }
 									)
