@@ -334,7 +334,7 @@ private fun TheSearchbar(
 							ElementColorItem(
 								Modifier
 									.padding(horizontal = 16.dp)
-									.animateItemPlacement(),
+									.animateItem(),
 								paletteState = inject(),
 								uiElementData = uiElementData,
 								index = index,

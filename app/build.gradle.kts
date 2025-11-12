@@ -11,12 +11,12 @@ val versionNumber = 10
 
 android {
     namespace = "com.number869.telemone"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.number869.telemone"
         minSdk = 31
-        targetSdk = 35
+        targetSdk = 36
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
