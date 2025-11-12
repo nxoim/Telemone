@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-dontwarn java.awt.event.ActionListener
+-dontwarn javax.swing.SwingUtilities
+-dontwarn javax.swing.Timer

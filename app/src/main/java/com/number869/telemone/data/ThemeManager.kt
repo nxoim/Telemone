@@ -39,8 +39,6 @@ class ThemeManager(
     val paletteState get() = paletteStateAccessor()
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    val themeList = themeRepository.getAllThemes()
-
     private val palette get() = paletteState.entirePaletteAsMap
 
     private var _mappedValues = MutableStateFlow(mapOf<String, UiElementColorData>())
@@ -48,11 +46,12 @@ class ThemeManager(
     var defaultCurrentTheme = mutableStateListOf<UiElementColorData>()
     private var loadedFromFileTheme = mutableStateMapOf<String, UiElementColorData>()
 
+    fun getThemes(range: IntRange) = themeRepository.getThemesInRange(range)
+    fun countSavedThemes() = themeRepository.getThemeCount()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun saveCurrentTheme() = scope.launch(start = CoroutineStart.ATOMIC) {
-        val data: List<UiElementColorData>
-
-        withContext(Dispatchers.Default) { data = _mappedValues.value.values.toList() }
+        val data = _mappedValues.value.values.toList()
 
         themeRepository.saveTheme(ThemeData(UUID.randomUUID().toString(), data))
     }

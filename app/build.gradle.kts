@@ -78,4 +78,5 @@ dependencies {
     implementation(libs.decomposite)
 
     implementation(libs.realm.library.base)
+    implementation(libs.evolpagink)
 }

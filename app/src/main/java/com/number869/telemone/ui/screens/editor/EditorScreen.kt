@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -49,7 +48,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -66,6 +64,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.ui.SmallTintedLabel
@@ -84,7 +83,12 @@ import com.number869.telemone.ui.screens.editor.components.new.SavedThemeDropdow
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
 import com.nxoim.decomposite.core.common.navigation.NavController
-import kotlinx.coroutines.Dispatchers
+import com.nxoim.evolpagink.compose.items
+import com.nxoim.evolpagink.compose.toState
+import com.nxoim.evolpagink.core.Pageable
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
@@ -103,7 +107,6 @@ fun EditorScreen(
 
 	val colorDisplayType = getColorDisplayType()
 
-	val themeList = vm.themeList.collectAsState(listOf())
 	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState()
 	val newUiElements by vm.newUiElements.collectAsState(listOf())
 	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf())
@@ -161,7 +164,6 @@ fun EditorScreen(
 						SavedThemesSection(
 							dialogsNavController,
 							vm,
-							themeList,
 							colorDisplayType
 						)
 					}
@@ -207,19 +209,26 @@ private fun CurrentThemeSection(
 
 @Composable
 private fun SavedThemesSection(
-	dialogsNavController: NavController<EditorDestinations.Dialogs>,
-	vm: EditorViewModel,
-	themeListState: State<List<ThemeData>>,
-	colorDisplayType: ThemeColorPreviewDisplayType
+    dialogsNavController: NavController<EditorDestinations.Dialogs>,
+    vm: EditorViewModel,
+    colorDisplayType: ThemeColorPreviewDisplayType
 ) {
-	val themeList by themeListState
-	val savedThemesRowState = rememberLazyListState()
+    val lazyThemeListState = rememberLazyListState()
+    val themePageable = vm.themesPageable.toState(
+        lazyThemeListState,
+        key = { it.uuid }
+    )
 	val displayingSavedThemes by remember {
-		derivedStateOf { themeList.isNotEmpty() }
+		derivedStateOf { themePageable.items.isNotEmpty() }
 	}
 
-	LaunchedEffect(themeList) {
-		if (themeList.isNotEmpty()) savedThemesRowState.animateScrollToItem(0)
+	LaunchedEffect(Unit) {
+        vm.themeCount.drop(1).collect {
+            launch {
+                lazyThemeListState.animateScrollToItem(0)
+            }
+            vm.themesPageable.jumpTo(0)
+        }
 	}
 
 	Row(
@@ -275,12 +284,12 @@ private fun SavedThemesSection(
 		) {
 			Column {
 				LazyRow(
-					state = savedThemesRowState,
+					state = lazyThemeListState,
 					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
 					horizontalArrangement = spacedBy(16.dp),
 					modifier = Modifier.animateContentSize()
 				) {
-					items(themeList, key = { item -> item.uuid }, contentType = { it::class.simpleName }) { theme ->
+					items(themePageable) { theme ->
 						var showDropDown by rememberSaveable { mutableStateOf(false) }
 
 						Box {
@@ -355,7 +364,7 @@ private fun SavedThemesSection(
 					}
 				}
 
-				ThemeSelectionToolbarSection(vm, themeList = themeList, dialogsNavController = dialogsNavController)
+				ThemeSelectionToolbarSection(vm, dialogsNavController = dialogsNavController)
 			}
 		}
 	}
@@ -394,8 +403,9 @@ private fun NoSavedThemesPlaceholder() {
 private fun ThemeSelectionToolbarSection(
 	vm: EditorViewModel,
 	dialogsNavController: NavController<EditorDestinations.Dialogs>,
-	themeList: List<ThemeData>
 ) {
+    val count by vm.themeCount.collectAsStateWithLifecycle()
+
 	Row(
 		Modifier.fillMaxWidth(),
 		horizontalArrangement = Arrangement.Center
@@ -408,7 +418,7 @@ private fun ThemeSelectionToolbarSection(
 			ThemeSelectionToolbar(
 				Modifier.padding(top = 16.dp),
 				selectedThemeCount = vm.selectedThemes.count(),
-				allThemesAreSelected = vm.selectedThemes.count() == themeList.count(),
+				allThemesAreSelected = vm.selectedThemes.count() == count,
 				unselectAllThemes = vm::unselectAllThemes,
 				selectAllThemes = vm::selectAllThemes,
 				hideToolbarAction = { vm.hideThemeSelectionModeToolbar() },
