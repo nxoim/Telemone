@@ -1,8 +1,6 @@
 package com.number869.telemone.data
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
@@ -11,11 +9,8 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
 import kotlin.reflect.KClass
@@ -31,20 +26,20 @@ fun settingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
 class SettingsManager(private val database: Realm) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun <T : Any> set(key: String, value: T?, type: KClass<out T>) = scope.launch {
+    fun <T : Any> setAsync(key: String, value: T?, type: KClass<out T>) = scope.launch {
         database.write {
             copyToRealm(asSettingType(key, value, type), UpdatePolicy.ALL)
         }
     }
 
-    fun <T : Any> setBlocking(key: String, value: T?, type: KClass<out T>) {
+    suspend fun <T : Any> setBlocking(key: String, value: T?, type: KClass<out T>) {
         database.writeBlocking {
             copyToRealm(asSettingType(key, value, type), UpdatePolicy.ALL)
         }
     }
 
     @JvmName("getBlockingNullable")
-    fun <T : Any> getBlocking(key: String, defaultValue: T? = null, type: KClass<out T>): T? {
+    suspend fun <T : Any> get(key: String, defaultValue: T? = null, type: KClass<out T>): T? {
         val realmSettingContainer = database
             .query(getSettingType(type),"key = '$key'")
             .first()
@@ -55,7 +50,7 @@ class SettingsManager(private val database: Realm) {
             ?: defaultValue
     }
 
-    fun <T : Any> getBlocking(key: String, defaultValue: T, type: KClass<out T>): T {
+    suspend fun <T : Any> get(key: String, defaultValue: T, type: KClass<out T>): T {
         val realmSettingContainer = database
             .query(getSettingType(type),"key = '$key'")
             .first()
@@ -88,31 +83,6 @@ class SettingsManager(private val database: Realm) {
                 ?.let { getValueFromSettingContainer(type, it) as T? }
                 ?: defaultValue
         }
-
-    fun <T : Any> getAsStateFlow(key: String, defaultValue: T, type: KClass<out T>): StateFlow<T> =
-        getAsFlow(
-            key,
-            defaultValue,
-            type
-        )
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = getBlocking(key, defaultValue, type)
-        )
-
-    @JvmName("getAsStateFlowNullable")
-    fun <T : Any> getAsStateFlow(key: String, defaultValue: T?, type: KClass<out T>): StateFlow<T?> =
-        getAsFlow(
-            key,
-            defaultValue,
-            type
-        )
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = getBlocking(key, defaultValue, type)
-        )
 }
 
 private fun <T : Any> getValueFromSettingContainer(type: KClass<T>, obj: RealmObject) = when(type) {
@@ -210,42 +180,34 @@ val settingsRealmSchemas = setOf(
 @Immutable
 class Setting<T : Any>(
     private val key: String,
-    private val defaultValue: T,
+    val defaultValue: T,
     private val targetSettingsManager: SettingsManager
 ) {
-    fun set(newValue: T) = targetSettingsManager
-        .set(key, newValue, defaultValue::class)
-    fun setBlocking(newValue: T) = targetSettingsManager
+    fun setAsync(newValue: T) = targetSettingsManager
+        .setAsync(key, newValue, defaultValue::class)
+    suspend fun setBlocking(newValue: T) = targetSettingsManager
         .setBlocking(key, newValue, defaultValue::class)
-    fun get() = targetSettingsManager
-        .getBlocking(key, defaultValue, defaultValue::class)
+    suspend fun get() = targetSettingsManager
+        .get(key, defaultValue, defaultValue::class)
     fun getAsFlow() = targetSettingsManager
         .getAsFlow(key, defaultValue, defaultValue::class)
-    fun getAsStateFlow() = targetSettingsManager
-        .getAsStateFlow(key, defaultValue, defaultValue::class)
-    @Composable
-    fun asState() = getAsStateFlow().collectAsState()
 }
 
 @Immutable
 class NullableSetting<T : Any>(
     private val key: String,
     private val type: KClass<out T>,
-    private val defaultValue: T? = null,
+    val defaultValue: T? = null,
     private val targetSettingsManager: SettingsManager,
 ) {
-    fun set(newValue: T?) = targetSettingsManager
-        .set(key, newValue, type)
-    fun setBlocking(newValue: T?) = targetSettingsManager
+    fun setAsync(newValue: T?) = targetSettingsManager
+        .setAsync(key, newValue, type)
+    suspend fun setBlocking(newValue: T?) = targetSettingsManager
         .setBlocking(key, newValue, type)
-    fun get() = targetSettingsManager
-        .getBlocking(key, defaultValue, type)
+    suspend fun get() = targetSettingsManager
+        .get(key, defaultValue, type)
     fun getAsFlow() = targetSettingsManager
         .getAsFlow(key, defaultValue, type)
-    fun getAsStateFlow() = targetSettingsManager
-        .getAsStateFlow(key, defaultValue, type)
-    @Composable
-    fun asState() = getAsStateFlow().collectAsState()
 }
 
 fun settingsManagerInitializer() = SettingsManager(settingsRealm("default"))

@@ -1,7 +1,12 @@
 package com.number869.telemone.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.ui.screens.about.AboutDestinations
@@ -27,35 +32,42 @@ fun Navigator(
     themeManager: ThemeManager,
     appSettings: AppSettings
 ) {
-	val skipWelcomeScreen = AppSettings.agreedToConditions.get()
-	val startDestination = if (skipWelcomeScreen) RootDestinations.Main else RootDestinations.Welcome
+	val skipWelcomeScreen by AppSettings.agreedToConditions
+        .getAsFlow()
+        .collectAsState(null)
 
-	val rootNavController = navController(startingDestination = startDestination)
-	NavHost(
-		rootNavController,
-		animations = {
-			scale(minimumScale = 0.7f, affectByGestures = false) + fade() + slide(dependOnSwipeEdge = true)
-		}
-	) {
-		when (it) {
-			RootDestinations.Welcome -> WelcomeScreen(rootNavController)
-			RootDestinations.Main -> MainScreen(
+    Crossfade(skipWelcomeScreen) { skip ->
+        if (skip != null) {
+            val startDestination = if (skip) RootDestinations.Main else RootDestinations.Welcome
+
+            val rootNavController = navController(startingDestination = startDestination)
+            NavHost(
                 rootNavController,
-                viewModel { MainViewModel(themeManager, appSettings) }
-            )
-			RootDestinations.Editor -> EditorNavigator(
-				viewModel { EditorViewModel(themeManager) },
-				rootNavController,
-				navController<EditorDestinations>(EditorDestinations.Editor),
-				navController<EditorDestinations.Dialogs>(EditorDestinations.Dialogs.Empty)
-			)
-			RootDestinations.About -> AboutNavigator(
-				rootNavController,
-				navController<AboutDestinations>(AboutDestinations.About),
-				navController<AboutDestinations.Dialogs>(AboutDestinations.Dialogs.Empty)
-			)
-		}
-	}
+                animations = {
+                    scale(minimumScale = 0.7f, affectByGestures = false) + fade() + slide(dependOnSwipeEdge = true)
+                }
+            ) {
+                when (it) {
+                    RootDestinations.Welcome -> WelcomeScreen(rootNavController)
+                    RootDestinations.Main -> MainScreen(
+                        rootNavController,
+                        viewModel { MainViewModel(themeManager, appSettings) }
+                    )
+                    RootDestinations.Editor -> EditorNavigator(
+                        viewModel { EditorViewModel(themeManager) },
+                        rootNavController,
+                        navController<EditorDestinations>(EditorDestinations.Editor),
+                        navController<EditorDestinations.Dialogs>(EditorDestinations.Dialogs.Empty)
+                    )
+                    RootDestinations.About -> AboutNavigator(
+                        rootNavController,
+                        navController<AboutDestinations>(AboutDestinations.About),
+                        navController<AboutDestinations.Dialogs>(AboutDestinations.Dialogs.Empty)
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Immutable

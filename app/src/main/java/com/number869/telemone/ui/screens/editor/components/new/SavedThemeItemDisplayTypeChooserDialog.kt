@@ -99,7 +99,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         SelectionDialogItem(
                             text = "Saved color values",
                             selectThisItem = {
-                                AppSettings.savedThemeDisplayType.set(
+                                AppSettings.savedThemeDisplayType.setAsync(
                                     ThemeColorPreviewDisplayType.SavedColorValues.id
                                 )
                                 displayTheDialog = false
@@ -110,7 +110,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         SelectionDialogItem(
                             text = "Current color scheme (fallback to saved colors)",
                             selectThisItem = {
-                                AppSettings.savedThemeDisplayType.set(
+                                AppSettings.savedThemeDisplayType.setAsync(
                                     ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback.id
                                 )
                                 displayTheDialog = false
@@ -122,7 +122,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         SelectionDialogItem(
                             text = "Current color scheme",
                             selectThisItem = {
-                                AppSettings.savedThemeDisplayType.set(
+                                AppSettings.savedThemeDisplayType.setAsync(
                                     ThemeColorPreviewDisplayType.CurrentColorScheme.id
                                 )
                                 displayTheDialog = false

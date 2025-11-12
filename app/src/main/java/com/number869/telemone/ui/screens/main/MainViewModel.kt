@@ -2,7 +2,6 @@ package com.number869.telemone.ui.screens.main
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import com.number869.telemone.App
 import com.number869.telemone.data.AppSettings
@@ -15,7 +14,6 @@ import com.number869.telemone.shared.utils.stringify
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
@@ -90,11 +88,11 @@ class MainViewModel(
         themeManager.updateDefaultThemeFromStock(light)
 
         if (light) {
-            AppSettings.lastAcceptedStockThemeHashLight.set(
+            AppSettings.lastAcceptedStockThemeHashLight.setAsync(
                 assetFoldersThemeHash(light = true, context)
             )
         } else {
-            AppSettings.lastAcceptedStockThemeHashDark.set(
+            AppSettings.lastAcceptedStockThemeHashDark.setAsync(
                 assetFoldersThemeHash(light = false, context)
             )
         }
@@ -104,9 +102,9 @@ class MainViewModel(
     fun declineThemeUpdate(light: Boolean, context: Context) {
         if (light)
             AppSettings.lastDeclinedStockThemeHashLight
-                .set(assetFoldersThemeHash(light = true, context))
+                .setAsync(assetFoldersThemeHash(light = true, context))
         else
             AppSettings.lastDeclinedStockThemeHashDark
-                .set(assetFoldersThemeHash(light = false, context))
+                .setAsync(assetFoldersThemeHash(light = false, context))
     }
 }

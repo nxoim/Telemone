@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -74,7 +75,9 @@ enum class ThemeColorPreviewDisplayType(val id: Int) {
 
 @Composable
 fun getColorDisplayType(): ThemeColorPreviewDisplayType {
-    val colorDisplayType by AppSettings.savedThemeDisplayType.asState()
+    val colorDisplayType by AppSettings.savedThemeDisplayType.run {
+        getAsFlow().collectAsState(defaultValue)
+    }
 
     return when (colorDisplayType) {
         1 -> ThemeColorPreviewDisplayType.SavedColorValues
