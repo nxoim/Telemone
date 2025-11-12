@@ -2,6 +2,7 @@ package com.number869.telemone.ui.screens.about
 
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -39,15 +40,6 @@ fun AboutScreen(
 ) {
     val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val listOfItems = listOf<@Composable () -> Unit>(
-        { DescriptionItem() },
-        { VersionItem() },
-        { DevelopersItem() },
-        { SourceAndLinksItem() },
-        { SpecialMentionsItem() },
-        { LegalItem(dialogsNavController) }
-    )
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -63,21 +55,25 @@ fun AboutScreen(
                 scrollBehavior = topAppBarState
             )
         },
-        bottomBar = { Box {} }, // hello edge-to-edge,
         modifier = Modifier.nestedScroll(topAppBarState.nestedScrollConnection)
     ) { scaffoldPadding ->
         LazyColumn(
-            modifier = Modifier.padding(scaffoldPadding),
             contentPadding = PaddingValues(
                 start = 16.dp,
                 end = 16.dp,
-                top = 8.dp,
-                bottom = WindowInsets.Companion.navigationBars.asPaddingValues().calculateBottomPadding()
+                top = 8.dp + scaffoldPadding.calculateTopPadding(),
+                bottom = scaffoldPadding.calculateBottomPadding()
             ),
-            verticalArrangement = spacedBy(16.dp)
         ) {
-            items(listOfItems) { itemContent ->
-                itemContent()
+            item {
+                Column(verticalArrangement = spacedBy(16.dp)) {
+                    DescriptionItem()
+                    VersionItem()
+                    DevelopersItem()
+                    SourceAndLinksItem()
+                    SpecialMentionsItem()
+                    LegalItem(dialogsNavController)
+                }
             }
         }
     }
