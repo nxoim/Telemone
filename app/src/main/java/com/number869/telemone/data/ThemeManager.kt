@@ -33,9 +33,10 @@ import java.util.UUID
 
 class ThemeManager(
     private val themeRepository: ThemeRepository,
-    private val paletteState: PaletteState,
+    private val paletteStateAccessor: () -> PaletteState,
     private val context: Context
 ) {
+    val paletteState get() = paletteStateAccessor()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     val themeList = themeRepository.getAllThemes()
@@ -46,12 +47,6 @@ class ThemeManager(
     val mappedValues = _mappedValues.asStateFlow()
     var defaultCurrentTheme = mutableStateListOf<UiElementColorData>()
     private var loadedFromFileTheme = mutableStateMapOf<String, UiElementColorData>()
-
-    init {
-        println("ThemeManager initialized")
-
-        startupConfigProcess()
-    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun saveCurrentTheme() = scope.launch(start = CoroutineStart.ATOMIC) {
@@ -84,7 +79,8 @@ class ThemeManager(
                             val uiElementName = splitLine[0]
                             val colorEitherValueOrTokenAsString = splitLine[1]
 
-                            val validFormat = uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()
+                            val validFormat =
+                                uiElementName.isNotEmpty() && colorEitherValueOrTokenAsString.isNotEmpty()
 
                             if (!validFormat) {
                                 throw IncompatibleFileTypeException()
@@ -120,7 +116,8 @@ class ThemeManager(
                                         colorValue.toArgb()
                                     )
                                 } else {
-                                    loadedList[uiElementName] = incompatibleUiElementColorData(uiElementName)
+                                    loadedList[uiElementName] =
+                                        incompatibleUiElementColorData(uiElementName)
 
                                     throw IncompatibleValuesException()
                                 }
@@ -161,7 +158,11 @@ class ThemeManager(
             when (exception) {
                 is IncompatibleValuesException -> onIncompatibleValuesFound()
                 is IncompatibleFileTypeException -> onIncompatibleFileType()
-                else -> Log.e(ControlsProviderService.TAG, "Error loadingMappedValues theme", exception)
+                else -> Log.e(
+                    ControlsProviderService.TAG,
+                    "Error loadingMappedValues theme",
+                    exception
+                )
             }
         }
     }
@@ -190,7 +191,7 @@ class ThemeManager(
     fun exportTheme(uuid: String, dataType: ThemeColorDataType) = scope.launch {
         backUpLastSessionPersistently()
 
-        val theme = themeRepository.getThemeByUUID(uuid)!!.values.stringify(dataType)
+        val theme = themeRepository.getThemeByUUID(uuid)!!.values.stringify(dataType, palette)
         val fileName = if (dataType == ThemeColorDataType.ColorTokens)
             "Telemone Export (Telemone Format).attheme"
         else
@@ -260,20 +261,25 @@ class ThemeManager(
         val appearanceTypeText = when (storedTheme) {
             ThemeStorageType.Default(isLight = true),
             ThemeStorageType.Stock(isLight = true) -> "light "
+
             ThemeStorageType.Default(isLight = false),
             ThemeStorageType.Stock(isLight = false) -> "dark "
+
             else -> "" // empty
         }
 
         fun loadDefaultOrStockTheme() {
             _mappedValues.value = mapOf()
-            when(storedTheme) {
+            when (storedTheme) {
                 is ThemeStorageType.Default -> {
                     _mappedValues.value = themeRepository.getThemeByUUID(
                         PredefinedTheme.Default(storedTheme.isLight).uuid
                     )!!.values.associate {
                         it.name to it.copy(
-                            colorValue = getColorValueFromColorToken(it.colorToken, palette).toArgb()
+                            colorValue = getColorValueFromColorToken(
+                                it.colorToken,
+                                palette
+                            ).toArgb()
                         )
                     }
                 }
@@ -284,7 +290,8 @@ class ThemeManager(
                         storedTheme.isLight
                     ).values.associateBy { it.name }
                 }
-                else -> { }
+
+                else -> {}
             }
 
             loadedFromFileTheme.clear()
@@ -320,7 +327,8 @@ class ThemeManager(
     fun exportCustomTheme() = scope.launch {
         backUpLastSessionPersistently()
 
-        val result = _mappedValues.value.values.toList().stringify(ThemeColorDataType.ColorValues)
+        val result =
+            _mappedValues.value.values.toList().stringify(ThemeColorDataType.ColorValues, palette)
 
         with(context) {
             File(cacheDir, "Telemone Custom.attheme").writeText(result)
@@ -339,7 +347,7 @@ class ThemeManager(
         }
     }
 
-    private fun startupConfigProcess() {
+    suspend fun initialize() {
         val stockLightTheme by lazy {
             themeRepository.getStockTheme(palette = palette, light = true)
         }
@@ -348,42 +356,41 @@ class ThemeManager(
             themeRepository.getStockTheme(palette, light = false)
         }
 
-        runBlocking {
-            if (getThemeByUUID(PredefinedTheme.Default(true).uuid) == null) {
-                themeRepository.saveTheme(
-                    ThemeData(PredefinedTheme.Default(true).uuid, stockLightTheme.values)
-                )
-            }
-
-            if (getThemeByUUID(PredefinedTheme.Default(false).uuid) == null) {
-                themeRepository.saveTheme(
-                    ThemeData(PredefinedTheme.Default(false).uuid, stockDarkTheme.values)
-                )
-            }
-
-            // save values so we can keep track of updates
-            // instead of relying on default values
-            if (AppSettings.lastDeclinedStockThemeHashLight.get().isEmpty())
-                AppSettings.lastDeclinedStockThemeHashLight.setBlocking(
-                    assetFoldersThemeHash(light = true)
-                )
-
-            if (AppSettings.lastDeclinedStockThemeHashDark.get().isEmpty())
-                AppSettings.lastDeclinedStockThemeHashDark.setBlocking(
-                    assetFoldersThemeHash(light = false)
-                )
-
-            // see canThemeBeUpdated in theme utils
-            if (AppSettings.lastAcceptedStockThemeHashLight.get() == null)
-                AppSettings.lastAcceptedStockThemeHashLight.set(
-                    assetFoldersThemeHash(true)
-                )
-
-            if (AppSettings.lastAcceptedStockThemeHashDark.get() == null)
-                AppSettings.lastAcceptedStockThemeHashDark.setBlocking(
-                    assetFoldersThemeHash(false)
-                )
+        if (getThemeByUUID(PredefinedTheme.Default(true).uuid) == null) {
+            themeRepository.saveTheme(
+                ThemeData(PredefinedTheme.Default(true).uuid, stockLightTheme.values)
+            )
         }
+
+        if (getThemeByUUID(PredefinedTheme.Default(false).uuid) == null) {
+            themeRepository.saveTheme(
+                ThemeData(PredefinedTheme.Default(false).uuid, stockDarkTheme.values)
+            )
+        }
+
+        // save values so we can keep track of updates
+        // instead of relying on default values
+        if (AppSettings.lastDeclinedStockThemeHashLight.get().isEmpty())
+            AppSettings.lastDeclinedStockThemeHashLight.setBlocking(
+                assetFoldersThemeHash(light = true, context)
+            )
+
+        if (AppSettings.lastDeclinedStockThemeHashDark.get().isEmpty())
+            AppSettings.lastDeclinedStockThemeHashDark.setBlocking(
+                assetFoldersThemeHash(light = false, context)
+            )
+
+        // see canThemeBeUpdated in theme utils
+        if (AppSettings.lastAcceptedStockThemeHashLight.get() == null)
+            AppSettings.lastAcceptedStockThemeHashLight.setBlocking(
+                assetFoldersThemeHash(true, context)
+            )
+
+        if (AppSettings.lastAcceptedStockThemeHashDark.get() == null)
+            AppSettings.lastAcceptedStockThemeHashDark.setBlocking(
+                assetFoldersThemeHash(false, context)
+            )
+
 
         val defaultThemeMatchingSystemDarkMode = getThemeByUUID(
             PredefinedTheme.Default(!paletteState.isDarkMode).uuid

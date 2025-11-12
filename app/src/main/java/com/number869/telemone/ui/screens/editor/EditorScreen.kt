@@ -74,7 +74,6 @@ import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.colorOf
 import com.number869.telemone.shared.utils.getColorDisplayType
 import com.number869.telemone.shared.utils.incompatibleUiElementColorData
-import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.components.new.CheckboxSelectionOverlay
@@ -104,10 +103,10 @@ fun EditorScreen(
 
 	val colorDisplayType = getColorDisplayType()
 
-	val themeList = vm.themeList.collectAsState(listOf(), Dispatchers.Default)
-	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState(Dispatchers.Default)
-	val newUiElements by vm.newUiElements.collectAsState(listOf(), Dispatchers.Default)
-	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf(), Dispatchers.Default)
+	val themeList = vm.themeList.collectAsState(listOf())
+	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState()
+	val newUiElements by vm.newUiElements.collectAsState(listOf())
+	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf())
 
 	Scaffold(
 		Modifier.nestedScroll(topAppBarState.nestedScrollConnection),
@@ -122,7 +121,8 @@ fun EditorScreen(
 				changeValue = vm::changeValue,
 				editorNavController = editorNavController,
 				dialogsNavController = dialogsNavController,
-				rootNavController = rootNavController
+				rootNavController = rootNavController,
+                paletteState = vm.paletteState
 			)
 		},
 		bottomBar = { Box {} } // hello edge-to-edge
@@ -311,7 +311,8 @@ private fun SavedThemesSection(
 										theme.values
 											.find { it.name == targetUiElement }
 											?: incompatibleUiElementColorData(targetUiElement),
-										colorDisplayType
+										colorDisplayType,
+                                        palette = vm.paletteState.entirePaletteAsMap
 									)
 								},
 								overlay = {
@@ -447,7 +448,7 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel, newUiElements: L
 				Modifier
 					.padding(horizontal = 16.dp)
 					.animateItem(),
-				paletteState = inject(),
+				paletteState = vm.paletteState,
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -484,7 +485,7 @@ private fun LazyListScope.IncompatibleValuesSection(
 				Modifier
 					.padding(horizontal = 16.dp)
 					.animateItem(),
-				paletteState = inject(),
+				paletteState = vm.paletteState,
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -500,7 +501,7 @@ private fun LazyListScope.AllColorsSection(vm: EditorViewModel, mappedValuesAsLi
 			Modifier
 				.padding(horizontal = 16.dp)
 				.animateItem(),
-			paletteState = inject(),
+			paletteState = vm.paletteState,
 			uiElementData = uiElementColorData,
 			index = index,
 			changeValue = vm::changeValue,

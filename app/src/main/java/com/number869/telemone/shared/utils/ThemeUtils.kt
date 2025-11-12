@@ -8,6 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import com.number869.telemone.App
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.ui.theme.PaletteState
@@ -23,9 +25,7 @@ fun incompatibleUiElementColorData(ofUiElement: String) = UiElementColorData(
 fun colorOf(
     data: UiElementColorData,
     colorDisplayType: ThemeColorPreviewDisplayType,
-    palette: Map<String, Color> = remember {
-        inject<PaletteState>().entirePaletteAsMap
-    }
+    palette: Map<String, Color>
 ) = animateColorAsState(
     when (colorDisplayType) {
         ThemeColorPreviewDisplayType.SavedColorValues -> {
@@ -98,12 +98,12 @@ sealed interface ThemeStorageType {
 fun stringify(
     source: List<UiElementColorData>,
     using: ThemeColorDataType,
-    palette: Map<String, Color> = inject<PaletteState>().entirePaletteAsMap
+    palette: Map<String, Color>
 ) = source.stringify(using, palette)
 
 fun List<UiElementColorData>.stringify(
     using: ThemeColorDataType,
-    palette: Map<String, Color> = inject<PaletteState>().entirePaletteAsMap
+    palette: Map<String, Color>
 ): String {
     val theme = when(using) {
         ThemeColorDataType.ColorValues -> {
@@ -139,32 +139,12 @@ fun List<UiElementColorData>.stringify(
     }\n"
 }
 
-// composable because used in ui and needs reactivity via state
-@Composable
-fun shouldDisplayUpdateDialog(light: Boolean): Boolean {
-    val lastDeclinedThemeHash by if (light)
-        AppSettings.lastDeclinedStockThemeHashLight.asState()
-    else
-        AppSettings.lastDeclinedStockThemeHashDark.asState()
-
-    return (lastDeclinedThemeHash != assetFoldersThemeHash(light))
-}
-
-@Composable
-fun canThemeBeUpdated(light: Boolean): Boolean {
-    val lastAcceptedHash by if (light)
-        AppSettings.lastAcceptedStockThemeHashLight.asState()
-    else
-        AppSettings.lastAcceptedStockThemeHashDark.asState()
-
-    return lastAcceptedHash == "" || assetFoldersThemeHash(light) != lastAcceptedHash
-}
 
 // pretend it does actually calculate a hash. i dont want to import a library just to
 // calculate the hash
 fun assetFoldersThemeHash(
     light: Boolean,
-    context: Context = inject()
+    context: Context
 ) = context.assets
     .open("default${if (light) "Light" else "Dark"}File.attheme")
     .bufferedReader()

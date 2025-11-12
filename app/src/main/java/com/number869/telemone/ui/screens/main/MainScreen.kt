@@ -22,9 +22,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.shared.utils.canThemeBeUpdated
-import com.number869.telemone.shared.utils.shouldDisplayUpdateDialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.number869.telemone.App
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
 import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
@@ -35,10 +36,15 @@ import com.nxoim.decomposite.core.common.viewModel.viewModel
 @Composable
 fun MainScreen(
 	navController: NavController<RootDestinations>,
-	vm: MainViewModel = viewModel { MainViewModel() }
+	vm: MainViewModel
 ) {
+    val context = LocalContext.current
 	var userChoseToSeeUpdateLight by remember { mutableStateOf(false) }
 	var userChoseToSeeUpdateDark by remember { mutableStateOf(false) }
+    val canThemeBeUpdatedLight by vm.canLightBeUpdated.collectAsStateWithLifecycle()
+    val canThemeBeUpdatedDark by vm.canDarkBeUpdated.collectAsStateWithLifecycle()
+    val shouldDisplayUpdateDialogLight by vm.shouldDisplayLightUpdateDialog.collectAsStateWithLifecycle()
+    val shouldDisplayUpdateDialogDark by vm.shouldDisplayDarkUpdateDialog.collectAsStateWithLifecycle()
 
 	Column(Modifier.fillMaxSize()) {
 		var showMenu by rememberSaveable { mutableStateOf(false) }
@@ -54,7 +60,7 @@ fun MainScreen(
 					expanded = showMenu,
 					onDismissRequest = { showMenu = false }
 				) {
-					if (canThemeBeUpdated(true)) {
+					if (canThemeBeUpdatedLight) {
 						DropdownMenuItem(
 							text = { Text("Update default light theme") },
 							onClick = {
@@ -64,7 +70,7 @@ fun MainScreen(
 						)
 					}
 
-					if (canThemeBeUpdated(false)) {
+					if (canThemeBeUpdatedDark) {
 						DropdownMenuItem(
 							text = { Text("Update default dark theme") },
 							onClick = {
@@ -87,12 +93,13 @@ fun MainScreen(
 
 		Column(
 			Modifier
-				.padding(24.dp)
-				.weight(1f),
+                .padding(24.dp)
+                .weight(1f),
 			verticalArrangement = Arrangement.SpaceAround,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			DefaultThemesButtons(exportTheme = vm::exportDefaultTheme)
+            val context = LocalContext.current
+			DefaultThemesButtons(exportTheme = { vm.exportDefaultTheme(it, context) })
 
 			OutlinedButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
 				Text(text = "Theme Editor")
@@ -100,28 +107,28 @@ fun MainScreen(
 		}
 	}
 
-	if (shouldDisplayUpdateDialog(light = true) || userChoseToSeeUpdateLight)
+	if (shouldDisplayUpdateDialogLight || userChoseToSeeUpdateLight)
 		ThemeUpdateAvailableDialog(
 			ofLight = true,
 			decline = {
-				vm.declineThemeUpdate(true)
+				vm.declineThemeUpdate(true, context)
 				userChoseToSeeUpdateLight = false
 			},
 			acceptStockThemeUpdate = {
-				vm.acceptThemeUpdate(true)
+				vm.acceptThemeUpdate(true, context)
 				userChoseToSeeUpdateLight = false
 			},
 		)
 
-	if (shouldDisplayUpdateDialog(light = false) || userChoseToSeeUpdateDark)
+	if (shouldDisplayUpdateDialogDark || userChoseToSeeUpdateDark)
 		ThemeUpdateAvailableDialog(
 			ofLight = false,
 			decline = {
-				vm.declineThemeUpdate(false)
+				vm.declineThemeUpdate(false, context)
 				userChoseToSeeUpdateDark = false
 			},
 			acceptStockThemeUpdate = {
-				vm.acceptThemeUpdate(false)
+				vm.acceptThemeUpdate(false, context)
 				userChoseToSeeUpdateDark = false
 			}
 		)

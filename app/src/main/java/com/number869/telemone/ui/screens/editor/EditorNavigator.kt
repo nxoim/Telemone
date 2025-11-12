@@ -20,7 +20,6 @@ import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDis
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.NavHost
-import com.nxoim.decomposite.core.common.navigation.navController
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -32,7 +31,10 @@ fun EditorNavigator(
 ) {
     NavHost(editorNavController) {
         when (it) {
-            EditorDestinations.ThemeValues -> ThemeValuesScreen()
+            EditorDestinations.ThemeValues -> ThemeValuesScreen(
+                vm.mappedValuesAsList,
+                vm.paletteState
+            )
 
             EditorDestinations.Editor -> EditorScreen(
                 rootNavController,
@@ -97,6 +99,7 @@ private fun DialogsHost(
                     close = { navController.navigateBack() },
                     theme = destination.theme,
                     deleteTheme = { vm.deleteTheme(destination.theme.uuid) },
+                    entirePaletteAsMap = vm.paletteState.entirePaletteAsMap
                 )
             }
             is EditorDestinations.Dialogs.DeleteSelectedThemes -> {
@@ -126,6 +129,7 @@ private fun DialogsHost(
                     lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
                     darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
                     overwriteWith = destination.withTheme,
+                    entirePaletteAsMap = vm.paletteState.entirePaletteAsMap
                 )
             }
             is EditorDestinations.Dialogs.OverwriteDefaultThemeChoice -> {
@@ -151,6 +155,7 @@ private fun DialogsHost(
                     },
                     lightTheme = vm.getThemeByUUID(PredefinedTheme.Default(true).uuid)!!,
                     darkTheme = vm.getThemeByUUID(PredefinedTheme.Default(false).uuid)!!,
+                    entirePaletteAsMap = vm.paletteState.entirePaletteAsMap
                 )
             }
             EditorDestinations.Dialogs.SavedThemeTypeSelection -> {

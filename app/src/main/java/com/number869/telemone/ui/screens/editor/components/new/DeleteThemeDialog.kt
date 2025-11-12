@@ -12,6 +12,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
@@ -20,10 +21,12 @@ import com.number869.telemone.shared.utils.incompatibleUiElementColorData
 
 @Composable
 fun DeleteThemeDialog(
-	close: () -> Unit,
-	deleteTheme: () -> Unit,
-	theme: ThemeData,
-) {
+    close: () -> Unit,
+    deleteTheme: () -> Unit,
+    theme: ThemeData,
+    entirePaletteAsMap: LinkedHashMap<String, Color>,
+
+    ) {
 	AlertDialog(
 		onDismissRequest = close,
 		title = { Text("Delete this theme?") },
@@ -38,7 +41,7 @@ fun DeleteThemeDialog(
 						.find { it.name == targetUiElement }
 						?: incompatibleUiElementColorData(targetUiElement)
 
-					colorOf(data, ThemeColorPreviewDisplayType.SavedColorValues)
+					colorOf(data, ThemeColorPreviewDisplayType.SavedColorValues, entirePaletteAsMap)
 				},
 			)
 		},

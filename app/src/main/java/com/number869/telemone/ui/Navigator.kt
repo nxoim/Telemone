@@ -3,12 +3,14 @@ package com.number869.telemone.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import com.number869.telemone.data.AppSettings
+import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.ui.screens.about.AboutDestinations
 import com.number869.telemone.ui.screens.about.AboutNavigator
 import com.number869.telemone.ui.screens.editor.EditorDestinations
 import com.number869.telemone.ui.screens.editor.EditorNavigator
 import com.number869.telemone.ui.screens.editor.EditorViewModel
 import com.number869.telemone.ui.screens.main.MainScreen
+import com.number869.telemone.ui.screens.main.MainViewModel
 import com.number869.telemone.ui.screens.welcome.WelcomeScreen
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.NavHost
@@ -21,7 +23,10 @@ import com.nxoim.decomposite.core.common.viewModel.viewModel
 import kotlinx.serialization.Serializable
 
 @Composable
-fun Navigator() {
+fun Navigator(
+    themeManager: ThemeManager,
+    appSettings: AppSettings
+) {
 	val skipWelcomeScreen = AppSettings.agreedToConditions.get()
 	val startDestination = if (skipWelcomeScreen) RootDestinations.Main else RootDestinations.Welcome
 
@@ -34,9 +39,12 @@ fun Navigator() {
 	) {
 		when (it) {
 			RootDestinations.Welcome -> WelcomeScreen(rootNavController)
-			RootDestinations.Main -> MainScreen(rootNavController)
+			RootDestinations.Main -> MainScreen(
+                rootNavController,
+                viewModel { MainViewModel(themeManager, appSettings) }
+            )
 			RootDestinations.Editor -> EditorNavigator(
-				viewModel { EditorViewModel() },
+				viewModel { EditorViewModel(themeManager) },
 				rootNavController,
 				navController<EditorDestinations>(EditorDestinations.Editor),
 				navController<EditorDestinations.Dialogs>(EditorDestinations.Dialogs.Empty)

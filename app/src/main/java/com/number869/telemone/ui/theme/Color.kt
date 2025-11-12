@@ -1,70 +1,8 @@
 package com.number869.telemone.ui.theme
 
-import android.R.color.system_accent1_0
-import android.R.color.system_accent1_10
-import android.R.color.system_accent1_100
-import android.R.color.system_accent1_1000
-import android.R.color.system_accent1_200
-import android.R.color.system_accent1_300
-import android.R.color.system_accent1_400
-import android.R.color.system_accent1_50
+import android.R
 import android.R.color.system_accent1_500
-import android.R.color.system_accent1_600
-import android.R.color.system_accent1_700
-import android.R.color.system_accent1_800
-import android.R.color.system_accent1_900
-import android.R.color.system_accent2_0
-import android.R.color.system_accent2_10
-import android.R.color.system_accent2_100
-import android.R.color.system_accent2_1000
-import android.R.color.system_accent2_200
-import android.R.color.system_accent2_300
-import android.R.color.system_accent2_400
-import android.R.color.system_accent2_50
-import android.R.color.system_accent2_500
-import android.R.color.system_accent2_600
-import android.R.color.system_accent2_700
-import android.R.color.system_accent2_800
-import android.R.color.system_accent2_900
-import android.R.color.system_accent3_0
-import android.R.color.system_accent3_10
-import android.R.color.system_accent3_100
-import android.R.color.system_accent3_1000
-import android.R.color.system_accent3_200
-import android.R.color.system_accent3_300
-import android.R.color.system_accent3_400
-import android.R.color.system_accent3_50
-import android.R.color.system_accent3_500
-import android.R.color.system_accent3_600
-import android.R.color.system_accent3_700
-import android.R.color.system_accent3_800
-import android.R.color.system_accent3_900
-import android.R.color.system_neutral1_0
-import android.R.color.system_neutral1_10
-import android.R.color.system_neutral1_100
-import android.R.color.system_neutral1_1000
-import android.R.color.system_neutral1_200
-import android.R.color.system_neutral1_300
-import android.R.color.system_neutral1_400
-import android.R.color.system_neutral1_50
-import android.R.color.system_neutral1_500
-import android.R.color.system_neutral1_600
-import android.R.color.system_neutral1_700
-import android.R.color.system_neutral1_800
-import android.R.color.system_neutral1_900
-import android.R.color.system_neutral2_0
-import android.R.color.system_neutral2_10
-import android.R.color.system_neutral2_100
-import android.R.color.system_neutral2_1000
-import android.R.color.system_neutral2_200
-import android.R.color.system_neutral2_300
-import android.R.color.system_neutral2_400
-import android.R.color.system_neutral2_50
-import android.R.color.system_neutral2_500
-import android.R.color.system_neutral2_600
-import android.R.color.system_neutral2_700
-import android.R.color.system_neutral2_800
-import android.R.color.system_neutral2_900
+import android.content.Context
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
@@ -76,19 +14,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.materialkolor.hct.Hct
 import com.materialkolor.ktx.from
 import com.materialkolor.ktx.harmonize
 import com.materialkolor.ktx.toHct
 import com.materialkolor.palettes.TonalPalette
-
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
 
 @Immutable
 data class PaletteState(
@@ -141,36 +72,45 @@ data class PaletteState(
     val allPossibleColorTokensAsList = entirePaletteAsMap.keys
 }
 
-@Composable
-fun rememberPaletteState(): PaletteState {
-    val isDarkMode = isSystemInDarkTheme()
-    val lightColorScheme = getColorScheme(isDark = false)
-    val darkColorScheme = getColorScheme(isDark = true)
+fun createPaletteState(context: Context): PaletteState {
+    val isDarkMode = context.resources.configuration.isNightModeActive
+    val lightColorScheme = getColorScheme(isDark = false, context)
+    val darkColorScheme = getColorScheme(isDark = true, context)
 
-    return rememberUpdatedState(
-        PaletteState(
-            primaryTones = primaryTones,
-            secondaryTones = secondaryTones,
-            tertiaryTones = tertiaryTones,
-            neutralTones = neutralTones,
-            neutralVariantTones = neutralVariantTones,
-            blueTones = blueTones,
-            redTones = redTones,
-            greenTones = greenTones,
-            orangeTones = orangeTones,
-            violetTones = violetTones,
-            cyanTones = cyanTones,
-            pinkTones = pinkTones,
-            colorRolesLight = lightColorScheme.toColorRoles(light = true),
-            colorRolesDark = darkColorScheme.toColorRoles(light = false),
-            colorRolesShared = getSharedColorRoles(primaryTones, secondaryTones, tertiaryTones),
-            additionalColors = getAdditionalColors(
-                surfaceElevationLevel3Light = lightColorScheme.surfaceColorAtElevation(3.dp),
-                surfaceElevationLevel3Dark = darkColorScheme.surfaceColorAtElevation(3.dp)
-            ),
-            isDarkMode = isDarkMode
-        )
-    ).value
+    val primaryTones = getPrimaryTones(context)
+    val secondaryTones = getSecondaryTones(context)
+    val tertiaryTones = getTertiaryTones(context)
+
+    val blueTones = blue.getCustomTones(name = "blue", context)
+    val redTones = red.getCustomTones(name = "red", context)
+    val greenTones = green.getCustomTones(name = "green", context)
+    val orangeTones = orange.getCustomTones(name = "orange", context)
+    val violetTones = violet.getCustomTones(name = "violet", context)
+    val pinkTones = pink.getCustomTones(name = "pink", context)
+    val cyanTones = cyan.getCustomTones(name = "cyan", context)
+
+    return PaletteState(
+        primaryTones = primaryTones,
+        secondaryTones = secondaryTones,
+        tertiaryTones = tertiaryTones,
+        neutralTones = getNeutralTones(context),
+        neutralVariantTones = getNeutralVariantTones(context),
+        blueTones = blueTones,
+        redTones = redTones,
+        greenTones = greenTones,
+        orangeTones = orangeTones,
+        violetTones = violetTones,
+        cyanTones = cyanTones,
+        pinkTones = pinkTones,
+        colorRolesLight = lightColorScheme.toColorRoles(light = true),
+        colorRolesDark = darkColorScheme.toColorRoles(light = false),
+        colorRolesShared = getSharedColorRoles(primaryTones, secondaryTones, tertiaryTones),
+        additionalColors = getAdditionalColors(
+            surfaceElevationLevel3Light = lightColorScheme.surfaceColorAtElevation(3.dp),
+            surfaceElevationLevel3Dark = darkColorScheme.surfaceColorAtElevation(3.dp)
+        ),
+        isDarkMode = isDarkMode
+    )
 }
 
 private fun ColorScheme.toColorRoles(light: Boolean): ColorRoles {
@@ -427,153 +367,126 @@ private fun getAdditionalColors(
     transparent = DataAboutColors("transparent", Color.Transparent)
 )
 
-private val primaryTones
-    @Composable
-    get() = possibleTones.map { toneNumber ->
-        val color = when (toneNumber) {
-            100 -> colorResource(system_accent1_0)
-            99 -> colorResource(system_accent1_10)
-            95 -> colorResource(system_accent1_50)
-            90 -> colorResource(system_accent1_100)
-            80 -> colorResource(system_accent1_200)
-            70 -> colorResource(system_accent1_300)
-            60 -> colorResource(system_accent1_400)
-            50 -> colorResource(system_accent1_500)
-            40 -> colorResource(system_accent1_600)
-            30 -> colorResource(system_accent1_700)
-            20 -> colorResource(system_accent1_800)
-            10 -> colorResource(system_accent1_900)
-            else -> colorResource(system_accent1_1000)
-        }
-
+private fun getTones(
+    context: Context,
+    prefix: String,
+    resourceMap: Map<Int, Int>
+): List<ToneInfo> {
+    return resourceMap.map { (toneNumber, resId) ->
+        val colorInt = ContextCompat.getColor(context, resId)
         ToneInfo(
             toneNumber,
-            colorToken = "primary_$toneNumber",
-            colorValue = color
+            colorToken = "${prefix}_$toneNumber",
+            colorValue = Color(colorInt)
         )
     }
+}
 
-private val secondaryTones
-    @Composable
-    get() = possibleTones.map { toneNumber ->
-        val color = when (toneNumber) {
-            100 -> colorResource(system_accent2_0)
-            99 -> colorResource(system_accent2_10)
-            95 -> colorResource(system_accent2_50)
-            90 -> colorResource(system_accent2_100)
-            80 -> colorResource(system_accent2_200)
-            70 -> colorResource(system_accent2_300)
-            60 -> colorResource(system_accent2_400)
-            50 -> colorResource(system_accent2_500)
-            40 -> colorResource(system_accent2_600)
-            30 -> colorResource(system_accent2_700)
-            20 -> colorResource(system_accent2_800)
-            10 -> colorResource(system_accent2_900)
-            else -> colorResource(system_accent2_1000)
-        }
+fun getPrimaryTones(context: Context): List<ToneInfo> = getTones(
+    context, "primary", mapOf(
+        100 to R.color.system_accent1_0,
+        99 to R.color.system_accent1_10,
+        95 to R.color.system_accent1_50,
+        90 to R.color.system_accent1_100,
+        80 to R.color.system_accent1_200,
+        70 to R.color.system_accent1_300,
+        60 to R.color.system_accent1_400,
+        50 to R.color.system_accent1_500,
+        40 to R.color.system_accent1_600,
+        30 to R.color.system_accent1_700,
+        20 to R.color.system_accent1_800,
+        10 to R.color.system_accent1_900,
+        0 to R.color.system_accent1_1000
+    )
+)
 
-        ToneInfo(
-            toneNumber,
-            colorToken = "secondary_$toneNumber",
-            colorValue = color
-        )
-    }
+fun getSecondaryTones(context: Context): List<ToneInfo> = getTones(
+    context, "secondary", mapOf(
+        100 to R.color.system_accent2_0,
+        99 to R.color.system_accent2_10,
+        95 to R.color.system_accent2_50,
+        90 to R.color.system_accent2_100,
+        80 to R.color.system_accent2_200,
+        70 to R.color.system_accent2_300,
+        60 to R.color.system_accent2_400,
+        50 to R.color.system_accent2_500,
+        40 to R.color.system_accent2_600,
+        30 to R.color.system_accent2_700,
+        20 to R.color.system_accent2_800,
+        10 to R.color.system_accent2_900,
+        0 to R.color.system_accent2_1000
+    )
+)
 
-private val tertiaryTones
-    @Composable
-    get() = possibleTones.map { toneNumber ->
-        val color = when (toneNumber) {
-            100 -> colorResource(system_accent3_0)
-            99 -> colorResource(system_accent3_10)
-            95 -> colorResource(system_accent3_50)
-            90 -> colorResource(system_accent3_100)
-            80 -> colorResource(system_accent3_200)
-            70 -> colorResource(system_accent3_300)
-            60 -> colorResource(system_accent3_400)
-            50 -> colorResource(system_accent3_500)
-            40 -> colorResource(system_accent3_600)
-            30 -> colorResource(system_accent3_700)
-            20 -> colorResource(system_accent3_800)
-            10 -> colorResource(system_accent3_900)
-            else -> colorResource(system_accent3_1000)
-        }
-        ToneInfo(
-            toneNumber,
-            colorToken = "tertiary_$toneNumber",
-            colorValue = color
-        )
-    }
+fun getTertiaryTones(context: Context): List<ToneInfo> = getTones(
+    context, "tertiary", mapOf(
+        100 to R.color.system_accent3_0,
+        99 to R.color.system_accent3_10,
+        95 to R.color.system_accent3_50,
+        90 to R.color.system_accent3_100,
+        80 to R.color.system_accent3_200,
+        70 to R.color.system_accent3_300,
+        60 to R.color.system_accent3_400,
+        50 to R.color.system_accent3_500,
+        40 to R.color.system_accent3_600,
+        30 to R.color.system_accent3_700,
+        20 to R.color.system_accent3_800,
+        10 to R.color.system_accent3_900,
+        0 to R.color.system_accent3_1000
+    )
+)
 
-private val neutralTones
-    @Composable
-    get() = possibleTones.map { toneNumber ->
-        val color = when (toneNumber) {
-            100 -> colorResource(system_neutral1_0)
-            99 -> colorResource(system_neutral1_10)
-            95 -> colorResource(system_neutral1_50)
-            90 -> colorResource(system_neutral1_100)
-            80 -> colorResource(system_neutral1_200)
-            70 -> colorResource(system_neutral1_300)
-            60 -> colorResource(system_neutral1_400)
-            50 -> colorResource(system_neutral1_500)
-            40 -> colorResource(system_neutral1_600)
-            30 -> colorResource(system_neutral1_700)
-            20 -> colorResource(system_neutral1_800)
-            10 -> colorResource(system_neutral1_900)
-            else -> colorResource(system_neutral1_1000)
-        }
-        ToneInfo(
-            toneNumber,
-            colorToken = "neutral_$toneNumber",
-            colorValue = color
-        )
-    }
+fun getNeutralTones(context: Context): List<ToneInfo> = getTones(
+    context, "neutral", mapOf(
+        100 to R.color.system_neutral1_0,
+        99 to R.color.system_neutral1_10,
+        95 to R.color.system_neutral1_50,
+        90 to R.color.system_neutral1_100,
+        80 to R.color.system_neutral1_200,
+        70 to R.color.system_neutral1_300,
+        60 to R.color.system_neutral1_400,
+        50 to R.color.system_neutral1_500,
+        40 to R.color.system_neutral1_600,
+        30 to R.color.system_neutral1_700,
+        20 to R.color.system_neutral1_800,
+        10 to R.color.system_neutral1_900,
+        0 to R.color.system_neutral1_1000
+    )
+)
 
-// if only google provided a way to get the m3 tonal palette🤡🤡🤡
-private val neutralVariantTones
-    @Composable
-    get() = possibleTones.map { toneNumber ->
-        val color = when (toneNumber) {
-            100 -> colorResource(system_neutral2_0)
-            99 -> colorResource(system_neutral2_10)
-            95 -> colorResource(system_neutral2_50)
-            90 -> colorResource(system_neutral2_100)
-            80 -> colorResource(system_neutral2_200)
-            70 -> colorResource(system_neutral2_300)
-            60 -> colorResource(system_neutral2_400)
-            50 -> colorResource(system_neutral2_500)
-            40 -> colorResource(system_neutral2_600)
-            30 -> colorResource(system_neutral2_700)
-            20 -> colorResource(system_neutral2_800)
-            10 -> colorResource(system_neutral2_900)
-            else -> colorResource(system_neutral2_1000)
-        }
+fun getNeutralVariantTones(context: Context): List<ToneInfo> = getTones(
+    context, "neutral_variant", mapOf(
+        100 to R.color.system_neutral2_0,
+        99 to R.color.system_neutral2_10,
+        95 to R.color.system_neutral2_50,
+        90 to R.color.system_neutral2_100,
+        80 to R.color.system_neutral2_200,
+        70 to R.color.system_neutral2_300,
+        60 to R.color.system_neutral2_400,
+        50 to R.color.system_neutral2_500,
+        40 to R.color.system_neutral2_600,
+        30 to R.color.system_neutral2_700,
+        20 to R.color.system_neutral2_800,
+        10 to R.color.system_neutral2_900,
+        0 to R.color.system_neutral2_1000
+    )
+)
 
-        ToneInfo(
-            toneNumber,
-            colorToken = "neutral_variant_$toneNumber",
-            colorValue = color
-        )
-    }
-
-private val blueTones @Composable get() = blue.getCustomTones(name = "blue")
-private val redTones @Composable get() = red.getCustomTones(name = "red")
-private val greenTones @Composable get() = green.getCustomTones(name = "green")
-private val orangeTones @Composable get() = orange.getCustomTones(name = "orange")
-private val violetTones @Composable get() = violet.getCustomTones(name = "violet")
-private val pinkTones @Composable get() = pink.getCustomTones(name = "pink")
-private val cyanTones @Composable get() = cyan.getCustomTones(name = "cyan")
-
-@Stable
-@Composable
-private fun Color.getCustomTones(name: String): List<ToneInfo> {
+private fun Color.getCustomTones(name: String, context: Context): List<ToneInfo> {
     return possibleTones.map { toneNumber ->
         ToneInfo(
             toneNumber,
             colorToken = "${name}_$toneNumber",
             colorValue = this
-                .harmonize(colorResource(system_accent1_500))
-                .matchSaturation(toThatOf = colorResource(system_accent1_500))
+                .harmonize(Color(ContextCompat.getColor(context, system_accent1_500)))
+                .matchSaturation(
+                    toThatOf = Color(
+                        ContextCompat.getColor(
+                            context,
+                            system_accent1_500
+                        )
+                    )
+                )
                 .getTone(toneNumber)
         )
     }

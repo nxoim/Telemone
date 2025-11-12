@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
@@ -32,11 +33,12 @@ import com.number869.telemone.shared.utils.colorOf
 
 @Composable
 fun OverwriteChoiceDialog(
-	close: () -> Unit,
-	chooseLight: () -> Unit,
-	chooseDark: () -> Unit,
-	lightTheme: ThemeData,
-	darkTheme: ThemeData,
+    close: () -> Unit,
+    chooseLight: () -> Unit,
+    chooseDark: () -> Unit,
+    lightTheme: ThemeData,
+    darkTheme: ThemeData,
+    entirePaletteAsMap: LinkedHashMap<String, Color>,
 ) {
 	AlertDialog(
 		onDismissRequest = { close() },
@@ -58,7 +60,7 @@ fun OverwriteChoiceDialog(
 							colorOf = { targetUiElementColor ->
 								val data = lightTheme.values.find { it.name == targetUiElementColor }!!
 
-								colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+								colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme, entirePaletteAsMap)
 							},
 						)
 
@@ -83,7 +85,7 @@ fun OverwriteChoiceDialog(
 							colorOf = { targetUiElementColor ->
 								val data = darkTheme.values.find { it.name == targetUiElementColor }!!
 
-								colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+								colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme, entirePaletteAsMap)
 							},
 						)
 
@@ -110,6 +112,7 @@ fun OverwriteDefaultsDialog(
 	lightTheme: ThemeData,
 	darkTheme: ThemeData,
 	overwriteWith: ThemeData,
+    entirePaletteAsMap: LinkedHashMap<String, Color>
 ) {
 	val targetTheme = remember { if (overwriteDark) darkTheme else lightTheme }
 	val thingThatsBeingOverwritten = if (overwriteDark) "default dark theme" else "default light theme"
@@ -144,7 +147,7 @@ fun OverwriteDefaultsDialog(
 					colorOf = { targetUiElementColor ->
 						val data = targetTheme.values.find { it.name == targetUiElementColor }!!
 
-						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme, entirePaletteAsMap)
 					},
 				)
 
@@ -164,7 +167,7 @@ fun OverwriteDefaultsDialog(
 					colorOf = { targetUiElementColor ->
 						val data = overwriteWith.values.find { it.name == targetUiElementColor }!!
 
-						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme)
+						colorOf(data, ThemeColorPreviewDisplayType.CurrentColorScheme, entirePaletteAsMap)
 					},
 				)
 			}

@@ -21,21 +21,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.stringify
-import com.number869.telemone.ui.screens.editor.EditorViewModel
-import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
+import com.number869.telemone.ui.theme.PaletteState
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
+fun ThemeValuesScreen(
+    mappedValuesAsList: StateFlow<List<UiElementColorData>>,
+    paletteState: PaletteState
+) {
 	var showValues by remember { mutableStateOf(false) }
 	val text = remember(showValues) {
 		stringify(
-			vm.mappedValuesAsList.value.toList(),
+			mappedValuesAsList.value.toList(),
 			if (showValues)
 				ThemeColorDataType.ColorValues
 			else
-				ThemeColorDataType.ColorTokens
+				ThemeColorDataType.ColorTokens,
+            palette = paletteState.entirePaletteAsMap
 		)
 	}
 

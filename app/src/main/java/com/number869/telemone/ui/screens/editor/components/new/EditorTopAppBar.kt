@@ -58,9 +58,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.ThemeStorageType
-import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.EditorDestinations
+import com.number869.telemone.ui.theme.PaletteState
 import com.nxoim.decomposite.core.common.navigation.NavController
 import kotlinx.coroutines.delay
 
@@ -76,7 +76,8 @@ fun EditorTopAppBar(
 	changeValue: (String, String, Color) -> Unit,
 	editorNavController: NavController<EditorDestinations>,
 	dialogsNavController: NavController<EditorDestinations.Dialogs>,
-	rootNavController: NavController<RootDestinations>
+	rootNavController: NavController<RootDestinations>,
+    paletteState: PaletteState
 ) {
 	var searchbarVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -115,6 +116,7 @@ fun EditorTopAppBar(
 				mappedValues = mappedValues ,
 				changeValue = changeValue,
 				hideSearchbar = { searchbarVisible = false },
+                paletteState = paletteState
 			)
 		}
 	}
@@ -230,6 +232,7 @@ private fun TheSearchbar(
 	mappedValues: List<UiElementColorData>,
 	changeValue: (String, String, Color) -> Unit,
 	hideSearchbar: () -> Unit,
+    paletteState: PaletteState
 ) {
 	var fullscreen by rememberSaveable { mutableStateOf(false) }
 	var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -335,7 +338,7 @@ private fun TheSearchbar(
 								Modifier
 									.padding(horizontal = 16.dp)
 									.animateItem(),
-								paletteState = inject(),
+								paletteState = paletteState,
 								uiElementData = uiElementData,
 								index = index,
 								changeValue = changeValue,

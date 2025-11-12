@@ -1,9 +1,8 @@
 package com.number869.telemone.data
 
-import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
-import com.number869.telemone.shared.utils.inject
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
@@ -11,6 +10,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
@@ -28,7 +28,7 @@ fun settingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
     }
 )
 
-class SettingsManager(private val database: Realm = settingsRealm("default")) {
+class SettingsManager(private val database: Realm) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     fun <T : Any> set(key: String, value: T?, type: KClass<out T>) = scope.launch {
@@ -43,7 +43,8 @@ class SettingsManager(private val database: Realm = settingsRealm("default")) {
         }
     }
 
-    fun <T : Any> get(key: String, defaultValue: T? = null, type: KClass<out T>): T? {
+    @JvmName("getBlockingNullable")
+    fun <T : Any> getBlocking(key: String, defaultValue: T? = null, type: KClass<out T>): T? {
         val realmSettingContainer = database
             .query(getSettingType(type),"key = '$key'")
             .first()
@@ -54,7 +55,30 @@ class SettingsManager(private val database: Realm = settingsRealm("default")) {
             ?: defaultValue
     }
 
-    fun <T : Any> getAsStateFlow(key: String, defaultValue: T?, type: KClass<out T>) = database
+    fun <T : Any> getBlocking(key: String, defaultValue: T, type: KClass<out T>): T {
+        val realmSettingContainer = database
+            .query(getSettingType(type),"key = '$key'")
+            .first()
+            .find()
+
+        return realmSettingContainer
+            ?.let { getValueFromSettingContainer(type, it) as T }
+            ?: defaultValue
+    }
+
+    fun <T : Any> getAsFlow(key: String, defaultValue: T, type: KClass<out T>): Flow<T> = database
+        .query(getSettingType(type),"key = '$key'")
+        .first()
+        .asFlow()
+        .flowOn(Dispatchers.Default)
+        .map() { queried ->
+            queried.obj
+                ?.let { getValueFromSettingContainer(type, it) as T }
+                ?: defaultValue
+        }
+
+    @JvmName("getAsFlowNullable")
+    fun <T : Any> getAsFlow(key: String, defaultValue: T?, type: KClass<out T>): Flow<T?> = database
         .query(getSettingType(type),"key = '$key'")
         .first()
         .asFlow()
@@ -64,10 +88,30 @@ class SettingsManager(private val database: Realm = settingsRealm("default")) {
                 ?.let { getValueFromSettingContainer(type, it) as T? }
                 ?: defaultValue
         }
+
+    fun <T : Any> getAsStateFlow(key: String, defaultValue: T, type: KClass<out T>): StateFlow<T> =
+        getAsFlow(
+            key,
+            defaultValue,
+            type
+        )
         .stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
+            scope = scope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = get(key, defaultValue, type)
+            initialValue = getBlocking(key, defaultValue, type)
+        )
+
+    @JvmName("getAsStateFlowNullable")
+    fun <T : Any> getAsStateFlow(key: String, defaultValue: T?, type: KClass<out T>): StateFlow<T?> =
+        getAsFlow(
+            key,
+            defaultValue,
+            type
+        )
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = getBlocking(key, defaultValue, type)
         )
 }
 
@@ -163,39 +207,46 @@ val settingsRealmSchemas = setOf(
     DoubleSetting::class
 )
 
-@androidx.compose.runtime.Immutable
-data class Setting<T : Any>(
+@Immutable
+class Setting<T : Any>(
     private val key: String,
     private val defaultValue: T,
-    private val targetSettingsManager: SettingsManager = inject()
+    private val targetSettingsManager: SettingsManager
 ) {
     fun set(newValue: T) = targetSettingsManager
         .set(key, newValue, defaultValue::class)
     fun setBlocking(newValue: T) = targetSettingsManager
         .setBlocking(key, newValue, defaultValue::class)
     fun get() = targetSettingsManager
-        .get(key, defaultValue, defaultValue::class) ?: defaultValue
+        .getBlocking(key, defaultValue, defaultValue::class)
+    fun getAsFlow() = targetSettingsManager
+        .getAsFlow(key, defaultValue, defaultValue::class)
     fun getAsStateFlow() = targetSettingsManager
-        .getAsStateFlow(key, defaultValue, defaultValue::class) as StateFlow<T>
+        .getAsStateFlow(key, defaultValue, defaultValue::class)
     @Composable
     fun asState() = getAsStateFlow().collectAsState()
 }
 
-@androidx.compose.runtime.Immutable
-data class NullableSetting<T : Any>(
+@Immutable
+class NullableSetting<T : Any>(
     private val key: String,
     private val type: KClass<out T>,
     private val defaultValue: T? = null,
-    private val targetSettingsManager: SettingsManager = inject(),
+    private val targetSettingsManager: SettingsManager,
 ) {
-    fun set(newValue: T?) = targetSettingsManager.set(key, newValue, type)
+    fun set(newValue: T?) = targetSettingsManager
+        .set(key, newValue, type)
     fun setBlocking(newValue: T?) = targetSettingsManager
         .setBlocking(key, newValue, type)
-    fun get() = targetSettingsManager.get(key, defaultValue, type)
-    fun getAsStateFlow() = targetSettingsManager.getAsStateFlow(key, defaultValue, type)
+    fun get() = targetSettingsManager
+        .getBlocking(key, defaultValue, type)
+    fun getAsFlow() = targetSettingsManager
+        .getAsFlow(key, defaultValue, type)
+    fun getAsStateFlow() = targetSettingsManager
+        .getAsStateFlow(key, defaultValue, type)
     @Composable
     fun asState() = getAsStateFlow().collectAsState()
 }
 
-fun settingsManagerInitializer() = SettingsManager()
+fun settingsManagerInitializer() = SettingsManager(settingsRealm("default"))
 

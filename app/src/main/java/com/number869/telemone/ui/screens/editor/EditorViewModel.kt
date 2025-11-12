@@ -10,7 +10,6 @@ import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.color
-import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -28,8 +27,9 @@ import kotlinx.coroutines.launch
 // funny of you to actually expect some sort of documentation in the
 // comments
 class EditorViewModel(
-	private val themeManager: ThemeManager = inject()
+	private val themeManager: ThemeManager
 ) : ViewModel() {
+    val paletteState get() = themeManager.paletteState
 	var loadingMappedValues by mutableStateOf(true)
 	var loadingThemes by mutableStateOf(true)
 
