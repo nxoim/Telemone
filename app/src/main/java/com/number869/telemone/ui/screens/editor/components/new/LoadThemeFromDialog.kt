@@ -4,6 +4,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.number869.telemone.R
 import com.number869.telemone.shared.utils.ThemeStorageType
 
 @Composable
@@ -29,7 +31,7 @@ fun LoadWithOptionsDialog(
 					)
 				}
 			) {
-				Text("Load color values and clear current theme")
+				Text(stringResource(R.string.load_color_values_and_clear_current_theme))
 			}
 
 			TextButton(
@@ -45,10 +47,10 @@ fun LoadWithOptionsDialog(
 					)
 				}
 			) {
-				Text("Load color values and  don't clear current theme")
+				Text(stringResource(R.string.load_color_values_and_don_t_clear_current_theme))
 			}
 			TextButton(onClick = { close() }) {
-				Text("Cancel")
+				Text(stringResource(R.string.cancel))
 			}
 		},
 		dismissButton = {
@@ -65,7 +67,7 @@ fun LoadWithOptionsDialog(
 					)
 				}
 			) {
-				Text("Load colors from material color scheme tokens and clear current theme")
+				Text(stringResource(R.string.load_colors_from_material_color_scheme_tokens_and_clear_current_theme))
 			}
 			TextButton(
 				onClick = {
@@ -80,7 +82,7 @@ fun LoadWithOptionsDialog(
 					)
 				}
 			) {
-				Text("Load colors from material color scheme tokens and don't clear current theme")
+				Text(stringResource(R.string.load_colors_from_material_color_scheme_tokens_and_don_t_clear_current_theme))
 			}
 		}
 	)

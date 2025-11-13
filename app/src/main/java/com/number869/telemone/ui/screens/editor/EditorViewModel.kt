@@ -1,11 +1,12 @@
 package com.number869.telemone.ui.screens.editor
 
-import androidx.compose.runtime.Stable
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import com.number869.telemone.R
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
@@ -14,7 +15,6 @@ import com.number869.telemone.shared.utils.showToast
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.nxoim.evolpagink.core.pageable
 import com.nxoim.evolpagink.core.prefetchMinimumItemAmount
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -92,26 +92,36 @@ class EditorViewModel(
 
     fun saveCurrentTheme() {
         themeManager.saveCurrentTheme()
-        showToast("Theme has been saved successfully.")
+        showToast { getString(R.string.theme_has_been_saved_successfully) }
     }
 
     fun resetCurrentTheme() {
         themeManager.resetCurrentTheme()
-        showToast("Reset completed.")
+        showToast { getString(R.string.reset_completed) }
     }
 
     fun loadSavedTheme(themeStorageType: ThemeStorageType) = themeManager.loadSavedTheme(
         storedTheme = themeStorageType,
         onSuccess = { storageTypeText, appearanceTypeText ->
-            showToast(
-                "$storageTypeText ${appearanceTypeText}theme has been loaded successfully."
-            )
+            viewModelScope.launch {
+                showToast {
+                    getString(
+                        R.string.theme_has_been_loaded_successfully,
+                        storageTypeText,
+                        appearanceTypeText
+                    )
+                }
+            }
         },
         onIncompatibleValuesFound = {
-            showToast("Some colors are incompatible and were marked as such.")
+            viewModelScope.launch {
+                showToast { getString(R.string.some_colors_are_incompatible_and_were_marked_as_such) }
+            }
         },
         onIncompatibleFileType = {
-            showToast("Chosen file isn't a Telegram (not Telegram X) theme.")
+            viewModelScope.launch {
+                showToast { getString(R.string.chosen_file_isn_t_a_telegram_not_telegram_x_theme) }
+            }
         }
     )
 
@@ -133,8 +143,8 @@ class EditorViewModel(
         selectedThemes.add(uuid)
 
 
-    fun exportTheme(uuid: String, dataType: ThemeColorDataType) =
-        themeManager.exportTheme(uuid, dataType)
+    fun exportTheme(uuid: String, dataType: ThemeColorDataType, activityContext: Context) =
+        themeManager.exportTheme(uuid, dataType, activityContext)
 
     fun selectAllThemes() {
         selectedThemes.clear()
@@ -156,7 +166,7 @@ class EditorViewModel(
     fun deleteSelectedThemes(selectedThemeCount: Int) {
         selectedThemes.forEach { themeManager.deleteTheme(it) }
 
-        showToast("Themes ($selectedThemeCount) have been successfully deleted.")
+        showToast { getString(R.string.themes_have_been_successfully_deleted, selectedThemeCount) }
     }
 
     fun hideThemeSelectionModeToolbar() {
@@ -172,13 +182,13 @@ class EditorViewModel(
     fun deleteTheme(uuid: String) {
         themeManager.deleteTheme(uuid)
 
-        showToast("Theme has been deleted successfully.")
+        showToast { getString(R.string.theme_has_been_deleted_successfully) }
     }
 
     fun overwriteTheme(uuid: String, isLightTheme: Boolean) {
         themeManager.overwriteTheme(uuid, isLightTheme)
 
         val themeType = if (isLightTheme) "light" else "dark"
-        showToast("Default $themeType theme has been overwritten successfully.")
+        showToast { getString(R.string.default_theme_has_been_overwritten_successfully, themeType) }
     }
 }

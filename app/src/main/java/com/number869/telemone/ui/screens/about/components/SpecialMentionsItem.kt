@@ -2,6 +2,7 @@ package com.number869.telemone.ui.screens.about.components
 
 import android.content.Intent
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,125 +18,147 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.R
 
 @Composable
 fun SpecialMentionsItem() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	AboutCard("Special Mentions") {
-		val tgMonetMention = buildAnnotatedString {
-			append("Everyone involved in the ")
-			pushStringAnnotation(tag = "URL", annotation = "https://github.com/c3r5b8/Telegram-Monet")
-			withStyle(
-				style = SpanStyle(
-					color = MaterialTheme.colorScheme.tertiary,
-					textDecoration = TextDecoration.Underline
-				)
-			) {
-				append("Telegram Monet project")
-			}
-			pop()
-			append(" as it is what pushed me to start this project.")
-		}
+    AboutCard(stringResource(R.string.special_mentions_label)) {
+        val tgmonetName = stringResource(R.string.telegram_monet)
+        val designName = stringResource(R.string._480_design)
+        val solarIconSetName = stringResource(R.string.solar_icon_set)
 
-		val fourHundredEightyMention = buildAnnotatedString {
-			pushStringAnnotation(tag = "URL", annotation = "https://t.me/Design480")
-			withStyle(
-				style = SpanStyle(
-					color = MaterialTheme.colorScheme.tertiary,
-					textDecoration = TextDecoration.Underline
-				)
-			) {
-				append("480 Design")
-			}
-			pop()
+        val tgMonetMention = linkableTextResource(
+            R.string.full_monet_mention,
+            arrayOf(tgmonetName),
+            listOf(tgmonetName to "https://github.com/c3r5b8/Telegram-Monet")
+        )
 
-			append(" for the ")
-			pushStringAnnotation(tag = "URL", annotation = "https://github.com/480-Design/Solar-Icon-Set")
-			withStyle(
-				style = SpanStyle(
-					color = MaterialTheme.colorScheme.tertiary,
-					textDecoration = TextDecoration.Underline
-				)
-			) {
-				append("Solar Icon Set")
-			}
-			pop()
+        val fourHundredEightyMention = linkableTextResource(
+            R.string.full_icon_mention,
+            arrayOf(designName, solarIconSetName),
+            listOf(
+                designName to "https://t.me/Design480",
+                solarIconSetName to "https://github.com/480-Design/Solar-Icon-Set"
+            )
+        )
 
-			append(".")
-		}
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.StarBorder,
+                    contentDescription = null
+                )
+            }
 
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(8.dp)
-		) {
-			Box(
-				Modifier
-					.size(38.dp)
-					.clip(CircleShape)
-					.background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
-				contentAlignment = Alignment.Center
-			) {
-				Icon(
-					Icons.Default.StarBorder,
-					contentDescription = "Star"
-				)
-			}
+            ClickableText(
+                text = tgMonetMention,
+                style = MaterialTheme.typography.bodyLarge.plus(
+                    TextStyle(MaterialTheme.colorScheme.onSurface)
+                ),
+                onClick = {
+                    tgMonetMention.getStringAnnotations("URL", it, it).firstOrNull()
+                        ?.let { annotation ->
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                            context.startActivity(intent)
+                        }
+                }
+            )
+        }
 
-			ClickableText(
-				text = tgMonetMention,
-				style = MaterialTheme.typography.bodyLarge.plus(
-					TextStyle(MaterialTheme.colorScheme.onSurface)
-				),
-				onClick = {
-					tgMonetMention.getStringAnnotations("URL", it, it).firstOrNull()
-						?.let { annotation ->
-							val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-							context.startActivity(intent)
-						}
-				}
-			)
-		}
+        Spacer(modifier = Modifier.height(8.dp))
 
-		Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.StarBorder,
+                    contentDescription = null
+                )
+            }
 
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-			Box(
-				Modifier
-					.size(38.dp)
-					.clip(CircleShape)
-					.background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
-				contentAlignment = Alignment.Center
-			) {
-				Icon(
-					Icons.Default.StarBorder,
-					contentDescription = "Star"
-				)
-			}
+            ClickableText(
+                text = fourHundredEightyMention,
+                style = MaterialTheme.typography.bodyLarge.plus(
+                    TextStyle(MaterialTheme.colorScheme.onSurface)
+                ),
+                onClick = {
+                    fourHundredEightyMention.getStringAnnotations("URL", it, it)
+                        .forEach { annotation ->
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                            context.startActivity(intent)
+                        }
+                }
+            )
+        }
 
-			ClickableText(
-				text = fourHundredEightyMention,
-				style = MaterialTheme.typography.bodyLarge.plus(
-					TextStyle(MaterialTheme.colorScheme.onSurface)
-				),
-				onClick = {
-					fourHundredEightyMention.getStringAnnotations("URL", it, it).forEach { annotation ->
-						val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-						context.startActivity(intent)
-					}
-				}
-			)
-		}
+    }
+}
 
-	}
+@Composable
+private inline fun linkableTextResource(
+    @StringRes resId: Int,
+    args: Array<Any>,
+    links: List<Pair<String, String>>, // Pair(displayText, url),
+    linkColor: Color = MaterialTheme.colorScheme.tertiary
+): AnnotatedString {
+    val string = stringResource(resId, *args)
+
+    return remember(resId, args, links, linkColor) {
+        linkableTextResource(string, links, linkColor)
+    }
+}
+
+private fun linkableTextResource(
+    full: String,
+    links: List<Pair<String, String>>, // Pair(displayText, url),
+    linkColor: Color
+) = buildAnnotatedString {
+    append(full)
+    links.forEach { (text, url) ->
+        val start = full.indexOf(text)
+        if (start >= 0) {
+            val end = start + text.length
+            addStyle(
+                style = SpanStyle(
+                    color = linkColor,
+                    textDecoration = TextDecoration.Underline
+                ),
+                start = start,
+                end = end
+            )
+            addStringAnnotation(tag = "URL", annotation = url, start = start, end = end)
+        }
+    }
 }

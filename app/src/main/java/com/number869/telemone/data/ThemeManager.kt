@@ -27,8 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 
@@ -188,7 +186,7 @@ class ThemeManager(
         backUpLastSessionPersistently()
     }
 
-    fun exportTheme(uuid: String, dataType: ThemeColorDataType) = scope.launch {
+    fun exportTheme(uuid: String, dataType: ThemeColorDataType, activityContext: Context) = scope.launch {
         backUpLastSessionPersistently()
 
         val theme = themeRepository.getThemeByUUID(uuid)!!.values.stringify(dataType, palette)
@@ -197,7 +195,7 @@ class ThemeManager(
         else
             "Telemone Export.attheme"
 
-        with(context) {
+        with(activityContext) {
             File(cacheDir, fileName).writeText(theme)
 
             val uri = FileProvider.getUriForFile(

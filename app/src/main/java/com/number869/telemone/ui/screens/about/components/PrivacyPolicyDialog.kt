@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.ui.screens.about.AboutDestinations
-import com.nxoim.decomposite.core.common.navigation.NavController
 
 @Composable
 fun PrivacyPolicyDialog(
@@ -34,8 +32,8 @@ fun PrivacyPolicyDialog(
 			Column {
 				Column(
 					Modifier
-						.verticalScroll(rememberScrollState())
-						.weight(1f, false)) {
+                        .verticalScroll(rememberScrollState())
+                        .weight(1f, false)) {
 					Text(
 						stringResource(id = R.string.privacy_policy_text),
 						modifier = Modifier.padding(24.dp)
@@ -45,11 +43,11 @@ fun PrivacyPolicyDialog(
 				TextButton(
 					onClick = onNavigateBackRequest,
 					modifier = Modifier
-						.align(Alignment.End)
-						.padding(top = 20.dp, bottom = 20.dp, end = 24.dp)
-						.weight(1f, false)
+                        .align(Alignment.End)
+                        .padding(top = 20.dp, bottom = 20.dp, end = 24.dp)
+                        .weight(1f, false)
 				) {
-					Text(text = "Close")
+					Text(text = stringResource(R.string.close_action))
 				}
 			}
 		}

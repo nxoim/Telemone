@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.ui.screens.about.AboutDestinations
 
 @Composable
 fun TosDialog(
@@ -48,7 +47,7 @@ fun TosDialog(
 						.padding(top = 20.dp, bottom = 20.dp, end = 24.dp)
 						.weight(1f, false)
 				) {
-					Text(text = "Close")
+					Text(text = stringResource(R.string.close_action))
 				}
 			}
 		}

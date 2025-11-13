@@ -28,9 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.shared.ui.SelectionDialog
 import com.number869.telemone.shared.ui.SelectionDialogItem
@@ -92,12 +95,14 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                 ) {
                     DisposableEffect(Unit) { onDispose { hideDialog() } }
 
+                    val context = LocalContext.current 
+                    
                     SelectionDialog(
-                        title = "Choose display type",
+                        title = stringResource(R.string.choose_display_type_label),
                         contentAlpha = { animatedAlpha }
                     ) {
                         SelectionDialogItem(
-                            text = "Saved color values",
+                            text = context.getString(R.string.saved_color_values_label),
                             selectThisItem = {
                                 AppSettings.savedThemeDisplayType.setAsync(
                                     ThemeColorPreviewDisplayType.SavedColorValues.id
@@ -108,7 +113,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         )
 
                         SelectionDialogItem(
-                            text = "Current color scheme (fallback to saved colors)",
+                            text = context.getString(R.string.current_color_scheme_fallback_to_saved_colors_label),
                             selectThisItem = {
                                 AppSettings.savedThemeDisplayType.setAsync(
                                     ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback.id
@@ -120,7 +125,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         )
 
                         SelectionDialogItem(
-                            text = "Current color scheme",
+                            text = context.getString(R.string.current_color_scheme_label),
                             selectThisItem = {
                                 AppSettings.savedThemeDisplayType.setAsync(
                                     ThemeColorPreviewDisplayType.CurrentColorScheme.id

@@ -9,8 +9,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -58,11 +56,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.R
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.ui.RootDestinations
@@ -127,6 +128,8 @@ fun EditorTopAppBar(
     }
 }
 
+private val centerVertically = BiasAlignment(-1f, 0f)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TheAppBar(
@@ -158,21 +161,23 @@ private fun TheAppBar(
             }
         },
         title = {
-            AnimatedVisibility(
-                !isShowingTapToSearchText,
-                modifier = Modifier.clickable { showSearchbar() },
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Text("Theme Editor")
-            }
-            AnimatedVisibility(
-                isShowingTapToSearchText,
-                modifier = Modifier.clickable { showSearchbar() },
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Text("Tap to search")
+            Box(contentAlignment = centerVertically) {
+                AnimatedVisibility(
+                    !isShowingTapToSearchText,
+                    modifier = Modifier.clickable { showSearchbar() },
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Text(stringResource(R.string.theme_editor))
+                }
+                AnimatedVisibility(
+                    isShowingTapToSearchText,
+                    modifier = Modifier.clickable { showSearchbar() },
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Text(stringResource(R.string.tap_to_search))
+                }
             }
         },
         actions = {
@@ -189,37 +194,37 @@ private fun TheAppBar(
 
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                     DropdownMenuItem(
-                        text = { Text(text = "Reset current theme") },
+                        text = { Text(text = stringResource(R.string.reset_current_theme)) },
                         onClick = { resetCurrentTheme() },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Refresh,
-                                contentDescription = "Reset current theme"
+                                contentDescription = stringResource(R.string.reset_current_theme)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Load stock light theme") },
+                        text = { Text(text = stringResource(R.string.load_stock_light_theme)) },
                         onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.LightMode,
-                                contentDescription = "Load stock light theme"
+                                contentDescription = stringResource(R.string.load_stock_light_theme)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Load stock dark theme") },
+                        text = { Text(text = stringResource(R.string.load_stock_dark_theme)) },
                         onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = false)) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.DarkMode,
-                                contentDescription = "Load stock dark theme"
+                                contentDescription = stringResource(R.string.load_stock_dark_theme)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Show values") },
+                        text = { Text(text = stringResource(R.string.show_values_action)) },
                         onClick = {
                             editorNavController.navigate(EditorDestinations.ThemeValues)
                             showMenu = false
@@ -227,37 +232,37 @@ private fun TheAppBar(
                         leadingIcon = {
                             Icon(
                                 Icons.Default.ShortText,
-                                contentDescription = "Show values"
+                                contentDescription = stringResource(R.string.show_values_action)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Load default light theme") },
+                        text = { Text(text = stringResource(R.string.load_default_light_theme)) },
                         onClick = { loadSavedTheme(ThemeStorageType.Default(isLight = true)) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.LightMode,
-                                contentDescription = "Load default light theme"
+                                contentDescription = stringResource(R.string.load_default_light_theme)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Load default dark theme") },
+                        text = { Text(text = stringResource(R.string.load_default_dark_theme)) },
                         onClick = { loadSavedTheme(ThemeStorageType.Default(isLight = false)) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.DarkMode,
-                                contentDescription = "Load default dark theme"
+                                contentDescription = stringResource(R.string.load_default_dark_theme)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Load theme from file") },
+                        text = { Text(text = stringResource(R.string.load_theme_from_file)) },
                         onClick = { showClearBeforeLoadDialog(); showMenu = false },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.UploadFile,
-                                contentDescription = "Load default dark theme"
+                                contentDescription = stringResource(R.string.load_theme_from_file)
                             )
                         }
                     )
@@ -309,8 +314,8 @@ private fun TheSearchbar(
                 expanded = fullscreen,
                 onExpandedChange = { },
                 enabled = true,
-                placeholder = { Text(text = "Search in current theme") },
-                leadingIcon = { Icon(Icons.Default.Search, "Search") },
+                placeholder = { Text(text = stringResource(R.string.search_in_current_theme)) },
+                leadingIcon = { Icon(Icons.Default.Search, stringResource(R.string.search_title)) },
                 trailingIcon = {
                     AnimatedVisibility(
                         visible = searchQueryIsEmpty && !fullscreen,
@@ -318,7 +323,7 @@ private fun TheSearchbar(
                         exit = fadeOut()
                     ) {
                         IconButton(onClick = { hideSearchbar() }) {
-                            Icon(Icons.Default.ArrowUpward, "Hide searchbar")
+                            Icon(Icons.Default.ArrowUpward, stringResource(R.string.hide_searchbar_action))
                         }
                     }
 
@@ -328,7 +333,7 @@ private fun TheSearchbar(
                         exit = fadeOut()
                     ) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Clear, "Clear search")
+                            Icon(Icons.Default.Clear, stringResource(R.string.clear_search_action))
                         }
                     }
                 },
@@ -364,7 +369,7 @@ private fun TheSearchbar(
                             .fillMaxSize()
                     ) {
                         Text(
-                            "Search is empty. Tap this to close",
+                            stringResource(R.string.search_is_empty_tap_this_to_close_notice),
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }

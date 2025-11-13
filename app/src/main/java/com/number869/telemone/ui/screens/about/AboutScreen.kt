@@ -1,15 +1,9 @@
 package com.number869.telemone.ui.screens.about
 
 import androidx.compose.foundation.layout.Arrangement.spacedBy
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -22,7 +16,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.R
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.about.components.DescriptionItem
 import com.number869.telemone.ui.screens.about.components.DevelopersItem
@@ -43,12 +39,12 @@ fun AboutScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "About Telemone") },
+                title = { Text(text = stringResource(R.string.about_telemone)) },
                 navigationIcon = {
                     IconButton(onClick = { rootNavController.navigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back_action),
                         )
                     }
                 },

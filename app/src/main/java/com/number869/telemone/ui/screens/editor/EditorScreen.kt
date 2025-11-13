@@ -60,12 +60,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.number869.telemone.data.ThemeData
+import com.number869.telemone.R
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
@@ -85,8 +87,6 @@ import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToo
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.evolpagink.compose.items
 import com.nxoim.evolpagink.compose.toState
-import com.nxoim.evolpagink.core.Pageable
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
@@ -174,7 +174,7 @@ fun EditorScreen(
 					item {
 						SmallTintedLabel(
 							Modifier.padding(start = 16.dp),
-							labelText = "All Colors"
+							labelText = stringResource(R.string.all_colors_label)
 						)
 						Spacer(modifier = Modifier.height(16.dp))
 					}
@@ -202,7 +202,7 @@ private fun CurrentThemeSection(
 	modifier: Modifier = Modifier,
 	colorOf: @Composable (String) -> Color
 ) = Column(modifier) {
-	SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
+	SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = stringResource(R.string.current_theme_label))
 	CurrentThemePreview(colorOf)
 	Spacer(modifier = Modifier.height(8.dp))
 }
@@ -213,6 +213,7 @@ private fun SavedThemesSection(
     vm: EditorViewModel,
     colorDisplayType: ThemeColorPreviewDisplayType
 ) {
+    val context = LocalContext.current
     val lazyThemeListState = rememberLazyListState()
     val themePageable = vm.themesPageable.toState(
         lazyThemeListState,
@@ -233,16 +234,16 @@ private fun SavedThemesSection(
 
 	Row(
 		Modifier
-			.clip(CircleShape)
-			.clickable {
-				dialogsNavController.navigate(
-					EditorDestinations.Dialogs.SavedThemeTypeSelection,
-				)
-			},
+            .clip(CircleShape)
+            .clickable {
+                dialogsNavController.navigate(
+                    EditorDestinations.Dialogs.SavedThemeTypeSelection,
+                )
+            },
 		verticalAlignment = Alignment.Bottom,
 		horizontalArrangement = spacedBy(8.dp)
 	) {
-		SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Saved Themes")
+		SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = stringResource(R.string.saved_themes_label))
 
 		FilledTonalIconButton(
 			onClick = {
@@ -263,7 +264,9 @@ private fun SavedThemesSection(
 			enter = fadeIn(tween(200)),
 			exit = fadeOut(tween(200))
 		) {
-			Box(modifier = Modifier.fillMaxWidth().height(64.dp)) {
+			Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)) {
 				CircularProgressIndicator(Modifier.align(Alignment.Center))
 			}
 		}
@@ -308,7 +311,7 @@ private fun SavedThemesSection(
 														)
 													)
 
-													showToast("Theme loaded")
+                                                    showToast { getString(R.string.theme_loaded) }
 												},
 												onLongClick = { showDropDown = true }
 											)
@@ -342,7 +345,7 @@ private fun SavedThemesSection(
 									EditorDestinations.Dialogs.LoadThemeWithOptions(theme.uuid)
 								)
 							},
-							onExportTheme = { vm.exportTheme(theme.uuid, it) },
+							onExportTheme = { vm.exportTheme(theme.uuid, it, context) },
 							onOverwriteDefaultThemeChoiceRequest = {
 								showDropDown = false
 								dialogsNavController.navigate(
@@ -374,17 +377,17 @@ private fun SavedThemesSection(
 private fun NoSavedThemesPlaceholder() {
 	Box(
 		Modifier
-			.fillMaxWidth(1f)
-			.height(120.dp)
-			.clip(RoundedCornerShape(16.dp))
-			.animateContentSize()
+            .fillMaxWidth(1f)
+            .height(120.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .animateContentSize()
 	) {
 		Column(
 			Modifier
-				.fillMaxSize()
-				.padding(horizontal = 32.dp, vertical = 16.dp)
-				.clip(CircleShape)
-				.background(MaterialTheme.colorScheme.surfaceVariant),
+                .fillMaxSize()
+                .padding(horizontal = 32.dp, vertical = 16.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {
@@ -433,8 +436,8 @@ private fun ThemeSelectionToolbarSection(
 
 	Spacer(
 		Modifier
-			.animateContentSize()
-			.height(if (vm.themeSelectionToolbarIsVisible) 12.dp else 24.dp)
+            .animateContentSize()
+            .height(if (vm.themeSelectionToolbarIsVisible) 12.dp else 24.dp)
 	)
 }
 
@@ -443,21 +446,21 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel, newUiElements: L
 		item {
 			SmallTintedLabel(
 				Modifier
-					.padding(start = 16.dp)
-					.animateItem(),
-				labelText = "New Values"
+                    .padding(start = 16.dp)
+                    .animateItem(),
+				labelText = stringResource(R.string.new_values_label)
 			)
 
 			Spacer(modifier = Modifier
-				.height(16.dp)
-				.animateItem())
+                .height(16.dp)
+                .animateItem())
 		}
 
 		itemsIndexed(newUiElements) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
-					.padding(horizontal = 16.dp)
-					.animateItem(),
+                    .padding(horizontal = 16.dp)
+                    .animateItem(),
 				paletteState = vm.paletteState,
 				uiElementData = uiElementData,
 				index = index,
@@ -480,21 +483,21 @@ private fun LazyListScope.IncompatibleValuesSection(
 		item {
 			SmallTintedLabel(
 				Modifier
-					.padding(start = 16.dp)
-					.animateItem(),
-				labelText = "Incompatible Values"
+                    .padding(start = 16.dp)
+                    .animateItem(),
+				labelText = stringResource(R.string.incompatible_values_label)
 			)
 
 			Spacer(modifier = Modifier
-				.height(16.dp)
-				.animateItem())
+                .height(16.dp)
+                .animateItem())
 		}
 
 		itemsIndexed(incompatibleValues) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
-					.padding(horizontal = 16.dp)
-					.animateItem(),
+                    .padding(horizontal = 16.dp)
+                    .animateItem(),
 				paletteState = vm.paletteState,
 				uiElementData = uiElementData,
 				index = index,
@@ -509,8 +512,8 @@ private fun LazyListScope.AllColorsSection(vm: EditorViewModel, mappedValuesAsLi
 	itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementColorData ->
 		ElementColorItem(
 			Modifier
-				.padding(horizontal = 16.dp)
-				.animateItem(),
+                .padding(horizontal = 16.dp)
+                .animateItem(),
 			paletteState = vm.paletteState,
 			uiElementData = uiElementColorData,
 			index = index,

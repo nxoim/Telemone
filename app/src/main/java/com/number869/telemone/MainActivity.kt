@@ -29,6 +29,7 @@ import com.number869.telemone.ui.theme.createPaletteState
 import com.nxoim.decomposite.core.android.navigation.NavigationRootProvider
 import com.nxoim.decomposite.core.android.navigation.defaultNavigationRootData
 import com.nxoim.decomposite.core.common.navigation.BackGestureProviderContainer
+import io.github.sudarshanmhasrup.localina.api.LocalinaApp
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -48,19 +49,21 @@ class MainActivity : ComponentActivity() {
 		val navigationRootDataProvider = defaultNavigationRootData()
 
 		setContent {
-			TelemoneTheme {
-				BackGestureProviderContainer(
-					navigationRootDataProvider.defaultComponentContext,
-					blockChildDragInputs = false,
-					edgeWidth = null
-				) {
-					Surface(modifier = Modifier.fillMaxSize()) {
-						NavigationRootProvider(navigationRootDataProvider) {
-                            Navigator(App.themeManager, AppSettings.Companion)
+            LocalinaApp {
+                TelemoneTheme {
+                    BackGestureProviderContainer(
+                        navigationRootDataProvider.defaultComponentContext,
+                        blockChildDragInputs = false,
+                        edgeWidth = null
+                    ) {
+                        Surface(modifier = Modifier.fillMaxSize()) {
+                            NavigationRootProvider(navigationRootDataProvider) {
+                                Navigator(App.themeManager, AppSettings.Companion)
+                            }
                         }
-					}
-				}
-			}
+                    }
+                }
+            }
 		}
 	}
 }

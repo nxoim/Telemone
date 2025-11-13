@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-val version = "1.4.3"
-val versionNumber = 10
+val version = "1.5.0"
+val versionNumber = 11
 
 android {
     namespace = "com.number869.telemone"
@@ -49,6 +49,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
@@ -79,4 +83,5 @@ dependencies {
 
     implementation(libs.realm.library.base)
     implementation(libs.evolpagink)
+    implementation(libs.localina)
 }

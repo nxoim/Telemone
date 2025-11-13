@@ -4,6 +4,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.number869.telemone.R
 
 @Composable
 fun ClearBeforeLoadDialog(
@@ -13,20 +15,20 @@ fun ClearBeforeLoadDialog(
 ) {
 	AlertDialog(
 		onDismissRequest = { close() },
-		title = { Text("Clear current theme before loading an external theme?") },
-		text = { Text("""Loading a theme will save the current theme to "Saved Themes".""") },
+		title = { Text(stringResource(R.string.clear_current_theme_before_loading_an_external_theme)) },
+		text = { Text(stringResource(R.string.loading_a_theme_will_save_the_current_theme_to_saved_themes)) },
 		confirmButton = {
 			TextButton(onClick = { clear() }) {
-				Text("Clear")
+				Text(stringResource(R.string.clear))
 			}
 
 			TextButton(onClick = { leaveAsIs() }) {
-				Text("Leave as is")
+				Text(stringResource(R.string.leave_as_is))
 			}
 		},
 		dismissButton = {
 			TextButton(onClick = { close() }) {
-				Text("Cancel")
+				Text(stringResource(R.string.cancel))
 			}
 		}
 	)

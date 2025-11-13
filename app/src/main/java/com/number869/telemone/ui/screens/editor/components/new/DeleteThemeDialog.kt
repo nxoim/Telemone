@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.R
 import com.number869.telemone.data.ThemeData
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.colorOf
@@ -29,13 +31,13 @@ fun DeleteThemeDialog(
     ) {
 	AlertDialog(
 		onDismissRequest = close,
-		title = { Text("Delete this theme?") },
+		title = { Text(stringResource(R.string.delete_this_theme)) },
 		icon = {
 			SavedThemeItem(
 				Modifier
-					.width(150.dp)
-					.height(180.dp)
-					.clip(RoundedCornerShape(16.dp)),
+                    .width(150.dp)
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(16.dp)),
 				colorOf = { targetUiElement ->
 					val data = theme.values
 						.find { it.name == targetUiElement }
@@ -46,7 +48,7 @@ fun DeleteThemeDialog(
 			)
 		},
 		text = {
-			Text(text = "This theme will be unrecoverable after deletion.")
+			Text(text = stringResource(R.string.this_theme_will_be_unrecoverable_after_deletion))
 		},
 		confirmButton = {
 			FilledTonalButton(
@@ -59,12 +61,12 @@ fun DeleteThemeDialog(
 					contentColor = MaterialTheme.colorScheme.onErrorContainer
 				)
 			) {
-				Text("Delete")
+				Text(stringResource(R.string.delete))
 			}
 		},
 		dismissButton = {
 			TextButton(onClick = { close() },) {
-				Text("Cancel")
+				Text(stringResource(R.string.cancel))
 			}
 		}
 	)

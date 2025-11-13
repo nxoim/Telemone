@@ -17,6 +17,7 @@ decomposite = "0.2.1.0-p0"
 realm = "3.2.9"
 androidx-splashscreen = "1.2.0"
 evolpagink = "0.5.0"
+localina = "1.0.0-alpha3"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -43,6 +44,7 @@ decomposite = { module = "com.nxoim:decomposite", version.ref = "decomposite" }
 realm-library-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realm"}
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-splashscreen" }
 evolpagink = { module = "com.nxoim.evolpagink:compose", version.ref = "evolpagink"}
+localina = { module = "io.github.sudarshanmhasrup.localina:localina", version.ref = "localina"}
 
 
 [plugins]

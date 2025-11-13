@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
 import com.number869.telemone.App
+import com.number869.telemone.R
 import com.number869.telemone.data.AppSettings
 import com.number869.telemone.data.PredefinedTheme
 import com.number869.telemone.data.ThemeManager
@@ -101,7 +102,7 @@ class MainViewModel(
             )
         }
 
-        showToast("Default theme updated")
+        showToast { getString(R.string.default_theme_updated) }
     }
     fun declineThemeUpdate(light: Boolean, context: Context) {
         if (light)

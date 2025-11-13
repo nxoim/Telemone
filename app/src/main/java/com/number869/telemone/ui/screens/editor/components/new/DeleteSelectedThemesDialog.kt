@@ -10,6 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.number869.telemone.R
 
 @Composable
 fun DeleteSelectedThemesDialog(
@@ -20,9 +22,9 @@ fun DeleteSelectedThemesDialog(
 	selectedThemeCount: Int,
 ) {
 	AlertDialog(
-		icon = { Icon(Icons.Default.DeleteForever, contentDescription = "Delete icon") },
-		title = { Text("Permanently delete these themes?") },
-		text = { Text("These themes will be unrecoverable after deletion.") },
+		icon = { Icon(Icons.Default.DeleteForever, contentDescription = stringResource(R.string.delete_icon)) },
+		title = { Text(stringResource(R.string.permanently_delete_these_themes)) },
+		text = { Text(stringResource(R.string.these_themes_will_be_unrecoverable_after_deletion)) },
 		confirmButton = {
 			FilledTonalButton(
 				onClick = {
@@ -36,12 +38,12 @@ fun DeleteSelectedThemesDialog(
 					contentColor = MaterialTheme.colorScheme.onErrorContainer
 				)
 			) {
-				Text(text = "Delete themes ($selectedThemeCount)")
+				Text(text = stringResource(R.string.delete_themes, selectedThemeCount))
 			}
 		},
 		dismissButton = {
 			TextButton(onClick = hideDialog) {
-				Text(text = "Cancel")
+				Text(text = stringResource(R.string.cancel))
 			}
 		},
 		onDismissRequest = hideDialog

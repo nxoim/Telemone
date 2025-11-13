@@ -2,35 +2,21 @@
 
 package com.number869.telemone.ui.screens.main.components
 
-import android.R.attr.text
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkOut
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -41,18 +27,17 @@ import androidx.compose.material3.MaterialTheme.LocalMotionScheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.number869.telemone.R
 import com.number869.telemone.shared.ui.TextWithFixedSize
 import com.number869.telemone.ui.theme.SolarSet
-import kotlin.math.max
 
 @Composable
 fun DefaultThemesButtons(exportTheme: (light: Boolean) -> Unit) {
@@ -75,7 +60,7 @@ fun DefaultThemesButtons(exportTheme: (light: Boolean) -> Unit) {
                 exit = textExit
             ) {
                 TextWithFixedSize(
-                    text = "Save Light",
+                    text = stringResource(R.string.save_light_action),
                     fontSize = 35.sp,
                     style = MaterialTheme.typography.displaySmall.plus(
                         noPlatformPaddingText
@@ -98,7 +83,7 @@ fun DefaultThemesButtons(exportTheme: (light: Boolean) -> Unit) {
                 exit = textExit
             ) {
                 TextWithFixedSize(
-                    text = "Save Dark",
+                    text = stringResource(R.string.save_dark_action),
                     fontSize = 35.sp,
                     style = MaterialTheme.typography.displaySmall.plus(
                         noPlatformPaddingText

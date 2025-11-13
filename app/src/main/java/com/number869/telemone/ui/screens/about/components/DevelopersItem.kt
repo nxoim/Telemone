@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
 
@@ -25,23 +26,23 @@ import com.number869.telemone.R
 fun DevelopersItem() {
 	val context = LocalContext.current
 
-	AboutCard(label = "Developers") {
+	AboutCard(label = stringResource(R.string.developers_label)) {
 		Column(verticalArrangement = spacedBy(16.dp)) {
 			Row(
 				modifier = Modifier
-					.fillMaxWidth()
-					.clickable {
-						val intent = Intent(
-							Intent.ACTION_VIEW,
-							Uri.parse("https://github.com/nxoim")
-						)
-						context.startActivity(intent)
-					},
+                    .fillMaxWidth()
+                    .clickable {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/nxoim")
+                        )
+                        context.startActivity(intent)
+                    },
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Icon(
 					painter = painterResource(R.drawable.github_mark_white),
-					contentDescription = "GitHub",
+					contentDescription = stringResource(R.string.github),
 					modifier = Modifier.size(32.dp)
 				)
 
@@ -55,19 +56,19 @@ fun DevelopersItem() {
 
 			Row(
 				modifier = Modifier
-					.fillMaxWidth()
-					.clickable {
-						val intent = Intent(
-							Intent.ACTION_VIEW,
-							Uri.parse("https://github.com/Lambada10")
-						)
-						context.startActivity(intent)
-					},
+                    .fillMaxWidth()
+                    .clickable {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/Lambada10")
+                        )
+                        context.startActivity(intent)
+                    },
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Icon(
 					painter = painterResource(R.drawable.github_mark_white),
-					contentDescription = "GitHub",
+					contentDescription = stringResource(R.string.github),
 					modifier = Modifier.size(32.dp)
 				)
 
