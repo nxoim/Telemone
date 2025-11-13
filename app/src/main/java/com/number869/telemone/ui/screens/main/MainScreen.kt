@@ -2,9 +2,13 @@ package com.number869.telemone.ui.screens.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -14,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -93,6 +98,7 @@ fun MainScreen(
 
 		Column(
 			Modifier
+                .fillMaxSize()
                 .padding(24.dp)
                 .weight(1f),
 			verticalArrangement = Arrangement.SpaceAround,
@@ -101,9 +107,17 @@ fun MainScreen(
             val context = LocalContext.current
 			DefaultThemesButtons(exportTheme = { vm.exportDefaultTheme(it, context) })
 
-			OutlinedButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
-				Text(text = "Theme Editor")
-			}
+            TextButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(text = "Theme Editor")
+
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        Modifier.size(20.dp)
+                    )
+                }
+            }
 		}
 	}
 
