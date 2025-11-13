@@ -197,7 +197,11 @@ data class UiElementColorData(
 )
 
 @Serializable
-data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
+data class ThemeData(val uuid: String, val values: List<UiElementColorData>) {
+    companion object {
+        val Undefined = ThemeData("undefined", emptyList())
+    }
+}
 private class ThemeDataRealm : RealmObject {
 	@PrimaryKey
 	var _id: ObjectId = ObjectId()

@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,7 +56,8 @@ import kotlin.math.max
 
 @Composable
 fun DefaultThemesButtons(exportTheme: (light: Boolean) -> Unit) {
-    Column(
+    FlowRow(
+        horizontalArrangement = spacedBy(16.dp),
         verticalArrangement = spacedBy(16.dp)
     ) {
         val lightInteractionSource = remember { MutableInteractionSource() }

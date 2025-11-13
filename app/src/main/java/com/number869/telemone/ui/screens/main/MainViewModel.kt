@@ -14,8 +14,10 @@ import com.number869.telemone.shared.utils.stringify
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -59,28 +61,30 @@ class MainViewModel(
         .stateIn(viewModelScope, WhileSubscribed(), false)
 
     fun exportDefaultTheme(light: Boolean, context: Context) {
-        val themeName = if (light) "Telemone Light" else "Telemone Dark"
-        val theme = stringify(
-            themeManager.getThemeByUUID(PredefinedTheme.Default(light).uuid)!!.values,
-            ThemeColorDataType.ColorValuesFromDevicesColorScheme,
-            themeManager.paletteState.entirePaletteAsMap
-        )
-
-        with(context) {
-            File(cacheDir, "$themeName.attheme").writeText(theme)
-
-            val uri = FileProvider.getUriForFile(
-                applicationContext,
-                "${packageName}.provider",
-                File(cacheDir, "$themeName.attheme")
+        viewModelScope.launch(Dispatchers.IO) {
+            val themeName = if (light) "Telemone Light" else "Telemone Dark"
+            val theme = stringify(
+                themeManager.getThemeByUUID(PredefinedTheme.Default(light).uuid).first()!!.values,
+                ThemeColorDataType.ColorValuesFromDevicesColorScheme,
+                themeManager.paletteState.entirePaletteAsMap
             )
 
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.type = "*/attheme"
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
-            startActivity(Intent.createChooser(intent, themeName))
+            with(context) {
+                File(cacheDir, "$themeName.attheme").writeText(theme)
+
+                val uri = FileProvider.getUriForFile(
+                    applicationContext,
+                    "${packageName}.provider",
+                    File(cacheDir, "$themeName.attheme")
+                )
+
+                val intent = Intent(Intent.ACTION_SEND)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.type = "*/attheme"
+                intent.putExtra(Intent.EXTRA_STREAM, uri)
+                startActivity(Intent.createChooser(intent, themeName))
+            }
         }
     }
 

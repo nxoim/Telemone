@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -355,13 +356,13 @@ class ThemeManager(
             themeRepository.getStockTheme(palette, light = false)
         }
 
-        if (getThemeByUUID(PredefinedTheme.Default(true).uuid) == null) {
+        if (getThemeByUUID(PredefinedTheme.Default(true).uuid).first() == null) {
             themeRepository.saveTheme(
                 ThemeData(PredefinedTheme.Default(true).uuid, stockLightTheme.values)
             )
         }
 
-        if (getThemeByUUID(PredefinedTheme.Default(false).uuid) == null) {
+        if (getThemeByUUID(PredefinedTheme.Default(false).uuid).first() == null) {
             themeRepository.saveTheme(
                 ThemeData(PredefinedTheme.Default(false).uuid, stockDarkTheme.values)
             )
@@ -393,9 +394,9 @@ class ThemeManager(
 
         val defaultThemeMatchingSystemDarkMode = getThemeByUUID(
             PredefinedTheme.Default(!paletteState.isDarkMode).uuid
-        )
+        ).first()
         // load last session, or default
-        val startupTheme = getThemeByUUID(PredefinedTheme.LastSession.uuid)
+        val startupTheme = getThemeByUUID(PredefinedTheme.LastSession.uuid).first()
             ?: defaultThemeMatchingSystemDarkMode
 
         _mappedValues.value = startupTheme!!.values.associateBy { it.name }
@@ -409,7 +410,7 @@ class ThemeManager(
             themeRepository.saveTheme(
                 ThemeData(
                     UUID.randomUUID().toString(),
-                    getThemeByUUID(targetThemeId)!!.values
+                    getThemeByUUID(targetThemeId).first()!!.values
                 )
             )
 
@@ -422,7 +423,7 @@ class ThemeManager(
         }
     }
 
-    fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUID(uuid)
+    fun getThemeByUUID(uuid: String) = themeRepository.getThemeByUUIDAsFlow(uuid)
     private fun backUpLastSessionPersistently() = scope.launch {
         themeRepository.saveTheme(
             ThemeData(

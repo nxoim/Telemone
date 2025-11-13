@@ -103,21 +103,15 @@ class EditorViewModel(
     fun loadSavedTheme(themeStorageType: ThemeStorageType) = themeManager.loadSavedTheme(
         storedTheme = themeStorageType,
         onSuccess = { storageTypeText, appearanceTypeText ->
-            viewModelScope.launch {
-                showToast(
-                    "$storageTypeText ${appearanceTypeText}theme has been loaded successfully."
-                )
-            }
+            showToast(
+                "$storageTypeText ${appearanceTypeText}theme has been loaded successfully."
+            )
         },
         onIncompatibleValuesFound = {
-            viewModelScope.launch {
-                showToast("Some colors are incompatible and were marked as such.")
-            }
+            showToast("Some colors are incompatible and were marked as such.")
         },
         onIncompatibleFileType = {
-            viewModelScope.launch {
-                showToast("Chosen file isn't a Telegram (not Telegram X) theme.")
-            }
+            showToast("Chosen file isn't a Telegram (not Telegram X) theme.")
         }
     )
 
