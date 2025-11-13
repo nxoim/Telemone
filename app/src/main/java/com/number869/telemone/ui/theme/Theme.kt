@@ -2,6 +2,7 @@ package com.number869.telemone.ui.theme
 
 import android.app.Activity
 import android.content.Context
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -12,6 +13,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -45,7 +47,11 @@ fun TelemoneTheme(
 
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
-        content = content
+        content = {
+            CompositionLocalProvider(
+                LocalOverscrollFactory provides rememberNotCupertinoOverscrollFactory()
+            )  { content() }
+        }
     )
 }
 
