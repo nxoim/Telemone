@@ -8,7 +8,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.number869.telemone.ui.RootDestinations
+import androidx.compose.ui.res.stringResource
+import com.number869.telemone.R
 
 @Composable
 fun ThemeUpdateAvailableDialog(
@@ -21,24 +22,26 @@ fun ThemeUpdateAvailableDialog(
 	AlertDialog(
 		onDismissRequest = {  },
 		title = {
-			Text("Update default $typeText theme?")
+			Text(stringResource(R.string.update_default_theme, typeText))
 		},
 		text = {
-			Text(text = """Stock $typeText theme was updated by the developer. Would you like to apply the update?
-
-This will replace your current default $typeText theme and your current default $typeText theme will be backed up before the update is applied. The backed up theme will be available in the theme editor so you can restore it when you need to.
-
-If you decline - you can always change your mind and update by pressing the menu button (three dots) above and pressing "Update default $typeText theme".""".trimMargin())
+			Text(text = stringResource(
+                R.string.stock_theme_update_notice_content,
+                typeText,
+                typeText,
+                typeText,
+                typeText
+            ).trimMargin())
 		},
 		icon = {
 			Icon(Icons.Default.TipsAndUpdates, contentDescription = null)
 		},
 		confirmButton = {
-			Button(onClick = acceptStockThemeUpdate) { Text(text = "Apply") }
+			Button(onClick = acceptStockThemeUpdate) { Text(text = stringResource(R.string.apply)) }
 		},
 		dismissButton = {
 			OutlinedButton(onClick = decline) {
-				Text(text = "Decline")
+				Text(text = stringResource(R.string.decline))
 			}
 		}
 	)

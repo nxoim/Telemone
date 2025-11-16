@@ -6,17 +6,17 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-val version = "1.4.3"
-val versionNumber = 10
+val version = "1.5.0"
+val versionNumber = 11
 
 android {
     namespace = "com.number869.telemone"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.number869.telemone"
         minSdk = 31
-        targetSdk = 35
+        targetSdk = 36
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -49,6 +49,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
@@ -78,4 +82,6 @@ dependencies {
     implementation(libs.decomposite)
 
     implementation(libs.realm.library.base)
+    implementation(libs.evolpagink)
+    implementation(libs.localina)
 }

@@ -5,19 +5,3 @@ plugins {
     alias(libs.plugins.android.application).apply(false)
     alias(libs.plugins.kotlinx.serialization).apply(false)
 }
-
-subprojects {
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler"
-            )
-
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler"
-            )
-        }
-    }
-}

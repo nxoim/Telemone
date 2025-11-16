@@ -1,21 +1,23 @@
 [versions]
-androidGradlePlugin = "8.3.2"
-kotlin = "2.0.20"
-androidxCore = "1.15.0"
-androidxLifecycle = "2.8.7"
-androidxActivity = "1.9.3"
-compose = "1.7.5"
-material3 = "1.3.1"
-androidMaterial = "1.12.0"
-materialKolor = "1.4.4"
-androidxTest = "1.6.1"
+androidGradlePlugin = "8.13.0"
+kotlin = "2.2.10"
+androidxCore = "1.17.0"
+androidxLifecycle = "2.9.4"
+androidxActivity = "1.11.0"
+compose = "1.9.4"
+material3 = "1.5.0-alpha08"
+androidMaterial = "1.13.0"
+materialKolor = "4.0.4"
+androidxTest = "1.7.0"
 junit = "4.13.2"
-androidxTestExt = "1.2.1"
-androidxTestEspresso = "3.6.1"
+androidxTestExt = "1.3.0"
+androidxTestEspresso = "3.7.0"
 lazyColumnScrollbar = "1.7.2"
 decomposite = "0.2.1.0-p0"
-realm = "3.0.0"
-androidx-splashscreen = "1.0.1"
+realm = "3.2.9"
+androidx-splashscreen = "1.2.0"
+evolpagink = "0.5.0"
+localina = "1.0.0-alpha3"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -39,13 +41,15 @@ androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-mani
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version = "1.7.0-alpha06" }
 lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazyColumnScrollbar" }
 decomposite = { module = "com.nxoim:decomposite", version.ref = "decomposite" }
-realm-library-base = { module = "io.realm.kotlin:library-base", version.ref = "realm"}
+realm-library-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realm"}
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-splashscreen" }
+evolpagink = { module = "com.nxoim.evolpagink:compose", version.ref = "evolpagink"}
+localina = { module = "io.github.sudarshanmhasrup.localina:localina", version.ref = "localina"}
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-realm = { id = "io.realm.kotlin", version.ref = "realm" }
+realm = { id = "com.infomaniak.realm.kotlin", version.ref = "realm" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

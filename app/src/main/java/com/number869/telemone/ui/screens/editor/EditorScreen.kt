@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -49,7 +48,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -62,11 +60,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.number869.telemone.data.ThemeData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.number869.telemone.R
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.ui.SmallTintedLabel
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
@@ -74,7 +75,6 @@ import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.colorOf
 import com.number869.telemone.shared.utils.getColorDisplayType
 import com.number869.telemone.shared.utils.incompatibleUiElementColorData
-import com.number869.telemone.shared.utils.inject
 import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.components.new.CheckboxSelectionOverlay
@@ -85,7 +85,10 @@ import com.number869.telemone.ui.screens.editor.components.new.SavedThemeDropdow
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItem
 import com.number869.telemone.ui.screens.editor.components.new.ThemeSelectionToolbar
 import com.nxoim.decomposite.core.common.navigation.NavController
-import kotlinx.coroutines.Dispatchers
+import com.nxoim.evolpagink.compose.items
+import com.nxoim.evolpagink.compose.toState
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSelectionActionable
 
@@ -104,10 +107,9 @@ fun EditorScreen(
 
 	val colorDisplayType = getColorDisplayType()
 
-	val themeList = vm.themeList.collectAsState(listOf(), Dispatchers.Default)
-	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState(Dispatchers.Default)
-	val newUiElements by vm.newUiElements.collectAsState(listOf(), Dispatchers.Default)
-	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf(), Dispatchers.Default)
+	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState()
+	val newUiElements by vm.newUiElements.collectAsState(listOf())
+	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf())
 
 	Scaffold(
 		Modifier.nestedScroll(topAppBarState.nestedScrollConnection),
@@ -122,7 +124,8 @@ fun EditorScreen(
 				changeValue = vm::changeValue,
 				editorNavController = editorNavController,
 				dialogsNavController = dialogsNavController,
-				rootNavController = rootNavController
+				rootNavController = rootNavController,
+                paletteState = vm.paletteState
 			)
 		},
 		bottomBar = { Box {} } // hello edge-to-edge
@@ -161,7 +164,6 @@ fun EditorScreen(
 						SavedThemesSection(
 							dialogsNavController,
 							vm,
-							themeList,
 							colorDisplayType
 						)
 					}
@@ -172,7 +174,7 @@ fun EditorScreen(
 					item {
 						SmallTintedLabel(
 							Modifier.padding(start = 16.dp),
-							labelText = "All Colors"
+							labelText = stringResource(R.string.all_colors_label)
 						)
 						Spacer(modifier = Modifier.height(16.dp))
 					}
@@ -200,40 +202,48 @@ private fun CurrentThemeSection(
 	modifier: Modifier = Modifier,
 	colorOf: @Composable (String) -> Color
 ) = Column(modifier) {
-	SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Current Theme")
+	SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = stringResource(R.string.current_theme_label))
 	CurrentThemePreview(colorOf)
 	Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Composable
 private fun SavedThemesSection(
-	dialogsNavController: NavController<EditorDestinations.Dialogs>,
-	vm: EditorViewModel,
-	themeListState: State<List<ThemeData>>,
-	colorDisplayType: ThemeColorPreviewDisplayType
+    dialogsNavController: NavController<EditorDestinations.Dialogs>,
+    vm: EditorViewModel,
+    colorDisplayType: ThemeColorPreviewDisplayType
 ) {
-	val themeList by themeListState
-	val savedThemesRowState = rememberLazyListState()
+    val context = LocalContext.current
+    val lazyThemeListState = rememberLazyListState()
+    val themePageable = vm.themesPageable.toState(
+        lazyThemeListState,
+        key = { it.uuid }
+    )
 	val displayingSavedThemes by remember {
-		derivedStateOf { themeList.isNotEmpty() }
+		derivedStateOf { themePageable.items.isNotEmpty() }
 	}
 
-	LaunchedEffect(themeList) {
-		if (themeList.isNotEmpty()) savedThemesRowState.animateScrollToItem(0)
+	LaunchedEffect(Unit) {
+        vm.themeCount.drop(1).collect {
+            launch {
+                lazyThemeListState.animateScrollToItem(0)
+            }
+            vm.themesPageable.jumpTo(0)
+        }
 	}
 
 	Row(
 		Modifier
-			.clip(CircleShape)
-			.clickable {
-				dialogsNavController.navigate(
-					EditorDestinations.Dialogs.SavedThemeTypeSelection,
-				)
-			},
+            .clip(CircleShape)
+            .clickable {
+                dialogsNavController.navigate(
+                    EditorDestinations.Dialogs.SavedThemeTypeSelection,
+                )
+            },
 		verticalAlignment = Alignment.Bottom,
 		horizontalArrangement = spacedBy(8.dp)
 	) {
-		SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = "Saved Themes")
+		SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = stringResource(R.string.saved_themes_label))
 
 		FilledTonalIconButton(
 			onClick = {
@@ -254,7 +264,9 @@ private fun SavedThemesSection(
 			enter = fadeIn(tween(200)),
 			exit = fadeOut(tween(200))
 		) {
-			Box(modifier = Modifier.fillMaxWidth().height(64.dp)) {
+			Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)) {
 				CircularProgressIndicator(Modifier.align(Alignment.Center))
 			}
 		}
@@ -275,12 +287,12 @@ private fun SavedThemesSection(
 		) {
 			Column {
 				LazyRow(
-					state = savedThemesRowState,
+					state = lazyThemeListState,
 					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
 					horizontalArrangement = spacedBy(16.dp),
 					modifier = Modifier.animateContentSize()
 				) {
-					items(themeList, key = { item -> item.uuid }, contentType = { it::class.simpleName }) { theme ->
+					items(themePageable) { theme ->
 						var showDropDown by rememberSaveable { mutableStateOf(false) }
 
 						Box {
@@ -299,7 +311,7 @@ private fun SavedThemesSection(
 														)
 													)
 
-													showToast("Theme loaded")
+                                                    showToast { getString(R.string.theme_loaded) }
 												},
 												onLongClick = { showDropDown = true }
 											)
@@ -311,7 +323,8 @@ private fun SavedThemesSection(
 										theme.values
 											.find { it.name == targetUiElement }
 											?: incompatibleUiElementColorData(targetUiElement),
-										colorDisplayType
+										colorDisplayType,
+                                        palette = vm.paletteState.entirePaletteAsMap
 									)
 								},
 								overlay = {
@@ -332,7 +345,7 @@ private fun SavedThemesSection(
 									EditorDestinations.Dialogs.LoadThemeWithOptions(theme.uuid)
 								)
 							},
-							onExportTheme = { vm.exportTheme(theme.uuid, it) },
+							onExportTheme = { vm.exportTheme(theme.uuid, it, context) },
 							onOverwriteDefaultThemeChoiceRequest = {
 								showDropDown = false
 								dialogsNavController.navigate(
@@ -354,7 +367,7 @@ private fun SavedThemesSection(
 					}
 				}
 
-				ThemeSelectionToolbarSection(vm, themeList = themeList, dialogsNavController = dialogsNavController)
+				ThemeSelectionToolbarSection(vm, dialogsNavController = dialogsNavController)
 			}
 		}
 	}
@@ -364,17 +377,17 @@ private fun SavedThemesSection(
 private fun NoSavedThemesPlaceholder() {
 	Box(
 		Modifier
-			.fillMaxWidth(1f)
-			.height(120.dp)
-			.clip(RoundedCornerShape(16.dp))
-			.animateContentSize()
+            .fillMaxWidth(1f)
+            .height(120.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .animateContentSize()
 	) {
 		Column(
 			Modifier
-				.fillMaxSize()
-				.padding(horizontal = 32.dp, vertical = 16.dp)
-				.clip(CircleShape)
-				.background(MaterialTheme.colorScheme.surfaceVariant),
+                .fillMaxSize()
+                .padding(horizontal = 32.dp, vertical = 16.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {
@@ -393,8 +406,9 @@ private fun NoSavedThemesPlaceholder() {
 private fun ThemeSelectionToolbarSection(
 	vm: EditorViewModel,
 	dialogsNavController: NavController<EditorDestinations.Dialogs>,
-	themeList: List<ThemeData>
 ) {
+    val count by vm.themeCount.collectAsStateWithLifecycle()
+
 	Row(
 		Modifier.fillMaxWidth(),
 		horizontalArrangement = Arrangement.Center
@@ -407,7 +421,7 @@ private fun ThemeSelectionToolbarSection(
 			ThemeSelectionToolbar(
 				Modifier.padding(top = 16.dp),
 				selectedThemeCount = vm.selectedThemes.count(),
-				allThemesAreSelected = vm.selectedThemes.count() == themeList.count(),
+				allThemesAreSelected = vm.selectedThemes.count() == count,
 				unselectAllThemes = vm::unselectAllThemes,
 				selectAllThemes = vm::selectAllThemes,
 				hideToolbarAction = { vm.hideThemeSelectionModeToolbar() },
@@ -422,8 +436,8 @@ private fun ThemeSelectionToolbarSection(
 
 	Spacer(
 		Modifier
-			.animateContentSize()
-			.height(if (vm.themeSelectionToolbarIsVisible) 12.dp else 24.dp)
+            .animateContentSize()
+            .height(if (vm.themeSelectionToolbarIsVisible) 12.dp else 24.dp)
 	)
 }
 
@@ -432,22 +446,22 @@ private fun LazyListScope.NewValuesSection(vm: EditorViewModel, newUiElements: L
 		item {
 			SmallTintedLabel(
 				Modifier
-					.padding(start = 16.dp)
-					.animateItem(),
-				labelText = "New Values"
+                    .padding(start = 16.dp)
+                    .animateItem(),
+				labelText = stringResource(R.string.new_values_label)
 			)
 
 			Spacer(modifier = Modifier
-				.height(16.dp)
-				.animateItem())
+                .height(16.dp)
+                .animateItem())
 		}
 
 		itemsIndexed(newUiElements) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
-					.padding(horizontal = 16.dp)
-					.animateItem(),
-				paletteState = inject(),
+                    .padding(horizontal = 16.dp)
+                    .animateItem(),
+				paletteState = vm.paletteState,
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -469,22 +483,22 @@ private fun LazyListScope.IncompatibleValuesSection(
 		item {
 			SmallTintedLabel(
 				Modifier
-					.padding(start = 16.dp)
-					.animateItem(),
-				labelText = "Incompatible Values"
+                    .padding(start = 16.dp)
+                    .animateItem(),
+				labelText = stringResource(R.string.incompatible_values_label)
 			)
 
 			Spacer(modifier = Modifier
-				.height(16.dp)
-				.animateItem())
+                .height(16.dp)
+                .animateItem())
 		}
 
 		itemsIndexed(incompatibleValues) { index, uiElementData ->
 			ElementColorItem(
 				Modifier
-					.padding(horizontal = 16.dp)
-					.animateItem(),
-				paletteState = inject(),
+                    .padding(horizontal = 16.dp)
+                    .animateItem(),
+				paletteState = vm.paletteState,
 				uiElementData = uiElementData,
 				index = index,
 				changeValue = vm::changeValue,
@@ -498,9 +512,9 @@ private fun LazyListScope.AllColorsSection(vm: EditorViewModel, mappedValuesAsLi
 	itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementColorData ->
 		ElementColorItem(
 			Modifier
-				.padding(horizontal = 16.dp)
-				.animateItem(),
-			paletteState = inject(),
+                .padding(horizontal = 16.dp)
+                .animateItem(),
+			paletteState = vm.paletteState,
 			uiElementData = uiElementColorData,
 			index = index,
 			changeValue = vm::changeValue,

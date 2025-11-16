@@ -9,6 +9,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -28,12 +29,32 @@ class ThemeRepository(
 	),
 	private val context: Context
 ) {
-	fun getAllThemes() = realm.query(ThemeDataRealm::class)
+    fun getThemesInRange(range: IntRange) = realm.query(ThemeDataRealm::class)
+        .sort("_id", Sort.DESCENDING)
+        .asFlow()
+        .flowOn(Dispatchers.IO)
+        .map { results ->
+            results.list
+                .drop(range.first)
+                .take(range.last - range.first + 1)
+                .mapNotNull { theme ->
+                    val allowed = when (theme.uuid) {
+                        PredefinedTheme.LastSession.uuid,
+                        PredefinedTheme.Default(true).uuid,
+                        PredefinedTheme.Default(false).uuid -> false
+                        else -> true
+                    }
+
+                    if (allowed) theme.toThemeData() else null
+                }
+        }
+
+    fun getAllThemes() = realm.query(ThemeDataRealm::class)
+        .sort("_id", Sort.DESCENDING)
 		.asFlow()
 		.flowOn(Dispatchers.IO)
 		.map { results ->
 			results.list
-				.sortedByDescending { theme -> theme._id.timestamp }
 				.mapNotNull { theme ->
 					val allowed = when(theme.uuid) {
 						PredefinedTheme.LastSession.uuid,
@@ -46,7 +67,22 @@ class ThemeRepository(
 				}
 	}
 
-	fun getThemeByUUID(uuid: String): ThemeData? {
+    fun getThemeCount() = realm.query(ThemeDataRealm::class)
+        .asFlow()
+        .flowOn(Dispatchers.IO)
+        .map { results ->
+            results.list.count { theme ->
+                when (theme.uuid) {
+                    PredefinedTheme.LastSession.uuid,
+                    PredefinedTheme.Default(true).uuid,
+                    PredefinedTheme.Default(false).uuid -> false
+
+                    else -> true
+                }
+            }
+        }
+
+    fun getThemeByUUID(uuid: String): ThemeData? {
 		return realm.query(ThemeDataRealm::class, "uuid == $0", uuid)
 			.first()
 			.find()
@@ -161,7 +197,11 @@ data class UiElementColorData(
 )
 
 @Serializable
-data class ThemeData(val uuid: String, val values: List<UiElementColorData>)
+data class ThemeData(val uuid: String, val values: List<UiElementColorData>) {
+    companion object {
+        val Undefined = ThemeData("undefined", emptyList())
+    }
+}
 private class ThemeDataRealm : RealmObject {
 	@PrimaryKey
 	var _id: ObjectId = ObjectId()

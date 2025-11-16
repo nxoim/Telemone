@@ -21,28 +21,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.number869.telemone.R
+import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.stringify
-import com.number869.telemone.ui.screens.editor.EditorViewModel
-import com.nxoim.decomposite.core.common.viewModel.getExistingViewModel
+import com.number869.telemone.ui.theme.PaletteState
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
+fun ThemeValuesScreen(
+    mappedValuesAsList: StateFlow<List<UiElementColorData>>,
+    paletteState: PaletteState
+) {
 	var showValues by remember { mutableStateOf(false) }
 	val text = remember(showValues) {
 		stringify(
-			vm.mappedValuesAsList.value.toList(),
+			mappedValuesAsList.value.toList(),
 			if (showValues)
 				ThemeColorDataType.ColorValues
 			else
-				ThemeColorDataType.ColorTokens
+				ThemeColorDataType.ColorTokens,
+            palette = paletteState.entirePaletteAsMap
 		)
 	}
 
 	LazyColumn(
 		Modifier
-			.fillMaxSize()
-			.background(MaterialTheme.colorScheme.background),
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
 		contentPadding = PaddingValues(
 			top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding(),
 			bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
@@ -50,7 +57,7 @@ fun ThemeValuesScreen(vm: EditorViewModel = getExistingViewModel()) {
 	) {
 		item {
 			Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-				Text(text = "Show color values", style = MaterialTheme.typography.headlineSmall)
+				Text(text = stringResource(R.string.show_color_values), style = MaterialTheme.typography.headlineSmall)
 				Switch(checked = showValues, onCheckedChange = { showValues = it })
 			}
 

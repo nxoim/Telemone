@@ -9,9 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.R
 import com.number869.telemone.ui.screens.about.AboutDestinations
 import com.nxoim.decomposite.core.common.navigation.NavController
 
@@ -19,20 +21,20 @@ import com.nxoim.decomposite.core.common.navigation.NavController
 fun LegalItem(
 	navController: NavController<AboutDestinations.Dialogs>
 ) {
-	AboutCard(label = "Legal") {
+	AboutCard(label = stringResource(R.string.legal_label)) {
 		Column(
 			Modifier
-				.clickable {
-					navController.navigate(AboutDestinations.Dialogs.PrivacyPolicyDialog)
-				}
-				.fillMaxWidth()
+                .clickable {
+                    navController.navigate(AboutDestinations.Dialogs.PrivacyPolicyDialog)
+                }
+                .fillMaxWidth()
 		) {
 			Text(
-				"Privacy Policy",
+                stringResource(R.string.privacy_policy_label),
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.titleLarge),
 			)
 			Text(
-				"View Privacy Policy",
+                stringResource(R.string.view_privacy_policy_view_action),
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.bodyMedium),
 			)
 		}
@@ -41,17 +43,17 @@ fun LegalItem(
 
 		Column(
 			Modifier
-				.clickable {
-					navController.navigate(AboutDestinations.Dialogs.TosDialog)
-				}
-				.fillMaxWidth()
+                .clickable {
+                    navController.navigate(AboutDestinations.Dialogs.TosDialog)
+                }
+                .fillMaxWidth()
 		) {
 			Text(
-				"Terms of Service",
+                stringResource(R.string.terms_of_service_label),
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.titleLarge),
 			)
 			Text(
-				"View Terms of Service",
+                stringResource(R.string.view_terms_of_service_view_action),
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.bodyMedium),
 			)
 		}

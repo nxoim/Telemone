@@ -90,7 +90,7 @@ fun WelcomeScreen(
 
 		LargeTonalButton(
 			onClick = {
-				AppSettings.agreedToConditions.set(true)
+				AppSettings.agreedToConditions.setAsync(true)
 				navController.replaceAll(RootDestinations.Main)
 			},
 			label = "I Agree",
