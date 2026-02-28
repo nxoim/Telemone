@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -163,7 +164,7 @@ fun EditorScreen(
                     LazyColumn(
                         state = wholeThingListState,
                         verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
-                        contentPadding = PaddingValues(
+                        contentPadding = scaffoldPadding + PaddingValues(
                             bottom = WindowInsets.navigationBars.asPaddingValues()
                                 .calculateBottomPadding() + 8.dp
                         ),
@@ -171,7 +172,6 @@ fun EditorScreen(
                     ) {
                         item {
                             CurrentThemeSection(
-                                Modifier.padding(top = scaffoldPadding.calculateTopPadding()),
                                 colorOf = {
                                     val color by vm.colorFromCurrentTheme(it).collectAsState()
 
