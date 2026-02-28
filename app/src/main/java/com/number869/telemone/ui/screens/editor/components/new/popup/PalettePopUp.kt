@@ -2,13 +2,10 @@ package com.number869.telemone.ui.screens.editor.components.new.popup
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -34,17 +31,14 @@ import androidx.compose.foundation.layout.safeGesturesPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,13 +47,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastFilter
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.utils.CombineSharedTransitionAndAnimatedVisibility
 import com.number869.telemone.shared.utils.color
-import com.number869.telemone.ui.theme.ColorRolesShared
 import com.number869.telemone.ui.theme.PaletteState
-import com.number869.telemone.ui.theme.ToneInfo
 
 // TODO more optimisations can be done but its fast enough
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -321,7 +312,7 @@ fun PalettePopup(
                                             Modifier
                                                 .sharedBounds(
                                                     rememberSharedContentState(PaletteMenuCategories.ColorRoles),
-                                                    resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds(
+                                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(
                                                         ContentScale.FillBounds
                                                     )
                                                 ),
@@ -337,7 +328,7 @@ fun PalettePopup(
                                         Modifier
                                             .sharedBounds(
                                                 rememberSharedContentState("additionalSection"),
-                                                resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds(
+                                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(
                                                     ContentScale.FillBounds
                                                 )
                                             )

@@ -7,10 +7,9 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.OverlayClip
-import androidx.compose.animation.SharedTransitionScope.PlaceHolderSize
-import androidx.compose.animation.SharedTransitionScope.PlaceHolderSize.Companion.contentSize
+import androidx.compose.animation.SharedTransitionScope.PlaceholderSize
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
-import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.ScaleToBounds
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.scaleToBounds
 import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
@@ -39,8 +38,8 @@ class CombinedSharedTransitionScope(
         enter: EnterTransition = fadeIn(),
         exit: ExitTransition = fadeOut(),
         boundsTransform: BoundsTransform = customBoundsTransform,
-        resizeMode: ResizeMode = ScaleToBounds(ContentScale.FillWidth, Center),
-        placeHolderSize: PlaceHolderSize = contentSize,
+        resizeMode: ResizeMode = scaleToBounds(ContentScale.FillWidth, Center),
+        placeHolderSize: PlaceholderSize = PlaceholderSize.ContentSize,
         renderInOverlayDuringTransition: Boolean = true,
         zIndexInOverlay: Float = 0f,
         clipInOverlayDuringTransition: OverlayClip = object : OverlayClip {
@@ -69,7 +68,7 @@ class CombinedSharedTransitionScope(
     fun Modifier.sharedElement(
         state: SharedContentState,
         boundsTransform: BoundsTransform = customBoundsTransform,
-        placeHolderSize: PlaceHolderSize = contentSize,
+        placeHolderSize: PlaceholderSize = PlaceholderSize.ContentSize,
         renderInOverlayDuringTransition: Boolean = true,
         zIndexInOverlay: Float = 0f,
         clipInOverlayDuringTransition: OverlayClip =  object : OverlayClip {
