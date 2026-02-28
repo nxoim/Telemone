@@ -47,6 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -69,7 +70,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.number869.telemone.R
 import com.number869.telemone.data.UiElementColorData
+import com.number869.telemone.shared.ui.LocalScrollVisualFactor
 import com.number869.telemone.shared.ui.SmallTintedLabel
+import com.number869.telemone.shared.ui.rememberScrollVisualFactorRoot
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.colorOf
@@ -79,6 +82,7 @@ import com.number869.telemone.shared.utils.showToast
 import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.components.new.CheckboxSelectionOverlay
 import com.number869.telemone.ui.screens.editor.components.new.CurrentThemePreview
+import com.number869.telemone.ui.screens.editor.components.new.EditorSearchBottomBar
 import com.number869.telemone.ui.screens.editor.components.new.EditorTopAppBar
 import com.number869.telemone.ui.screens.editor.components.new.ElementColorItem
 import com.number869.telemone.ui.screens.editor.components.new.SavedThemeDropdownMenu
@@ -97,116 +101,130 @@ import my.nanihadesuka.compose.ScrollbarSelectionActionable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(
-	rootNavController: NavController<RootDestinations>,
-	editorNavController: NavController<EditorDestinations>,
-	dialogsNavController: NavController<EditorDestinations.Dialogs>,
-	vm: EditorViewModel
+    rootNavController: NavController<RootDestinations>,
+    editorNavController: NavController<EditorDestinations>,
+    dialogsNavController: NavController<EditorDestinations.Dialogs>,
+    vm: EditorViewModel
 ) {
-	val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
-	val wholeThingListState = rememberLazyListState()
+    val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
+    val wholeThingListState = rememberLazyListState()
 
-	val colorDisplayType = getColorDisplayType()
+    val colorDisplayType = getColorDisplayType()
 
-	val mappedValuesAsList by vm.mappedValuesAsList.collectAsState()
-	val newUiElements by vm.newUiElements.collectAsState(listOf())
-	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf())
+    val mappedValuesAsList by vm.mappedValuesAsList.collectAsState()
+    val newUiElements by vm.newUiElements.collectAsState(listOf())
+    val incompatibleValues by vm.incompatibleValues.collectAsState(listOf())
 
-	val activityContext = LocalContext.current
+    val activityContext = LocalContext.current
+    val scrollConnection = rememberScrollVisualFactorRoot()
 
-	Scaffold(
-		Modifier.nestedScroll(topAppBarState.nestedScrollConnection),
-		topBar = {
-			EditorTopAppBar(
-				topAppBarState,
-				mappedValuesAsList,
-				exportCustomTheme = { vm.exportCustomTheme(activityContext) },
-				saveCurrentTheme = vm::saveCurrentTheme,
-				resetCurrentTheme = vm::resetCurrentTheme,
-				loadSavedTheme = vm::loadSavedTheme,
-				changeValue = vm::changeValue,
-				editorNavController = editorNavController,
-				dialogsNavController = dialogsNavController,
-				rootNavController = rootNavController,
-                paletteState = vm.paletteState
-			)
-		},
-		bottomBar = { Box {} } // hello edge-to-edge
-	) { scaffoldPadding ->
-		Box() {
-			AnimatedVisibility(
-				visible = vm.loadingMappedValues,
-				enter = fadeIn(tween(300)),
-				exit = fadeOut(tween(300)),
-				modifier = Modifier.align(Alignment.Center)
-			) {
-				CircularProgressIndicator()
-			}
+    CompositionLocalProvider(
+        LocalScrollVisualFactor provides scrollConnection
+    ) {
+        Scaffold(
+            Modifier
+                .nestedScroll(topAppBarState.nestedScrollConnection)
+                .nestedScroll(scrollConnection),
+            topBar = {
+                EditorTopAppBar(
+                    topAppBarState,
+                    exportCustomTheme = { vm.exportCustomTheme(activityContext) },
+                    saveCurrentTheme = vm::saveCurrentTheme,
+                    resetCurrentTheme = vm::resetCurrentTheme,
+                    loadSavedTheme = vm::loadSavedTheme,
+                    editorNavController = editorNavController,
+                    dialogsNavController = dialogsNavController,
+                    rootNavController = rootNavController,
+                )
+            },
+            bottomBar = {
+                EditorSearchBottomBar(
+                    mappedValuesAsList = mappedValuesAsList,
+                    changeValue = vm::changeValue,
+                )
+            }
+        ) { scaffoldPadding ->
+            Box() {
+                AnimatedVisibility(
+                    visible = vm.loadingMappedValues,
+                    enter = fadeIn(tween(300)),
+                    exit = fadeOut(tween(300)),
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    CircularProgressIndicator()
+                }
 
-			AnimatedVisibility(
-				visible = !vm.loadingMappedValues,
-				enter = fadeIn(tween(300)),
-				exit = fadeOut(tween(300)),
-			) {
-				LazyColumn(
-					state = wholeThingListState,
-					verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
-					contentPadding = PaddingValues(
-						bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
-					)
-				) {
-					item {
-						CurrentThemeSection(
-							Modifier.padding(top = scaffoldPadding.calculateTopPadding()),
-							colorOf = {
-								val color by vm.colorFromCurrentTheme(it).collectAsState()
+                AnimatedVisibility(
+                    visible = !vm.loadingMappedValues,
+                    enter = fadeIn(tween(300)),
+                    exit = fadeOut(tween(300)),
+                ) {
+                    LazyColumn(
+                        state = wholeThingListState,
+                        verticalArrangement = Arrangement.Absolute.spacedBy(4.dp),
+                        contentPadding = PaddingValues(
+                            bottom = WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding() + 8.dp
+                        )
+                    ) {
+                        item {
+                            CurrentThemeSection(
+                                Modifier.padding(top = scaffoldPadding.calculateTopPadding()),
+                                colorOf = {
+                                    val color by vm.colorFromCurrentTheme(it).collectAsState()
 
-								animateColorAsState(color).value
-							}
-						)
-						SavedThemesSection(
-							dialogsNavController,
-							vm,
-							colorDisplayType
-						)
-					}
+                                    animateColorAsState(color).value
+                                }
+                            )
+                            SavedThemesSection(
+                                dialogsNavController,
+                                vm,
+                                colorDisplayType
+                            )
+                        }
 
-					NewValuesSection(vm, newUiElements)
-					IncompatibleValuesSection(vm, incompatibleValues, mappedValuesAsList)
+                        NewValuesSection(vm, newUiElements)
+                        IncompatibleValuesSection(vm, incompatibleValues, mappedValuesAsList)
 
-					item {
-						SmallTintedLabel(
-							Modifier.padding(start = 16.dp),
-							labelText = stringResource(R.string.all_colors_label)
-						)
-						Spacer(modifier = Modifier.height(16.dp))
-					}
+                        item {
+                            SmallTintedLabel(
+                                Modifier.padding(start = 16.dp),
+                                labelText = stringResource(R.string.all_colors_label)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
 
-					AllColorsSection(vm, mappedValuesAsList)
-				}
+                        AllColorsSection(vm, mappedValuesAsList)
+                    }
 
-				InternalLazyColumnScrollbar(
-					listState = wholeThingListState,
-					thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-					thumbSelectedColor = MaterialTheme.colorScheme.primary,
-					selectionActionable = ScrollbarSelectionActionable.WhenVisible,
-					modifier = Modifier.padding(
-						top = scaffoldPadding.calculateTopPadding() + 8.dp,
-						bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 8.dp
-					)
-				)
-			}
-		}
-	}
+                    InternalLazyColumnScrollbar(
+                        listState = wholeThingListState,
+                        thumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                        selectionActionable = ScrollbarSelectionActionable.WhenVisible,
+                        modifier = Modifier.padding(
+                            top = scaffoldPadding.calculateTopPadding() + 8.dp,
+                            bottom = WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding() + 8.dp
+                        )
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun CurrentThemeSection(
-	modifier: Modifier = Modifier,
-	colorOf: @Composable (String) -> Color
+    modifier: Modifier = Modifier,
+    colorOf: @Composable (String) -> Color
 ) = Column(modifier) {
-	SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = stringResource(R.string.current_theme_label))
-	CurrentThemePreview(colorOf)
-	Spacer(modifier = Modifier.height(8.dp))
+    SmallTintedLabel(
+        Modifier.padding(start = 16.dp),
+        labelText = stringResource(R.string.current_theme_label)
+    )
+    CurrentThemePreview(colorOf)
+    Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Composable
@@ -221,306 +239,323 @@ private fun SavedThemesSection(
         lazyThemeListState,
         key = { it.uuid }
     )
-	val displayingSavedThemes by remember {
-		derivedStateOf { themePageable.items.isNotEmpty() }
-	}
+    val displayingSavedThemes by remember {
+        derivedStateOf { themePageable.items.isNotEmpty() }
+    }
 
-	LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
         vm.themeCount.drop(1).collect {
             launch {
                 lazyThemeListState.animateScrollToItem(0)
             }
             vm.themesPageable.jumpTo(0)
         }
-	}
+    }
 
-	Row(
-		Modifier
+    Row(
+        Modifier
             .clip(CircleShape)
             .clickable {
                 dialogsNavController.navigate(
                     EditorDestinations.Dialogs.SavedThemeTypeSelection,
                 )
             },
-		verticalAlignment = Alignment.Bottom,
-		horizontalArrangement = spacedBy(8.dp)
-	) {
-		SmallTintedLabel(Modifier.padding(start = 16.dp), labelText = stringResource(R.string.saved_themes_label))
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = spacedBy(8.dp)
+    ) {
+        SmallTintedLabel(
+            Modifier.padding(start = 16.dp),
+            labelText = stringResource(R.string.saved_themes_label)
+        )
 
-		FilledTonalIconButton(
-			onClick = {
-				dialogsNavController.navigate(
-					EditorDestinations.Dialogs.SavedThemeTypeSelection,
-				)
-			},
-			modifier = Modifier.size(18.dp)
-		) {
-			Icon(Icons.Default.MoreVert, contentDescription = "Saved theme display type")
-		}
-	}
+        FilledTonalIconButton(
+            onClick = {
+                dialogsNavController.navigate(
+                    EditorDestinations.Dialogs.SavedThemeTypeSelection,
+                )
+            },
+            modifier = Modifier.size(18.dp)
+        ) {
+            Icon(Icons.Default.MoreVert, contentDescription = "Saved theme display type")
+        }
+    }
 
 
-	Box {
-		AnimatedVisibility(
-			visible = vm.loadingThemes,
-			enter = fadeIn(tween(200)),
-			exit = fadeOut(tween(200))
-		) {
-			Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)) {
-				CircularProgressIndicator(Modifier.align(Alignment.Center))
-			}
-		}
+    Box {
+        AnimatedVisibility(
+            visible = vm.loadingThemes,
+            enter = fadeIn(tween(200)),
+            exit = fadeOut(tween(200))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }
 
-		AnimatedVisibility(
-			visible = !vm.loadingThemes && !displayingSavedThemes,
-			enter = fadeIn() + expandVertically(),
-			exit = fadeOut() + shrinkVertically(),
-			modifier = Modifier.align(Alignment.Center)
-		) {
-			NoSavedThemesPlaceholder()
-		}
+        AnimatedVisibility(
+            visible = !vm.loadingThemes && !displayingSavedThemes,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            NoSavedThemesPlaceholder()
+        }
 
-		AnimatedVisibility(
-			visible = displayingSavedThemes,
-			enter = fadeIn() + expandVertically(),
-			exit = fadeOut() + shrinkVertically()
-		) {
-			Column {
-				LazyRow(
-					state = lazyThemeListState,
-					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
-					horizontalArrangement = spacedBy(16.dp),
-					modifier = Modifier.animateContentSize()
-				) {
-					items(themePageable) { theme ->
-						var showDropDown by rememberSaveable { mutableStateOf(false) }
+        AnimatedVisibility(
+            visible = displayingSavedThemes,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Column {
+                LazyRow(
+                    state = lazyThemeListState,
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
+                    horizontalArrangement = spacedBy(16.dp),
+                    modifier = Modifier.animateContentSize()
+                ) {
+                    items(themePageable) { theme ->
+                        var showDropDown by rememberSaveable { mutableStateOf(false) }
 
-						Box {
-							SavedThemeItem(
-								Modifier
-									.animateItem()
-									.let {
-										return@let if (!vm.themeSelectionToolbarIsVisible)
-											it.combinedClickable(
-												onClick = {
-													vm.loadSavedTheme(
-														ThemeStorageType.ByUuid(
-															theme.uuid,
-															withTokens = false,
-															clearCurrentTheme = true
-														)
-													)
+                        Box {
+                            SavedThemeItem(
+                                Modifier
+                                    .animateItem()
+                                    .let {
+                                        return@let if (!vm.themeSelectionToolbarIsVisible)
+                                            it.combinedClickable(
+                                                onClick = {
+                                                    vm.loadSavedTheme(
+                                                        ThemeStorageType.ByUuid(
+                                                            theme.uuid,
+                                                            withTokens = false,
+                                                            clearCurrentTheme = true
+                                                        )
+                                                    )
 
                                                     showToast { getString(R.string.theme_loaded) }
-												},
-												onLongClick = { showDropDown = true }
-											)
-										else
-											it.clickable { vm.selectOrUnselectSavedTheme(theme.uuid) }
-									},
-								colorOf = { targetUiElement ->
-									colorOf(
-										theme.values
-											.find { it.name == targetUiElement }
-											?: incompatibleUiElementColorData(targetUiElement),
-										colorDisplayType,
+                                                },
+                                                onLongClick = { showDropDown = true }
+                                            )
+                                        else
+                                            it.clickable { vm.selectOrUnselectSavedTheme(theme.uuid) }
+                                    },
+                                colorOf = { targetUiElement ->
+                                    colorOf(
+                                        theme.values
+                                            .find { it.name == targetUiElement }
+                                            ?: incompatibleUiElementColorData(targetUiElement),
+                                        colorDisplayType,
                                         palette = vm.paletteState.entirePaletteAsMap
-									)
-								},
-								overlay = {
-									CheckboxSelectionOverlay(
-										selected = vm.selectedThemes.contains(theme.uuid),
-										onCheckedChange = { vm.selectOrUnselectSavedTheme(theme.uuid) }
-									)
-								}
-							)
-						}
+                                    )
+                                },
+                                overlay = {
+                                    CheckboxSelectionOverlay(
+                                        selected = vm.selectedThemes.contains(theme.uuid),
+                                        onCheckedChange = { vm.selectOrUnselectSavedTheme(theme.uuid) }
+                                    )
+                                }
+                            )
+                        }
 
 
-						SavedThemeDropdownMenu(
-							showDropDown,
-							onDismissRequest = { showDropDown = false },
-							onLoadThemeWithOptionsRequest = {
-								dialogsNavController.navigate(
-									EditorDestinations.Dialogs.LoadThemeWithOptions(theme.uuid)
-								)
-							},
-							onExportTheme = { vm.exportTheme(theme.uuid, it, context) },
-							onOverwriteDefaultThemeChoiceRequest = {
-								showDropDown = false
-								dialogsNavController.navigate(
-									EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(theme)
-								)
-							},
-							onDeleteRequest = {
-								showDropDown = false
-								dialogsNavController.navigate(
-									EditorDestinations.Dialogs.DeleteOneTheme(theme)
-								)
-							},
-							onSelectRequest = {
-								showDropDown = false
-								vm.toggleThemeSelectionModeToolbar()
-								vm.selectOrUnselectSavedTheme(theme.uuid)
-							}
-						)
-					}
-				}
+                        SavedThemeDropdownMenu(
+                            showDropDown,
+                            onDismissRequest = { showDropDown = false },
+                            onLoadThemeWithOptionsRequest = {
+                                dialogsNavController.navigate(
+                                    EditorDestinations.Dialogs.LoadThemeWithOptions(theme.uuid)
+                                )
+                            },
+                            onExportTheme = { vm.exportTheme(theme.uuid, it, context) },
+                            onOverwriteDefaultThemeChoiceRequest = {
+                                showDropDown = false
+                                dialogsNavController.navigate(
+                                    EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(theme)
+                                )
+                            },
+                            onDeleteRequest = {
+                                showDropDown = false
+                                dialogsNavController.navigate(
+                                    EditorDestinations.Dialogs.DeleteOneTheme(theme)
+                                )
+                            },
+                            onSelectRequest = {
+                                showDropDown = false
+                                vm.toggleThemeSelectionModeToolbar()
+                                vm.selectOrUnselectSavedTheme(theme.uuid)
+                            }
+                        )
+                    }
+                }
 
-				ThemeSelectionToolbarSection(vm, dialogsNavController = dialogsNavController)
-			}
-		}
-	}
+                ThemeSelectionToolbarSection(vm, dialogsNavController = dialogsNavController)
+            }
+        }
+    }
 }
 
 @Composable
 private fun NoSavedThemesPlaceholder() {
-	Box(
-		Modifier
+    Box(
+        Modifier
             .fillMaxWidth(1f)
             .height(120.dp)
             .clip(RoundedCornerShape(16.dp))
             .animateContentSize()
-	) {
-		Column(
-			Modifier
+    ) {
+        Column(
+            Modifier
                 .fillMaxSize()
                 .padding(horizontal = 32.dp, vertical = 16.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.Center
-		) {
-			Text(
-				"No saved themes",
-				style = TextStyle(platformStyle = PlatformTextStyle(
-					includeFontPadding = false
-				)).plus(MaterialTheme.typography.headlineSmall),
-				textAlign = TextAlign.Center
-			)
-		}
-	}
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                "No saved themes",
+                style = TextStyle(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                ).plus(MaterialTheme.typography.headlineSmall),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
 
 @Composable
 private fun ThemeSelectionToolbarSection(
-	vm: EditorViewModel,
-	dialogsNavController: NavController<EditorDestinations.Dialogs>,
+    vm: EditorViewModel,
+    dialogsNavController: NavController<EditorDestinations.Dialogs>,
 ) {
     val count by vm.themeCount.collectAsStateWithLifecycle()
 
-	Row(
-		Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.Center
-	) {
-		AnimatedVisibility(
-			vm.themeSelectionToolbarIsVisible,
-			enter = expandVertically(expandFrom = Alignment.CenterVertically) + fadeIn(),
-			exit = shrinkVertically(shrinkTowards = Alignment.CenterVertically) + fadeOut(),
-		) {
-			ThemeSelectionToolbar(
-				Modifier.padding(top = 16.dp),
-				selectedThemeCount = vm.selectedThemes.count(),
-				allThemesAreSelected = vm.selectedThemes.count() == count,
-				unselectAllThemes = vm::unselectAllThemes,
-				selectAllThemes = vm::selectAllThemes,
-				hideToolbarAction = { vm.hideThemeSelectionModeToolbar() },
-				onRequestDeletion = {
-					dialogsNavController.navigate(
-						EditorDestinations.Dialogs.DeleteSelectedThemes(vm.selectedThemes.count()),
-					)
-				}
-			)
-		}
-	}
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        AnimatedVisibility(
+            vm.themeSelectionToolbarIsVisible,
+            enter = expandVertically(expandFrom = Alignment.CenterVertically) + fadeIn(),
+            exit = shrinkVertically(shrinkTowards = Alignment.CenterVertically) + fadeOut(),
+        ) {
+            ThemeSelectionToolbar(
+                Modifier.padding(top = 16.dp),
+                selectedThemeCount = vm.selectedThemes.count(),
+                allThemesAreSelected = vm.selectedThemes.count() == count,
+                unselectAllThemes = vm::unselectAllThemes,
+                selectAllThemes = vm::selectAllThemes,
+                hideToolbarAction = { vm.hideThemeSelectionModeToolbar() },
+                onRequestDeletion = {
+                    dialogsNavController.navigate(
+                        EditorDestinations.Dialogs.DeleteSelectedThemes(vm.selectedThemes.count()),
+                    )
+                }
+            )
+        }
+    }
 
-	Spacer(
-		Modifier
+    Spacer(
+        Modifier
             .animateContentSize()
             .height(if (vm.themeSelectionToolbarIsVisible) 12.dp else 24.dp)
-	)
+    )
 }
 
-private fun LazyListScope.NewValuesSection(vm: EditorViewModel, newUiElements: List<UiElementColorData>) {
-	if (newUiElements.isNotEmpty()) {
-		item {
-			SmallTintedLabel(
-				Modifier
+private fun LazyListScope.NewValuesSection(
+    vm: EditorViewModel,
+    newUiElements: List<UiElementColorData>
+) {
+    if (newUiElements.isNotEmpty()) {
+        item {
+            SmallTintedLabel(
+                Modifier
                     .padding(start = 16.dp)
                     .animateItem(),
-				labelText = stringResource(R.string.new_values_label)
-			)
+                labelText = stringResource(R.string.new_values_label)
+            )
 
-			Spacer(modifier = Modifier
-                .height(16.dp)
-                .animateItem())
-		}
+            Spacer(
+                modifier = Modifier
+                    .height(16.dp)
+                    .animateItem()
+            )
+        }
 
-		itemsIndexed(newUiElements) { index, uiElementData ->
-			ElementColorItem(
-				Modifier
+        itemsIndexed(newUiElements) { index, uiElementData ->
+            ElementColorItem(
+                Modifier
                     .padding(horizontal = 16.dp)
                     .animateItem(),
-				paletteState = vm.paletteState,
-				uiElementData = uiElementData,
-				index = index,
-				changeValue = vm::changeValue,
-				lastIndexInList = newUiElements.lastIndex
-			)
-		}
+                paletteState = vm.paletteState,
+                uiElementData = uiElementData,
+                index = index,
+                changeValue = vm::changeValue,
+                lastIndexInList = newUiElements.lastIndex
+            )
+        }
 
-		item { Spacer(modifier = Modifier.height(24.dp)) }
-	}
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.IncompatibleValuesSection(
-	vm: EditorViewModel,
-	incompatibleValues: List<UiElementColorData>,
-	mappedValuesAsList: List<UiElementColorData>
+    vm: EditorViewModel,
+    incompatibleValues: List<UiElementColorData>,
+    mappedValuesAsList: List<UiElementColorData>
 ) {
-	if (incompatibleValues.isNotEmpty()) {
-		item {
-			SmallTintedLabel(
-				Modifier
+    if (incompatibleValues.isNotEmpty()) {
+        item {
+            SmallTintedLabel(
+                Modifier
                     .padding(start = 16.dp)
                     .animateItem(),
-				labelText = stringResource(R.string.incompatible_values_label)
-			)
+                labelText = stringResource(R.string.incompatible_values_label)
+            )
 
-			Spacer(modifier = Modifier
-                .height(16.dp)
-                .animateItem())
-		}
+            Spacer(
+                modifier = Modifier
+                    .height(16.dp)
+                    .animateItem()
+            )
+        }
 
-		itemsIndexed(incompatibleValues) { index, uiElementData ->
-			ElementColorItem(
-				Modifier
+        itemsIndexed(incompatibleValues) { index, uiElementData ->
+            ElementColorItem(
+                Modifier
                     .padding(horizontal = 16.dp)
                     .animateItem(),
-				paletteState = vm.paletteState,
-				uiElementData = uiElementData,
-				index = index,
-				changeValue = vm::changeValue,
-				lastIndexInList = mappedValuesAsList.lastIndex
-			)
-		}
-	}
+                paletteState = vm.paletteState,
+                uiElementData = uiElementData,
+                index = index,
+                changeValue = vm::changeValue,
+                lastIndexInList = mappedValuesAsList.lastIndex
+            )
+        }
+    }
 }
 
-private fun LazyListScope.AllColorsSection(vm: EditorViewModel, mappedValuesAsList: List<UiElementColorData>) {
-	itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) {index, uiElementColorData ->
-		ElementColorItem(
-			Modifier
+private fun LazyListScope.AllColorsSection(
+    vm: EditorViewModel,
+    mappedValuesAsList: List<UiElementColorData>
+) {
+    itemsIndexed(mappedValuesAsList, key = { _, it -> it.name }) { index, uiElementColorData ->
+        ElementColorItem(
+            Modifier
                 .padding(horizontal = 16.dp)
                 .animateItem(),
-			paletteState = vm.paletteState,
-			uiElementData = uiElementColorData,
-			index = index,
-			changeValue = vm::changeValue,
-			lastIndexInList = mappedValuesAsList.size
-		)
-	}
+            paletteState = vm.paletteState,
+            uiElementData = uiElementColorData,
+            index = index,
+            changeValue = vm::changeValue,
+            lastIndexInList = mappedValuesAsList.size
+        )
+    }
 }
