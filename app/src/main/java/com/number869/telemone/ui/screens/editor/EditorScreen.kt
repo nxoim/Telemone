@@ -361,36 +361,35 @@ private fun SavedThemesSection(
                                     )
                                 }
                             )
+
+                            SavedThemeDropdownMenu(
+                                showDropDown,
+                                onDismissRequest = { showDropDown = false },
+                                onLoadThemeWithOptionsRequest = {
+                                    dialogsNavController.navigate(
+                                        EditorDestinations.Dialogs.LoadThemeWithOptions(theme.uuid)
+                                    )
+                                },
+                                onExportTheme = { vm.exportTheme(theme.uuid, it, context) },
+                                onOverwriteDefaultThemeChoiceRequest = {
+                                    showDropDown = false
+                                    dialogsNavController.navigate(
+                                        EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(theme)
+                                    )
+                                },
+                                onDeleteRequest = {
+                                    showDropDown = false
+                                    dialogsNavController.navigate(
+                                        EditorDestinations.Dialogs.DeleteOneTheme(theme)
+                                    )
+                                },
+                                onSelectRequest = {
+                                    showDropDown = false
+                                    vm.toggleThemeSelectionModeToolbar()
+                                    vm.selectOrUnselectSavedTheme(theme.uuid)
+                                }
+                            )
                         }
-
-
-                        SavedThemeDropdownMenu(
-                            showDropDown,
-                            onDismissRequest = { showDropDown = false },
-                            onLoadThemeWithOptionsRequest = {
-                                dialogsNavController.navigate(
-                                    EditorDestinations.Dialogs.LoadThemeWithOptions(theme.uuid)
-                                )
-                            },
-                            onExportTheme = { vm.exportTheme(theme.uuid, it, context) },
-                            onOverwriteDefaultThemeChoiceRequest = {
-                                showDropDown = false
-                                dialogsNavController.navigate(
-                                    EditorDestinations.Dialogs.OverwriteDefaultThemeChoice(theme)
-                                )
-                            },
-                            onDeleteRequest = {
-                                showDropDown = false
-                                dialogsNavController.navigate(
-                                    EditorDestinations.Dialogs.DeleteOneTheme(theme)
-                                )
-                            },
-                            onSelectRequest = {
-                                showDropDown = false
-                                vm.toggleThemeSelectionModeToolbar()
-                                vm.selectOrUnselectSavedTheme(theme.uuid)
-                            }
-                        )
                     }
                 }
 
