@@ -72,6 +72,7 @@ import com.number869.telemone.R
 import com.number869.telemone.data.UiElementColorData
 import com.number869.telemone.shared.ui.LocalScrollVisualFactor
 import com.number869.telemone.shared.ui.SmallTintedLabel
+import com.number869.telemone.shared.ui.modifiers.edgeToEdgeSystemBarsAlphaMaskFade
 import com.number869.telemone.shared.ui.rememberScrollVisualFactorRoot
 import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
 import com.number869.telemone.shared.utils.ThemeStorageType
@@ -157,7 +158,7 @@ fun EditorScreen(
                 AnimatedVisibility(
                     visible = !vm.loadingMappedValues,
                     enter = fadeIn(tween(300)),
-                    exit = fadeOut(tween(300)),
+                    exit = fadeOut(tween(300))
                 ) {
                     LazyColumn(
                         state = wholeThingListState,
@@ -165,7 +166,8 @@ fun EditorScreen(
                         contentPadding = PaddingValues(
                             bottom = WindowInsets.navigationBars.asPaddingValues()
                                 .calculateBottomPadding() + 8.dp
-                        )
+                        ),
+                        modifier = Modifier.edgeToEdgeSystemBarsAlphaMaskFade()
                     ) {
                         item {
                             CurrentThemeSection(
