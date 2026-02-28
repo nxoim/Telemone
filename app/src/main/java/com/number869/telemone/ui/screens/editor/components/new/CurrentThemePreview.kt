@@ -78,10 +78,7 @@ private fun PreviewHomeScreen(colorOf: @Composable (String) -> Color) {
 			ListPreviewHeader(
 				backgroundColor = colorOf("actionBarDefault"),
 				iconsColor = colorOf("actionBarDefaultIcon"),
-				titleColor = colorOf("actionBarDefaultTitle"),
-				folderUnderlineColor = colorOf("actionBarTabLine"),
-				selectedFolderItemColor = colorOf("actionBarActiveText"),
-				unselectedFolderItemColor = colorOf("actionBarUnactiveText")
+				titleColor = colorOf("actionBarDefaultTitle")
 			)
 
 			Spacer(modifier = Modifier.height(2.dp))
@@ -111,7 +108,7 @@ private fun PreviewChat(colorOf: @Composable (String) -> Color) {
 			colorOf("actionBarDefaultTitle"),
 			colorOf("actionBarDefaultSubtitle")
 		)
-		Messages(colorOf("windowBackgroundWhite"))
+		Messages(colorOf("windowBackgroundGray"))
 		ChatBottomAppBar(
 			colorOf("chat_messagePanelBackground"),
 //				colorOf("chats_attachMessage"),
@@ -275,10 +272,7 @@ private fun ChatBottomAppBar(
 private fun ListPreviewHeader(
 	backgroundColor: Color,
 	iconsColor: Color,
-	titleColor: Color,
-	folderUnderlineColor: Color,
-	selectedFolderItemColor: Color,
-	unselectedFolderItemColor: Color
+	titleColor: Color
 ) {
 	Row(
 		Modifier
@@ -340,24 +334,17 @@ fun ChatItem(
 		}
 	}
 
-	val backgroundColor = colorOf("windowBackgroundWhite")
 	val unreadCounterColor = colorOf("chats_unreadCounter")
-	val unreadMutedCounterColor = colorOf("chats_unreadCounterMuted")
 	val unreadCounterNumberColor = colorOf("chats_unreadCounterText")
 	val muteIconColor = colorOf("chats_muteIcon")
 	val dividerColor = colorOf("divider")
 	val messageTextColor = colorOf("chats_message")
-	val messageAttachementColor = colorOf("chats_actionMessage")
 	val pinIconColor = colorOf("chats_pinnedIcon")
 	val dateColor = colorOf("chats_date")
 	val readCheckColor = colorOf("chats_sentReadCheck")
-	val avatarService1Color = colorOf("avatar_backgroundSaved")
-	val avatarService2Color = colorOf("avatar_background2Saved")
 	val chatSecretIconColor = colorOf("chats_secretIcon")
 	val chatSecretNameColor = colorOf("chats_secretName")
 	val chatNameColor = colorOf("chats_name")
-//    val mutedIconColor literally doesnt show in app
-	val verifiedIconBackgroundColor = colorOf("chats_verifiedBackground")
 	val verifiedIconColor = colorOf("chats_verifiedCheck")
 	val avatarTextColor = colorOf("avatar_text")
 
@@ -390,8 +377,7 @@ fun ChatItem(
 		Row(
 			modifier = Modifier
 				.padding(start = 6.dp, end = 6.dp, top = 3.dp, bottom = 3.dp)
-				.fillMaxWidth()
-				.background(backgroundColor),
+				.fillMaxWidth(),
 			horizontalArrangement = Arrangement.Start,
 			verticalAlignment = Alignment.CenterVertically
 		) {
