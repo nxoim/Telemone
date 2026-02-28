@@ -1,6 +1,7 @@
 package com.number869.telemone.ui.screens.editor
 
 import android.content.Context
+import androidx.collection.LruCache
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -33,6 +35,7 @@ private const val pageSize = 10
 class EditorViewModel(
     private val themeManager: ThemeManager
 ) : ViewModel() {
+    private val colorFlowCache = LruCache<String, StateFlow<Color>>(maxSize = 100)
     val paletteState get() = themeManager.paletteState
     var loadingMappedValues by mutableStateOf(true)
     var loadingThemes by mutableStateOf(true)
@@ -129,13 +132,15 @@ class EditorViewModel(
         themeManager.changeValue(uiElementName, colorToken, colorValue)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun colorFromCurrentTheme(uiElementName: String) = mappedValues
-        .mapLatest { it[uiElementName]?.color ?: Color.Red }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = mappedValues.value[uiElementName]?.color ?: Color.Red
-        )
+    fun colorFromCurrentTheme(uiElementName: String) = colorFlowCache.getOrPut(uiElementName) {
+        mappedValues
+            .mapLatest { it[uiElementName]?.color ?: Color.Red }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = mappedValues.value[uiElementName]?.color ?: Color.Red
+            )
+    }
 
     fun selectOrUnselectSavedTheme(uuid: String) = if (selectedThemes.contains(uuid))
         selectedThemes.remove(uuid)
@@ -192,3 +197,6 @@ class EditorViewModel(
         showToast { getString(R.string.default_theme_has_been_overwritten_successfully, themeType) }
     }
 }
+
+private inline fun <K : Any, V : Any> LruCache<K, V>.getOrPut(key: K, block: () -> V): V =
+    get(key) ?: block().also { put(key, it) }
