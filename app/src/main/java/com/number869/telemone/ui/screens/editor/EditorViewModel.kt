@@ -88,7 +88,7 @@ class EditorViewModel(
         loadingThemes = true
     }
 
-    fun exportCustomTheme() = themeManager.exportCustomTheme()
+    fun exportCustomTheme(activityContext: Context) = themeManager.exportCustomTheme(activityContext)
 
     fun saveCurrentTheme() {
         themeManager.saveCurrentTheme()

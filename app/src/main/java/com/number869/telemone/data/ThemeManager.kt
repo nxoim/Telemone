@@ -322,13 +322,13 @@ class ThemeManager(
         backUpLastSessionPersistently()
     }
 
-    fun exportCustomTheme() = scope.launch {
+    fun exportCustomTheme(activityContext: Context) = scope.launch {
         backUpLastSessionPersistently()
 
         val result =
             _mappedValues.value.values.toList().stringify(ThemeColorDataType.ColorValues, palette)
 
-        with(context) {
+        with(activityContext) {
             File(cacheDir, "Telemone Custom.attheme").writeText(result)
 
             val uri = FileProvider.getUriForFile(

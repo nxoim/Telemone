@@ -111,13 +111,15 @@ fun EditorScreen(
 	val newUiElements by vm.newUiElements.collectAsState(listOf())
 	val incompatibleValues by vm.incompatibleValues.collectAsState(listOf())
 
+	val activityContext = LocalContext.current
+
 	Scaffold(
 		Modifier.nestedScroll(topAppBarState.nestedScrollConnection),
 		topBar = {
 			EditorTopAppBar(
 				topAppBarState,
 				mappedValuesAsList,
-				exportCustomTheme = vm::exportCustomTheme,
+				exportCustomTheme = { vm.exportCustomTheme(activityContext) },
 				saveCurrentTheme = vm::saveCurrentTheme,
 				resetCurrentTheme = vm::resetCurrentTheme,
 				loadSavedTheme = vm::loadSavedTheme,
