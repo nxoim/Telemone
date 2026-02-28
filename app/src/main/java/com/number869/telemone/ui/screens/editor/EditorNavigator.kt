@@ -23,6 +23,7 @@ import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDis
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.nxoim.decomposite.core.common.navigation.NavController
 import com.nxoim.decomposite.core.common.navigation.NavHost
+import com.nxoim.decomposite.core.common.navigation.animations.emptyAnimation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -60,7 +61,10 @@ private fun DialogsHost(
     vm: EditorViewModel,
     navController: NavController<EditorDestinations.Dialogs>
 ) {
-    NavHost(navController) { destination ->
+    NavHost(
+        navController,
+        animations = { emptyAnimation() }
+    ) { destination ->
         when (destination) {
             EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile -> {
                 val pickedFileUriState = remember { mutableStateOf<Uri?>(null) }
