@@ -13,6 +13,8 @@ import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.color
 import com.number869.telemone.shared.utils.showToast
+import com.number869.telemone.ui.screens.editor.components.new.EditorSearchComponent
+import com.number869.telemone.ui.screens.editor.components.new.EditorSearchComponentImpl
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.nxoim.evolpagink.core.pageable
 import com.nxoim.evolpagink.core.prefetchMinimumItemAmount
@@ -53,7 +55,7 @@ class EditorViewModel(
         .stateIn(viewModelScope, WhileSubscribed(), 0)
 
     private val mappedValues = themeManager.mappedValues
-    var mappedValuesAsList = mappedValues
+    val mappedValuesAsList = mappedValues
         .map {
             it.values
                 .sortedBy { it.name }
@@ -65,7 +67,7 @@ class EditorViewModel(
             initialValue = mappedValues.value.values.toList()
         )
     private val defaultCurrentTheme = themeManager.defaultCurrentTheme
-    var newUiElements = mappedValues
+    val newUiElements = mappedValues
         .map {
             it.values
                 .asSequence()
@@ -74,7 +76,7 @@ class EditorViewModel(
                 .toList()
         }
 
-    var incompatibleValues = mappedValues
+    val incompatibleValues = mappedValues
         .map {
             it.values
                 .asSequence()
@@ -85,6 +87,8 @@ class EditorViewModel(
 
     val selectedThemes = mutableStateListOf<String>()
     var themeSelectionToolbarIsVisible by mutableStateOf(false)
+
+    val searchComponent: EditorSearchComponent = EditorSearchComponentImpl(mappedValues, viewModelScope)
 
     override fun onDestroy(removeFromViewModelStore: () -> Unit) {
         loadingMappedValues = true

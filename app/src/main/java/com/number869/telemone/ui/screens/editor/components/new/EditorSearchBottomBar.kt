@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -52,7 +54,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -70,6 +71,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.number869.telemone.App.Companion.paletteState
 import com.number869.telemone.R
 import com.number869.telemone.data.UiElementColorData
@@ -80,15 +82,15 @@ import com.number869.telemone.ui.theme.scaleInWithFade
 import com.number869.telemone.ui.theme.scaleOutWithFade
 import com.nxoim.blean.ui.composeUiCommons.modifiers.swipeable.SwipeConstraint
 import com.nxoim.blean.ui.composeUiCommons.modifiers.swipeable.swipeable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EditorSearchBottomBar(
-    mappedValuesAsList: List<UiElementColorData>,
+    searchComponent: EditorSearchComponent,
     changeValue: (String, String, Color) -> Unit,
     exportCustomTheme: () -> Unit,
     saveCurrentTheme: () -> Unit,
@@ -183,7 +185,7 @@ fun EditorSearchBottomBar(
                     } else {
                         EditorSearchBar(
                             modifier = Modifier.align(Alignment.Center),
-                            mappedValuesAsList = mappedValuesAsList,
+                            searchComponent = searchComponent,
                             sharedContentKey = sharedContentKey,
                             changeValue = changeValue,
                             onDismiss = { expanded = false },
@@ -198,29 +200,16 @@ fun EditorSearchBottomBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CombinedSharedTransitionScope.EditorSearchBar(
-    mappedValuesAsList: List<UiElementColorData>,
+    searchComponent: EditorSearchComponent,
     sharedContentKey: SharedTransitionScope.SharedContentState,
     changeValue: (String, String, Color) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var fullscreen by rememberSaveable { mutableStateOf(false) }
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-    val searchQueryIsEmpty by remember { derivedStateOf { searchQuery.isEmpty() } }
+    val searchQueryIsEmpty by remember { derivedStateOf { searchComponent.queryState.text.isEmpty() } }
 
-    val searchedThings by produceState(emptyList()) {
-        snapshotFlow { searchQuery }
-            .flowOn(Dispatchers.Default)
-            .collect { query ->
-                value = if (query.isBlank())
-                    emptyList()
-                else
-                    mappedValuesAsList.filter {
-                        it.name.contains(query, ignoreCase = true) ||
-                                it.colorToken.contains(query, ignoreCase = true)
-                    }
-            }
-    }
+    val searchResults by searchComponent.searchResults.collectAsStateWithLifecycle()
 
     var gestureOffset by remember { mutableStateOf(Offset.Zero) }
     val coroutineScope = rememberCoroutineScope()
@@ -234,12 +223,17 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+
+        // trigger fullscreen on new inputs
+        snapshotFlow { searchComponent.queryState.text  }
+            .drop(1)
+            .collect { if (it.isNotEmpty()) fullscreen = true }
     }
 
     LaunchedEffect(this.transition.targetState) {
         if (transition.targetState == EnterExitState.Visible) {
             fullscreen = false
-            searchQuery = ""
+            searchComponent.queryState.clearText()
             gestureOffset = Offset.Zero
         }
     }
@@ -247,11 +241,7 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
     SearchBar(
         inputField = {
             SearchBarDefaults.InputField(
-                query = searchQuery,
-                onQueryChange = {
-                    searchQuery = it
-                    fullscreen = true
-                },
+                state = searchComponent.queryState,
                 onSearch = { },
                 expanded = fullscreen,
                 onExpandedChange = { },
@@ -284,7 +274,9 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        IconButton(onClick = { searchQuery = "" }) {
+                        IconButton(
+                            onClick = { searchComponent.queryState.clearText() }
+                        ) {
                             Icon(Icons.Default.Clear, stringResource(R.string.clear_search_action))
                         }
                     }
@@ -369,7 +361,7 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
                         ),
                         verticalArrangement = spacedBy(4.dp)
                     ) {
-                        itemsIndexed(searchedThings) { index, uiElementData ->
+                        itemsIndexed(searchResults) { index, uiElementData ->
                             ElementColorItem(
                                 Modifier
                                     .padding(horizontal = 16.dp)
@@ -378,7 +370,7 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
                                 uiElementData = uiElementData,
                                 index = index,
                                 changeValue = changeValue,
-                                lastIndexInList = mappedValuesAsList.lastIndex
+                                lastIndexInList = searchResults.lastIndex
                             )
                         }
                     }
@@ -386,4 +378,9 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
             }
         }
     )
+}
+
+interface EditorSearchComponent {
+    val queryState: TextFieldState
+    val searchResults: StateFlow<List<UiElementColorData>>
 }

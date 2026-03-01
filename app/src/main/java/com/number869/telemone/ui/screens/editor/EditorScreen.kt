@@ -138,7 +138,7 @@ fun EditorScreen(
             },
             bottomBar = {
                 EditorSearchBottomBar(
-                    mappedValuesAsList = mappedValuesAsList,
+                    searchComponent = vm.searchComponent,
                     changeValue = vm::changeValue,
                     exportCustomTheme = { vm.exportCustomTheme(activityContext) },
                     saveCurrentTheme = vm::saveCurrentTheme,
