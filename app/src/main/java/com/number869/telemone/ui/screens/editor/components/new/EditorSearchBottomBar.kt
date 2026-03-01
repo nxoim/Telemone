@@ -3,6 +3,7 @@ package com.number869.telemone.ui.screens.editor.components.new
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.VectorConverter
@@ -80,7 +81,6 @@ import com.number869.telemone.ui.theme.scaleOutWithFade
 import com.nxoim.blean.ui.composeUiCommons.modifiers.swipeable.SwipeConstraint
 import com.nxoim.blean.ui.composeUiCommons.modifiers.swipeable.swipeable
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -208,14 +208,17 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val searchQueryIsEmpty by remember { derivedStateOf { searchQuery.isEmpty() } }
 
-    val searchedThings by produceState(emptyList<UiElementColorData>()) {
+    val searchedThings by produceState(emptyList()) {
         snapshotFlow { searchQuery }
             .flowOn(Dispatchers.Default)
             .collect { query ->
-                value = mappedValuesAsList.filter {
-                    it.name.contains(query, ignoreCase = true) ||
-                            it.colorToken.contains(query, ignoreCase = true)
-                }
+                value = if (query.isBlank())
+                    emptyList()
+                else
+                    mappedValuesAsList.filter {
+                        it.name.contains(query, ignoreCase = true) ||
+                                it.colorToken.contains(query, ignoreCase = true)
+                    }
             }
     }
 
@@ -230,8 +233,15 @@ private fun CombinedSharedTransitionScope.EditorSearchBar(
     )
 
     LaunchedEffect(Unit) {
-        delay(300)
         focusRequester.requestFocus()
+    }
+
+    LaunchedEffect(this.transition.targetState) {
+        if (transition.targetState == EnterExitState.Visible) {
+            fullscreen = false
+            searchQuery = ""
+            gestureOffset = Offset.Zero
+        }
     }
 
     SearchBar(
