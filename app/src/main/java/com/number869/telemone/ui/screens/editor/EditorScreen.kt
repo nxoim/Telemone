@@ -130,8 +130,6 @@ fun EditorScreen(
             topBar = {
                 EditorTopAppBar(
                     topAppBarState,
-                    exportCustomTheme = { vm.exportCustomTheme(activityContext) },
-                    saveCurrentTheme = vm::saveCurrentTheme,
                     resetCurrentTheme = vm::resetCurrentTheme,
                     loadSavedTheme = vm::loadSavedTheme,
                     editorNavController = editorNavController,
@@ -143,6 +141,8 @@ fun EditorScreen(
                 EditorSearchBottomBar(
                     mappedValuesAsList = mappedValuesAsList,
                     changeValue = vm::changeValue,
+                    exportCustomTheme = { vm.exportCustomTheme(activityContext) },
+                    saveCurrentTheme = vm::saveCurrentTheme,
                 )
             }
         ) { scaffoldPadding ->

@@ -12,9 +12,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.ShortText
-import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -42,8 +40,6 @@ import com.nxoim.decomposite.core.common.navigation.NavController
 @Composable
 fun EditorTopAppBar(
     topAppBarState: TopAppBarScrollBehavior,
-    exportCustomTheme: () -> Unit,
-    saveCurrentTheme: () -> Unit,
     resetCurrentTheme: () -> Unit,
     loadSavedTheme: (ThemeStorageType) -> Unit,
     editorNavController: NavController<EditorDestinations>,
@@ -60,13 +56,11 @@ fun EditorTopAppBar(
                     EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile
                 )
             },
-            exportCustomTheme,
-            saveCurrentTheme,
-            resetCurrentTheme,
-            loadSavedTheme,
-            topAppBarState,
-            editorNavController,
-            rootNavController,
+            resetCurrentTheme = resetCurrentTheme,
+            loadSavedTheme = loadSavedTheme,
+            topAppBarState = topAppBarState,
+            editorNavController = editorNavController,
+            rootNavController = rootNavController,
         )
     }
 }
@@ -75,8 +69,6 @@ fun EditorTopAppBar(
 @Composable
 private fun TheAppBar(
     showClearBeforeLoadDialog: () -> Unit,
-    exportCustomTheme: () -> Unit,
-    saveCurrentTheme: () -> Unit,
     resetCurrentTheme: () -> Unit,
     loadSavedTheme: (ThemeStorageType) -> Unit,
     topAppBarState: TopAppBarScrollBehavior,
@@ -95,12 +87,6 @@ private fun TheAppBar(
         },
         title = { Text(stringResource(R.string.theme_editor)) },
         actions = {
-            IconButton(onClick = { exportCustomTheme() }) {
-                Icon(Icons.Default.Upload, contentDescription = "Export current theme")
-            }
-            IconButton(onClick = { saveCurrentTheme() }) {
-                Icon(Icons.Default.Save, contentDescription = "Save current theme")
-            }
             Box {
                 IconButton(onClick = { showMenu = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "Options")

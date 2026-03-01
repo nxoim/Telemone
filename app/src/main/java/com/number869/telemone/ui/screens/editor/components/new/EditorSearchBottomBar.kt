@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -22,19 +23,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -75,11 +85,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EditorSearchBottomBar(
     mappedValuesAsList: List<UiElementColorData>,
     changeValue: (String, String, Color) -> Unit,
+    exportCustomTheme: () -> Unit,
+    saveCurrentTheme: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollVisualFactor = LocalScrollVisualFactor.current
@@ -99,19 +111,73 @@ fun EditorSearchBottomBar(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
                                 .navigationBarsPadding()
-                                .padding(bottom = 8.dp, end = 16.dp)
-                                .sharedBounds(
-                                    sharedContentKey,
-                                    resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                                )
+                                .padding(bottom = 8.dp)
                         ) {
-                            FloatingActionButton(
-                                onClick = { expanded = true }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = stringResource(R.string.search_title)
-                                )
+                            Column(horizontalAlignment = Alignment.End) {
+                                var menuIsOpen by remember { mutableStateOf(false) }
+
+                                FloatingActionButtonMenu(
+                                    menuIsOpen,
+                                    button = {
+                                        SmallFloatingActionButton(
+                                            onClick = { menuIsOpen = !menuIsOpen },
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        ) {
+                                            AnimatedContent(menuIsOpen) { isOpen ->
+                                                if (isOpen) Icon(
+                                                    Icons.Default.Close,
+                                                    contentDescription = "Save current theme"
+                                                ) else Icon(
+                                                    Icons.Default.Add,
+                                                    contentDescription = "Save current theme"
+                                                )
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .offset(y = 8.dp)
+                                        .padding(end = 4.dp)
+                                ) {
+                                    FloatingActionButtonMenuItem(
+                                        onClick = { exportCustomTheme() },
+                                        icon = {
+                                            Icon(
+                                                Icons.Default.Upload,
+                                                contentDescription = "Export current"
+                                            )
+                                        },
+                                        text = { Text("Export current") }
+                                    )
+
+                                    FloatingActionButtonMenuItem(
+                                        onClick = { saveCurrentTheme() },
+                                        icon = {
+                                            Icon(
+                                                Icons.Default.Save,
+                                                contentDescription = "Save current theme"
+                                            )
+                                        },
+                                        text = {
+                                            Text("Save current theme")
+                                        }
+                                    )
+                                }
+
+                                FloatingActionButton(
+                                    onClick = { expanded = true },
+                                    modifier = Modifier
+                                        .padding(end = 16.dp)
+                                        .sharedBounds(
+                                            sharedContentKey,
+                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                        )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Search,
+                                        contentDescription = stringResource(R.string.search_title)
+                                    )
+                                }
                             }
                         }
                     } else {
