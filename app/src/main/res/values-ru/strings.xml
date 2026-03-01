@@ -3,7 +3,7 @@
     <string name="privacy_policy_text">Политика конфиденциальности.\n\t\t\nМы уважаем вашу конфиденциальность, и Telemone («это приложение») не собирает и не передаёт никакой вашей личной информации при использовании на вашем устройстве.\n\nЧтобы использовать это приложение, вам нужно принять эту политику конфиденциальности, нажав кнопку «Согласен». Если вы не согласны с этой политикой конфиденциальности, вы не должны использовать это приложение и должны удалить его со своего устройства.\n\nВы можете найти этот текст в разделе «О приложении». Он может периодически обновляться, и вам будет предложено принять изменения.</string>
     <string name="tos_text">Условия использования.\n\nЭто приложение и его разработчики не связаны, не одобрены и не спонсируются компанией Telegram FZ LLC или её лицензиарами.\n\nВы несёте ответственность за любые последствия, которые могут возникнуть в результате использования этого приложения. Telemone не несёт ответственности за любые убытки или ущерб, которые вы можете понести при использовании этого приложения.\n\nЭто приложение распространяется по лицензии GNU General Public License версии 3 (GPLv3), что означает, что вы можете бесплатно использовать, изменять и распространять исходный код приложения при соблюдении условий лицензии. GPLv3 — строгая копилефт-лицензия, которая требует, чтобы любые изменённые или производные версии этого приложения распространялись под той же лицензией, а исходный код был доступен любому получателю копии приложения. Вам запрещено распространять изменённые или производные версии этого приложения как закрытое или коммерческое ПО.\n\nВаше использование этого приложения регулируется законами и нормами страны или региона, в котором вы проживаете. Нажимая кнопку «Согласен», вы подтверждаете своё согласие с Условиями использования Telemone и обязуетесь соблюдать все применимые законы и нормы.\n\nВы можете найти этот текст в разделе «О приложении». Он может периодически обновляться, и вам будет предложено принять изменения.</string>
     <string name="clear_current_theme_before_loading_an_external_theme">Очистить текущую тему перед загрузкой внешней темы?</string>
-    <string name="loading_a_theme_will_save_the_current_theme_to_saved_themes">Загрузка темы сохранит текущую тему в «Сохранённых темах».</string>
+    <string name="loading_a_theme_will_save_the_current_theme_to_saved_themes">Загрузка темы создаст снимок текущей темы.</string>
     <string name="clear">Очистить</string>
     <string name="leave_as_is">Оставить как есть</string>
     <string name="cancel">Отмена</string>
@@ -62,7 +62,7 @@
     <string name="some_colors_are_incompatible_and_were_marked_as_such">Некоторые цвета несовместимы и были помечены соответствующим образом.</string>
     <string name="chosen_file_isn_t_a_telegram_not_telegram_x_theme">Выбранный файл не является темой Telegram (не Telegram X).</string>
     <string name="reset_completed">Сброс выполнен.</string>
-    <string name="theme_has_been_saved_successfully">Тема успешно сохранена.</string>
+    <string name="theme_has_been_saved_successfully">Снимок успешно сохранён.</string>
     <string name="default_theme_updated">Стандартная тема обновлена</string>
     <string name="default_theme_has_been_overwritten_successfully">Стандартная %1$s тема успешно перезаписана.</string>
     <string name="theme_has_been_deleted_successfully">Тема успешно удалена.</string>
@@ -72,7 +72,7 @@
     <string name="save_dark_action">Сохранить Тёмную</string>
     <string name="all_colors_label">Все Цвета</string>
     <string name="current_theme_label">Текущая Тема</string>
-    <string name="saved_themes_label">Сохранённые Темы</string>
+    <string name="saved_themes_label">Снимки</string>
     <string name="new_values_label">Новые Значения</string>
     <string name="incompatible_values_label">Несовместимые значения</string>
     <string name="search_is_empty_tap_this_to_close_notice">Поиск пуст. Нажмите, чтобы закрыть</string>
@@ -101,8 +101,8 @@
     <string name="saved_color_values_label">Сохранённые значения цветов</string>
     <string name="current_color_scheme_fallback_to_saved_colors_label">Текущая цветовая схема (фоллбек к сохраненным цветам)</string>
     <string name="current_color_scheme_label">Текущая цветовая схема</string>
-    <string name="export_current_label">Экспортировать текущее</string>
-    <string name="save_current_label">Сохранить текущее</string>
+    <string name="export_current_label">Экспортировать текущую</string>
+    <string name="save_current_label">Снимок текущей</string>
     <string name="welcome_to_telemone_title">Добро пожаловать в Telemone</string>
     <string name="tos_agree_prompt">Чтобы использовать это приложение — примите следующую Политику конфиденциальности и Условия использования.</string>
     <string name="i_agree_label">Согласен</string>
