@@ -278,7 +278,7 @@ private fun SavedThemesSection(
             },
             modifier = Modifier.size(18.dp)
         ) {
-            Icon(Icons.Default.MoreVert, contentDescription = "Saved theme display type")
+            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.choose_display_type_label))
         }
     }
 

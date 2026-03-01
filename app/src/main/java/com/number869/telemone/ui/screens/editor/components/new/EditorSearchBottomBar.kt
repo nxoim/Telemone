@@ -127,10 +127,10 @@ fun EditorSearchBottomBar(
                                             AnimatedContent(menuIsOpen) { isOpen ->
                                                 if (isOpen) Icon(
                                                     Icons.Default.Close,
-                                                    contentDescription = "Save current theme"
+                                                    contentDescription = stringResource(R.string.close_action)
                                                 ) else Icon(
                                                     Icons.Default.Add,
-                                                    contentDescription = "Save current theme"
+                                                    contentDescription = stringResource(R.string.more_label)
                                                 )
                                             }
                                         }
@@ -144,10 +144,10 @@ fun EditorSearchBottomBar(
                                         icon = {
                                             Icon(
                                                 Icons.Default.Upload,
-                                                contentDescription = "Export current"
+                                                contentDescription = stringResource(R.string.export_current_label)
                                             )
                                         },
-                                        text = { Text("Export current") }
+                                        text = { Text(stringResource(R.string.export_current_label)) }
                                     )
 
                                     FloatingActionButtonMenuItem(
@@ -155,11 +155,11 @@ fun EditorSearchBottomBar(
                                         icon = {
                                             Icon(
                                                 Icons.Default.Save,
-                                                contentDescription = "Save current theme"
+                                                contentDescription = stringResource(R.string.save_current_label)
                                             )
                                         },
                                         text = {
-                                            Text("Save current theme")
+                                            Text(stringResource(R.string.save_current_label))
                                         }
                                     )
                                 }

@@ -101,4 +101,17 @@
     <string name="saved_color_values_label">Saved color values</string>
     <string name="current_color_scheme_fallback_to_saved_colors_label">Current color scheme (fallback to saved colors)</string>
     <string name="current_color_scheme_label">Current color scheme</string>
+    <string name="export_current_label">Export current</string>
+    <string name="save_current_label">Save current</string>
+    <string name="welcome_to_telemone_title">Welcome to Telemone</string>
+    <string name="tos_agree_prompt">To use this app - please agree to the following Privacy Policy and Terms of Service.</string>
+    <string name="i_agree_label">I Agree</string>
+    <string name="menu">Menu</string>
+    <string name="close_popup_label">Close popup</string>
+    <string name="delete_label">Delete</string>
+    <string name="select_all_label">Select All</string>
+    <string name="deselect_all_label">Deselect All</string>
+    <string name="back_label">Back</string>
+    <string name="options_label">Options</string>
+    <string name="more_label">More</string>
 </resources>

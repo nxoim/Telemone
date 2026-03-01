@@ -56,7 +56,7 @@ fun MainScreen(
             title = { Text(text = "Telemone") },
             actions = {
                 IconButton(onClick = { showMenu = true }) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = "Menu")
+                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.menu))
                 }
 
                 DropdownMenu(

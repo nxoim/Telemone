@@ -82,14 +82,14 @@ private fun TheAppBar(
         modifier = modifier,
         navigationIcon = {
             IconButton(onClick = { rootNavController.navigateBack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back_label))
             }
         },
         title = { Text(stringResource(R.string.theme_editor)) },
         actions = {
             Box {
                 IconButton(onClick = { showMenu = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Options")
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.options_label))
                 }
 
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {

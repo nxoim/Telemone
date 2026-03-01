@@ -27,10 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.number869.telemone.R
 
 @Composable
 fun PalettePopupAppBar(
@@ -46,11 +48,11 @@ fun PalettePopupAppBar(
 		Box(Modifier.padding(top = 8.dp, start = 8.dp)) {
 			if (isOnHomePage) {
 				IconButton(onClick = hidePopup) {
-					Icon(Icons.Default.Close, contentDescription = "Close popup")
+					Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close_popup_label))
 				}
 			} else {
 				IconButton(onClick = openHome) {
-					Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+					Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back_action))
 				}
 			}
 		}

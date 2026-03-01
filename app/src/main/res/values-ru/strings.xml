@@ -89,7 +89,7 @@
     <string name="special_mentions_label">Особые благодарности</string>
     <string name="telegram_monet">Telegram Monet</string>
     <string name="_480_design">480 Design</string>
-    <string name="solar_icon_set">Solae Icon Set</string>
+    <string name="solar_icon_set">Solar Icon Set</string>
     <string name="full_monet_mention">Всем вовлеченным в проекте %1$s, поскольку именно он подтолкнул меня начать этот проект.</string>
     <string name="full_icon_mention">%1$s за %2$s.</string>
     <string name="legal_label">Правовая информация</string>
@@ -97,8 +97,21 @@
     <string name="view_privacy_policy_view_action">Просмотреть политику конфиденциальности</string>
     <string name="terms_of_service_label">Условия использования</string>
     <string name="view_terms_of_service_view_action">Просмотреть условия использования</string>
-    <string name="choose_display_type_label">Выберите сбособ отображения</string>
+    <string name="choose_display_type_label">Выберите способ отображения</string>
     <string name="saved_color_values_label">Сохранённые значения цветов</string>
     <string name="current_color_scheme_fallback_to_saved_colors_label">Текущая цветовая схема (фоллбек к сохраненным цветам)</string>
     <string name="current_color_scheme_label">Текущая цветовая схема</string>
+    <string name="export_current_label">Экспортировать текущее</string>
+    <string name="save_current_label">Сохранить текущее</string>
+    <string name="welcome_to_telemone_title">Добро пожаловать в Telemone</string>
+    <string name="tos_agree_prompt">Чтобы использовать это приложение — примите следующую Политику конфиденциальности и Условия использования.</string>
+    <string name="i_agree_label">Согласен</string>
+    <string name="menu">Меню</string>
+    <string name="close_popup_label">Закрыть всплывающее окно</string>
+    <string name="delete_label">Удалить</string>
+    <string name="select_all_label">Выбрать всё</string>
+    <string name="deselect_all_label">Снять выделение</string>
+    <string name="back_label">Назад</string>
+    <string name="options_label">Параметры</string>
+    <string name="more_label">Ещё</string>
 </resources>
