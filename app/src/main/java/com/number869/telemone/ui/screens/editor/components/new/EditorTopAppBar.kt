@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShortText
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.DropdownMenu
@@ -40,7 +39,6 @@ import com.nxoim.decomposite.core.common.navigation.NavController
 @Composable
 fun EditorTopAppBar(
     topAppBarState: TopAppBarScrollBehavior,
-    resetCurrentTheme: () -> Unit,
     loadSavedTheme: (ThemeStorageType) -> Unit,
     editorNavController: NavController<EditorDestinations>,
     dialogsNavController: NavController<EditorDestinations.Dialogs>,
@@ -56,7 +54,6 @@ fun EditorTopAppBar(
                     EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile
                 )
             },
-            resetCurrentTheme = resetCurrentTheme,
             loadSavedTheme = loadSavedTheme,
             topAppBarState = topAppBarState,
             editorNavController = editorNavController,
@@ -69,7 +66,6 @@ fun EditorTopAppBar(
 @Composable
 private fun TheAppBar(
     showClearBeforeLoadDialog: () -> Unit,
-    resetCurrentTheme: () -> Unit,
     loadSavedTheme: (ThemeStorageType) -> Unit,
     topAppBarState: TopAppBarScrollBehavior,
     editorNavController: NavController<EditorDestinations>,
@@ -93,16 +89,6 @@ private fun TheAppBar(
                 }
 
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.reset_current_theme)) },
-                        onClick = { resetCurrentTheme() },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = stringResource(R.string.reset_current_theme)
-                            )
-                        }
-                    )
                     DropdownMenuItem(
                         text = { Text(text = stringResource(R.string.load_stock_light_theme)) },
                         onClick = { loadSavedTheme(ThemeStorageType.Stock(isLight = true)) },

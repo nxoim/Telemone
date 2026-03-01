@@ -130,7 +130,6 @@ fun EditorScreen(
             topBar = {
                 EditorTopAppBar(
                     topAppBarState,
-                    resetCurrentTheme = vm::resetCurrentTheme,
                     loadSavedTheme = vm::loadSavedTheme,
                     editorNavController = editorNavController,
                     dialogsNavController = dialogsNavController,

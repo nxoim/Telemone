@@ -98,11 +98,6 @@ class EditorViewModel(
         showToast { getString(R.string.theme_has_been_saved_successfully) }
     }
 
-    fun resetCurrentTheme() {
-        themeManager.resetCurrentTheme()
-        showToast { getString(R.string.reset_completed) }
-    }
-
     fun loadSavedTheme(themeStorageType: ThemeStorageType) = themeManager.loadSavedTheme(
         storedTheme = themeStorageType,
         onSuccess = { storageTypeText, appearanceTypeText ->

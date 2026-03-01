@@ -165,12 +165,6 @@ class ThemeManager(
         }
     }
 
-    fun resetCurrentTheme() = scope.launch(Dispatchers.Default) {
-        _mappedValues.value = defaultCurrentTheme.associateBy { it.name }
-        loadedFromFileTheme.clear()
-        backUpLastSessionPersistently()
-    }
-
     fun overwriteTheme(uuid: String, isLightTheme: Boolean) = scope.launch {
         val targetThemeId = PredefinedTheme.Default(isLightTheme).uuid
         val newDefaultTheme = themeRepository.getThemeByUUID(uuid) ?: error(
