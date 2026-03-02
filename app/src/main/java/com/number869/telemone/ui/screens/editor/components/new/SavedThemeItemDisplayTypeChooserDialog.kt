@@ -1,5 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutExpo
 import androidx.compose.animation.core.EaseOutQuart
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,20 +36,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.number869.telemone.R
-import com.number869.telemone.data.AppSettings
-import com.number869.telemone.shared.ui.SelectionDialog
-import com.number869.telemone.shared.ui.SelectionDialogItem
-import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
-import com.number869.telemone.shared.utils.getColorDisplayType
+import com.number869.telemone.ui.screens.editor.ThemeDisplaySettings
+import com.number869.telemone.ui.shared.SelectionDialog
+import com.number869.telemone.ui.shared.SelectionDialogItem
+import com.number869.telemone.utils.ThemeColorPreviewDisplayType
+import kotlinx.coroutines.launch
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
+fun SavedThemeItemDisplayTypeChooserDialog(
+    savedThemeItemDisplayType: ThemeColorPreviewDisplayType,
+    displayTypeSettings: ThemeDisplaySettings,
+    hideDialog: () -> Unit
+) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp +
             WindowInsets.statusBars.asPaddingValues().calculateTopPadding() +
             WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val savedThemeItemDisplayType = getColorDisplayType()
-
+    val coroutineScope = rememberCoroutineScope()
     var displayTheDialog by remember { mutableStateOf(false) }
 
     val animatedAlpha by animateFloatAsState(
@@ -63,9 +69,7 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
 
     Popup(
         onDismissRequest = { displayTheDialog = false },
-        properties = PopupProperties(
-            focusable = displayTheDialog,
-        )
+        properties = PopupProperties(focusable = displayTheDialog)
     ) {
         Box(Modifier.fillMaxSize()) {
             Box(
@@ -81,22 +85,19 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
 
             Box(
                 Modifier.graphicsLayer {
-                    translationY =
-                        ((screenHeight.toPx() / 2) - (154.dp.toPx() + ((1f - animatedAlpha) * 32.dp.toPx())))
+                    translationY = ((screenHeight.toPx() / 2) - (154.dp.toPx() + ((1f - animatedAlpha) * 32.dp.toPx())))
                 },
                 contentAlignment = Alignment.TopCenter
             ) {
                 AnimatedVisibility(
                     visible = displayTheDialog,
-                    enter = fadeIn(tween(50))
-                            + expandVertically(expandFrom = Alignment.Top),
-                    exit = fadeOut(tween(70, 20, EaseInOutExpo))
-                            + shrinkVertically(shrinkTowards = Alignment.Top),
+                    enter = fadeIn(tween(50)) + expandVertically(expandFrom = Alignment.Top),
+                    exit = fadeOut(tween(70, 20, EaseInOutExpo)) + shrinkVertically(shrinkTowards = Alignment.Top),
                 ) {
                     DisposableEffect(Unit) { onDispose { hideDialog() } }
 
-                    val context = LocalContext.current 
-                    
+                    val context = LocalContext.current
+
                     SelectionDialog(
                         title = stringResource(R.string.choose_display_type_label),
                         contentAlpha = { animatedAlpha }
@@ -104,9 +105,11 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         SelectionDialogItem(
                             text = context.getString(R.string.saved_color_values_label),
                             selectThisItem = {
-                                AppSettings.savedThemeDisplayType.setAsync(
-                                    ThemeColorPreviewDisplayType.SavedColorValues.id
-                                )
+                                coroutineScope.launch {
+                                    displayTypeSettings.setDisplayType(
+                                        ThemeColorPreviewDisplayType.SavedColorValues.id
+                                    )
+                                }
                                 displayTheDialog = false
                             },
                             selected = savedThemeItemDisplayType == ThemeColorPreviewDisplayType.SavedColorValues
@@ -115,30 +118,31 @@ fun SavedThemeItemDisplayTypeChooserDialog(hideDialog: () -> Unit) {
                         SelectionDialogItem(
                             text = context.getString(R.string.current_color_scheme_fallback_to_saved_colors_label),
                             selectThisItem = {
-                                AppSettings.savedThemeDisplayType.setAsync(
-                                    ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback.id
-                                )
+                                coroutineScope.launch {
+                                    displayTypeSettings.setDisplayType(
+                                        ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback.id
+                                    )
+                                }
                                 displayTheDialog = false
                             },
-                            selected = savedThemeItemDisplayType
-                                    == ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
+                            selected = savedThemeItemDisplayType == ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
                         )
 
                         SelectionDialogItem(
                             text = context.getString(R.string.current_color_scheme_label),
                             selectThisItem = {
-                                AppSettings.savedThemeDisplayType.setAsync(
-                                    ThemeColorPreviewDisplayType.CurrentColorScheme.id
-                                )
+                                coroutineScope.launch {
+                                    displayTypeSettings.setDisplayType(
+                                        ThemeColorPreviewDisplayType.CurrentColorScheme.id
+                                    )
+                                }
                                 displayTheDialog = false
                             },
                             selected = savedThemeItemDisplayType == ThemeColorPreviewDisplayType.CurrentColorScheme
                         )
                     }
-
                 }
             }
-
         }
     }
 }

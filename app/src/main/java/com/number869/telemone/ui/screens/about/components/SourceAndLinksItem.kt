@@ -1,7 +1,5 @@
 package com.number869.telemone.ui.screens.about.components
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -24,9 +21,9 @@ const val sourceCodeLink = "https://github.com/nxoim/Telemone"
 const val supportLink = "https://t.me/nxoimCommunity"
 
 @Composable
-fun SourceAndLinksItem() {
-	val context = LocalContext.current
-
+fun SourceAndLinksItem(
+	onLink: (String) -> Unit
+) {
 	AboutCard(label = stringResource(R.string.source_and_links_label)) {
 		Spacer(modifier = Modifier.height(4.dp))
 
@@ -34,9 +31,7 @@ fun SourceAndLinksItem() {
 			modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    val intent =
-                        Intent(Intent.ACTION_VIEW, Uri.parse(sourceCodeLink))
-                    context.startActivity(intent)
+                    onLink(sourceCodeLink)
                 },
 			verticalAlignment = Alignment.CenterVertically
 		) {
@@ -57,8 +52,7 @@ fun SourceAndLinksItem() {
 			modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(supportLink))
-                    context.startActivity(intent)
+                    onLink(supportLink)
                 },
 			verticalAlignment = Alignment.CenterVertically
 		) {

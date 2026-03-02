@@ -17,9 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
 import com.number869.telemone.data.ThemeData
-import com.number869.telemone.shared.utils.ThemeColorPreviewDisplayType
-import com.number869.telemone.shared.utils.colorOf
-import com.number869.telemone.shared.utils.incompatibleUiElementColorData
+import com.number869.telemone.utils.ThemeColorPreviewDisplayType
+import com.number869.telemone.utils.colorOf
+import com.number869.telemone.utils.incompatibleUiElementColorData
 
 @Composable
 fun DeleteThemeDialog(

@@ -36,8 +36,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.number869.telemone.R
-import com.number869.telemone.shared.ui.TextWithFixedSize
-import com.number869.telemone.ui.theme.SolarSet
+import com.number869.telemone.ui.shared.TextWithFixedSize
+import com.number869.telemone.ui.shared.theme.SolarSet
 
 @Composable
 fun DefaultThemesButtons(exportTheme: (light: Boolean) -> Unit) {

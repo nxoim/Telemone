@@ -16,18 +16,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
-import com.number869.telemone.shared.utils.CombinedSharedTransitionScope
-import com.number869.telemone.ui.theme.ToneInfo
+import com.number869.telemone.data.ToneInfo
+import com.number869.telemone.ui.screens.editor.components.new.ChangeThemeValue
+import com.number869.telemone.utils.CombinedSharedTransitionScope
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun CombinedSharedTransitionScope.TonalPalette(
     modifier: Modifier = Modifier,
     tones: List<ToneInfo>,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     touchActionEnabled: Boolean,
     uiElementName: String
 ) {
@@ -76,7 +76,7 @@ fun TonalPaletteItem(
     modifier: Modifier = Modifier,
     toneInfo: ToneInfo,
     uiElementName: String,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     enabled: Boolean
 ) {
     val size = if (!enabled)

@@ -1,4 +1,4 @@
-package com.number869.telemone.shared.utils
+package com.number869.telemone.utils
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform

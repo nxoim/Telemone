@@ -1,4 +1,4 @@
-package com.number869.telemone.shared.ui
+package com.number869.telemone.ui.shared
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
@@ -40,7 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.ui.theme.TelemoneTheme
+import com.number869.telemone.ui.shared.theme.TelemoneTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

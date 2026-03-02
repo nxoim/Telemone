@@ -6,12 +6,10 @@ import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
 import kotlin.reflect.KClass
 
@@ -24,44 +22,13 @@ fun settingsRealm(key: String, encryptionKey: ByteArray? = null) = Realm.open(
 )
 
 class SettingsManager(private val database: Realm) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    fun <T : Any> setAsync(key: String, value: T?, type: KClass<out T>) = scope.launch {
+    suspend fun <T : Any> set(key: String, value: T?, type: KClass<out T>) {
         database.write {
             copyToRealm(asSettingType(key, value, type), UpdatePolicy.ALL)
         }
     }
 
-    suspend fun <T : Any> setBlocking(key: String, value: T?, type: KClass<out T>) {
-        database.writeBlocking {
-            copyToRealm(asSettingType(key, value, type), UpdatePolicy.ALL)
-        }
-    }
-
-    @JvmName("getBlockingNullable")
-    suspend fun <T : Any> get(key: String, defaultValue: T? = null, type: KClass<out T>): T? {
-        val realmSettingContainer = database
-            .query(getSettingType(type),"key = '$key'")
-            .first()
-            .find()
-
-        return realmSettingContainer
-            ?.let { getValueFromSettingContainer(type, it) as T? }
-            ?: defaultValue
-    }
-
-    suspend fun <T : Any> get(key: String, defaultValue: T, type: KClass<out T>): T {
-        val realmSettingContainer = database
-            .query(getSettingType(type),"key = '$key'")
-            .first()
-            .find()
-
-        return realmSettingContainer
-            ?.let { getValueFromSettingContainer(type, it) as T }
-            ?: defaultValue
-    }
-
-    fun <T : Any> getAsFlow(key: String, defaultValue: T, type: KClass<out T>): Flow<T> = database
+    fun <T : Any> get(key: String, defaultValue: T, type: KClass<out T>): Flow<T> = database
         .query(getSettingType(type),"key = '$key'")
         .first()
         .asFlow()
@@ -73,7 +40,7 @@ class SettingsManager(private val database: Realm) {
         }
 
     @JvmName("getAsFlowNullable")
-    fun <T : Any> getAsFlow(key: String, defaultValue: T?, type: KClass<out T>): Flow<T?> = database
+    fun <T : Any> get(key: String, defaultValue: T?, type: KClass<out T>): Flow<T?> = database
         .query(getSettingType(type),"key = '$key'")
         .first()
         .asFlow()
@@ -183,14 +150,10 @@ class Setting<T : Any>(
     val defaultValue: T,
     private val targetSettingsManager: SettingsManager
 ) {
-    fun setAsync(newValue: T) = targetSettingsManager
-        .setAsync(key, newValue, defaultValue::class)
-    suspend fun setBlocking(newValue: T) = targetSettingsManager
-        .setBlocking(key, newValue, defaultValue::class)
-    suspend fun get() = targetSettingsManager
+    suspend fun set(newValue: T) = targetSettingsManager
+        .set(key, newValue, defaultValue::class)
+    fun get() = targetSettingsManager
         .get(key, defaultValue, defaultValue::class)
-    fun getAsFlow() = targetSettingsManager
-        .getAsFlow(key, defaultValue, defaultValue::class)
 }
 
 @Immutable
@@ -200,14 +163,10 @@ class NullableSetting<T : Any>(
     val defaultValue: T? = null,
     private val targetSettingsManager: SettingsManager,
 ) {
-    fun setAsync(newValue: T?) = targetSettingsManager
-        .setAsync(key, newValue, type)
-    suspend fun setBlocking(newValue: T?) = targetSettingsManager
-        .setBlocking(key, newValue, type)
-    suspend fun get() = targetSettingsManager
+    suspend fun set(newValue: T?) = targetSettingsManager
+        .set(key, newValue, type)
+    fun get() = targetSettingsManager
         .get(key, defaultValue, type)
-    fun getAsFlow() = targetSettingsManager
-        .getAsFlow(key, defaultValue, type)
 }
 
 fun settingsManagerInitializer() = SettingsManager(settingsRealm("default"))

@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.shared.utils.ThemeStorageType
+import com.number869.telemone.utils.ThemeStorageType
 
 @Composable
 fun LoadWithOptionsDialog(

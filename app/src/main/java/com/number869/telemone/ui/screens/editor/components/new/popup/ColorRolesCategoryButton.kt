@@ -1,7 +1,6 @@
 package com.number869.telemone.ui.screens.editor.components.new.popup
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,29 +16,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
-import com.number869.telemone.ui.theme.ColorRoles
-import com.number869.telemone.ui.theme.DataAboutColors
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.number869.telemone.data.ColorRoles
+import com.number869.telemone.ui.screens.editor.components.new.ChangeThemeValue
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -48,7 +36,7 @@ fun ColorRolesCategoryButton(
     expand: () -> Unit,
     label: String,
     colorRolesLight: ColorRoles,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     key: String
 ) {
     Row(

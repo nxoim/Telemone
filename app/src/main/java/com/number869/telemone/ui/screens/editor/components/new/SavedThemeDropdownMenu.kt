@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.number869.telemone.R
-import com.number869.telemone.shared.utils.ThemeColorDataType
+import com.number869.telemone.utils.ThemeColorDataType
 
 @Composable
 fun SavedThemeDropdownMenu(

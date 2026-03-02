@@ -32,13 +32,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
-import com.number869.telemone.ui.theme.ColorRoles
-import com.number869.telemone.ui.theme.ColorRolesShared
-import com.number869.telemone.ui.theme.DataAboutColors
-import com.number869.telemone.ui.theme.SolarSet
+import com.number869.telemone.data.ColorRoles
+import com.number869.telemone.data.ColorRolesShared
+import com.number869.telemone.data.DataAboutColors
+import com.number869.telemone.ui.screens.editor.components.new.ChangeThemeValue
+import com.number869.telemone.ui.shared.theme.SolarSet
 
 @Composable
 fun ColorRolesContent(
@@ -46,7 +46,7 @@ fun ColorRolesContent(
     colorRolesLight: ColorRoles,
     colorRolesDark: ColorRoles,
     colorRolesShared: ColorRolesShared,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     uiElementName: String,
 ) {
     val colorRoleItems = remember {
@@ -242,7 +242,7 @@ fun ColorRoleItem(
     modifier: Modifier = Modifier,
     dataAboutColors: DataAboutColors,
     uiElementName: String,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     enabled: Boolean,
 ) {
     val colorToken = dataAboutColors.colorToken
@@ -271,7 +271,7 @@ private fun ItemRow(
     items: List<DataAboutColors>,
     additionalItems: List<DataAboutColors>? = null,
     uiElementName: String,
-    changeValue: (String, String, Color) -> Unit
+    changeValue: ChangeThemeValue
 ) {
     Row(
         modifier = modifier,

@@ -22,7 +22,7 @@ import com.number869.telemone.R
 
 @Composable
 fun TosDialog(
-	onNavigateBackRequest: () -> Unit
+	onDismiss: () -> Unit
 ) {
 	Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		Card(
@@ -41,7 +41,7 @@ fun TosDialog(
 				}
 
 				TextButton(
-					onClick = onNavigateBackRequest,
+					onClick = onDismiss,
 					modifier = Modifier
 						.align(Alignment.End)
 						.padding(top = 20.dp, bottom = 20.dp, end = 24.dp)

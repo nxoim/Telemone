@@ -83,9 +83,12 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.lazycolumnscrollbar)
 
-    implementation(libs.decomposite)
-
     implementation(libs.realm.library.base)
     implementation(libs.evolpagink)
     implementation(libs.localina)
+    implementation(libs.decompose)
+    implementation(libs.decomposeCompose)
+    implementation(libs.fileKit)
+    implementation(libs.kotlinResult)
+    implementation(libs.androidxBrowser)
 }

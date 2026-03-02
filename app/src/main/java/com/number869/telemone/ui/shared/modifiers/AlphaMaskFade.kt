@@ -1,4 +1,4 @@
-package com.number869.telemone.shared.ui.modifiers
+package com.number869.telemone.ui.shared.modifiers
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars

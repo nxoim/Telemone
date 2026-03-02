@@ -19,20 +19,17 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.about.components.DescriptionItem
 import com.number869.telemone.ui.screens.about.components.DevelopersItem
 import com.number869.telemone.ui.screens.about.components.LegalItem
 import com.number869.telemone.ui.screens.about.components.SourceAndLinksItem
 import com.number869.telemone.ui.screens.about.components.SpecialMentionsItem
 import com.number869.telemone.ui.screens.about.components.VersionItem
-import com.nxoim.decomposite.core.common.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
-    rootNavController: NavController<RootDestinations>,
-    dialogsNavController: NavController<AboutDestinations.Dialogs>
+    model: AboutModel
 ) {
     val topAppBarState = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -41,7 +38,7 @@ fun AboutScreen(
             CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(R.string.about_telemone)) },
                 navigationIcon = {
-                    IconButton(onClick = { rootNavController.navigateBack() }) {
+                    IconButton(onClick = model.navigation::navigateBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_action),
@@ -64,11 +61,11 @@ fun AboutScreen(
             item {
                 Column(verticalArrangement = spacedBy(16.dp)) {
                     DescriptionItem()
-                    VersionItem()
-                    DevelopersItem()
-                    SourceAndLinksItem()
-                    SpecialMentionsItem()
-                    LegalItem(dialogsNavController)
+                    VersionItem(version = model.buildInfo.versionString)
+                    DevelopersItem(onLink = model.navigation::openUri)
+                    SourceAndLinksItem(onLink = model.navigation::openUri)
+                    SpecialMentionsItem(onLink = model.navigation::openUri)
+                    LegalItem(model.navigation)
                 }
             }
         }

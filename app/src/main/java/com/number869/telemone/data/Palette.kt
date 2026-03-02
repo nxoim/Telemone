@@ -1,18 +1,13 @@
-package com.number869.telemone.ui.theme
+package com.number869.telemone.data
 
 import android.R
 import android.R.color.system_accent1_500
 import android.content.Context
 import androidx.annotation.FloatRange
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.materialkolor.hct.Hct
@@ -20,6 +15,7 @@ import com.materialkolor.ktx.from
 import com.materialkolor.ktx.harmonize
 import com.materialkolor.ktx.toHct
 import com.materialkolor.palettes.TonalPalette
+import com.number869.telemone.ui.shared.theme.getColorScheme
 
 @Immutable
 data class PaletteState(
@@ -391,7 +387,7 @@ fun getPrimaryTones(context: Context): List<ToneInfo> = getTones(
         80 to R.color.system_accent1_200,
         70 to R.color.system_accent1_300,
         60 to R.color.system_accent1_400,
-        50 to R.color.system_accent1_500,
+        50 to system_accent1_500,
         40 to R.color.system_accent1_600,
         30 to R.color.system_accent1_700,
         20 to R.color.system_accent1_800,

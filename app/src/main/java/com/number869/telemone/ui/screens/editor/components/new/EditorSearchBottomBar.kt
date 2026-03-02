@@ -64,7 +64,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -72,14 +71,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.number869.telemone.App.Companion.paletteState
 import com.number869.telemone.R
+import com.number869.telemone.data.PaletteState
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.shared.ui.LocalScrollVisualFactor
-import com.number869.telemone.shared.utils.CombineSharedTransitionAndAnimatedVisibility
-import com.number869.telemone.shared.utils.CombinedSharedTransitionScope
-import com.number869.telemone.ui.theme.scaleInWithFade
-import com.number869.telemone.ui.theme.scaleOutWithFade
+import com.number869.telemone.ui.shared.LocalScrollVisualFactor
+import com.number869.telemone.ui.shared.theme.scaleInWithFade
+import com.number869.telemone.ui.shared.theme.scaleOutWithFade
+import com.number869.telemone.utils.CombineSharedTransitionAndAnimatedVisibility
+import com.number869.telemone.utils.CombinedSharedTransitionScope
 import com.nxoim.blean.ui.composeUiCommons.modifiers.swipeable.SwipeConstraint
 import com.nxoim.blean.ui.composeUiCommons.modifiers.swipeable.swipeable
 import kotlinx.coroutines.flow.StateFlow
@@ -90,8 +89,9 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EditorSearchBottomBar(
+    paletteState: PaletteState,
     searchComponent: EditorSearchComponent,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     exportCustomTheme: () -> Unit,
     saveCurrentTheme: () -> Unit,
     modifier: Modifier = Modifier,
@@ -184,6 +184,7 @@ fun EditorSearchBottomBar(
                         }
                     } else {
                         EditorSearchBar(
+                            paletteState = paletteState,
                             modifier = Modifier.align(Alignment.Center),
                             searchComponent = searchComponent,
                             sharedContentKey = sharedContentKey,
@@ -200,9 +201,10 @@ fun EditorSearchBottomBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CombinedSharedTransitionScope.EditorSearchBar(
+    paletteState: PaletteState,
     searchComponent: EditorSearchComponent,
     sharedContentKey: SharedTransitionScope.SharedContentState,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

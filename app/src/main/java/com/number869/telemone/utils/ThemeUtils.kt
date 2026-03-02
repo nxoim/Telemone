@@ -1,19 +1,12 @@
-package com.number869.telemone.shared.utils
+package com.number869.telemone.utils
 
 import android.content.Context
-import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import com.number869.telemone.App
-import com.number869.telemone.data.AppSettings
+import com.number869.telemone.common.ThemeFileSource
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.ui.theme.PaletteState
 
 val UiElementColorData.color get() = Color(colorValue)
 fun incompatibleUiElementColorData(ofUiElement: String) = UiElementColorData(
@@ -70,19 +63,14 @@ enum class ThemeColorDataType {
 enum class ThemeColorPreviewDisplayType(val id: Int) {
     SavedColorValues(1),
     CurrentColorSchemeWithFallback(2),
-    CurrentColorScheme(3)
-}
+    CurrentColorScheme(3);
 
-@Composable
-fun getColorDisplayType(): ThemeColorPreviewDisplayType {
-    val colorDisplayType by AppSettings.savedThemeDisplayType.run {
-        getAsFlow().collectAsState(defaultValue)
-    }
-
-    return when (colorDisplayType) {
-        1 -> ThemeColorPreviewDisplayType.SavedColorValues
-        2 -> ThemeColorPreviewDisplayType.CurrentColorSchemeWithFallback
-        else -> ThemeColorPreviewDisplayType.CurrentColorScheme
+    companion object  {
+        fun fromId(id: Int) = when (id) {
+            1 -> SavedColorValues
+            2 -> CurrentColorSchemeWithFallback
+            else -> CurrentColorScheme
+        }
     }
 }
 
@@ -94,7 +82,10 @@ sealed interface ThemeStorageType {
         val withTokens: Boolean,
         val clearCurrentTheme: Boolean
     ) : ThemeStorageType
-    data class ExternalFile(val uri: Uri, val clearCurrentTheme: Boolean) : ThemeStorageType
+    data class ExternalFile(
+        val source: ThemeFileSource,
+        val clearCurrentTheme: Boolean
+    ) : ThemeStorageType
 }
 
 @JvmName("stringify2") // cuz compile issue "declaration clash"
