@@ -3,7 +3,7 @@
     <string name="privacy_policy_text">Privacy Policy.\n\t\t\nWe respect your privacy and Telemone(\"this app\") does not collect or share any of your personal information when you use it on your device.\n\nTo use this app, you need to agree to this privacy policy by clicking the \"I Agree\" button below. If you disagree with this privacy policy, you should not use this app and remove it from your device.\n\nYou can find this text in the \"About\" section of this app. It may change occasionally and you will be notified and asked to accept the changes.</string>
     <string name="tos_text">Terms of Service.\n\nThis app and its developers are not affiliated with, endorsed by, or sponsored by Telegram FZ LLC or its licensors.\n\nYou are responsible for any consequences that may arise from your use of this app. Telemone disclaims any liability for any damages or losses that you may incur as a result of using this app.\n\nThis app is licensed under the GNU General Public License version 3 (GPLv3), which means that you are allowed to use, modify, and distribute the source code of this app free of charge, as long as you comply with the terms of the license. The GPL v3 is a strong copyleft license that requires you to release any modified or derived versions of this app under the same license and to make the source code available to anyone who receives a copy of this app. You are not allowed to distribute modified or derived versions of this app as closed-source or commercial software.\n\nYour use of this app is subject to the laws and regulations of the country or region where you reside. By pressing the \"I Agree\" button you agree with Telemone\'s Terms of Service and you agree to comply with all applicable laws and regulations.\n\nYou can find this text in the \"About\" section of this app. It may change occasionally and you will be notified and asked to accept the changes.</string>
     <string name="clear_current_theme_before_loading_an_external_theme">Clear current theme before loading an external theme?</string>
-    <string name="loading_a_theme_will_save_the_current_theme_to_saved_themes">Loading a theme will save the current theme to \"Saved Themes\".</string>
+    <string name="loading_a_theme_will_save_the_current_theme_to_saved_themes">Loading a theme will snapshot the current theme.</string>
     <string name="clear">Clear</string>
     <string name="leave_as_is">Leave as is</string>
     <string name="cancel">Cancel</string>
@@ -62,7 +62,7 @@
     <string name="some_colors_are_incompatible_and_were_marked_as_such">Some colors are incompatible and were marked as such.</string>
     <string name="chosen_file_isn_t_a_telegram_not_telegram_x_theme">Chosen file isn\'t a Telegram (not Telegram X) theme.</string>
     <string name="reset_completed">Reset completed.</string>
-    <string name="theme_has_been_saved_successfully">Theme has been saved successfully.</string>
+    <string name="theme_has_been_saved_successfully">Snapshot saved successfully.</string>
     <string name="default_theme_updated">Default theme updated</string>
     <string name="default_theme_has_been_overwritten_successfully">Default %1$s theme has been overwritten successfully.</string>
     <string name="theme_has_been_deleted_successfully">Theme has been deleted successfully.</string>
@@ -72,7 +72,7 @@
     <string name="save_dark_action">Save Dark</string>
     <string name="all_colors_label">All Colors</string>
     <string name="current_theme_label">Current Theme</string>
-    <string name="saved_themes_label">Saved Themes</string>
+    <string name="saved_themes_label">Snapshots</string>
     <string name="new_values_label">New Values</string>
     <string name="incompatible_values_label">Incompatible Values</string>
     <string name="search_is_empty_tap_this_to_close_notice">Search is empty. Tap this to close</string>
@@ -101,4 +101,17 @@
     <string name="saved_color_values_label">Saved color values</string>
     <string name="current_color_scheme_fallback_to_saved_colors_label">Current color scheme (fallback to saved colors)</string>
     <string name="current_color_scheme_label">Current color scheme</string>
+    <string name="export_current_label">Export current</string>
+    <string name="save_current_label">Snapshot current</string>
+    <string name="welcome_to_telemone_title">Welcome to Telemone</string>
+    <string name="tos_agree_prompt">To use this app - please agree to the following Privacy Policy and Terms of Service.</string>
+    <string name="i_agree_label">I Agree</string>
+    <string name="menu">Menu</string>
+    <string name="close_popup_label">Close popup</string>
+    <string name="delete_label">Delete</string>
+    <string name="select_all_label">Select All</string>
+    <string name="deselect_all_label">Deselect All</string>
+    <string name="back_label">Back</string>
+    <string name="options_label">Options</string>
+    <string name="more_label">More</string>
 </resources>

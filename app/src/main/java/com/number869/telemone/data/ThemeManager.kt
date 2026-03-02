@@ -165,12 +165,6 @@ class ThemeManager(
         }
     }
 
-    fun resetCurrentTheme() = scope.launch(Dispatchers.Default) {
-        _mappedValues.value = defaultCurrentTheme.associateBy { it.name }
-        loadedFromFileTheme.clear()
-        backUpLastSessionPersistently()
-    }
-
     fun overwriteTheme(uuid: String, isLightTheme: Boolean) = scope.launch {
         val targetThemeId = PredefinedTheme.Default(isLightTheme).uuid
         val newDefaultTheme = themeRepository.getThemeByUUID(uuid) ?: error(
@@ -322,13 +316,13 @@ class ThemeManager(
         backUpLastSessionPersistently()
     }
 
-    fun exportCustomTheme() = scope.launch {
+    fun exportCustomTheme(activityContext: Context) = scope.launch {
         backUpLastSessionPersistently()
 
         val result =
             _mappedValues.value.values.toList().stringify(ThemeColorDataType.ColorValues, palette)
 
-        with(context) {
+        with(activityContext) {
             File(cacheDir, "Telemone Custom.attheme").writeText(result)
 
             val uri = FileProvider.getUriForFile(

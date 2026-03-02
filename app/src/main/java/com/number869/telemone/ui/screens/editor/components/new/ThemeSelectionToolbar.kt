@@ -73,7 +73,7 @@ fun ThemeSelectionToolbar(
 				onClick = { unselectAllThemes() },
 				enabled = !noThemesAreSelected
 			) {
-				Icon(Icons.Outlined.Deselect, contentDescription = "Deselect All Button")
+				Icon(Icons.Outlined.Deselect, contentDescription = stringResource(R.string.deselect_all_label))
 			}
 
 			Spacer(modifier = Modifier.height(8.dp))
@@ -82,7 +82,7 @@ fun ThemeSelectionToolbar(
 				onClick = { selectAllThemes() },
 				enabled = !allThemesAreSelected
 			) {
-				Icon(Icons.Outlined.SelectAll, contentDescription = "Select All Button")
+				Icon(Icons.Outlined.SelectAll, contentDescription = stringResource(R.string.select_all_label))
 			}
 
 			Spacer(modifier = Modifier.width(16.dp))
@@ -95,7 +95,7 @@ fun ThemeSelectionToolbar(
 					contentColor = MaterialTheme.colorScheme.onErrorContainer
 				)
 			) {
-				Icon(Icons.Outlined.DeleteForever, contentDescription = "Delete button")
+				Icon(Icons.Outlined.DeleteForever, contentDescription = stringResource(R.string.delete_label))
 			}
 		}
 	}

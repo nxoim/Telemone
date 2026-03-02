@@ -1,14 +1,7 @@
 package com.number869.telemone.ui.screens.editor.components.new
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,33 +21,19 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.number869.telemone.data.ThemeData
-import com.number869.telemone.shared.utils.ThemeColorDataType
-import com.number869.telemone.shared.utils.ThemeStorageType
-import com.number869.telemone.shared.utils.showToast
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -82,7 +61,7 @@ fun SavedThemeItem(
 						colorOf("actionBarDefaultTitle"),
 						colorOf("actionBarDefaultSubtitle")
 					)
-					Messages(Modifier.weight(1f), colorOf("windowBackgroundWhite"))
+					Messages(Modifier.weight(1f), colorOf("windowBackgroundGray"))
 					ChatBottomAppBar(
 						colorOf("chat_messagePanelBackground"),
 						colorOf("chat_messagePanelIcons"),

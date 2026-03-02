@@ -1,6 +1,7 @@
 package com.number869.telemone.ui.screens.editor
 
 import android.content.Context
+import androidx.collection.LruCache
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +13,8 @@ import com.number869.telemone.shared.utils.ThemeColorDataType
 import com.number869.telemone.shared.utils.ThemeStorageType
 import com.number869.telemone.shared.utils.color
 import com.number869.telemone.shared.utils.showToast
+import com.number869.telemone.ui.screens.editor.components.new.EditorSearchComponent
+import com.number869.telemone.ui.screens.editor.components.new.EditorSearchComponentImpl
 import com.nxoim.decomposite.core.common.viewModel.ViewModel
 import com.nxoim.evolpagink.core.pageable
 import com.nxoim.evolpagink.core.prefetchMinimumItemAmount
@@ -19,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -33,6 +37,7 @@ private const val pageSize = 10
 class EditorViewModel(
     private val themeManager: ThemeManager
 ) : ViewModel() {
+    private val colorFlowCache = LruCache<String, StateFlow<Color>>(maxSize = 100)
     val paletteState get() = themeManager.paletteState
     var loadingMappedValues by mutableStateOf(true)
     var loadingThemes by mutableStateOf(true)
@@ -50,7 +55,7 @@ class EditorViewModel(
         .stateIn(viewModelScope, WhileSubscribed(), 0)
 
     private val mappedValues = themeManager.mappedValues
-    var mappedValuesAsList = mappedValues
+    val mappedValuesAsList = mappedValues
         .map {
             it.values
                 .sortedBy { it.name }
@@ -62,7 +67,7 @@ class EditorViewModel(
             initialValue = mappedValues.value.values.toList()
         )
     private val defaultCurrentTheme = themeManager.defaultCurrentTheme
-    var newUiElements = mappedValues
+    val newUiElements = mappedValues
         .map {
             it.values
                 .asSequence()
@@ -71,7 +76,7 @@ class EditorViewModel(
                 .toList()
         }
 
-    var incompatibleValues = mappedValues
+    val incompatibleValues = mappedValues
         .map {
             it.values
                 .asSequence()
@@ -83,21 +88,18 @@ class EditorViewModel(
     val selectedThemes = mutableStateListOf<String>()
     var themeSelectionToolbarIsVisible by mutableStateOf(false)
 
+    val searchComponent: EditorSearchComponent = EditorSearchComponentImpl(mappedValues, viewModelScope)
+
     override fun onDestroy(removeFromViewModelStore: () -> Unit) {
         loadingMappedValues = true
         loadingThemes = true
     }
 
-    fun exportCustomTheme() = themeManager.exportCustomTheme()
+    fun exportCustomTheme(activityContext: Context) = themeManager.exportCustomTheme(activityContext)
 
     fun saveCurrentTheme() {
         themeManager.saveCurrentTheme()
         showToast { getString(R.string.theme_has_been_saved_successfully) }
-    }
-
-    fun resetCurrentTheme() {
-        themeManager.resetCurrentTheme()
-        showToast { getString(R.string.reset_completed) }
     }
 
     fun loadSavedTheme(themeStorageType: ThemeStorageType) = themeManager.loadSavedTheme(
@@ -129,13 +131,15 @@ class EditorViewModel(
         themeManager.changeValue(uiElementName, colorToken, colorValue)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun colorFromCurrentTheme(uiElementName: String) = mappedValues
-        .mapLatest { it[uiElementName]?.color ?: Color.Red }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = mappedValues.value[uiElementName]?.color ?: Color.Red
-        )
+    fun colorFromCurrentTheme(uiElementName: String) = colorFlowCache.getOrPut(uiElementName) {
+        mappedValues
+            .mapLatest { it[uiElementName]?.color ?: Color.Red }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = mappedValues.value[uiElementName]?.color ?: Color.Red
+            )
+    }
 
     fun selectOrUnselectSavedTheme(uuid: String) = if (selectedThemes.contains(uuid))
         selectedThemes.remove(uuid)
@@ -192,3 +196,6 @@ class EditorViewModel(
         showToast { getString(R.string.default_theme_has_been_overwritten_successfully, themeType) }
     }
 }
+
+private inline fun <K : Any, V : Any> LruCache<K, V>.getOrPut(key: K, block: () -> V): V =
+    get(key) ?: block().also { put(key, it) }

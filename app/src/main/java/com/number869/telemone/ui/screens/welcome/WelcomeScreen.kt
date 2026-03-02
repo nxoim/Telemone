@@ -46,7 +46,7 @@ fun WelcomeScreen(
 				.fillMaxWidth()
 		) {
 			Text(
-				text = "Welcome to Telemone",
+				text = stringResource(R.string.welcome_to_telemone_title),
 				textAlign = TextAlign.Center,
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.headlineLarge),
 				modifier = Modifier
@@ -57,7 +57,7 @@ fun WelcomeScreen(
 			Spacer(modifier = Modifier.height(16.dp))
 
 			Text(
-				text = "To use this app - please agree to the following Privacy Policy and Terms of Service.",
+				text = stringResource(R.string.tos_agree_prompt),
 				textAlign = TextAlign.Center,
 				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.titleMedium),
 				modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -93,7 +93,7 @@ fun WelcomeScreen(
 				AppSettings.agreedToConditions.setAsync(true)
 				navController.replaceAll(RootDestinations.Main)
 			},
-			label = "I Agree",
+			label = stringResource(R.string.i_agree_label),
 			modifier = Modifier.weight(1f, false)
 		)
 	}

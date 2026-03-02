@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">Telemone</string>
-    <string name="privacy_policy_text">Informativa sulla Privacy.\n\t\t\nRispettiamo la tua privacy e Telemone ("questa app") non raccoglie né condivide alcuna tua informazione personale quando la utilizzi sul tuo dispositivo.\n\nPer usare questa app devi accettare questa informativa sulla privacy cliccando sul pulsante "Accetto" qui sotto. Se non sei d’accordo con questa informativa, non dovresti usare questa app e dovresti rimuoverla dal tuo dispositivo.\n\nPuoi trovare questo testo nella sezione "Informazioni" dell’app. Può cambiare occasionalmente e ti verrà richiesto di accettare le modifiche.</string>
-    <string name="tos_text">Termini di Servizio.\n\nQuesta app e i suoi sviluppatori non sono affiliati, autorizzati o sponsorizzati da Telegram FZ LLC o dai suoi licenziatari.\n\nSei responsabile di qualsiasi conseguenza derivante dall’uso di questa app. Telemone declina qualsiasi responsabilità per danni o perdite che potresti subire a seguito dell’uso di questa app.\n\nQuesta app è distribuita sotto la GNU General Public License versione 3 (GPLv3), il che significa che puoi usare, modificare e distribuire gratuitamente il codice sorgente dell’app, purché tu rispetti i termini della licenza. La GPLv3 è una licenza copyleft forte che richiede di rilasciare qualsiasi versione modificata o derivata sotto la stessa licenza e di rendere disponibile il codice sorgente a chiunque riceva una copia dell’app. Non è consentito distribuire versioni modificate o derivate dell’app come software proprietario o commerciale.\n\nL’uso di questa app è soggetto alle leggi e normative del paese o della regione in cui risiedi. Premendo il pulsante "Accetto" accetti i Termini di Servizio di Telemone e ti impegni a rispettare tutte le leggi e normative applicabili.\n\nPuoi trovare questo testo nella sezione "Informazioni" dell’app. Può cambiare occasionalmente e ti verrà richiesto di accettare le modifiche.</string>
+    <string name="privacy_policy_text">Informativa sulla Privacy.\n\t\t\nRispettiamo la tua privacy e Telemone (\"questa app\") non raccoglie né condivide alcuna tua informazione personale quando la utilizzi sul tuo dispositivo.\n\nPer usare questa app devi accettare questa informativa sulla privacy cliccando sul pulsante \"Accetto\" qui sotto. Se non sei d\'accordo con questa informativa, non dovresti usare questa app e dovresti rimuoverla dal tuo dispositivo.\n\nPuoi trovare questo testo nella sezione \"Informazioni\" dell\'app. Può cambiare occasionalmente e ti verrà richiesto di accettare le modifiche.</string>
+    <string name="tos_text">Termini di Servizio.\n\nQuesta app e i suoi sviluppatori non sono affiliati, autorizzati o sponsorizzati da Telegram FZ LLC o dai suoi licenziatari.\n\nSei responsabile di qualsiasi conseguenza derivante dall\'uso di questa app. Telemone declina qualsiasi responsabilità per danni o perdite che potresti subire a seguito dell\'uso di questa app.\n\nQuesta app è distribuita sotto la GNU General Public License versione 3 (GPLv3), il che significa che puoi usare, modificare e distribuire gratuitamente il codice sorgente dell\'app, purché tu rispetti i termini della licenza. La GPLv3 è una licenza copyleft forte che richiede di rilasciare qualsiasi versione modificata o derivata sotto la stessa licenza e di rendere disponibile il codice sorgente a chiunque riceva una copia dell\'app. Non è consentito distribuire versioni modificate o derivate dell\'app come software proprietario o commerciale.\n\nL\'uso di questa app è soggetto alle leggi e normative del paese o della regione in cui risiedi. Premendo il pulsante \"Accetto\" accetti i Termini di Servizio di Telemone e ti impegni a rispettare tutte le leggi e normative applicabili.\n\nPuoi trovare questo testo nella sezione \"Informazioni\" dell\'app. Può cambiare occasionalmente e ti verrà richiesto di accettare le modifiche.</string>
     <string name="clear_current_theme_before_loading_an_external_theme">Cancellare il tema attuale prima di caricarne uno esterno?</string>
-    <string name="loading_a_theme_will_save_the_current_theme_to_saved_themes">Caricare un tema salverà il tema attuale in "Temi Salvati".</string>
+    <string name="loading_a_theme_will_save_the_current_theme_to_saved_themes">Caricare un tema creerà uno snapshot del tema attuale.</string>
     <string name="clear">Cancella</string>
     <string name="leave_as_is">Lascia così</string>
     <string name="cancel">Annulla</string>
     <string name="permanently_delete_these_themes">Eliminare definitivamente questi temi?</string>
-    <string name="these_themes_will_be_unrecoverable_after_deletion">Questi temi non saranno recuperabili dopo l’eliminazione.</string>
+    <string name="these_themes_will_be_unrecoverable_after_deletion">Questi temi non saranno recuperabili dopo l\'eliminazione.</string>
     <string name="delete_icon">Elimina icona</string>
     <string name="delete_this_theme">Eliminare questo tema?</string>
-    <string name="this_theme_will_be_unrecoverable_after_deletion">Questo tema non sarà recuperabile dopo l’eliminazione.</string>
+    <string name="this_theme_will_be_unrecoverable_after_deletion">Questo tema non sarà recuperabile dopo l\'eliminazione.</string>
     <string name="delete">Elimina</string>
     <string name="theme_editor">Editor Temi</string>
     <string name="tap_to_search">Tocca per cercare</string>
@@ -23,7 +23,7 @@
     <string name="dark_adjective">Scuro</string>
     <string name="overwrite">Sovrascrivi</string>
     <string name="overwrite_the">Sovrascrivere %1$s?</string>
-    <string name="default_theme_override_notice">La sovrascrittura salverà solo i token della palette Material You, poiché i loro colori dipendono dalle impostazioni della palette del tuo dispositivo. Questa modifica può essere annullata in qualsiasi momento nell’editor dei temi.</string>
+    <string name="default_theme_override_notice">La sovrascrittura salverà solo i token della palette Material You, poiché i loro colori dipendono dalle impostazioni della palette del tuo dispositivo. Questa modifica può essere annullata in qualsiasi momento nell\'editor dei temi.</string>
     <string name="arrow_pointing_at_the_prompted_new_default_theme">Freccia che indica il nuovo tema predefinito suggerito.</string>
     <string name="load_theme_with_options">Carica tema con opzioni</string>
     <string name="export_this_theme">Esporta questo tema</string>
@@ -35,7 +35,7 @@
     <string name="update_default_dark_theme">Aggiorna il tema scuro predefinito</string>
     <string name="about_title">Informazioni</string>
     <string name="update_default_theme">Aggiornare il tema %1$s predefinito?</string>
-    <string name="stock_theme_update_notice_content">Il tema %1$s stock è stato aggiornato dallo sviluppatore. Applicare l’aggiornamento?\n\nQuesto sostituirà il tuo tema %2$s predefinito e il tuo attuale tema %3$s predefinito verrà salvato come backup prima dell’aggiornamento. Il tema salvato sarà disponibile nell’editor temi per poterlo ripristinare.\n\nSe rifiuti, potrai sempre aggiornare premendo il pulsante del menu (tre punti) in alto e selezionando "Aggiorna tema %4$s predefinito".</string>
+    <string name="stock_theme_update_notice_content">Il tema %1$s stock è stato aggiornato dallo sviluppatore. Applicare l\'aggiornamento?\n\nQuesto sostituirà il tuo tema %2$s predefinito e il tuo attuale tema %3$s predefinito verrà salvato come backup prima dell\'aggiornamento. Il tema salvato sarà disponibile nell\'editor temi per poterlo ripristinare.\n\nSe rifiuti, potrai sempre aggiornare premendo il pulsante del menu (tre punti) in alto e selezionando \"Aggiorna tema %4$s predefinito\".</string>
     <string name="about_telemone">Informazioni su Telemone</string>
     <string name="back_action">Indietro</string>
     <string name="close_action">Chiudi</string>
@@ -62,7 +62,7 @@
     <string name="some_colors_are_incompatible_and_were_marked_as_such">Alcuni colori sono incompatibili e sono stati contrassegnati come tali.</string>
     <string name="chosen_file_isn_t_a_telegram_not_telegram_x_theme">Il file selezionato non è un tema Telegram (non Telegram X).</string>
     <string name="reset_completed">Ripristino completato.</string>
-    <string name="theme_has_been_saved_successfully">Tema salvato correttamente.</string>
+    <string name="theme_has_been_saved_successfully">Snapshot salvato correttamente.</string>
     <string name="default_theme_updated">Tema predefinito aggiornato</string>
     <string name="default_theme_has_been_overwritten_successfully">Il tema %1$s predefinito è stato sovrascritto correttamente.</string>
     <string name="theme_has_been_deleted_successfully">Tema eliminato correttamente.</string>
@@ -72,11 +72,11 @@
     <string name="save_dark_action">Salva Scuro</string>
     <string name="all_colors_label">Tutti i Colori</string>
     <string name="current_theme_label">Tema Attuale</string>
-    <string name="saved_themes_label">Temi Salvati</string>
+    <string name="saved_themes_label">Snapshot</string>
     <string name="new_values_label">Nuovi Valori</string>
     <string name="incompatible_values_label">Valori Incompatibili</string>
     <string name="search_is_empty_tap_this_to_close_notice">La ricerca è vuota. Tocca qui per chiudere</string>
-    <string name="about_app">Telemone è un’app che ti permette di creare temi monet Telegram personalizzati.</string>
+    <string name="about_app">Telemone è un\'app che ti permette di creare temi monet Telegram personalizzati.</string>
     <string name="version_label">Versione</string>
     <string name="cant_get_version_name_for_some_reason">Impossibile ottenere il nome della versione per qualche motivo</string>
     <string name="developers_label">Sviluppatori</string>
@@ -101,4 +101,17 @@
     <string name="saved_color_values_label">Valori di colori salvati</string>
     <string name="current_color_scheme_fallback_to_saved_colors_label">Schema attuale (colori salvati usati per fallback)</string>
     <string name="current_color_scheme_label">Schema attuale</string>
+    <string name="export_current_label">Esporta attuale</string>
+    <string name="save_current_label">Snapshot attuale</string>
+    <string name="welcome_to_telemone_title">Benvenuto in Telemone</string>
+    <string name="tos_agree_prompt">Per usare questa app - accetta la seguente Informativa sulla Privacy e i Termini di Servizio.</string>
+    <string name="i_agree_label">Accetto</string>
+    <string name="menu">Menu</string>
+    <string name="close_popup_label">Chiudi popup</string>
+    <string name="delete_label">Elimina</string>
+    <string name="select_all_label">Seleziona tutto</string>
+    <string name="deselect_all_label">Deseleziona tutto</string>
+    <string name="back_label">Indietro</string>
+    <string name="options_label">Opzioni</string>
+    <string name="more_label">Altro</string>
 </resources>

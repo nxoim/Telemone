@@ -8,7 +8,7 @@ import com.number869.telemone.R
 
 @Composable
 fun DescriptionItem() {
-	AboutCard(label = "About") {
+	AboutCard(label = stringResource(R.string.about_title)) {
 		Text(
 			text = stringResource(R.string.about_app),
 			style = MaterialTheme.typography.bodyLarge

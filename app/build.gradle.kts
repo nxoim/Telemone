@@ -1,15 +1,21 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.realm)
     alias(libs.plugins.composeCompiler)
 }
 
-val version = "1.5.0"
-val versionNumber = 11
+kotlin {
+    compilerOptions {
+        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2
+    }
+}
+
+val version = "1.6.0"
+val versionNumber = 12
 
 android {
+
     namespace = "com.number869.telemone"
     compileSdk = 36
 
@@ -38,9 +44,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_19
         targetCompatibility = JavaVersion.VERSION_19
     }
-    kotlinOptions {
-        jvmTarget = "19"
-    }
+
     buildFeatures {
         compose = true
     }
