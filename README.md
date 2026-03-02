@@ -4,7 +4,7 @@ Telemone is a theme builder made to bring Material You-like dynamic themes to Te
 
 ### Download from [Github Releases](https://github.com/nxoim/Telemone/releases "Github Releases")
 
-![SCREENSHOTS](https://github.com/user-attachments/assets/8fcff8d4-ab9a-4b2d-970c-eea25c80e263)
+<img width="409" height="345.1" alt="Screenshots" src="https://github.com/user-attachments/assets/57bd1880-9156-49d3-9dd9-3568a1b7466d" />
 
 ## Features
 - **Default Themes.**
