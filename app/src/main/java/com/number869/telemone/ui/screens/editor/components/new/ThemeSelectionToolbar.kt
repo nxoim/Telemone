@@ -27,7 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.ui.theme.blendWith
+import com.number869.telemone.data.blendWith
 
 @Composable
 fun ThemeSelectionToolbar(

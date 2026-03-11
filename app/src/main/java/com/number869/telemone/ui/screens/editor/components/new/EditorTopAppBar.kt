@@ -30,19 +30,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.number869.telemone.R
-import com.number869.telemone.shared.utils.ThemeStorageType
-import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.editor.EditorDestinations
-import com.nxoim.decomposite.core.common.navigation.NavController
+import com.number869.telemone.utils.ThemeStorageType
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditorTopAppBar(
     topAppBarState: TopAppBarScrollBehavior,
     loadSavedTheme: (ThemeStorageType) -> Unit,
-    editorNavController: NavController<EditorDestinations>,
-    dialogsNavController: NavController<EditorDestinations.Dialogs>,
-    rootNavController: NavController<RootDestinations>,
+    onNavigateBack: () -> Unit,
+    onNavigateToThemeValues: () -> Unit,
+    onNavigateToDialog: (EditorDestinations.Dialogs) -> Unit
 ) {
     Box(
         Modifier.fillMaxWidth(),
@@ -50,14 +48,14 @@ fun EditorTopAppBar(
     ) {
         TheAppBar(
             showClearBeforeLoadDialog = {
-                dialogsNavController.navigate(
+                onNavigateToDialog(
                     EditorDestinations.Dialogs.ClearThemeBeforeLoadingFromFile
                 )
             },
             loadSavedTheme = loadSavedTheme,
             topAppBarState = topAppBarState,
-            editorNavController = editorNavController,
-            rootNavController = rootNavController,
+            onNavigateBack = onNavigateBack,
+            onNavigateToThemeValues = onNavigateToThemeValues
         )
     }
 }
@@ -66,18 +64,18 @@ fun EditorTopAppBar(
 @Composable
 private fun TheAppBar(
     showClearBeforeLoadDialog: () -> Unit,
-    loadSavedTheme: (ThemeStorageType) -> Unit,
     topAppBarState: TopAppBarScrollBehavior,
-    editorNavController: NavController<EditorDestinations>,
-    rootNavController: NavController<RootDestinations>,
-    modifier: Modifier = Modifier
+    loadSavedTheme: (ThemeStorageType) -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToThemeValues: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
     TopAppBar(
         modifier = modifier,
         navigationIcon = {
-            IconButton(onClick = { rootNavController.navigateBack() }) {
+            IconButton(onClick = onNavigateBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back_label))
             }
         },
@@ -112,7 +110,7 @@ private fun TheAppBar(
                     DropdownMenuItem(
                         text = { Text(text = stringResource(R.string.show_values_action)) },
                         onClick = {
-                            editorNavController.navigate(EditorDestinations.ThemeValues)
+                            onNavigateToThemeValues()
                             showMenu = false
                         },
                         leadingIcon = {

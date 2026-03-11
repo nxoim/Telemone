@@ -11,7 +11,7 @@ kotlin {
     }
 }
 
-val version = "1.6.0"
+val version = "1.6.1"
 val versionNumber = 12
 
 android {
@@ -83,9 +83,12 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.lazycolumnscrollbar)
 
-    implementation(libs.decomposite)
-
     implementation(libs.realm.library.base)
     implementation(libs.evolpagink)
     implementation(libs.localina)
+    implementation(libs.decompose)
+    implementation(libs.decomposeCompose)
+    implementation(libs.fileKit)
+    implementation(libs.kotlinResult)
+    implementation(libs.androidxBrowser)
 }

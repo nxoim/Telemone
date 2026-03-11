@@ -1,10 +1,9 @@
 package com.number869.telemone.data
 
 import android.content.Context
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.number869.telemone.shared.utils.getColorValueFromColorToken
+import com.number869.telemone.utils.getColorValueFromColorToken
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
@@ -49,24 +48,6 @@ class ThemeRepository(
                 }
         }
 
-    fun getAllThemes() = realm.query(ThemeDataRealm::class)
-        .sort("_id", Sort.DESCENDING)
-		.asFlow()
-		.flowOn(Dispatchers.IO)
-		.map { results ->
-			results.list
-				.mapNotNull { theme ->
-					val allowed = when(theme.uuid) {
-						PredefinedTheme.LastSession.uuid,
-						PredefinedTheme.Default(true).uuid,
-						PredefinedTheme.Default(false).uuid -> false
-						else -> true
-					}
-
-					if (allowed) theme.toThemeData() else null
-				}
-	}
-
     fun getThemeCount() = realm.query(ThemeDataRealm::class)
         .asFlow()
         .flowOn(Dispatchers.IO)
@@ -82,14 +63,7 @@ class ThemeRepository(
             }
         }
 
-    fun getThemeByUUID(uuid: String): ThemeData? {
-		return realm.query(ThemeDataRealm::class, "uuid == $0", uuid)
-			.first()
-			.find()
-			?.toThemeData()
-	}
-
-	fun getThemeByUUIDAsFlow(uuid: String) = realm
+	fun getThemeByUUID(uuid: String) = realm
 		.query(ThemeDataRealm::class, "uuid = $0", uuid)
 		.first()
 		.asFlow()
@@ -104,21 +78,8 @@ class ThemeRepository(
 		return@withContext
 	}
 
-	fun saveThemeBlocking(theme: ThemeData) {
-		realm.writeBlocking {
-			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", theme.uuid))
-			this.copyToRealm(theme.toRealmRepresentation(), UpdatePolicy.ERROR)
-		}
-	}
-
 	suspend fun deleteTheme(uuid: String) = withContext(Dispatchers.IO) {
 		realm.write {
-			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", uuid).first())
-		}
-	}
-
-	fun deleteThemeBlocking(uuid: String) {
-		realm.writeBlocking {
 			this.delete(this.query(ThemeDataRealm::class, "uuid == $0", uuid).first())
 		}
 	}

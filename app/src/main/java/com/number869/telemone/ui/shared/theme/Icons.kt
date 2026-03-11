@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.theme
+package com.number869.telemone.ui.shared.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType

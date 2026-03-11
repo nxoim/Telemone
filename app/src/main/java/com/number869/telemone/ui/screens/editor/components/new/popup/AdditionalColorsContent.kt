@@ -8,18 +8,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.ui.theme.AdditionalColors
-import com.number869.telemone.ui.theme.PaletteState
+import com.number869.telemone.data.AdditionalColors
+import com.number869.telemone.ui.screens.editor.components.new.ChangeThemeValue
 
 @Composable
 fun AdditionalColorsContent(
     modifier: Modifier = Modifier,
     additionalColors: AdditionalColors,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     uiElementName: String
 ) {
     Column(modifier, verticalArrangement = Arrangement.Absolute.spacedBy(8.dp)) {

@@ -1,7 +1,5 @@
 package com.number869.telemone.ui.screens.about.components
 
-import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -34,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
 
 @Composable
-fun SpecialMentionsItem() {
-    val context = LocalContext.current
-
+fun SpecialMentionsItem(
+    onLink: (String) -> Unit
+) {
     AboutCard(stringResource(R.string.special_mentions_label)) {
         val tgmonetName = stringResource(R.string.telegram_monet)
         val designName = stringResource(R.string._480_design)
@@ -82,8 +79,7 @@ fun SpecialMentionsItem() {
                 onClick = {
                     tgMonetMention.getStringAnnotations("URL", it, it).firstOrNull()
                         ?.let { annotation ->
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-                            context.startActivity(intent)
+                            onLink(annotation.item)
                         }
                 }
             )
@@ -116,8 +112,7 @@ fun SpecialMentionsItem() {
                 onClick = {
                     fourHundredEightyMention.getStringAnnotations("URL", it, it)
                         .forEach { annotation ->
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-                            context.startActivity(intent)
+                            onLink(annotation.item)
                         }
                 }
             )

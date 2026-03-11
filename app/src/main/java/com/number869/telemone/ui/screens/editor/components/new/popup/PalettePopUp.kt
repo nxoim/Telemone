@@ -43,14 +43,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.number869.telemone.data.PaletteState
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.shared.utils.CombineSharedTransitionAndAnimatedVisibility
-import com.number869.telemone.shared.utils.color
-import com.number869.telemone.ui.theme.PaletteState
+import com.number869.telemone.ui.screens.editor.components.new.ChangeThemeValue
+import com.number869.telemone.utils.CombineSharedTransitionAndAnimatedVisibility
+import com.number869.telemone.utils.color
 
 // TODO more optimisations can be done but its fast enough
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -58,7 +58,7 @@ import com.number869.telemone.ui.theme.PaletteState
 fun PalettePopup(
     paletteState: PaletteState,
     uiElementColorData: UiElementColorData,
-    changeValue: (String, String, Color) -> Unit,
+    changeValue: ChangeThemeValue,
     onDismissRequest: () -> Unit
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }

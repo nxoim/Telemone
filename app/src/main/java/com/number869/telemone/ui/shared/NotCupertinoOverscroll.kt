@@ -1,4 +1,4 @@
-package com.number869.telemone.ui.theme
+package com.number869.telemone.ui.shared
 
 
 /*
@@ -419,7 +419,7 @@ class NotCupertinoOverscrollEffect(
                 animationSpec = animationSpec.run {
                     if (this is SpringSpec<*>)
                     // create a new spec to force the 1 pixel threshold
-                        androidx.compose.animation.core.spring(
+                        spring(
                             dampingRatio = this.dampingRatio,
                             stiffness = this.stiffness,
                             visibilityThreshold = 1f // 1 pixel

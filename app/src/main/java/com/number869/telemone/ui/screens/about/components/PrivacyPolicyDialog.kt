@@ -22,7 +22,7 @@ import com.number869.telemone.R
 
 @Composable
 fun PrivacyPolicyDialog(
-	onNavigateBackRequest: () -> Unit,
+	onDIsmiss: () -> Unit,
 ) {
 	Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		Card(
@@ -41,7 +41,7 @@ fun PrivacyPolicyDialog(
 				}
 
 				TextButton(
-					onClick = onNavigateBackRequest,
+					onClick = onDIsmiss,
 					modifier = Modifier
                         .align(Alignment.End)
                         .padding(top = 20.dp, bottom = 20.dp, end = 24.dp)

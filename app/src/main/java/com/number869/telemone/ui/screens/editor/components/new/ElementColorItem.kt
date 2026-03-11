@@ -28,10 +28,10 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.number869.telemone.data.PaletteState
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.shared.utils.color
 import com.number869.telemone.ui.screens.editor.components.new.popup.PalettePopup
-import com.number869.telemone.ui.theme.PaletteState
+import com.number869.telemone.utils.color
 
 @Composable
 fun ElementColorItem(
@@ -39,7 +39,7 @@ fun ElementColorItem(
 	paletteState: PaletteState,
 	uiElementData: UiElementColorData,
 	index: Int,
-	changeValue: (String, String, Color) -> Unit,
+	changeValue: ChangeThemeValue,
 	lastIndexInList: Int
 ) {
 	val backgroundColor by animateColorAsState(uiElementData.color, label = "")

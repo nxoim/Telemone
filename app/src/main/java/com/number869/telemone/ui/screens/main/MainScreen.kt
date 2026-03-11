@@ -25,23 +25,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.number869.telemone.R
-import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.main.components.DefaultThemesButtons
 import com.number869.telemone.ui.screens.main.components.ThemeUpdateAvailableDialog
-import com.nxoim.decomposite.core.common.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navController: NavController<RootDestinations>,
-    vm: MainViewModel
+    vm: MainModel,
+    onNavigateToAbout: () -> Unit,
+    onNavigateToEditor: () -> Unit
 ) {
-    val context = LocalContext.current
     var userChoseToSeeUpdateLight by remember { mutableStateOf(false) }
     var userChoseToSeeUpdateDark by remember { mutableStateOf(false) }
     val canThemeBeUpdatedLight by vm.canLightBeUpdated.collectAsStateWithLifecycle()
@@ -63,7 +60,7 @@ fun MainScreen(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
-                    if (canThemeBeUpdatedLight) {
+                    if (canThemeBeUpdatedLight == true) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.update_default_light_theme)) },
                             onClick = {
@@ -73,7 +70,7 @@ fun MainScreen(
                         )
                     }
 
-                    if (canThemeBeUpdatedDark) {
+                    if (canThemeBeUpdatedDark == true) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.update_default_dark_theme)) },
                             onClick = {
@@ -86,7 +83,7 @@ fun MainScreen(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.about_title)) },
                         onClick = {
-                            navController.navigate(RootDestinations.About)
+                            onNavigateToAbout()
                             showMenu = false
                         }
                     )
@@ -102,10 +99,9 @@ fun MainScreen(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-            val context = LocalContext.current
-            DefaultThemesButtons(exportTheme = { vm.exportDefaultTheme(it, context) })
+            DefaultThemesButtons(exportTheme = { vm.exportDefaultTheme(it) })
 
-            TextButton(onClick = { navController.navigate(RootDestinations.Editor) }) {
+            TextButton(onClick = { onNavigateToEditor() }) {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(text = stringResource(R.string.theme_editor))
 
@@ -119,28 +115,28 @@ fun MainScreen(
         }
     }
 
-    if (shouldDisplayUpdateDialogLight || userChoseToSeeUpdateLight)
+    if (shouldDisplayUpdateDialogLight == true || userChoseToSeeUpdateLight)
         ThemeUpdateAvailableDialog(
             ofLight = true,
             decline = {
-                vm.declineThemeUpdate(true, context)
+                vm.declineThemeUpdate(true)
                 userChoseToSeeUpdateLight = false
             },
             acceptStockThemeUpdate = {
-                vm.acceptThemeUpdate(true, context)
+                vm.acceptThemeUpdate(true)
                 userChoseToSeeUpdateLight = false
             },
         )
 
-    if (shouldDisplayUpdateDialogDark || userChoseToSeeUpdateDark)
+    if (shouldDisplayUpdateDialogDark == true || userChoseToSeeUpdateDark)
         ThemeUpdateAvailableDialog(
             ofLight = false,
             decline = {
-                vm.declineThemeUpdate(false, context)
+                vm.declineThemeUpdate(false)
                 userChoseToSeeUpdateDark = false
             },
             acceptStockThemeUpdate = {
-                vm.acceptThemeUpdate(false, context)
+                vm.acceptThemeUpdate(false)
                 userChoseToSeeUpdateDark = false
             }
         )

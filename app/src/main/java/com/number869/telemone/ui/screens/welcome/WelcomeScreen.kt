@@ -22,15 +22,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
-import com.number869.telemone.data.AppSettings
-import com.number869.telemone.shared.ui.LargeTonalButton
-import com.number869.telemone.ui.RootDestinations
-import com.nxoim.decomposite.core.common.navigation.NavController
+import com.number869.telemone.ui.shared.LargeTonalButton
 
 @Composable
-fun WelcomeScreen(
-	navController: NavController<RootDestinations>
-) {
+fun WelcomeScreen(onAgree: () -> Unit) {
 	val privacyPolicyText = stringResource(R.string.privacy_policy_text)
 	val tosText = stringResource(R.string.tos_text)
 
@@ -41,14 +36,12 @@ fun WelcomeScreen(
 			.padding(horizontal = 16.dp),
 		verticalArrangement = Arrangement.SpaceBetween
 	) {
-		Column(
-			Modifier
-				.fillMaxWidth()
-		) {
+		Column(Modifier.fillMaxWidth()) {
 			Text(
 				text = stringResource(R.string.welcome_to_telemone_title),
 				textAlign = TextAlign.Center,
-				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.headlineLarge),
+				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+					.plus(MaterialTheme.typography.headlineLarge),
 				modifier = Modifier
 					.align(Alignment.CenterHorizontally)
 					.padding(vertical = 8.dp)
@@ -59,14 +52,17 @@ fun WelcomeScreen(
 			Text(
 				text = stringResource(R.string.tos_agree_prompt),
 				textAlign = TextAlign.Center,
-				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)).plus(MaterialTheme.typography.titleMedium),
-				modifier = Modifier.align(Alignment.CenterHorizontally))
+				style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+					.plus(MaterialTheme.typography.titleMedium),
+				modifier = Modifier.align(Alignment.CenterHorizontally)
+			)
 		}
 
 		Column(
 			Modifier
 				.fillMaxSize()
-				.weight(4f)) {
+				.weight(4f)
+		) {
 			OutlinedCard(
 				Modifier
 					.padding(vertical = 16.dp)
@@ -89,10 +85,7 @@ fun WelcomeScreen(
 		}
 
 		LargeTonalButton(
-			onClick = {
-				AppSettings.agreedToConditions.setAsync(true)
-				navController.replaceAll(RootDestinations.Main)
-			},
+			onClick = onAgree,
 			label = stringResource(R.string.i_agree_label),
 			modifier = Modifier.weight(1f, false)
 		)

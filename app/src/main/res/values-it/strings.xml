@@ -82,7 +82,7 @@
     <string name="developers_label">Sviluppatori</string>
     <string name="github">GitHub</string>
     <string name="source_and_links_label">Sorgente e Link</string>
-    <string name="view_source_code_action">Vedi Codice Sorgente</string>
+    <string name="view_source_code_action">Repositorio e Discussioni</string>
     <string name="telegram">Telegram</string>
     <string name="telegram_channel">Canale Telegram</string>
     <string name="license_gplv3">Licenza: GPLv3</string>

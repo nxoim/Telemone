@@ -23,10 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.number869.telemone.R
+import com.number869.telemone.data.PaletteState
 import com.number869.telemone.data.UiElementColorData
-import com.number869.telemone.shared.utils.ThemeColorDataType
-import com.number869.telemone.shared.utils.stringify
-import com.number869.telemone.ui.theme.PaletteState
+import com.number869.telemone.utils.ThemeColorDataType
+import com.number869.telemone.utils.stringify
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable

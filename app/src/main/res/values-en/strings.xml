@@ -82,7 +82,7 @@
     <string name="developers_label">Developers</string>
     <string name="github">GitHub</string>
     <string name="source_and_links_label">Source and Links</string>
-    <string name="view_source_code_action">View Source Code</string>
+    <string name="view_source_code_action">Repository and Discussions</string>
     <string name="telegram">Telegram</string>
     <string name="telegram_channel">Telegram Channel</string>
     <string name="license_gplv3">License: GPLv3</string>

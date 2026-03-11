@@ -1,4 +1,4 @@
-package com.number869.telemone.shared.ui
+package com.number869.telemone.ui.shared
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animate
