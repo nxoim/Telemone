@@ -82,7 +82,7 @@
     <string name="developers_label">Разработчики</string>
     <string name="github">GitHub</string>
     <string name="source_and_links_label">Исходный код и ссылки</string>
-    <string name="view_source_code_action">Посмотреть исходный код</string>
+    <string name="view_source_code_action">Репозиторий и обсуждения</string>
     <string name="telegram">Telegram</string>
     <string name="telegram_channel">Telegram-канал</string>
     <string name="license_gplv3">Лицензия: GPLv3</string>

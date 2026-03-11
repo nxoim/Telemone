@@ -12,7 +12,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.router.stack.ChildStack
-import com.number869.telemone.data.ThemeData
 import com.number869.telemone.ui.screens.editor.components.new.ClearBeforeLoadDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteSelectedThemesDialog
 import com.number869.telemone.ui.screens.editor.components.new.DeleteThemeDialog
@@ -23,7 +22,6 @@ import com.number869.telemone.ui.screens.editor.components.new.SavedThemeItemDis
 import com.number869.telemone.ui.screens.themeValues.ThemeValuesScreen
 import com.number869.telemone.ui.shared.theme.cleanSlideAndFadeAnimator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -179,44 +177,5 @@ private fun DialogsHost(
         }
 
         else -> {}
-    }
-}
-
-@Serializable
-sealed interface EditorDestinations {
-    @Serializable
-    data object Editor : EditorDestinations
-
-    @Serializable
-    data object ThemeValues : EditorDestinations
-
-    @Serializable
-    sealed interface Dialogs {
-        @Serializable
-        data object Empty : Dialogs
-
-        @Serializable
-        data object SavedThemeTypeSelection : Dialogs
-
-        @Serializable
-        data class LoadThemeWithOptions(val uuid: String) : Dialogs
-
-        @Serializable
-        data class OverwriteDefaultThemeChoice(val withTheme: ThemeData) : Dialogs
-
-        @Serializable
-        data class OverwriteDefaultThemeConfirmation(
-            val overwriteDark: Boolean,
-            val withTheme: ThemeData
-        ) : Dialogs
-
-        @Serializable
-        data class DeleteOneTheme(val theme: ThemeData) : Dialogs
-
-        @Serializable
-        data class DeleteSelectedThemes(val selectedThemeCount: Int) : Dialogs
-
-        @Serializable
-        data object ClearThemeBeforeLoadingFromFile : Dialogs
     }
 }

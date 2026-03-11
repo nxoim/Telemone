@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.number869.telemone.R
 
 const val sourceCodeLink = "https://github.com/nxoim/Telemone"
-const val supportLink = "https://t.me/nxoimCommunity"
 
 @Composable
 fun SourceAndLinksItem(
@@ -46,26 +45,6 @@ fun SourceAndLinksItem(
 			)
 		}
 
-		Spacer(modifier = Modifier.height(8.dp))
-
-		Row(
-			modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    onLink(supportLink)
-                },
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			Icon(
-				painter = painterResource(R.drawable.telegram_app_white),
-				contentDescription = stringResource(R.string.telegram),
-				modifier = Modifier.size(32.dp)
-			)
-			Spacer(modifier = Modifier.width(8.dp))
-			Text(
-				text = stringResource(R.string.telegram_channel),
-			)
-		}
 
 		Spacer(modifier = Modifier.height(8.dp))
 

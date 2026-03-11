@@ -5,14 +5,17 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushToFront
+import com.number869.telemone.data.ThemeData
 import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.ui.screens.common.ThemeExporter
 import com.number869.telemone.ui.screens.common.ThemeFilePicker
 import com.number869.telemone.utils.lifecycledCoroutineScope
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class EditorComponent(
     context: ComponentContext,
+    private val navigateToParent: () -> Unit,
     private val themeManager: ThemeManager,
     private val themeExporter: ThemeExporter,
     private val themePicker: ThemeFilePicker,
@@ -20,7 +23,10 @@ class EditorComponent(
 ) {
     val backHandler = context.backHandler
     private val dialogsNavigation = EditorDialogsNavigationImpl()
-    private val editorNavigation = EditorNavigationImpl(dialogsNavigation)
+    private val editorNavigation = EditorNavigationImpl(
+        dialogsNavigation,
+        navigateToParent
+    )
 
     val model = EditorModel(
         themeManager,
@@ -59,8 +65,11 @@ private class EditorDialogsNavigationImpl()
 
 private class EditorNavigationImpl(
     private val dialogsNavigator: StackNavigation<EditorDestinations.Dialogs>,
+    private val navigateToParent: () -> Unit
 ) : EditorNavigation, StackNavigation<EditorDestinations> by StackNavigation() {
-    override fun navigateBack() = pop()
+    override fun navigateBack() = pop() { popped ->
+        if (!popped) navigateToParent()
+    }
     override fun navigateToThemeValues() =
         pushToFront(EditorDestinations.ThemeValues)
 
@@ -73,4 +82,44 @@ private class EditorNavigationImpl(
 sealed interface EditorDestinationsInstance {
     data object Editor : EditorDestinationsInstance
     data object ThemeValues : EditorDestinationsInstance
+}
+
+
+@Serializable
+sealed interface EditorDestinations {
+    @Serializable
+    data object Editor : EditorDestinations
+
+    @Serializable
+    data object ThemeValues : EditorDestinations
+
+    @Serializable
+    sealed interface Dialogs {
+        @Serializable
+        data object Empty : Dialogs
+
+        @Serializable
+        data object SavedThemeTypeSelection : Dialogs
+
+        @Serializable
+        data class LoadThemeWithOptions(val uuid: String) : Dialogs
+
+        @Serializable
+        data class OverwriteDefaultThemeChoice(val withTheme: ThemeData) : Dialogs
+
+        @Serializable
+        data class OverwriteDefaultThemeConfirmation(
+            val overwriteDark: Boolean,
+            val withTheme: ThemeData
+        ) : Dialogs
+
+        @Serializable
+        data class DeleteOneTheme(val theme: ThemeData) : Dialogs
+
+        @Serializable
+        data class DeleteSelectedThemes(val selectedThemeCount: Int) : Dialogs
+
+        @Serializable
+        data object ClearThemeBeforeLoadingFromFile : Dialogs
+    }
 }

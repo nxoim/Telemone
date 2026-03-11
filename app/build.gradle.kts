@@ -11,7 +11,7 @@ kotlin {
     }
 }
 
-val version = "1.6.0"
+val version = "1.6.1"
 val versionNumber = 12
 
 android {

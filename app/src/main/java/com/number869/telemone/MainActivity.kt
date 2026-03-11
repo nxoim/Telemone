@@ -19,7 +19,6 @@ import com.number869.telemone.data.ThemeManager
 import com.number869.telemone.data.createPaletteState
 import com.number869.telemone.data.settingsManagerInitializer
 import com.number869.telemone.data.themeRepositoryInitializer
-import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.shared.BackGestureProviderContainer
 import com.number869.telemone.ui.shared.theme.TelemoneTheme
 import io.github.sudarshanmhasrup.localina.api.LocalinaApp

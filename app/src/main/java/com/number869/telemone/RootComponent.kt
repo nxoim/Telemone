@@ -1,5 +1,6 @@
 package com.number869.telemone
 
+import androidx.compose.runtime.Immutable
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -9,7 +10,6 @@ import com.arkivanov.decompose.router.stack.pushToFront
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.number869.telemone.data.StockThemeUpdateManager
 import com.number869.telemone.data.ThemeManager
-import com.number869.telemone.ui.RootDestinations
 import com.number869.telemone.ui.screens.about.AboutComponent
 import com.number869.telemone.ui.screens.about.BuildInfo
 import com.number869.telemone.ui.screens.common.LinkHandler
@@ -21,6 +21,7 @@ import com.number869.telemone.ui.screens.main.MainNavigation
 import com.number869.telemone.utils.lifecycledCoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class RootComponent(
@@ -65,6 +66,7 @@ class RootComponent(
                 RootDestinations.Editor -> RootDestinationsInstance.Editor(
                     EditorComponent(
                         componentContext,
+                        navigateToParent = navigation::navigateBack,
                         themeManager,
                         themeExporter,
                         themePicker,
@@ -75,6 +77,7 @@ class RootComponent(
                 RootDestinations.About -> RootDestinationsInstance.About(
                     AboutComponent(
                         componentContext,
+                        navigateToParent = navigation::navigateBack,
                         linkHandler,
                         buildInfo
                     )
@@ -104,4 +107,20 @@ sealed interface RootDestinationsInstance {
 interface OnboardingSettings {
     fun hasAgreedToConditions(): Flow<Boolean>
     suspend fun setAgreedToConditions(agreed: Boolean)
+}
+
+@Immutable
+@Serializable
+sealed interface RootDestinations {
+    @Serializable
+    data object Welcome : RootDestinations
+
+    @Serializable
+    data object Main : RootDestinations
+
+    @Serializable
+    data object Editor : RootDestinations
+
+    @Serializable
+    data object About : RootDestinations
 }
